@@ -35,7 +35,6 @@ const navItems = [
   { href: "/dashboard/settings",      label: "Configuración",   icon: Settings },
 ];
 
-
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -50,26 +49,30 @@ export function Sidebar() {
 
   return (
     <aside
-      className="flex flex-col w-[272px] shrink-0 min-h-screen overflow-y-auto"
+      className="flex flex-col w-[260px] shrink-0 min-h-screen overflow-y-auto"
       style={{
-        background: "linear-gradient(180deg, #fffcfc 0%, #f8fafc 68%, #f5f7fb 100%)",
-        borderRight: "1px solid rgba(203,213,225,0.7)",
+        background: "#111827",
+        borderRight: "1px solid rgba(255,255,255,0.06)",
       }}
     >
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
-        <Logo size="sm" />
+        <Logo size="sm" className="text-white" />
       </div>
 
-      {/* Ava info card */}
-      <div className="mx-3 mb-4 rounded-[20px] border border-rose-100 p-4"
-        style={{ background: "linear-gradient(135deg, #fff1f2 0%, #ffffff 50%, #fffbeb 100%)" }}>
-        <div className="flex items-center gap-2 text-sm font-medium text-slate-800">
-          <Sparkles className="h-4 w-4 text-rose-500" />
-          Ava IA activa
+      {/* Ava status pill */}
+      <div className="mx-3 mb-4 rounded-2xl px-4 py-3"
+        style={{ background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)" }}>
+        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#fda4af" }}>
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+          </span>
+          <Sparkles className="h-3.5 w-3.5" />
+          Ava activa
         </div>
-        <p className="mt-1.5 text-xs leading-5 text-slate-500">
-          Atendiendo leads de WhatsApp y sincronizando al CRM en tiempo real.
+        <p className="mt-1 text-xs leading-4" style={{ color: "rgba(255,255,255,0.3)" }}>
+          Atendiendo WhatsApp en tiempo real
         </p>
       </div>
 
@@ -86,25 +89,24 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 px-3 py-3 text-sm font-medium transition-all duration-150",
-                active ? "nav-item-active" : "sidebar-nav-hover text-slate-600 hover:text-slate-900"
+                "flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150",
+                active
+                  ? "bg-rose-600 text-white shadow-[0_4px_12px_rgba(225,29,72,0.35)]"
+                  : "text-gray-400 hover:text-white hover:bg-white/5"
               )}
             >
-              <Icon
-                className={cn("h-4 w-4 shrink-0 nav-icon", !active && "text-slate-400")}
-              />
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-white" : "text-gray-500")} />
               <span>{label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Quick actions — dark block */}
-      <div className="mx-3 mb-4 mt-6 rounded-[24px] bg-slate-950 p-4 shadow-[0_16px_40px_rgba(15,23,42,0.22)]">
-        <div
-          className="text-xs font-semibold uppercase tracking-[0.25em] mb-3"
-          style={{ color: "rgba(255,255,255,0.4)" }}
-        >
+      {/* Quick actions */}
+      <div className="mx-3 mb-4 mt-6 rounded-[20px] p-4"
+        style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}>
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] mb-3"
+          style={{ color: "rgba(255,255,255,0.3)", fontFamily: "var(--font-manrope)" }}>
           Acciones rápidas
         </div>
         <QuickActionSheets />
@@ -114,7 +116,8 @@ export function Sidebar() {
       <div className="px-3 pb-5 pt-1">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium text-slate-400 transition-all sidebar-nav-hover hover:text-slate-700"
+          className="flex w-full items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all hover:bg-white/5"
+          style={{ color: "rgba(255,255,255,0.3)" }}
         >
           <LogOut className="h-4 w-4" />
           Cerrar sesión

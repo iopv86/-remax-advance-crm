@@ -59,12 +59,12 @@
 ═══════════════════════════════════════ */
 :root {
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
-  --font-display: var(--font-playfair);
+  --font-serif: var(--font-manrope);
+  --font-display: var(--font-manrope);
   --font-mono: var(--font-mono);
 
-  /* Page bg — light blue-gray */
-  --background: #f3f7fb;
+  /* Page bg — warm white (Attio Broker) */
+  --background: #FAFAF9;
   --foreground: #0f172a;
 
   /* Cards — pure white */
@@ -89,14 +89,14 @@
   --ring: rgba(225, 29, 72, 0.25);
   --radius: 1rem;
 
-  /* Sidebar — warm white */
-  --sidebar: #fffcfc;
-  --sidebar-foreground: #0f172a;
+  /* Sidebar — dark #111827 (Attio Broker) */
+  --sidebar: #111827;
+  --sidebar-foreground: #f9fafb;
   --sidebar-primary: #e11d48;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #fff1f2;
-  --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: rgba(203, 213, 225, 0.7);
+  --sidebar-accent: rgba(225, 29, 72, 0.1);
+  --sidebar-accent-foreground: #f9fafb;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: #e11d48;
 
   /* Brand accent — Rose/Red (CTAs, primary actions) */
@@ -122,45 +122,53 @@
 }
 
 /* ═══════════════════════════════════════
-   DARK MODE — Premium slate-950 palette
+   DARK MODE — Obsidian palette
+   #0D0D0D bg + gold #C9A84C accent
 ═══════════════════════════════════════ */
 .dark {
-  /* Page bg — deep slate */
-  --background: #020617;
-  --foreground: #e2e8f0;
+  /* Page bg — Obsidian black */
+  --background: #0D0D0D;
+  --foreground: #e8e3dc;
 
-  /* Cards — slate-900 with subtle border */
-  --card: #0f172a;
-  --card-foreground: #e2e8f0;
-  --popover: #0f172a;
-  --popover-foreground: #e2e8f0;
+  /* Cards — very dark with subtle warmth */
+  --card: #161614;
+  --card-foreground: #e8e3dc;
+  --popover: #161614;
+  --popover-foreground: #e8e3dc;
 
-  /* Primary stays rose-red */
+  /* Primary — rose-red stays */
   --primary: #f43f5e;
   --primary-foreground: #ffffff;
 
-  --secondary: #1e293b;
-  --secondary-foreground: #cbd5e1;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #e2e8f0;
+  --secondary: #1c1c1a;
+  --secondary-foreground: #c5bfb5;
+  --muted: #1c1c1a;
+  --muted-foreground: #7a7368;
+  --accent: #1c1c1a;
+  --accent-foreground: #e8e3dc;
   --destructive: #f43f5e;
-  --border: rgba(51, 65, 85, 0.8);
-  --input: #1e293b;
-  --ring: rgba(244, 63, 94, 0.3);
+  --border: rgba(255, 255, 255, 0.07);
+  --input: #1c1c1a;
+  --ring: rgba(201, 168, 76, 0.3);
 
-  /* Sidebar — slate-950 */
-  --sidebar: #0a0f1e;
-  --sidebar-foreground: #e2e8f0;
-  --sidebar-primary: #f43f5e;
+  /* Sidebar — same dark as light mode (unified sidebar) */
+  --sidebar: #111827;
+  --sidebar-foreground: #f9fafb;
+  --sidebar-primary: #e11d48;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(244, 63, 94, 0.08);
-  --sidebar-accent-foreground: #e2e8f0;
-  --sidebar-border: rgba(51, 65, 85, 0.6);
-  --sidebar-ring: #f43f5e;
+  --sidebar-accent: rgba(225, 29, 72, 0.1);
+  --sidebar-accent-foreground: #f9fafb;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #e11d48;
 
-  /* Brand accents — slightly brighter for dark */
+  /* Gold accent for dark mode (Obsidian theme) */
+  --amber: #C9A84C;
+  --amber-muted: rgba(201, 168, 76, 0.1);
+  --gold: #C9A84C;
+  --gold-light: #E0C070;
+  --gold-muted: rgba(201, 168, 76, 0.1);
+
+  /* Brand accents */
   --red: #f43f5e;
   --red-muted: rgba(244, 63, 94, 0.1);
   --blue: #3b82f6;
@@ -169,14 +177,8 @@
   --emerald-muted: rgba(16, 185, 129, 0.1);
   --violet: #8b5cf6;
   --violet-muted: rgba(139, 92, 246, 0.1);
-  --amber: #f59e0b;
-  --amber-muted: rgba(245, 158, 11, 0.1);
   --teal: #14b8a6;
   --teal-muted: rgba(20, 184, 166, 0.1);
-
-  --gold: var(--amber);
-  --gold-light: #fbbf24;
-  --gold-muted: var(--amber-muted);
 }
 
 /* Dark mode component overrides */
@@ -203,8 +205,8 @@
 }
 
 .dark .page-bg {
-  background: radial-gradient(circle at top left, rgba(30, 41, 59, 0.5), transparent 28%),
-    linear-gradient(180deg, #020617 0%, #0a0f1e 45%, #020617 100%);
+  background: radial-gradient(circle at top left, rgba(201, 168, 76, 0.06), transparent 28%),
+    linear-gradient(180deg, #0D0D0D 0%, #111110 45%, #0D0D0D 100%);
 }
 
 .dark .nav-item-active {
@@ -226,8 +228,8 @@
 ═══════════════════════════════════════ */
 .page-bg {
   background:
-    radial-gradient(circle at top left, rgba(219, 234, 254, 0.9), transparent 28%),
-    linear-gradient(180deg, #f8fbff 0%, #f3f7fb 45%, #eef3f9 100%);
+    radial-gradient(circle at top left, rgba(255, 241, 242, 0.5), transparent 28%),
+    linear-gradient(180deg, #FAFAF9 0%, #F5F5F3 45%, #EFEFED 100%);
 }
 
 .bg-grid {
@@ -321,7 +323,7 @@
    KPI STAT
 ═══════════════════════════════════════ */
 .stat-number {
-  font-family: var(--font-serif), Georgia, serif;
+  font-family: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
   font-weight: 600;
   color: var(--foreground);
   letter-spacing: -0.03em;
