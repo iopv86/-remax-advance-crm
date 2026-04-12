@@ -1,3 +1,12 @@
 {
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "functions": {
+    "app/api/pdf/route.ts": {
+      "memory": 1024,
+      "maxDuration": 30
+    },
+    "app/api/ava/route.ts": {
+      "maxDuration": 30
+    }
+  }
 }

@@ -86,7 +86,7 @@ export function ContactsSearch() {
           variant="ghost"
           size="sm"
           onClick={() => router.push(pathname)}
-          className="text-gray-500"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="w-4 h-4 mr-1" /> Limpiar
         </Button>

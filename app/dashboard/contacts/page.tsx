@@ -1,39 +1,9 @@
 import { createClient } from "@/lib/supabase/server";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { CLASSIFICATION_COLORS, CLASSIFICATION_LABELS } from "@/lib/types";
 import type { Contact } from "@/lib/types";
-import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
 import { ContactsSearch } from "./contacts-search";
-
-const STATUS_LABELS: Record<string, string> = {
-  new: "Nuevo",
-  contacted: "Contactado",
-  qualified: "Calificado",
-  unqualified: "No calificado",
-  nurturing: "Nutriendo",
-  archived: "Archivado",
-};
-
-const SOURCE_LABELS: Record<string, string> = {
-  ctwa_ad: "CTWA Ad",
-  lead_form: "Formulario",
-  referral: "Referido",
-  walk_in: "Walk-in",
-  website: "Web",
-  social_media: "Redes",
-  other: "Otro",
-};
+import { ContactsTable } from "./contacts-table";
+import { Users } from "lucide-react";
+import { NewContactButton } from "@/components/quick-action-sheets";
 
 export default async function ContactsPage({
   searchParams,
@@ -45,7 +15,7 @@ export default async function ContactsPage({
 
   let query = supabase
     .from("contacts")
-    .select("id, first_name, last_name, phone, email, lead_classification, lead_status, source, lead_score, created_at, agent:agents(full_name)")
+    .select("id, first_name, last_name, phone, email, lead_classification, lead_status, source, lead_score, budget_min, budget_max, budget_currency, created_at, agent:agents(full_name)")
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -64,94 +34,41 @@ export default async function ContactsPage({
   const { data: contacts } = await query;
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Contactos</h1>
-          <p className="text-sm text-gray-500 mt-1">{contacts?.length ?? 0} contactos</p>
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* Page header */}
+      <div className="page-header animate-fade-up">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-1">
+              Base de datos
+            </p>
+            <h1
+              style={{
+                fontFamily: "var(--font-playfair),Georgia,serif",
+                fontWeight: 700,
+                fontSize: 30,
+                letterSpacing: "-0.02em",
+                color: "var(--foreground)",
+                lineHeight: 1.1,
+              }}
+            >
+              Contactos
+            </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            <NewContactButton />
+            <div className="flex items-center gap-2 rounded-full border border-rose-100 bg-white/80 px-3 py-1.5 text-xs font-medium text-rose-700 shadow-sm backdrop-blur">
+              <Users className="h-3.5 w-3.5" />
+              {contacts?.length ?? 0} contactos
+            </div>
+          </div>
         </div>
       </div>
 
-      <ContactsSearch />
-
-      <Card className="overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Teléfono / Email</TableHead>
-              <TableHead>Clasificación</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Fuente</TableHead>
-              <TableHead>Score</TableHead>
-              <TableHead>Creado</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {((contacts as unknown as Contact[]) ?? []).length === 0 && (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center text-gray-400 py-8">
-                  No se encontraron contactos.
-                </TableCell>
-              </TableRow>
-            )}
-            {((contacts as unknown as Contact[]) ?? []).map((c) => (
-              <TableRow key={c.id} className="hover:bg-gray-50">
-                <TableCell className="font-medium">
-                  {c.first_name} {c.last_name}
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    {c.phone && <p>{c.phone}</p>}
-                    {c.email && <p className="text-gray-400">{c.email}</p>}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {c.lead_classification ? (
-                    <Badge variant="outline" className={`text-xs ${CLASSIFICATION_COLORS[c.lead_classification]}`}>
-                      {CLASSIFICATION_LABELS[c.lead_classification]}
-                    </Badge>
-                  ) : (
-                    <span className="text-gray-400 text-xs">—</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm text-gray-600">
-                    {c.lead_status ? STATUS_LABELS[c.lead_status] ?? c.lead_status : "—"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <span className="text-xs text-gray-500">
-                    {c.source ? SOURCE_LABELS[c.source] ?? c.source : "—"}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {c.lead_score != null ? (
-                    <span
-                      className={`text-sm font-semibold ${
-                        c.lead_score >= 8
-                          ? "text-red-600"
-                          : c.lead_score >= 5
-                          ? "text-orange-500"
-                          : c.lead_score >= 2
-                          ? "text-blue-500"
-                          : "text-gray-400"
-                      }`}
-                    >
-                      {c.lead_score}/10
-                    </span>
-                  ) : (
-                    <span className="text-gray-400 text-xs">—</span>
-                  )}
-                </TableCell>
-                <TableCell className="text-xs text-gray-400">
-                  {formatDistanceToNow(new Date(c.created_at), { addSuffix: true, locale: es })}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+      <div className="p-7 space-y-5 animate-fade-up-1">
+        <ContactsSearch />
+        <ContactsTable contacts={(contacts as unknown as Contact[]) ?? []} />
+      </div>
     </div>
   );
 }

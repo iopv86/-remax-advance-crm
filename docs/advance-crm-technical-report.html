@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advance Estate CRM — Reporte Técnico Completo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --red: #cc2929;
+    --red-light: #f8eded;
+    --teal: #1a9e8f;
+    --teal-light: #e8f6f4;
+    --amber: #d4850a;
+    --amber-light: #fdf4e3;
+    --ink: #1a1a2e;
+    --ink-2: #2d2d45;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #ffffff;
+    --bg-alt: #f9fafb;
+    --sidebar: #111827;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    font-size: 10.5pt;
+    line-height: 1.65;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .no-print { display: none !important; }
+    body { font-size: 9.5pt; }
+    .page-break { page-break-before: always; }
+    .avoid-break { page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+    .cover { height: 100vh; }
+  }
+
+  @page {
+    margin: 18mm 20mm 18mm 20mm;
+    @bottom-right { content: counter(page) " / " counter(pages); font-size: 8pt; color: #9ca3af; }
+  }
+
+  /* ── COVER ── */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 88vh;
+    padding: 60px 0 40px;
+    border-bottom: 3px solid var(--red);
+    margin-bottom: 60px;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: var(--red);
+    color: white;
+    font-size: 8.5pt;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 3px;
+    margin-bottom: 28px;
+  }
+
+  .cover h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52pt;
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .cover h1 span { color: var(--red); }
+
+  .cover-sub {
+    font-size: 13pt;
+    color: var(--muted);
+    font-weight: 400;
+    margin-bottom: 40px;
+    max-width: 520px;
+  }
+
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 580px;
+  }
+
+  .cover-meta-item { }
+  .cover-meta-item .label {
+    font-size: 7.5pt;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .cover-meta-item .value {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section {
+    margin-bottom: 48px;
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    color: var(--red);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26pt;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 10px;
+    margin-bottom: 24px;
+  }
+
+  h3 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11.5pt;
+    font-weight: 700;
+    color: var(--ink);
+    margin-top: 28px;
+    margin-bottom: 12px;
+  }
+
+  h4 {
+    font-size: 10pt;
+    font-weight: 600;
+    color: var(--ink-2);
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  p { margin-bottom: 12px; color: #374151; }
+
+  /* ── TABLES ── */
+  .table-wrap {
+    overflow-x: auto;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+  }
+
+  thead tr {
+    background: var(--sidebar);
+    color: white;
+  }
+
+  thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 8.5pt;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  tbody tr:nth-child(even) { background: var(--bg-alt); }
+  tbody tr:hover { background: var(--red-light); }
+
+  tbody td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  /* ── CODE ── */
+  pre {
+    background: #0f1117;
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+    line-height: 1.7;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    border-left: 3px solid var(--red);
+  }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #f3f4f6;
+    color: var(--red);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.88em;
+  }
+
+  pre code { background: transparent; color: inherit; padding: 0; font-size: inherit; }
+
+  .comment { color: #6b7280; }
+  .kw { color: #93c5fd; }
+  .str { color: #86efac; }
+  .fn { color: #fde68a; }
+  .num { color: #f9a8d4; }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-left: 4px solid var(--teal);
+    background: var(--teal-light);
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 16px;
+  }
+
+  .callout.red {
+    border-left-color: var(--red);
+    background: var(--red-light);
+  }
+
+  .callout.amber {
+    border-left-color: var(--amber);
+    background: var(--amber-light);
+  }
+
+  .callout .callout-title {
+    font-weight: 700;
+    font-size: 9.5pt;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .callout p { margin-bottom: 0; font-size: 9.5pt; color: var(--ink-2); }
+
+  /* ── CARDS GRID ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    background: white;
+    break-inside: avoid;
+  }
+
+  .card .card-title {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .card .card-value {
+    font-size: 20pt;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--bg-alt);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  .flow-step {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 9pt;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .flow-step.red { border-color: var(--red); color: var(--red); }
+  .flow-step.teal { border-color: var(--teal); color: var(--teal); }
+  .flow-step.amber { border-color: var(--amber); color: var(--amber); }
+
+  .flow-arrow {
+    color: var(--muted);
+    font-size: 14pt;
+    font-weight: 300;
+  }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 8pt;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  .badge.green { background: #dcfce7; color: #166534; }
+  .badge.red { background: var(--red-light); color: var(--red); }
+  .badge.amber { background: var(--amber-light); color: var(--amber); }
+  .badge.blue { background: #dbeafe; color: #1d4ed8; }
+  .badge.gray { background: #f3f4f6; color: var(--muted); }
+
+  /* ── FILE LIST ── */
+  .file-list {
+    background: #0f1117;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .file-item {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid #1e293b;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5pt;
+  }
+
+  .file-item:last-child { border-bottom: none; }
+  .file-path { color: #93c5fd; }
+  .file-action { color: #86efac; font-size: 7.5pt; text-transform: uppercase; font-weight: 600; }
+  .file-action.edit { color: #fde68a; }
+  .file-action.new { color: #86efac; }
+  .file-desc { color: #9ca3af; font-size: 8pt; }
+
+  /* ── TOC ── */
+  .toc {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+  }
+
+  .toc h3 {
+    margin-top: 0;
+    font-size: 10pt;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 5px 0;
+    border-bottom: 1px dotted var(--border);
+    font-size: 10pt;
+  }
+
+  .toc-item:last-child { border-bottom: none; }
+  .toc-num { font-family: 'JetBrains Mono', monospace; color: var(--red); font-size: 9pt; min-width: 28px; }
+
+  ul { padding-left: 20px; margin-bottom: 12px; }
+  ul li { margin-bottom: 6px; color: #374151; }
+
+  /* ── PRINT BUTTON ── */
+  .print-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 11pt;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(204,41,41,0.4);
+    z-index: 100;
+  }
+
+  .print-btn:hover { background: #b71c1c; }
+
+  /* ── SEPARATOR ── */
+  .sep {
+    height: 1px;
+    background: linear-gradient(to right, var(--red), var(--border), transparent);
+    margin: 40px 0;
+  }
+
+  /* ── ARCH DIAGRAM ── */
+  .arch-box {
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    font-size: 9pt;
+    font-weight: 600;
+    background: white;
+    min-width: 120px;
+  }
+
+  .arch-box.dark {
+    background: var(--sidebar);
+    color: white;
+    border-color: var(--sidebar);
+  }
+
+  .arch-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin: 16px 0;
+  }
+
+  .footer {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--muted);
+    font-size: 8.5pt;
+  }
+
+  .footer .logo-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14pt;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .footer .logo-text span { color: var(--red); }
+</style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">⬇ Guardar como PDF</button>
+
+<!-- ══════════════════════════════════════════
+     COVER
+══════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Documentación Técnica · Confidencial</div>
+  <h1>Advance Estate<br><span>CRM</span></h1>
+  <p class="cover-sub">Arquitectura completa, integración Ava IA, diseño del sistema y registro de implementación para RE/MAX Advance República Dominicana</p>
+
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <div class="label">Fecha</div>
+      <div class="value">Abril 2026</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Versión</div>
+      <div class="value">1.3.0</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Estado</div>
+      <div class="value" style="color:var(--teal)">En desarrollo</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Stack</div>
+      <div class="value">Next.js 16 + Supabase</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">IA</div>
+      <div class="value">Claude claude-sonnet-4-6</div>
+    </div>
+    <div class="cover-meta-item">
+      <div class="label">Agente</div>
+      <div class="value">Ava · Railway</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TABLE OF CONTENTS
+══════════════════════════════════════════ -->
+<div class="toc avoid-break">
+  <h3>Contenido</h3>
+  <div class="toc-item"><span><span class="toc-num">01</span> Visión General del Proyecto</span></div>
+  <div class="toc-item"><span><span class="toc-num">02</span> Stack Tecnológico</span></div>
+  <div class="toc-item"><span><span class="toc-num">03</span> Arquitectura del Sistema</span></div>
+  <div class="toc-item"><span><span class="toc-num">04</span> Módulos del CRM</span></div>
+  <div class="toc-item"><span><span class="toc-num">05</span> Design System — Midnight SaaS</span></div>
+  <div class="toc-item"><span><span class="toc-num">06</span> Agente Ava — Integración WhatsApp IA</span></div>
+  <div class="toc-item"><span><span class="toc-num">07</span> Sincronización Ava → Supabase CRM</span></div>
+  <div class="toc-item"><span><span class="toc-num">08</span> Problemas Resueltos &amp; Fixes Técnicos</span></div>
+  <div class="toc-item"><span><span class="toc-num">09</span> Inventario Completo de Archivos</span></div>
+  <div class="toc-item"><span><span class="toc-num">10</span> Configuración de Entorno</span></div>
+  <div class="toc-item"><span><span class="toc-num">11</span> Estado Actual y Pendientes</span></div>
+  <div class="toc-item"><span><span class="toc-num">12</span> Guía de Despliegue</span></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     01 - VISION GENERAL
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 01</div>
+  <h2>Visión General del Proyecto</h2>
+
+  <p><strong>Advance Estate CRM</strong> es una plataforma de gestión de relaciones con clientes diseñada específicamente para <strong>RE/MAX Advance</strong>, franquicia inmobiliaria con sede en República Dominicana. El sistema centraliza la gestión de contactos, propiedades, pipeline de ventas, publicidad digital y comunicaciones de WhatsApp en una sola interfaz.</p>
+
+  <p>El proyecto combina un CRM web moderno con un agente de inteligencia artificial (<strong>Ava</strong>) que atiende automáticamente leads entrantes por WhatsApp, clasifica prospectos y sincroniza toda la información al CRM en tiempo real.</p>
+
+  <div class="card-grid">
+    <div class="card avoid-break">
+      <div class="card-title">Módulos CRM</div>
+      <div class="card-value">9</div>
+    </div>
+    <div class="card avoid-break">
+      <div class="card-title">Páginas implementadas</div>
+      <div class="card-value">11</div>
+    </div>
+    <div class="card avoid-break">
+      <div class="card-title">Tokens CSS custom</div>
+      <div class="card-value">25+</div>
+    </div>
+    <div class="card avoid-break">
+      <div class="card-title">Agente IA</div>
+      <div class="card-value" style="font-size:13pt">Claude claude-sonnet-4-6</div>
+    </div>
+  </div>
+
+  <h3>Objetivos del sistema</h3>
+  <ul>
+    <li>Centralizar la operación inmobiliaria: contactos, deals, propiedades, tareas y comunicaciones</li>
+    <li>Automatizar la atención inicial de leads CTWA (Click-to-WhatsApp Ads) mediante IA</li>
+    <li>Dar visibilidad de rendimiento a agentes y gerencia (KPIs, pipeline, ads)</li>
+    <li>Sincronizar automáticamente conversaciones de WhatsApp al CRM</li>
+    <li>Proporcionar una interfaz premium que refleje el posicionamiento de marca RE/MAX</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════
+     02 - STACK
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 02</div>
+  <h2>Stack Tecnológico</h2>
+
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr>
+          <th>Capa</th>
+          <th>Tecnología</th>
+          <th>Versión</th>
+          <th>Propósito</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Frontend framework</td>
+          <td><strong>Next.js</strong></td>
+          <td>16.2.3</td>
+          <td>App Router, SSR, Turbopack</td>
+        </tr>
+        <tr>
+          <td>UI / Estilos</td>
+          <td><strong>Tailwind CSS</strong></td>
+          <td>v4</td>
+          <td>@theme inline, oklch colors</td>
+        </tr>
+        <tr>
+          <td>Componentes base</td>
+          <td><strong>shadcn/ui</strong></td>
+          <td>latest</td>
+          <td>Button, Input, Card, Badge</td>
+        </tr>
+        <tr>
+          <td>Base de datos</td>
+          <td><strong>Supabase</strong> (PostgreSQL)</td>
+          <td>—</td>
+          <td>Auth, REST API, tablas CRM</td>
+        </tr>
+        <tr>
+          <td>Autenticación</td>
+          <td><strong>Supabase Auth</strong> via SSR</td>
+          <td>—</td>
+          <td>Sesiones server-side, cookies</td>
+        </tr>
+        <tr>
+          <td>Proxy/Middleware</td>
+          <td><strong>Next.js Proxy</strong> (proxy.ts)</td>
+          <td>Next.js 16</td>
+          <td>Auth guard, redirección /login</td>
+        </tr>
+        <tr>
+          <td>Notificaciones UI</td>
+          <td><strong>Sonner</strong></td>
+          <td>—</td>
+          <td>Toast de error/éxito</td>
+        </tr>
+        <tr>
+          <td>Iconos</td>
+          <td><strong>Lucide React</strong></td>
+          <td>—</td>
+          <td>Iconografía consistente</td>
+        </tr>
+        <tr>
+          <td>Agente IA</td>
+          <td><strong>FastAPI + Claude</strong></td>
+          <td>Python 3.11</td>
+          <td>Webhook WhatsApp, orquestación</td>
+        </tr>
+        <tr>
+          <td>LLM</td>
+          <td><strong>Claude claude-sonnet-4-6</strong> (Anthropic)</td>
+          <td>API v3</td>
+          <td>Clasificación, respuesta leads</td>
+        </tr>
+        <tr>
+          <td>WhatsApp</td>
+          <td><strong>Meta Cloud API</strong></td>
+          <td>v19</td>
+          <td>Mensajería CTWA, webhook</td>
+        </tr>
+        <tr>
+          <td>Base datos agente</td>
+          <td><strong>SQLite + aiosqlite</strong></td>
+          <td>—</td>
+          <td>Memoria conversacional local</td>
+        </tr>
+        <tr>
+          <td>HTTP async</td>
+          <td><strong>httpx</strong></td>
+          <td>—</td>
+          <td>Llamadas Supabase REST desde Python</td>
+        </tr>
+        <tr>
+          <td>Deploy frontend</td>
+          <td><strong>Vercel</strong> (local: localhost:3000)</td>
+          <td>—</td>
+          <td>Hosting Next.js</td>
+        </tr>
+        <tr>
+          <td>Deploy agente</td>
+          <td><strong>Railway</strong></td>
+          <td>—</td>
+          <td>Hosting FastAPI, variables de entorno</td>
+        </tr>
+        <tr>
+          <td>Tipografías</td>
+          <td>Plus Jakarta Sans, Cormorant Garamond, JetBrains Mono</td>
+          <td>—</td>
+          <td>Design system</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     03 - ARQUITECTURA
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 03</div>
+  <h2>Arquitectura del Sistema</h2>
+
+  <h3>Diagrama de alto nivel</h3>
+
+  <div class="arch-row">
+    <div class="arch-box" style="border-color:var(--amber);color:var(--amber)">
+      📱 WhatsApp<br><small style="font-weight:400">Lead / Usuario</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="arch-box" style="border-color:var(--red);color:var(--red)">
+      Meta Cloud API<br><small style="font-weight:400">CTWA Webhook</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="arch-box dark">
+      Ava / Railway<br><small style="font-weight:400;color:#9ca3af">FastAPI · Python</small>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="arch-box" style="border-color:var(--teal);color:var(--teal)">
+      Claude claude-sonnet-4-6<br><small style="font-weight:400">Anthropic API</small>
+    </div>
+  </div>
+
+  <div class="arch-row">
+    <div style="flex:1; text-align:center; color:var(--muted); font-size:9pt">↓ sync fire-and-forget</div>
+  </div>
+
+  <div class="arch-row">
+    <div class="arch-box" style="border-color:#6366f1;color:#6366f1">
+      Supabase<br><small style="font-weight:400">PostgreSQL · REST</small>
+    </div>
+    <div class="flow-arrow">←</div>
+    <div class="arch-box dark">
+      Advance Estate CRM<br><small style="font-weight:400;color:#9ca3af">Next.js 16 · App Router</small>
+    </div>
+    <div class="flow-arrow">←</div>
+    <div class="arch-box" style="border-color:var(--muted)">
+      👤 Agente RE/MAX<br><small style="font-weight:400">Browser</small>
+    </div>
+  </div>
+
+  <h3>Flujo de autenticación</h3>
+  <p>El archivo <code>proxy.ts</code> intercepta todas las peticiones HTTP. Si el usuario no tiene sesión activa de Supabase Auth, redirige a <code>/login</code>. Las rutas <code>/login</code> y <code>/</code> son públicas.</p>
+
+  <pre><code><span class="comment">// proxy.ts — Next.js 16</span>
+<span class="kw">export async function</span> <span class="fn">proxy</span>(request: NextRequest) {
+  <span class="comment">// Crea cliente Supabase SSR con cookies</span>
+  <span class="kw">const</span> { data: { user } } = <span class="kw">await</span> supabase.auth.getUser();
+
+  <span class="kw">const</span> { pathname } = request.nextUrl;
+  <span class="kw">const</span> isPublic = pathname === <span class="str">"/login"</span> || pathname === <span class="str">"/"</span>;
+
+  <span class="kw">if</span> (!user && !isPublic) {
+    <span class="kw">return</span> NextResponse.redirect(<span class="kw">new</span> URL(<span class="str">"/login"</span>, request.url));
+  }
+  <span class="kw">return</span> supabaseResponse;
+}</code></pre>
+
+  <h3>Tablas principales de Supabase</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Tabla / Vista</th><th>Columnas clave</th><th>Uso</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>contacts</code></td>
+          <td>id, phone (UNIQUE), first_name, last_name, source, lead_classification, score</td>
+          <td>Base de contactos/leads</td>
+        </tr>
+        <tr>
+          <td><code>messages</code></td>
+          <td>id, contact_id, content, direction, is_automated, created_at</td>
+          <td>Historial conversaciones</td>
+        </tr>
+        <tr>
+          <td><code>deals</code></td>
+          <td>id, contact_id, agent_id, stage, value, property_id</td>
+          <td>Pipeline comercial</td>
+        </tr>
+        <tr>
+          <td><code>properties</code></td>
+          <td>id, title, price, status, type, bedrooms, location</td>
+          <td>Inventario inmuebles</td>
+        </tr>
+        <tr>
+          <td><code>tasks</code></td>
+          <td>id, title, assigned_to, due_date, priority, status</td>
+          <td>Gestión de tareas</td>
+        </tr>
+        <tr>
+          <td><code>campaigns</code></td>
+          <td>id, name, platform, status, spend, leads_generated, clicks, impressions</td>
+          <td>Publicidad digital</td>
+        </tr>
+        <tr>
+          <td><code>agents</code></td>
+          <td>id, name, email, phone, avatar_url</td>
+          <td>Perfiles agentes</td>
+        </tr>
+        <tr>
+          <td><code>agent_monthly_kpis</code> (VIEW)</td>
+          <td>agent_id, month, deals_closed, revenue, leads_contacted, conversion_rate</td>
+          <td>KPIs mensuales</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     04 - MÓDULOS CRM
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 04</div>
+  <h2>Módulos del CRM</h2>
+
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr>
+          <th>Módulo</th>
+          <th>Ruta</th>
+          <th>Fuente de datos</th>
+          <th>Características</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Dashboard</strong></td>
+          <td><code>/dashboard</code></td>
+          <td>contacts, tasks, deals</td>
+          <td>KPI cards (revenue, leads, propiedades, tareas), actividad reciente, tareas pendientes</td>
+        </tr>
+        <tr>
+          <td><strong>Contactos</strong></td>
+          <td><code>/dashboard/contacts</code></td>
+          <td>contacts</td>
+          <td>Tabla con avatar, score IA (0–100), clasificación hot/warm/cold/unqualified, búsqueda</td>
+        </tr>
+        <tr>
+          <td><strong>Pipeline</strong></td>
+          <td><code>/dashboard/pipeline</code></td>
+          <td>deals, contacts, properties</td>
+          <td>Kanban drag-ready, 6 etapas (Prospecto → Cerrado), valor por etapa, color por stage</td>
+        </tr>
+        <tr>
+          <td><strong>Propiedades</strong></td>
+          <td><code>/dashboard/properties</code></td>
+          <td>properties</td>
+          <td>Cards con imagen placeholder, status badge overlay (activo/reservado/vendido/alquilado)</td>
+        </tr>
+        <tr>
+          <td><strong>Conversaciones</strong></td>
+          <td><code>/dashboard/conversations</code></td>
+          <td>messages, contacts</td>
+          <td>Lista con preview, badge Ava (automatizado), inbound/outbound color-coded</td>
+        </tr>
+        <tr>
+          <td><strong>Tareas</strong></td>
+          <td><code>/dashboard/tasks</code></td>
+          <td>tasks</td>
+          <td>Tabla con prioridad (alta/media/baja), tint rojo para tareas vencidas, asignación</td>
+        </tr>
+        <tr>
+          <td><strong>Publicidad</strong> ✨ NUEVO</td>
+          <td><code>/dashboard/ads</code></td>
+          <td>campaigns</td>
+          <td>Métricas por campaña: CPL, CTR, leads, clicks, impresiones; resumen por plataforma</td>
+        </tr>
+        <tr>
+          <td><strong>Agentes</strong> ✨ NUEVO</td>
+          <td><code>/dashboard/agents</code></td>
+          <td>agent_monthly_kpis, agents, deals</td>
+          <td>Ranking mensual, progress bar revenue, 🥇🥈🥉 top 3, KPIs individuales</td>
+        </tr>
+        <tr>
+          <td><strong>Ava IA</strong></td>
+          <td><code>/dashboard/ava</code></td>
+          <td>—</td>
+          <td>Panel de estado del agente, arquitectura, Railway URL, estadísticas de uso</td>
+        </tr>
+        <tr>
+          <td><strong>Ajustes</strong></td>
+          <td><code>/dashboard/settings</code></td>
+          <td>—</td>
+          <td>Config de integraciones: WhatsApp Cloud API, Claude API, Supabase, Railway</td>
+        </tr>
+        <tr>
+          <td><strong>Login</strong></td>
+          <td><code>/login</code></td>
+          <td>supabase.auth</td>
+          <td>Autenticación con email/password, show/hide password, logo RE/MAX</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Módulo Publicidad — Ads (/dashboard/ads)</h3>
+  <p>Página nueva creada para visualizar el rendimiento de campañas de publicidad digital. Lee de la tabla <code>campaigns</code> y calcula automáticamente:</p>
+  <ul>
+    <li><strong>CPL (Costo por Lead)</strong>: <code>totalSpend / totalLeads</code></li>
+    <li><strong>CTR</strong>: <code>(clicks / impressions) × 100</code> — solo si hay datos de impresiones</li>
+    <li>Colores por plataforma: Facebook (azul), Instagram (rosa), Google (rojo), TikTok (negro), WhatsApp/CTWA (verde)</li>
+  </ul>
+
+  <h3>Módulo Agentes (/dashboard/agents)</h3>
+  <p>Página nueva con ranking mensual de agentes. Usa la vista <code>agent_monthly_kpis</code> y hace fallback a cálculo manual desde <code>deals</code> si la vista no tiene datos del mes actual.</p>
+
+  <pre><code><span class="comment">// Fallback si agent_monthly_kpis no tiene datos del mes</span>
+<span class="kw">const</span> agentStats = deals
+  .reduce((acc, deal) => {
+    <span class="kw">const</span> a = acc.find(x => x.id === deal.agent_id) || { id: deal.agent_id, deals: <span class="num">0</span>, revenue: <span class="num">0</span> };
+    a.deals++;
+    a.revenue += deal.value || <span class="num">0</span>;
+    <span class="kw">return</span> acc;
+  }, [])
+  .sort((a, b) => b.revenue - a.revenue);
+
+<span class="comment">// Barra de progreso relativa al #1</span>
+<span class="kw">const</span> barWidth = Math.max(<span class="num">4</span>, Math.round((agent.revenue / agentStats[<span class="num">0</span>].revenue) * <span class="num">100</span>));</code></pre>
+</div>
+
+<!-- ══════════════════════════════════════════
+     05 - DESIGN SYSTEM
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 05</div>
+  <h2>Design System — Light Luminous (v2)</h2>
+
+  <p>El design system fue completamente rediseñado en la segunda sesión de trabajo. Se migró de un tema "Midnight SaaS" con sidebar oscuro a un sistema <strong>Light Luminous</strong> de paleta luminosa, editorial y premium. Utiliza <strong>Tailwind CSS v4</strong> con tokens CSS en <code>globals.css</code>, tipografía serif Playfair Display para headings, e Inter para UI. El tema es <strong>light-only</strong> sin dark mode automático.</p>
+
+  <h3>Paleta de colores (v2 — valores hex)</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Token</th><th>Hex</th><th>Uso</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--background</code></td><td>#f3f7fb</td><td>Fondo general — azul-gris claro</td></tr>
+        <tr><td><code>--card</code></td><td>#ffffff</td><td>Fondo de cards</td></tr>
+        <tr><td><code>--sidebar</code></td><td>#fffcfc</td><td>Sidebar — blanco cálido</td></tr>
+        <tr><td><code>--red</code> (primario)</td><td>#e11d48</td><td>CTAs, botones principales, rose-700</td></tr>
+        <tr><td><code>--blue</code></td><td>#2563eb</td><td>KPI contactos, pipeline qualified</td></tr>
+        <tr><td><code>--emerald</code></td><td>#10b981</td><td>Leads nuevos, closed_won, Ava activo</td></tr>
+        <tr><td><code>--violet</code></td><td>#7c3aed</td><td>Pipeline activo, etapa contract</td></tr>
+        <tr><td><code>--amber</code></td><td>#d97706</td><td>Leads HOT, tareas urgentes, publicidad</td></tr>
+        <tr><td><code>--teal</code></td><td>#0d9488</td><td>Propiedades, conversaciones</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Clases CSS principales</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead><tr><th>Clase</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>.card-glow</code></td><td>Card blanca, border-radius 24px, sombra 10px/30px, hover elevación</td></tr>
+        <tr><td><code>.card-glass</code></td><td>Card glassmorphism para login (blur 12px, bg rgba 88%)</td></tr>
+        <tr><td><code>.page-header</code></td><td>Header sticky con blur, border-bottom y bg blanco 70%</td></tr>
+        <tr><td><code>.nav-item-active</code></td><td>Nav activo: gradiente rose→blanco, outline rose-200, radius 16px</td></tr>
+        <tr><td><code>.badge-hot / .badge-warm / .badge-cold</code></td><td>Badges de clasificación de leads</td></tr>
+        <tr><td><code>.kanban-col</code></td><td>Columna kanban: bg slate-50, border, radius 22px</td></tr>
+        <tr><td><code>.stat-number</code></td><td>Números KPI en Playfair Display, letter-spacing −0.03em</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Tipografías</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Fuente</th><th>Variable CSS</th><th>Uso</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Plus Jakarta Sans</strong></td>
+          <td><code>--font-sans</code></td>
+          <td>Interfaz principal, labels, botones, texto UI</td>
+        </tr>
+        <tr>
+          <td><strong>Cormorant Garamond</strong></td>
+          <td><code>--font-display</code></td>
+          <td>Títulos de página, headings prominentes, logo</td>
+        </tr>
+        <tr>
+          <td><strong>JetBrains Mono</strong></td>
+          <td><code>--font-mono</code></td>
+          <td>Valores numéricos, datos, código, KPIs</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Clases utilitarias personalizadas</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Clase</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>.page-header</code></td><td>Header de página con título Cormorant, subtítulo muted, borde inferior</td></tr>
+        <tr><td><code>.card-glow</code></td><td>Card blanca con sombra suave + glow rojo sutil en hover</td></tr>
+        <tr><td><code>.card-base</code></td><td>Card base sin glow, solo border y shadow leve</td></tr>
+        <tr><td><code>.table-row-hover</code></td><td>Fila de tabla con hover a rojo-muted</td></tr>
+        <tr><td><code>.kanban-col</code></td><td>Columna kanban con fondo sutil y borde</td></tr>
+        <tr><td><code>.nav-item-active</code></td><td>Item de navegación activo: fondo rojo-muted, texto rojo</td></tr>
+        <tr><td><code>.badge-hot</code></td><td>Badge rojo para leads calientes</td></tr>
+        <tr><td><code>.badge-warm</code></td><td>Badge amber para leads tibios</td></tr>
+        <tr><td><code>.badge-cold</code></td><td>Badge azul-muted para leads fríos</td></tr>
+        <tr><td><code>.status-active</code></td><td>Badge verde para propiedades activas</td></tr>
+        <tr><td><code>.status-reserved</code></td><td>Badge amber para propiedades reservadas</td></tr>
+        <tr><td><code>.status-sold</code></td><td>Badge gris para propiedades vendidas</td></tr>
+        <tr><td><code>.status-rented</code></td><td>Badge teal para propiedades alquiladas</td></tr>
+        <tr><td><code>.delta-up</code></td><td>Indicador de cambio positivo (verde + flecha ↑)</td></tr>
+        <tr><td><code>.delta-down</code></td><td>Indicador de cambio negativo (rojo + flecha ↓)</td></tr>
+        <tr><td><code>.stat-number</code></td><td>Número de estadística grande, JetBrains Mono</td></tr>
+        <tr><td><code>.bg-grid</code></td><td>Fondo con patrón de grilla sutil (login page)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Opciones de diseño alternativas (pendiente de selección)</h3>
+  <p>Se creó el archivo <code>design-options.html</code> con 4 propuestas visuales alternativas al diseño Midnight SaaS actual:</p>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Opción</th><th>Nombre</th><th>Paleta</th><th>Tipografía</th><th>Estética</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>A</strong></td>
+          <td>Ivory Luxe</td>
+          <td>Crema #f7f4ef + oro #c9a84c</td>
+          <td>Cormorant Garamond dominante</td>
+          <td>Lujo / Sotheby's</td>
+        </tr>
+        <tr>
+          <td><strong>B</strong></td>
+          <td>Carbon Pro</td>
+          <td>Negro #0d0d0d + rojo neón #ff4444</td>
+          <td>DM Sans</td>
+          <td>Bloomberg / data terminal</td>
+        </tr>
+        <tr>
+          <td><strong>C</strong></td>
+          <td>RE/MAX Bold</td>
+          <td>Sidebar rojo #cc1f1f + blanco</td>
+          <td>Outfit</td>
+          <td>On-brand RE/MAX</td>
+        </tr>
+        <tr>
+          <td><strong>D</strong></td>
+          <td>Nordic Frost</td>
+          <td>Blanco + azul-gris #eef1f6</td>
+          <td>Inter</td>
+          <td>Clean SaaS / Notion</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout amber avoid-break">
+    <div class="callout-title">Pendiente</div>
+    <p>El usuario debe abrir <code>C:\Users\ivanp\advance-crm\design-options.html</code> en el navegador y elegir una opción (A/B/C/D) para reimplementar el design system completo.</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     06 - AVA
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 06</div>
+  <h2>Agente Ava — Integración WhatsApp IA</h2>
+
+  <p><strong>Ava</strong> es el agente de inteligencia artificial de RE/MAX Advance. Está desplegado en <strong>Railway</strong> como servicio FastAPI (Python 3.11) y atiende automáticamente los mensajes de WhatsApp de leads que llegaron por campañas CTWA (Click-to-WhatsApp Ads).</p>
+
+  <h3>URL de producción</h3>
+  <pre><code>https://remax-advance-ava-production.up.railway.app</code></pre>
+
+  <h3>Endpoints principales</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Método</th><th>Endpoint</th><th>Descripción</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge green">GET</span></td>
+          <td><code>/webhook</code></td>
+          <td>Verificación del webhook de Meta (hub.challenge)</td>
+        </tr>
+        <tr>
+          <td><span class="badge blue">POST</span></td>
+          <td><code>/webhook</code></td>
+          <td>Recibe mensajes entrantes de WhatsApp</td>
+        </tr>
+        <tr>
+          <td><span class="badge green">GET</span></td>
+          <td><code>/health</code></td>
+          <td>Health check del servicio</td>
+        </tr>
+        <tr>
+          <td><span class="badge green">GET</span></td>
+          <td><code>/stats</code></td>
+          <td>Estadísticas de conversaciones procesadas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Arquitectura del agente</h3>
+  <div class="file-list">
+    <div class="file-item">
+      <span class="file-path">whatsapp-agentkit/</span>
+      <span class="file-desc">Raíz del proyecto Ava</span>
+    </div>
+    <div class="file-item">
+      <span class="file-path">  agent/main.py</span>
+      <span class="file-desc">FastAPI app, webhook handler, orquestador</span>
+    </div>
+    <div class="file-item">
+      <span class="file-path">  agent/tools.py</span>
+      <span class="file-desc">Herramientas Claude (registrar_lead, buscar_propiedades, etc.) + sync Supabase</span>
+    </div>
+    <div class="file-item">
+      <span class="file-path">  agent/models.py</span>
+      <span class="file-desc">Pydantic models para mensajes WhatsApp</span>
+    </div>
+    <div class="file-item">
+      <span class="file-path">  agent/memory.py</span>
+      <span class="file-desc">Gestión de memoria conversacional SQLite</span>
+    </div>
+    <div class="file-item">
+      <span class="file-path">  .env</span>
+      <span class="file-desc">Variables de entorno (ANTHROPIC_API_KEY, META_ACCESS_TOKEN, SUPABASE_URL, ...)</span>
+    </div>
+    <div class="file-item">
+      <span class="file-path">  requirements.txt</span>
+      <span class="file-desc">Dependencias Python (fastapi, httpx, anthropic, supabase, etc.)</span>
+    </div>
+  </div>
+
+  <h3>Capacidades de Ava</h3>
+  <ul>
+    <li><strong>Clasificación de leads</strong>: Identifica si el contacto es hot/warm/cold según sus respuestas</li>
+    <li><strong>Búsqueda de propiedades</strong>: Consulta el inventario de Supabase según criterios del lead</li>
+    <li><strong>Registro de leads</strong>: Crea/actualiza contactos automáticamente</li>
+    <li><strong>Programación de citas</strong>: Coordina visitas con agentes disponibles</li>
+    <li><strong>Memoria conversacional</strong>: Recuerda el contexto de conversaciones previas (SQLite)</li>
+    <li><strong>Sync al CRM</strong>: Sincroniza cada conversación a Supabase en tiempo real</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════
+     07 - SYNC AVA → SUPABASE
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 07</div>
+  <h2>Sincronización Ava → Supabase CRM</h2>
+
+  <p>Esta fue una funcionalidad crítica del sprint: cada vez que Ava atiende un lead en WhatsApp, la conversación completa se sincroniza automáticamente a Supabase para que aparezca en el módulo de Conversaciones del CRM.</p>
+
+  <h3>Diagrama de flujo</h3>
+  <div class="flow avoid-break">
+    <div class="flow-step amber">Lead envía msg WhatsApp</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Meta webhook → Railway</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">Ava procesa con Claude</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step red">Responde al lead</div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-step" style="margin-left:0">[fire-and-forget]</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step teal">sync_contact_to_crm()</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step teal">sync_message_to_crm() × 2</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-color:#6366f1;color:#6366f1">Supabase PostgreSQL</div>
+  </div>
+
+  <h3>Función sync_contact_to_crm()</h3>
+  <pre><code><span class="kw">async def</span> <span class="fn">sync_contact_to_crm</span>(phone, first_name=<span class="str">""</span>, last_name=<span class="str">""</span>,
+    source=<span class="str">"ctwa_ad"</span>, lead_classification=<span class="str">"unqualified"</span>) -> str | None:
+  <span class="str">"""Upsert de contacto en Supabase. Retorna contact_id UUID."""</span>
+  <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+    resp = <span class="kw">await</span> client.post(
+      f<span class="str">"{_SUPABASE_URL}/rest/v1/contacts?on_conflict=phone"</span>,
+      headers={
+        <span class="str">"apikey"</span>: _SUPABASE_KEY,
+        <span class="str">"Authorization"</span>: f<span class="str">"Bearer {_SUPABASE_KEY}"</span>,
+        <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
+        <span class="str">"Prefer"</span>: <span class="str">"return=representation,resolution=merge-duplicates"</span>,
+      },
+      json={
+        <span class="str">"phone"</span>: phone,
+        <span class="str">"first_name"</span>: first_name,
+        <span class="str">"last_name"</span>: last_name,
+        <span class="str">"source"</span>: source,
+        <span class="str">"lead_classification"</span>: lead_classification,
+      }
+    )
+    data = resp.json()
+    <span class="kw">return</span> data[<span class="num">0</span>][<span class="str">"id"</span>] <span class="kw">if</span> data <span class="kw">else None</span></code></pre>
+
+  <h3>Función sync_message_to_crm()</h3>
+  <pre><code><span class="kw">async def</span> <span class="fn">sync_message_to_crm</span>(contact_id, content,
+    direction=<span class="str">"inbound"</span>, is_automated=<span class="num">False</span>) -> bool:
+  <span class="str">"""Inserta un mensaje en la tabla messages."""</span>
+  <span class="kw">async with</span> httpx.AsyncClient() <span class="kw">as</span> client:
+    resp = <span class="kw">await</span> client.post(
+      f<span class="str">"{_SUPABASE_URL}/rest/v1/messages"</span>,
+      headers={ ... },
+      json={
+        <span class="str">"contact_id"</span>: contact_id,
+        <span class="str">"content"</span>: content,
+        <span class="str">"direction"</span>: direction,  <span class="comment"># "inbound" | "outbound"</span>
+        <span class="str">"is_automated"</span>: is_automated,
+      }
+    )
+    <span class="kw">return</span> resp.status_code == <span class="num">201</span></code></pre>
+
+  <h3>Integración en main.py (fire-and-forget)</h3>
+  <pre><code><span class="comment"># En procesar_mensaje() — después de obtener respuesta de Claude</span>
+<span class="kw">try</span>:
+  contact_id = <span class="kw">await</span> sync_contact_to_crm(phone=msg.telefono)
+  <span class="kw">if</span> contact_id:
+    <span class="kw">await</span> sync_message_to_crm(contact_id, msg.texto,
+      direction=<span class="str">"inbound"</span>, is_automated=<span class="num">False</span>)
+    <span class="kw">await</span> sync_message_to_crm(contact_id, respuesta,
+      direction=<span class="str">"outbound"</span>, is_automated=<span class="num">True</span>)
+<span class="kw">except</span> Exception <span class="kw">as</span> crm_err:
+  logger.warning(f<span class="str">"CRM sync falló (no crítico): {crm_err}"</span>)
+  <span class="comment"># El WhatsApp flow NO se interrumpe</span></code></pre>
+
+  <div class="callout avoid-break">
+    <div class="callout-title">Diseño: Fire-and-Forget</div>
+    <p>El sync está envuelto en su propio try/except. Si Supabase no responde, Ava igual manda la respuesta al lead por WhatsApp. La confiabilidad del agente no depende de la disponibilidad del CRM.</p>
+  </div>
+
+  <h3>Detalles técnicos del upsert</h3>
+  <ul>
+    <li><strong>on_conflict=phone</strong>: Si ya existe un contacto con ese número, actualiza en lugar de crear duplicado</li>
+    <li><strong>Prefer: resolution=merge-duplicates</strong>: Header de PostgREST para merge semántico</li>
+    <li><strong>Prefer: return=representation</strong>: Retorna el registro upsertado (necesario para obtener el UUID generado)</li>
+    <li><strong>Service Role Key</strong>: Se usa <code>SUPABASE_SERVICE_ROLE_KEY</code> (no anon key) para bypass de RLS en escrituras del agente</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════
+     08 - PROBLEMAS RESUELTOS
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 08</div>
+  <h2>Problemas Resueltos &amp; Fixes Técnicos</h2>
+
+  <h3>Fix #1 — Error 405 en todas las rutas del CRM</h3>
+
+  <div class="callout red avoid-break">
+    <div class="callout-title">Síntoma</div>
+    <p>Todas las rutas del CRM retornaban HTTP 405 Method Not Allowed. El dev server mostraba el error al iniciar.</p>
+  </div>
+
+  <p><strong>Causa raíz</strong>: Next.js 16 deprecó el archivo <code>middleware.ts</code> y la función exportada <code>middleware()</code>. La nueva convención es <code>proxy.ts</code> con función <code>proxy()</code>.</p>
+
+  <p><strong>Error en consola:</strong></p>
+  <pre><code>⚠ The "middleware" file convention is deprecated. Please use "proxy" instead.
+Error: Both middleware file "./middleware.ts" and proxy file "./proxy.ts" are detected.
+Please use "./proxy.ts" only.</code></pre>
+
+  <p><strong>Solución aplicada:</strong></p>
+  <ul>
+    <li>Creado <code>proxy.ts</code> con función <code>proxy()</code> (idéntica lógica al middleware anterior)</li>
+    <li>Eliminado <code>middleware.ts</code> vía PowerShell (el comando <code>rm</code> de bash era silencioso pero no confiable en Windows)</li>
+    <li>Limpiado caché <code>.next</code>: <code>powershell Remove-Item .next -Recurse -Force</code></li>
+    <li>Reiniciado dev server: confirmado 307 → 200 en todas las rutas</li>
+  </ul>
+
+  <pre><code><span class="comment"># Comandos de limpieza usados</span>
+powershell -Command "Remove-Item -Path '.next' -Recurse -Force"
+powershell -Command "Remove-Item -Path 'middleware.ts' -Force"
+npm run dev</code></pre>
+
+  <h3>Fix #2 — getUser() duplicado en proxy.ts</h3>
+  <p>El primer borrador del archivo <code>proxy.ts</code> tenía dos llamadas consecutivas a <code>supabase.auth.getUser()</code>. La primera fue removida con el Edit tool, dejando solo una llamada al final correctamente.</p>
+
+  <h3>Fix #3 — Railway CLI token inválido</h3>
+  <p>Los UUIDs proporcionados como "tokens de Railway" (<code>56bb313c-...</code>, <code>68880b62-...</code>) eran en realidad Project IDs, no Personal Access Tokens. Railway CLI solo acepta tokens de tipo Personal Token en el env var <code>RAILWAY_TOKEN</code>. Las variables de entorno fueron añadidas manualmente vía el Dashboard de Railway (Raw Editor).</p>
+
+  <h3>Fix #4 — Browser cacheando 405</h3>
+  <p>Después de corregir proxy.ts y limpiar .next, <code>curl</code> confirmaba respuestas correctas (307→login, 200 en páginas públicas), pero el navegador seguía mostrando 405. Causa: el navegador tenía cacheada la respuesta de error. Solución: Ctrl+Shift+R (hard refresh) o abrir en ventana de incógnito.</p>
+
+  <h3>Fix #5 — CLASSIFICATION_COLORS incompatible con Tailwind v4</h3>
+  <p>La página de contactos usaba un objeto con strings de clases Tailwind (<code>bg-red-100 text-red-700</code>, etc.) generados dinámicamente. Tailwind v4 con JIT no puede detectar estas clases si no están presentes literalmente en el código. Se eliminó el objeto y se reemplazó con clases CSS utilitarias custom (<code>.badge-hot</code>, <code>.badge-warm</code>, etc.) definidas en <code>globals.css</code>.</p>
+
+  <h3>Fix #6 — Template literals con clases dinámicas</h3>
+  <p>Varios componentes usaban template literals para combinar clases con delays de animación: <code>`card-glow p-5 ${delay}`</code>. Esto causaba que Tailwind no purgara correctamente. Se cambió a concatenación simple: <code>"card-glow p-5 " + delay</code>.</p>
+
+  <h3>Fix #7 — Variables Railway (entorno de producción)</h3>
+  <p>Las variables <code>SUPABASE_URL</code> y <code>SUPABASE_SERVICE_ROLE_KEY</code> debían añadirse tanto en <code>.env</code> local como en Railway Dashboard para producción. El proceso fue:</p>
+  <ul>
+    <li>Local: Editado <code>whatsapp-agentkit/.env</code></li>
+    <li>Railway: Dashboard → Variables → Raw Editor → paste de ambas variables</li>
+    <li>Railway: Redeploy automático detectado por Railway al cambiar variables</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════
+     09 - INVENTARIO DE ARCHIVOS
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 09</div>
+  <h2>Inventario Completo de Archivos</h2>
+
+  <h3>advance-crm/ (Next.js CRM)</h3>
+  <div class="file-list">
+    <div class="file-item">
+      <span class="file-action new">NUEVO</span>
+      <span class="file-path">proxy.ts</span>
+      <span class="file-desc">Reemplaza middleware.ts. Auth guard Next.js 16 con Supabase SSR</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/globals.css</span>
+      <span class="file-desc">Design tokens oklch, 25+ variables CSS, utilidades page-header/card-glow/badge-*/status-*/delta-*</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/login/page.tsx</span>
+      <span class="file-desc">var(--gold-*) → var(--red-*), botón rojo RE/MAX</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/page.tsx</span>
+      <span class="file-desc">KPI cards con accents por color, activity feed, table-row-hover</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/contacts/page.tsx</span>
+      <span class="file-desc">Removido CLASSIFICATION_COLORS, avatar inline style, badge-hot/warm/cold</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/pipeline/page.tsx</span>
+      <span class="file-desc">STAGE_ACCENT record, kanban-col, colores por etapa</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/conversations/page.tsx</span>
+      <span class="file-desc">Badge Ava (red-muted), inbound=teal, outbound=amber</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/properties/page.tsx</span>
+      <span class="file-desc">Status badge como overlay en imagen, status-active/reserved/sold/rented</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/tasks/page.tsx</span>
+      <span class="file-desc">Overdue rows con tint rojo, priority chips con inline style vars</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/settings/page.tsx</span>
+      <span class="file-desc">Removido n8n, actualizado a WhatsApp Cloud API + Claude + Railway</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">app/dashboard/ava/page.tsx</span>
+      <span class="file-desc">Removido n8n, arquitectura FastAPI+Claude+SQLite+Supabase, Railway URL</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action new">NUEVO</span>
+      <span class="file-path">app/dashboard/ads/page.tsx</span>
+      <span class="file-desc">Módulo publicidad: campañas, CPL, CTR, leads, spend por plataforma</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action new">NUEVO</span>
+      <span class="file-path">app/dashboard/agents/page.tsx</span>
+      <span class="file-desc">Módulo agentes: ranking mensual, KPIs individuales, progress bar revenue</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action new">NUEVO</span>
+      <span class="file-path">design-options.html</span>
+      <span class="file-desc">4 mockups visuales alternativos (Ivory Luxe / Carbon Pro / RE/MAX Bold / Nordic Frost)</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action new">NUEVO</span>
+      <span class="file-path">docs/advance-crm-technical-report.html</span>
+      <span class="file-desc">Este documento</span>
+    </div>
+  </div>
+
+  <h3>whatsapp-agentkit/ (Ava Railway Agent)</h3>
+  <div class="file-list">
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">agent/tools.py</span>
+      <span class="file-desc">Añadido sync_contact_to_crm(), sync_message_to_crm(), httpx async calls, load_dotenv</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">agent/main.py</span>
+      <span class="file-desc">Import sync functions, fire-and-forget CRM sync en procesar_mensaje()</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">.env</span>
+      <span class="file-desc">Añadido SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY</span>
+    </div>
+    <div class="file-item">
+      <span class="file-action edit">EDIT</span>
+      <span class="file-path">.env.example</span>
+      <span class="file-desc">Documentadas variables de Supabase para nuevos desarrolladores</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     10 - CONFIGURACIÓN DE ENTORNO
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 10</div>
+  <h2>Configuración de Entorno</h2>
+
+  <h3>advance-crm — .env.local</h3>
+  <pre><code><span class="comment"># Supabase</span>
+NEXT_PUBLIC_SUPABASE_URL=https://zlnqsgepzfghlmsfolko.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<span class="str">[anon key aquí]</span>
+
+<span class="comment"># Next.js</span>
+NEXTAUTH_URL=http://localhost:3000</code></pre>
+
+  <h3>whatsapp-agentkit — .env</h3>
+  <pre><code><span class="comment"># Anthropic Claude API</span>
+ANTHROPIC_API_KEY=sk-ant-api03-...
+
+<span class="comment"># Meta Cloud API (WhatsApp)</span>
+META_ACCESS_TOKEN=EAAZC...
+META_PHONE_NUMBER_ID=1011993898671913
+META_VERIFY_TOKEN=remax-advance-2026
+META_WABA_ID=813172161043400
+
+<span class="comment"># Servidor</span>
+PORT=8000
+ENVIRONMENT=development
+WHATSAPP_PROVIDER=meta
+
+<span class="comment"># Base de datos</span>
+DATABASE_URL=sqlite+aiosqlite:///./agentkit.db
+
+<span class="comment"># Supabase CRM Sync</span>
+SUPABASE_URL=https://zlnqsgepzfghlmsfolko.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=sb_secret_i7rxchdg...</code></pre>
+
+  <h3>Variables Railway (producción)</h3>
+  <p>Las mismas variables del <code>.env</code> deben existir en el proyecto Railway de Ava. Se añaden vía <strong>Dashboard → Variables → Raw Editor</strong>. Railway hace redeploy automático al cambiar variables.</p>
+
+  <div class="callout red avoid-break">
+    <div class="callout-title">Seguridad</div>
+    <p>El <code>SUPABASE_SERVICE_ROLE_KEY</code> tiene permisos completos sobre la base de datos (bypass RLS). Nunca debe exponerse en el cliente ni comitearse al repositorio. Solo debe estar en Railway y en <code>.env</code> local (en .gitignore).</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     11 - ESTADO ACTUAL Y PENDIENTES
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 11</div>
+  <h2>Estado Actual y Pendientes</h2>
+
+  <h3>Completado ✅</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Item</th><th>Estado</th><th>Notas</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Proxy auth (Next.js 16)</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>proxy.ts reemplaza middleware.ts deprecado</td>
+        </tr>
+        <tr>
+          <td>Design system v2 — Light Luminous</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>globals.css reescrito: hex tokens, card-glow, page-header, badges</td>
+        </tr>
+        <tr>
+          <td>Login page — layout 2 columnas</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>Hero izquierdo con stats + glass card derecho. Playfair 54px h1 gradiente</td>
+        </tr>
+        <tr>
+          <td>Sidebar — warm white</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>Gradiente fffcfc→f5f7fb, nav activo rose, bloque dark "Acciones rápidas" al fondo</td>
+        </tr>
+        <tr>
+          <td>Logo component</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>Ícono cuadrado gradiente naranja-red + wordmark Playfair</td>
+        </tr>
+        <tr>
+          <td>Dashboard — nueva UI</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>4 KPI cards con progress bars (azul/emerald/amber/violeta), bar chart, Ava dark card</td>
+        </tr>
+        <tr>
+          <td>Todos los sub-módulos — headers unificados</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>Playfair h1 30px, pill badges rounded-full por módulo</td>
+        </tr>
+        <tr>
+          <td>Pipeline — accent colors actualizados</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>Colores por etapa: azul/amber/rose/violeta/emerald en hex</td>
+        </tr>
+        <tr>
+          <td>Módulo Publicidad (/ads)</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>CPL, CTR, campaigns table, header amber</td>
+        </tr>
+        <tr>
+          <td>Módulo Agentes (/agents)</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>Ranking mensual, agent_monthly_kpis view, header blue</td>
+        </tr>
+        <tr>
+          <td>Sync Ava → Supabase</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>tools.py + main.py fire-and-forget con httpx async</td>
+        </tr>
+        <tr>
+          <td>Dashboard layout — radial gradient bg</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>layout.tsx main con gradiente azul-gris luminoso</td>
+        </tr>
+        <tr>
+          <td>TypeScript — 0 errores</td>
+          <td><span class="badge green">Hecho</span></td>
+          <td>npx tsc --noEmit pasa limpio. Build exitoso en todas las rutas.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Pendiente 🔄 — Funcionalidades a desarrollar</h3>
+  <div class="table-wrap avoid-break">
+    <table>
+      <thead>
+        <tr><th>Feature</th><th>Prioridad</th><th>Descripción técnica</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Integración Meta Ads</strong></td>
+          <td><span class="badge red">Alta</span></td>
+          <td>Conectar la API de Marketing de Meta para sincronizar campañas, gasto, leads generados y CPL en tiempo real en <code>/dashboard/ads</code>. Requiere: Meta Business Manager app, webhook de leads, tabla <code>campaigns</code> actualizada automáticamente.</td>
+        </tr>
+        <tr>
+          <td><strong>Acciones Rápidas funcionales</strong></td>
+          <td><span class="badge red">Alta</span></td>
+          <td>El bloque dark del sidebar ("Nuevo cliente", "Nueva oportunidad", "Agendar seguimiento") actualmente no tiene acción. Implementar: modal/sheet deslizable desde el sidebar con formularios mínimos. Stack sugerido: Radix Dialog o shadcn/ui Sheet.</td>
+        </tr>
+        <tr>
+          <td><strong>Dark Mode en Configuración</strong></td>
+          <td><span class="badge amber">Media</span></td>
+          <td>Agregar toggle de dark/light en <code>/dashboard/settings</code>. Requiere: (1) restaurar bloque <code>html.dark {}</code> en globals.css con tokens oscuros, (2) ThemeProvider con estado persistido en localStorage, (3) toggle en settings page con <code>useTheme()</code>.</td>
+        </tr>
+        <tr>
+          <td>Drag-and-drop en Pipeline</td>
+          <td><span class="badge amber">Media</span></td>
+          <td>dnd-kit para mover cards entre columnas del Kanban. Actualiza <code>stage</code> en Supabase via Realtime.</td>
+        </tr>
+        <tr>
+          <td>Prueba sync Ava → CRM (producción)</td>
+          <td><span class="badge amber">Media</span></td>
+          <td>Enviar mensaje real de WhatsApp al número de Ava y verificar que el contacto aparece en /contacts.</td>
+        </tr>
+        <tr>
+          <td>Deploy CRM a producción</td>
+          <td><span class="badge gray">Normal</span></td>
+          <td>Vercel deploy con variables de entorno de Supabase. Configurar dominio custom si aplica.</td>
+        </tr>
+        <tr>
+          <td>Notificaciones en tiempo real</td>
+          <td><span class="badge gray">Normal</span></td>
+          <td>Supabase Realtime channel en /conversations para nuevos mensajes entrantes. Toast + badge contador.</td>
+        </tr>
+        <tr>
+          <td>Perfil de contacto expandido</td>
+          <td><span class="badge gray">Normal</span></td>
+          <td>Página <code>/dashboard/contacts/[id]</code> con timeline de mensajes, deals, tareas y notas del contacto.</td>
+        </tr>
+        <tr>
+          <td><strong>Ava — Matching de propiedades por rango de precio</strong></td>
+          <td><span class="badge red">Alta</span></td>
+          <td>Cuando Ava captura el presupuesto de un lead por WhatsApp, consulta automáticamente la tabla <code>properties</code> en Supabase filtrando por rango de precio y tipo de propiedad de interés. Envía al cliente un mensaje formateado con 1–3 propiedades que coincidan (foto, precio, ubicación, m², link). Requiere: (1) campo <code>budget_min / budget_max</code> y <code>property_type_interest</code> en <code>contacts</code>, (2) función <code>match_properties_for_contact()</code> en tools.py, (3) template de mensaje WhatsApp con Media Message para la foto.</td>
+        </tr>
+        <tr>
+          <td><strong>Propuestas PDF de propiedades</strong></td>
+          <td><span class="badge red">Alta</span></td>
+          <td>El agente selecciona 1 o varias propiedades desde el CRM y genera un PDF de propuesta comercial con: logo Advance Estate, datos del agente (nombre, foto, teléfono, email), ficha de cada propiedad (fotos, precio, descripción, m², ubicación) y pie de página con branding RE/MAX. Generación server-side con Puppeteer (ya instalado) o React-PDF. El PDF se descarga o se envía directamente por WhatsApp al contacto.</td>
+        </tr>
+        <tr>
+          <td><strong>WhatsApp directo desde CRM y app móvil</strong></td>
+          <td><span class="badge red">Alta</span></td>
+          <td>En la ficha de cada contacto y en la lista de conversaciones, agregar botón "Enviar WhatsApp" que abra un composer de mensaje. En web (CRM): usar la Meta Cloud API para enviar el mensaje desde el número de Ava directamente, sin salir del CRM — el mensaje queda registrado en <code>messages</code> con <code>direction=outbound</code>. En app móvil: opción adicional de abrir WhatsApp nativo con <code>whatsapp://send?phone=…</code> para uso rápido del agente. El número de teléfono del contacto también debe ser clickeable como enlace <code>tel:</code> en todas las vistas.</td>
+        </tr>
+        <tr>
+          <td><strong>Alta de propiedades desde el CRM</strong></td>
+          <td><span class="badge red">Alta</span></td>
+          <td>Formulario de creación de propiedades en <code>/dashboard/properties</code>. Campos: tipo (apartamento/villa/casa/solar/etc.), precio, ubicación, habitaciones, baños, m², estado (activo/reservado/vendido), descripción y fotos (upload a Supabase Storage). Botón "Nueva propiedad" en el header de la página abre un Sheet o página <code>/properties/new</code>. También agregar acción de editar/eliminar en cada card existente.</td>
+        </tr>
+        <tr>
+          <td><strong>App Móvil CRM</strong></td>
+          <td><span class="badge amber">Planificado</span></td>
+          <td>Aplicación móvil nativa para iOS y Android. Stack recomendado: <strong>React Native + Expo</strong> reutilizando la misma conexión Supabase. Vistas prioritarias: Dashboard KPIs, lista de contactos, pipeline, tareas del día, chat con Ava. Autenticación con <code>supabase-js</code> + Expo SecureStore para tokens. Notificaciones push via Expo Notifications para seguimientos y mensajes entrantes de WhatsApp.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     12 - GUÍA DE DESPLIEGUE
+══════════════════════════════════════════ -->
+<div class="section page-break">
+  <div class="section-number">— 12</div>
+  <h2>Guía de Despliegue</h2>
+
+  <h3>CRM (advance-crm) — Desarrollo local</h3>
+  <pre><code><span class="comment"># Instalar dependencias</span>
+cd advance-crm
+npm install
+
+<span class="comment"># Configurar variables de entorno</span>
+cp .env.local.example .env.local
+<span class="comment"># Editar .env.local con las credenciales de Supabase</span>
+
+<span class="comment"># Iniciar servidor de desarrollo</span>
+npm run dev
+<span class="comment"># → http://localhost:3000</span></code></pre>
+
+  <h3>CRM (advance-crm) — Producción con Vercel</h3>
+  <pre><code><span class="comment"># Deploy a Vercel</span>
+npx vercel --prod
+
+<span class="comment"># Variables de entorno en Vercel Dashboard:</span>
+<span class="comment"># NEXT_PUBLIC_SUPABASE_URL</span>
+<span class="comment"># NEXT_PUBLIC_SUPABASE_ANON_KEY</span></code></pre>
+
+  <h3>Agente Ava — Railway</h3>
+  <pre><code><span class="comment"># El deploy es automático via GitHub → Railway CI</span>
+<span class="comment"># Variables requeridas en Railway Dashboard:</span>
+ANTHROPIC_API_KEY=sk-ant-...
+META_ACCESS_TOKEN=EAAZC...
+META_PHONE_NUMBER_ID=1011993898671913
+META_VERIFY_TOKEN=remax-advance-2026
+META_WABA_ID=813172161043400
+WHATSAPP_PROVIDER=meta
+PORT=8000
+SUPABASE_URL=https://zlnqsgepzfghlmsfolko.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=sb_secret_...</code></pre>
+
+  <h3>Configurar webhook en Meta Business</h3>
+  <pre><code><span class="comment"># En Meta Developers → WhatsApp → Configuration</span>
+Callback URL: https://remax-advance-ava-production.up.railway.app/webhook
+Verify Token: remax-advance-2026
+Subscribe to: messages</code></pre>
+
+  <h3>Verificar funcionamiento del sync</h3>
+  <pre><code><span class="comment"># 1. Enviar mensaje WhatsApp al número de Ava</span>
+<span class="comment"># 2. Esperar respuesta de Ava (2–5 segundos)</span>
+<span class="comment"># 3. Verificar en Supabase Dashboard:</span>
+<span class="comment">#    SELECT * FROM contacts WHERE phone = '+1...' ORDER BY created_at DESC;</span>
+<span class="comment">#    SELECT * FROM messages WHERE contact_id = '...' ORDER BY created_at DESC;</span>
+<span class="comment"># 4. Verificar en CRM:</span>
+<span class="comment">#    http://localhost:3000/dashboard/conversations</span></code></pre>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FEATURES IMPLEMENTADAS — v1.4
+══════════════════════════════════════════ -->
+<div class="sep page-break"></div>
+<div class="section avoid-break">
+  <div class="section-header">
+    <span class="section-tag">v1.4 — Abril 2026</span>
+    <h2>Features Implementadas</h2>
+  </div>
+
+  <!-- F12: Security hardening -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>12. Seguridad API — Hardening Completo</h3>
+    <p>Todas las rutas API internas y el agente Ava han sido reforzadas contra acceso no autorizado, injection de prompts y datos malformados.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Fix</th><th>Detalle</th></tr></thead>
+      <tbody>
+        <tr><td><code>middleware.ts</code></td><td>Creado</td><td>Edge auth: protege /dashboard/* (redirect) y /api/messages + /api/pdf (401). /api/ava excluido por diseño.</td></tr>
+        <tr><td><code>app/api/messages/route.ts</code></td><td>Refactorizado</td><td>Auth defense-in-depth: UUID regex, E.164 phone, content ≤4096 chars, verificación de contacto existente</td></tr>
+        <tr><td><code>app/api/ava/route.ts</code></td><td>Refactorizado</td><td>Bearer secret AVA_WEBHOOK_SECRET, sanitización contact_name/phone (strip control chars), UUID check, verify contact exists</td></tr>
+        <tr><td><code>app/api/pdf/route.ts</code></td><td>Refactorizado</td><td>Auth check via sesión, agentEmail resuelto desde user.email (no request body), UUID validation en propertyIds</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Arquitectura de seguridad:</strong> Middleware (edge) → Handler auth check (defense-in-depth) → Input validation → Service role DB ops</p>
+    <p><strong>Pendiente en entorno:</strong> Añadir <code>AVA_WEBHOOK_SECRET</code> en Railway + <code>.env.local</code> con el mismo valor. El Python agent debe enviar <code>Authorization: Bearer &lt;secret&gt;</code>.</p>
+  </div>
+
+  <!-- F13: Supabase Realtime -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>13. Supabase Realtime — Conversaciones y Contacto Detalle</h3>
+    <p>Las páginas de conversaciones y la sección WhatsApp en el detalle de contacto se actualizan en tiempo real sin refresh manual cuando llegan mensajes nuevos.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>app/dashboard/conversations/conversations-client.tsx</code></td><td>Creado</td><td>Client component: <code>supabase.channel().on("postgres_changes")</code> → refetch full list on any insert/update</td></tr>
+        <tr><td><code>app/dashboard/conversations/page.tsx</code></td><td>Reescrito</td><td>Server shell: SSR data fetch → pasa initialConversations a ConversationsClient</td></tr>
+        <tr><td><code>app/dashboard/contacts/[id]/contact-whatsapp.tsx</code></td><td>Creado</td><td>Client component: suscripción INSERT filtrada por contact_id, append optimista, auto-scroll al fondo</td></tr>
+        <tr><td><code>app/dashboard/contacts/[id]/page.tsx</code></td><td>Modificado</td><td>Reemplaza mensaje estático por &lt;ContactWhatsApp initialMessages={...} /&gt;</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Canal conversations:</strong> <code>messages-realtime</code> · filter: <code>channel=eq.whatsapp</code> · evento: <code>*</code> → refetch completo (incluye contact join)</p>
+    <p><strong>Canal contact detail:</strong> <code>messages-contact-{contactId}</code> · filter: <code>contact_id=eq.{id}</code> · evento: <code>INSERT</code> → append al array local</p>
+    <p><strong>Cleanup:</strong> <code>supabase.removeChannel()</code> en return del useEffect para evitar leaks</p>
+  </div>
+
+  <!-- F14: Tasks CRUD -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>14. Editar y Eliminar Tareas</h3>
+    <p>La página de tareas ahora es interactiva: se puede marcar una tarea como completada con un clic, editarla en un Sheet pre-llenado, o eliminarla con confirmación.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>app/dashboard/tasks/tasks-table.tsx</code></td><td>Creado</td><td>Client component: tabla con toggle de completado, iconos ✎ y 🗑 en hover, TaskSheet</td></tr>
+        <tr><td><code>app/dashboard/tasks/task-sheet.tsx</code></td><td>Creado</td><td>Sheet de creación/edición: title, description, due_date, priority, status. isEdit = !!task</td></tr>
+        <tr><td><code>app/dashboard/tasks/page.tsx</code></td><td>Reescrito</td><td>Server shell → pasa tasks a &lt;TasksTable /&gt;</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Toggle completado:</strong> Botón circular → <code>supabase.update({status: "completed"})</code> → router.refresh(). Tarea completada aparece tachada.</p>
+    <p><strong>Patrón consistente:</strong> Mismo patrón que contacts-table.tsx y pipeline-client.tsx — group-hover:opacity-100, confirm() antes de delete, toast.success/error.</p>
+  </div>
+
+  <!-- F8: Contact Detail Page -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>8. Vista Detalle de Contacto <code>/contacts/[id]</code></h3>
+    <p>Página de perfil completo de contacto: header con avatar, badges y datos de contacto; sección de oportunidades con cards por etapa; sección de seguimientos con prioridad y fecha; conversación WhatsApp inline con historial y composer.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>app/dashboard/contacts/[id]/page.tsx</code></td><td>Creado</td><td>Server component: fetch contact+deals+tasks+messages, render layout completo</td></tr>
+        <tr><td><code>app/dashboard/contacts/[id]/contact-actions.tsx</code></td><td>Creado</td><td>Client: botones "Nueva oportunidad" / "Nuevo seguimiento" pre-seleccionados al contacto</td></tr>
+        <tr><td><code>app/dashboard/contacts/page.tsx</code></td><td>Modificado</td><td>Columna nombre es ahora un Link a /contacts/[id]</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Secciones:</strong> Datos del contacto (avatar, nombre, badges clasificación/estado, teléfono, email, presupuesto, score) · Oportunidades (cards coloridos por etapa) · Seguimientos (prioridad, vencimiento, estado) · Conversación WhatsApp (burbuja inbound/outbound, ícono Ava, timestamp, composer inline)</p>
+    <p><strong>Patrón:</strong> Server component → datos como props estáticas → client components solo para interactividad (sheets, composer). <code>router.refresh()</code> tras guardar.</p>
+  </div>
+
+  <!-- F9: Edit/Delete Contacts -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>9. Editar y Eliminar Contactos</h3>
+    <p>Botones de edición y eliminación en cada fila de la tabla de contactos. Sheet de edición pre-rellena todos los campos del contacto.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>components/contact-sheet.tsx</code></td><td>Creado</td><td>Sheet de creación/edición reutilizable con isEdit = !!contact, todos los campos del modelo</td></tr>
+        <tr><td><code>app/dashboard/contacts/contacts-table.tsx</code></td><td>Creado</td><td>Client component: tabla interactiva con iconos ✎ y 🗑 por fila, confirmación antes de borrar</td></tr>
+        <tr><td><code>app/dashboard/contacts/page.tsx</code></td><td>Modificado</td><td>Reemplaza tabla estática por &lt;ContactsTable /&gt;, selecciona campos adicionales (budget_min/max)</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Campos editables:</strong> first_name, last_name, phone, email, lead_classification, lead_status, source, budget_min, budget_max</p>
+    <p><strong>Delete:</strong> confirm() nativo → supabase.from("contacts").delete().eq("id") → toast.success → router.refresh()</p>
+  </div>
+
+  <!-- F10: Edit/Delete Deals -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>10. Editar y Eliminar Deals en Pipeline</h3>
+    <p>Botones de edición y eliminación que aparecen al hacer hover sobre cada card del pipeline kanban.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>components/deal-sheet.tsx</code></td><td>Creado</td><td>Sheet de creación/edición de deal con selector de contacto, etapa, valor, moneda, fecha y notas</td></tr>
+        <tr><td><code>app/dashboard/pipeline/pipeline-client.tsx</code></td><td>Creado</td><td>Client component kanban: DealCard con hover actions, DealSheet, drag &amp; drop (ver F11)</td></tr>
+        <tr><td><code>app/dashboard/pipeline/page.tsx</code></td><td>Modificado</td><td>Server shell → pasa typedDeals a &lt;PipelineClient /&gt;</td></tr>
+      </tbody>
+    </table>
+    <p><strong>UX:</strong> Iconos ✎ y 🗑 aparecen solo en hover (<code>group-hover:opacity-100</code>). Nombre del contacto en cada card es Link a /contacts/[id].</p>
+  </div>
+
+  <!-- F11: Drag & Drop Pipeline -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>11. Drag &amp; Drop en Pipeline</h3>
+    <p>Los deals pueden moverse entre columnas con drag &amp; drop. La etapa se actualiza en Supabase al soltar con actualización optimista de UI.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>app/dashboard/pipeline/pipeline-client.tsx</code></td><td>Creado</td><td>DndContext + DragOverlay + useDraggable (DealCard) + useDroppable (DroppableColumn)</td></tr>
+        <tr><td><code>package.json</code></td><td>Modificado</td><td>Añade @dnd-kit/core + @dnd-kit/sortable + @dnd-kit/utilities</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Librería:</strong> @dnd-kit/core (compatible con Next.js RSC) · <strong>Sensor:</strong> PointerSensor con activationConstraint distance: 8px para evitar drags accidentales</p>
+    <p><strong>Optimistic update:</strong> setDeals() inmediato → supabase.update(stage) → revert si error · <strong>DragOverlay:</strong> card fantasma con rotación al arrastrar · Columnas muestran "Soltar aquí" si están vacías y el drag está sobre ellas</p>
+  </div>
+
+  <!-- F1: Quick Actions -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>1. Acciones Rápidas del Sidebar</h3>
+    <p>Tres botones en el bloque dark del sidebar abren Sheets de shadcn/ui para alta rápida de datos sin salir del contexto actual.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>components/quick-action-sheets.tsx</code></td><td>Creado</td><td>Componente cliente con 3 sub-formularios (NewContactForm, NewDealForm, NewTaskForm)</td></tr>
+        <tr><td><code>components/sidebar.tsx</code></td><td>Modificado</td><td>Reemplaza botones estáticos con &lt;QuickActionSheets /&gt;</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Formularios:</strong> Nuevo cliente (first_name, last_name, phone, lead_classification) · Nueva oportunidad (contacto, deal_value, stage) · Agendar seguimiento (contacto, title, due_date, priority)</p>
+    <p><strong>Tecnología:</strong> @base-ui/react Sheet · Supabase client · Sonner toasts · null-guard en Select.onValueChange para <code>string | null</code></p>
+  </div>
+
+  <!-- F2: Property CRUD -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>2. Alta de Propiedades</h3>
+    <p>CRUD completo de propiedades con upload de fotos a Supabase Storage desde <code>/dashboard/properties</code>.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>components/property-sheet.tsx</code></td><td>Creado</td><td>Sheet de creación/edición con upload de imágenes</td></tr>
+        <tr><td><code>app/dashboard/properties/properties-client.tsx</code></td><td>Creado</td><td>Wrapper cliente: sheet, selección, delete, PDF trigger</td></tr>
+        <tr><td><code>app/dashboard/properties/page.tsx</code></td><td>Modificado</td><td>Server shell → pasa initialProperties a PropertiesClient</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Bucket Supabase Storage:</strong> <code>property-images</code> · Upload: <code>storage.from("property-images").upload(path, file)</code> → getPublicUrl</p>
+    <p><strong>Campos:</strong> title, property_type, transaction_type, price, currency, location_city, location_sector, bedrooms, bathrooms, area_m2, status, description, images[]</p>
+  </div>
+
+  <!-- F3: WhatsApp Direct -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>3. WhatsApp Directo</h3>
+    <p>Envío de mensajes outbound desde el CRM via Meta Cloud API con persistencia en tabla <code>messages</code>.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>app/api/messages/route.ts</code></td><td>Creado</td><td>POST con normalización de teléfono, Meta Cloud API v22.0, insert a messages</td></tr>
+        <tr><td><code>components/whatsapp-composer.tsx</code></td><td>Creado</td><td>Textarea + botón verde, Ctrl+Enter shortcut</td></tr>
+        <tr><td><code>app/dashboard/conversations/conversation-composer.tsx</code></td><td>Creado</td><td>Wrapper cliente con router.refresh() tras envío</td></tr>
+        <tr><td><code>app/dashboard/contacts/page.tsx</code></td><td>Modificado</td><td>Celdas de teléfono: tel: link + ícono wa.me/</td></tr>
+      </tbody>
+    </table>
+    <p><strong>direction:</strong> <code>outbound</code> · <strong>is_automated:</strong> <code>false</code> · teléfonos normalizados: <code>phone.replace(/[\s\-().]/g, "")</code></p>
+  </div>
+
+  <!-- F4: PDF Proposals -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>4. Propuestas PDF</h3>
+    <p>Selección de 1–10 propiedades desde el listado, generación de PDF con Puppeteer incluyendo branding Advance Estate + RE/MAX.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>lib/pdf-template.ts</code></td><td>Creado</td><td>buildProposalHtml(): HTML de portada + fichas de propiedad</td></tr>
+        <tr><td><code>app/api/pdf/route.ts</code></td><td>Creado</td><td>POST → Puppeteer → application/pdf, máx 10 propiedades</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Puppeteer args:</strong> --no-sandbox, --disable-setuid-sandbox · <strong>Output:</strong> Content-Disposition attachment para descarga directa</p>
+  </div>
+
+  <!-- F5: Ava Matching -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>5. Ava — Matching de Propiedades por Presupuesto</h3>
+    <p>Ava puede buscar propiedades activas que coincidan con el presupuesto y tipo de interés del lead, usando Claude tool use.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>whatsapp-agentkit/agent/tools.py</code></td><td>Modificado</td><td>Añade match_properties_for_contact() y format_property_message()</td></tr>
+        <tr><td><code>whatsapp-agentkit/agent/brain.py</code></td><td>Modificado</td><td>AVA_TOOLS (4 tools), agentic loop con tool_use de Claude</td></tr>
+        <tr><td><code>whatsapp-agentkit/agent/main.py</code></td><td>Modificado</td><td>Pre-sync de contacto para obtener contact_id; pasa context al brain</td></tr>
+        <tr><td><code>advance-crm/migrations/0003_contact_budget_fields.sql</code></td><td>Creado</td><td>Añade budget_min, budget_max, budget_currency, property_type_interest a contacts</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Herramientas Ava:</strong> registrar_lead · match_properties_for_contact · registrar_cita · buscar_en_knowledge</p>
+    <p><strong>Migración SQL:</strong> Ejecutar en Supabase SQL Editor → <code>migrations/0003_contact_budget_fields.sql</code></p>
+    <pre><code>ALTER TABLE contacts
+  ADD COLUMN IF NOT EXISTS budget_min       numeric,
+  ADD COLUMN IF NOT EXISTS budget_max       numeric,
+  ADD COLUMN IF NOT EXISTS budget_currency  text DEFAULT 'USD',
+  ADD COLUMN IF NOT EXISTS property_type_interest text;</code></pre>
+  </div>
+
+  <!-- F7: Page-level Add Buttons -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>7. Botones "Nuevo" en Contactos y Oportunidades</h3>
+    <p>Botones de acción rápida en los headers de las páginas de Contactos y Pipeline, con Sheet inline y refresco automático de la lista al guardar.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>components/quick-action-sheets.tsx</code></td><td>Modificado</td><td>Exports <code>NewContactButton</code> + <code>NewDealButton</code> con router.refresh()</td></tr>
+        <tr><td><code>app/dashboard/contacts/page.tsx</code></td><td>Modificado</td><td>Botón "Nuevo cliente" en header + fix color foreground para dark mode</td></tr>
+        <tr><td><code>app/dashboard/pipeline/page.tsx</code></td><td>Modificado</td><td>Botón "Nueva oportunidad" en header + fix color foreground para dark mode</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Comportamiento:</strong> Al guardar, <code>router.refresh()</code> recarga los datos del server component sin full-page reload. Los contactos del picker de deals se cargan solo cuando se abre el Sheet (lazy load).</p>
+  </div>
+
+  <!-- F6: Dark Mode -->
+  <div class="avoid-break" style="margin-bottom:28px">
+    <h3>6. Dark Mode</h3>
+    <p>Toggle de tema premium oscuro (slate-950) con persistencia en localStorage via next-themes. Accesible desde /dashboard/settings.</p>
+    <table>
+      <thead><tr><th>Archivo</th><th>Operación</th><th>Descripción</th></tr></thead>
+      <tbody>
+        <tr><td><code>components/theme-provider.tsx</code></td><td>Modificado</td><td>next-themes ThemeProvider con attribute="class", storageKey</td></tr>
+        <tr><td><code>components/theme-toggle.tsx</code></td><td>Creado</td><td>Botón toggle con pill animada, Sun/Moon icons</td></tr>
+        <tr><td><code>app/globals.css</code></td><td>Modificado</td><td>Bloque .dark { } con tokens slate-950/slate-900 + overrides de componentes</td></tr>
+        <tr><td><code>app/layout.tsx</code></td><td>Modificado</td><td>Elimina clase "light" hardcoded; next-themes la gestiona</td></tr>
+        <tr><td><code>app/dashboard/settings/page.tsx</code></td><td>Modificado</td><td>Añade card "Apariencia" con ThemeToggle</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Paleta dark:</strong> background #020617 (slate-950) · card #0f172a (slate-900) · sidebar #0a0f1e · primary rose-500 <code>#f43f5e</code></p>
+    <p><strong>Persistencia:</strong> localStorage key <code>advance-crm-theme</code> · next-themes gestiona SSR con suppressHydrationWarning</p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ESTADO Y BACKLOG
+══════════════════════════════════════════ -->
+<div class="sep page-break"></div>
+<div class="section avoid-break">
+  <div class="section-header">
+    <span class="section-tag">Estado actual</span>
+    <h2>Completado · Pendiente · Backlog</h2>
+  </div>
+
+  <h3>✅ Completado</h3>
+  <table>
+    <thead><tr><th>Feature</th><th>Descripción</th><th>Archivos clave</th></tr></thead>
+    <tbody>
+      <tr><td>Acciones rápidas sidebar</td><td>3 Sheets: nuevo cliente, nueva oportunidad, seguimiento</td><td>quick-action-sheets.tsx, sidebar.tsx</td></tr>
+      <tr><td>Alta de propiedades</td><td>CRUD completo + upload fotos a Supabase Storage</td><td>property-sheet.tsx, properties-client.tsx</td></tr>
+      <tr><td>WhatsApp directo</td><td>Composer + Meta Cloud API + links tel:/wa.me/</td><td>api/messages/route.ts, whatsapp-composer.tsx</td></tr>
+      <tr><td>Propuestas PDF</td><td>Selección de propiedades + Puppeteer + branding RE/MAX</td><td>api/pdf/route.ts, lib/pdf-template.ts</td></tr>
+      <tr><td>Ava matching por precio</td><td>Tool use Claude + filtro por presupuesto + SQL migration</td><td>agent/brain.py, agent/tools.py, 0003_contact_budget_fields.sql</td></tr>
+      <tr><td>Dark mode</td><td>next-themes + tokens slate-950 + toggle en settings</td><td>theme-provider.tsx, theme-toggle.tsx, globals.css</td></tr>
+      <tr><td>Botones "Nuevo" en páginas</td><td>NewContactButton en /contacts, NewDealButton en /pipeline</td><td>quick-action-sheets.tsx, contacts/page.tsx, pipeline/page.tsx</td></tr>
+      <tr><td>Vista detalle /contacts/[id]</td><td>Perfil completo: deals, tareas, conversación WhatsApp inline</td><td>contacts/[id]/page.tsx, contact-actions.tsx</td></tr>
+      <tr><td>Editar/eliminar contactos</td><td>Sheet de edición + delete con confirm por fila en tabla</td><td>contact-sheet.tsx, contacts-table.tsx</td></tr>
+      <tr><td>Editar/eliminar deals</td><td>Sheet de edición + delete en hover sobre cards del pipeline</td><td>deal-sheet.tsx, pipeline-client.tsx</td></tr>
+      <tr><td>Drag &amp; drop pipeline</td><td>@dnd-kit: mover deals entre columnas, update optimista en Supabase</td><td>pipeline-client.tsx, package.json</td></tr>
+      <tr><td><strong>Seguridad API</strong></td><td>Middleware, auth defense-in-depth, UUID/phone validation, prompt injection fix</td><td>middleware.ts, api/messages, api/ava, api/pdf</td></tr>
+      <tr><td><strong>Realtime conversaciones</strong></td><td>ConversationsClient con postgres_changes subscription, refetch automático</td><td>conversations-client.tsx, conversations/page.tsx</td></tr>
+      <tr><td><strong>Realtime contacto WhatsApp</strong></td><td>ContactWhatsApp con INSERT subscription filtrada, auto-scroll al fondo</td><td>contacts/[id]/contact-whatsapp.tsx</td></tr>
+      <tr><td><strong>Tasks CRUD</strong></td><td>Toggle completado + editar Sheet + eliminar con confirm</td><td>tasks-table.tsx, task-sheet.tsx</td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:24px">⏳ Pendiente de ejecutar manualmente</h3>
+  <table>
+    <thead><tr><th>Acción</th><th>Dónde</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td>Migración SQL budget fields</td><td>Supabase SQL Editor</td><td><code>migrations/0003_contact_budget_fields.sql</code> — columnas ya verificadas como existentes vía REST</td></tr>
+      <tr><td>Crear bucket Supabase Storage</td><td>Supabase Dashboard → Storage</td><td>Nombre: <code>property-images</code> · Acceso: public · Políticas: INSERT para authenticated</td></tr>
+      <tr><td>Configurar WHATSAPP_TOKEN en .env</td><td><code>advance-crm/.env.local</code></td><td>Para envío outbound desde CRM (Feature 3)</td></tr>
+      <tr><td><strong>Configurar AVA_WEBHOOK_SECRET</strong></td><td><code>advance-crm/.env.local</code> + Railway</td><td>Mismo valor en ambos entornos. Python agent debe enviar <code>Authorization: Bearer &lt;secret&gt;</code></td></tr>
+    </tbody>
+  </table>
+
+  <h3 style="margin-top:24px">📋 Backlog (definido, no implementado)</h3>
+  <table>
+    <thead><tr><th>Item</th><th>Prioridad</th><th>Descripción</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Ava — Multimedia (voz, imagen, links)</strong></td>
+        <td>Alta</td>
+        <td>
+          Recibir y procesar mensajes multimedia entrantes desde WhatsApp:<br>
+          <strong>Notas de voz:</strong> Descargar audio/ogg desde Meta API → transcribir con OpenAI Whisper → pasar texto a thread de Ava<br>
+          <strong>Imágenes:</strong> Descargar imagen → analizar con GPT-4o Vision → incluir descripción en contexto de Ava<br>
+          <strong>Links:</strong> Detectar URLs en mensaje → extraer título/descripción con og:meta o puppeteer → enriquecer contexto<br>
+          <strong>DB:</strong> Campos <code>media_url</code> + <code>media_type</code> en tabla <code>messages</code> · Migración <code>0004_messages_media_fields.sql</code><br>
+          <strong>CRM:</strong> Mostrar burbujas de audio (player HTML5), thumbnails de imagen y previews de link en el chat del contacto
+        </td>
+      </tr>
+      <tr><td>App móvil Expo</td><td>Alta</td><td>Agentes en campo — acceso a contactos, pipeline y composer desde iOS/Android</td></tr>
+      <tr><td>Deploy a Vercel</td><td>Media</td><td>CI/CD automático desde GitHub. Prerrequisito: variables de entorno, dominio custom, Puppeteer layer.</td></tr>
+      <tr><td>Calendario de citas</td><td>Media</td><td>Vista calendar integrada con tareas y seguimientos</td></tr>
+      <tr><td>Reportes y analítica</td><td>Baja</td><td>Conversión por etapa, leads por fuente, revenue pipeline</td></tr>
+      <tr><td>Meta Ads API</td><td>Baja</td><td>Conectar Marketing API de Meta a /dashboard/ads</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<div class="sep"></div>
+<div class="footer">
+  <div>
+    <div class="logo-text">Advance <span>Estate</span> CRM</div>
+    <div style="font-size:8pt;margin-top:3px">RE/MAX Advance · República Dominicana</div>
+  </div>
+  <div style="text-align:right">
+    <div>Documentación Técnica v1.4</div>
+    <div>Abril 2026 · Confidencial</div>
+  </div>
+</div>
+
+</body>
+</html>
