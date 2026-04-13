@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { Eye, EyeOff, ArrowUpRight, Loader2, Sparkles } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -12,6 +12,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  async function handleGoogleLogin() {
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -28,164 +36,319 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 md:p-6"
-      style={{
-        background: "radial-gradient(circle at top left, rgba(219,234,254,.9), transparent 28%), linear-gradient(180deg,#f8fbff 0%,#f3f7fb 45%,#eef3f9 100%)",
-      }}
-    >
-      <div
-        className="w-full max-w-[1200px] overflow-hidden"
-        style={{
-          borderRadius: 32,
-          border: "1px solid rgba(255,255,255,0.7)",
-          background: "rgba(255,255,255,0.55)",
-          boxShadow: "0 24px 80px rgba(15,23,42,0.08)",
-          backdropFilter: "blur(16px)",
-        }}
+    <main className="flex min-h-screen overflow-hidden bg-[#FAFAF9] text-[#1C1917]">
+      {/* LEFT PANEL: Brand Side */}
+      <section
+        className="hidden md:flex md:w-1/2 flex-col justify-between p-16 relative overflow-hidden"
+        style={{ background: "#111827" }}
       >
-        <div className="grid min-h-[680px] lg:grid-cols-2">
+        {/* Top spacer */}
+        <div />
 
-          {/* LEFT — Hero */}
-          <div className="relative hidden lg:flex flex-col justify-between p-10 xl:p-14 overflow-hidden">
-            <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(circle at top left,rgba(29,78,216,.12),transparent 22%),radial-gradient(circle at bottom right,rgba(225,29,72,.10),transparent 24%),linear-gradient(180deg,#f8fbff 0%,#f3f7fb 100%)" }} />
-            <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(148,163,184,0.14) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.14) 1px,transparent 1px)", backgroundSize: "32px 32px", opacity: 0.35 }} />
-
-            <div className="relative z-10">
-              <div className="flex items-center gap-4 mb-20">
-                <div style={{ width: 56, height: 56, borderRadius: 18, background: "linear-gradient(135deg, #f97316, #e11d48)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 16px 30px rgba(225,29,72,0.28)" }}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z" fill="white" fillOpacity="0.95" /></svg>
-                </div>
-                <div>
-                  <div style={{ fontFamily: "var(--font-playfair),Georgia,serif", fontWeight: 600, color: "#0f172a", fontSize: 22, letterSpacing: "0.04em" }}>Advance Estate</div>
-                  <div style={{ fontFamily: "var(--font-inter),sans-serif", color: "#94a3b8", fontSize: 10, letterSpacing: "0.3em", textTransform: "uppercase", marginTop: 2 }}>CRM Inmobiliario con IA</div>
-                </div>
-              </div>
-
-              <div className="inline-flex items-center gap-2 rounded-full border border-rose-100 bg-white/80 px-4 py-2 text-xs font-medium text-rose-700 shadow-sm backdrop-blur mb-6">
-                <Sparkles className="h-3.5 w-3.5" />
-                Plataforma comercial premium
-              </div>
-
-              <h1 style={{ fontFamily: "var(--font-playfair),Georgia,serif", fontWeight: 800, fontSize: 54, lineHeight: 1.04, letterSpacing: "-0.02em", color: "#0f172a" }}>
-                Gestiona clientes,
-                <br />
-                <span style={{ background: "linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #e11d48 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  oportunidades
-                </span>
-                <br />y ventas con claridad.
-              </h1>
-
-              <p className="mt-5 text-base leading-7 text-slate-500 max-w-md">
-                Una experiencia luminosa, elegante y productiva para equipos que necesitan responder rápido, priorizar mejor y cerrar más negocios.
-              </p>
-            </div>
-
-            <div className="relative z-10 grid grid-cols-3 gap-3">
-              {[
-                { label: "Pipeline activo", value: "$4.2M", sub: "+14% este mes", color: "#10b981" },
-                { label: "Seguimientos hoy", value: "18", sub: "6 prioritarios", color: "#2563eb" },
-                { label: "Conversión", value: "28%", sub: "Lectura en tiempo real", color: "#7c3aed" },
-              ].map((s) => (
-                <div key={s.label} className="rounded-[24px] p-4" style={{ border: "1px solid rgba(255,255,255,0.7)", background: "rgba(255,255,255,0.75)", boxShadow: "0 10px 30px rgba(15,23,42,0.06)", backdropFilter: "blur(8px)" }}>
-                  <div className="text-xs text-slate-500 mb-1">{s.label}</div>
-                  <div style={{ fontFamily: "var(--font-playfair),Georgia,serif", fontWeight: 700, fontSize: 26, color: "#0f172a", letterSpacing: "-0.02em" }}>{s.value}</div>
-                  <div className="text-xs mt-1.5" style={{ color: s.color }}>{s.sub}</div>
-                </div>
-              ))}
-            </div>
+        {/* Center Content */}
+        <div className="flex flex-col items-center text-center">
+          {/* AE Monogram */}
+          <div className="relative w-20 h-20 flex items-center justify-center mb-8">
+            <div
+              className="absolute w-full"
+              style={{
+                height: 4,
+                background: "#e11d48",
+                top: "50%",
+                transform: "translateY(-50%)",
+                zIndex: 10,
+              }}
+            />
+            <svg
+              className="w-full h-full fill-none stroke-white"
+              strokeWidth="4"
+              viewBox="0 0 100 100"
+            >
+              <path d="M20 80 L50 20 L80 80" />
+              <path d="M40 80 L40 20 L75 20 M40 80 L75 80" />
+            </svg>
           </div>
 
-          {/* RIGHT — Form */}
-          <div className="relative flex items-center justify-center p-6 md:p-10" style={{ background: "linear-gradient(180deg,rgba(255,255,255,.78) 0%,rgba(248,250,252,.94) 100%)" }}>
-            <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: "linear-gradient(rgba(148,163,184,0.15) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.15) 1px,transparent 1px)", backgroundSize: "28px 28px", opacity: 0.18 }} />
-
-            <div className="relative z-10 w-full max-w-[420px]">
-              {/* Mobile logo */}
-              <div className="mb-8 text-center lg:hidden">
-                <div style={{ width: 52, height: 52, borderRadius: 16, background: "linear-gradient(135deg, #f97316, #e11d48)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", boxShadow: "0 16px 30px rgba(225,29,72,0.28)" }}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 12L12 3L21 12V21H15V15H9V21H3V12Z" fill="white" fillOpacity="0.95" /></svg>
-                </div>
-                <div style={{ fontFamily: "var(--font-playfair),Georgia,serif", fontWeight: 600, fontSize: 22, color: "#0f172a", marginTop: 12 }}>Advance Estate</div>
-                <div style={{ color: "#94a3b8", fontSize: 10, letterSpacing: "0.28em", textTransform: "uppercase", marginTop: 3 }}>CRM Inmobiliario con IA</div>
-              </div>
-
-              <div style={{ borderRadius: 32, border: "1px solid rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.88)", padding: 32, boxShadow: "0 24px 80px rgba(15,23,42,0.10)", backdropFilter: "blur(12px)" }}>
-                <div className="flex items-start justify-between gap-3 mb-7">
-                  <div>
-                    <div className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-2">Bienvenido</div>
-                    <h2 style={{ fontFamily: "var(--font-playfair),Georgia,serif", fontWeight: 700, fontSize: 36, letterSpacing: "-0.02em", color: "#0f172a", lineHeight: 1.1 }}>
-                      Inicia sesión
-                    </h2>
-                    <p className="mt-2 text-sm leading-6 text-slate-500">Accede al panel comercial, revisa oportunidades y da seguimiento a tus clientes.</p>
-                  </div>
-                  <div className="shrink-0 text-center rounded-2xl px-3 py-2 text-xs font-semibold text-rose-700" style={{ background: "#fff1f2", border: "1px solid #fecdd3", lineHeight: 1.4 }}>En<br />vivo</div>
-                </div>
-
-                <form onSubmit={handleLogin} className="space-y-4">
-                  <div>
-                    <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Email</label>
-                    <input type="email" placeholder="agente@remaxadvance.com" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email"
-                      className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 text-sm text-slate-700 shadow-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100" />
-                  </div>
-
-                  <div>
-                    <div className="mb-2 flex items-center justify-between">
-                      <label className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Contraseña</label>
-                      <button type="button" className="text-xs text-slate-400 hover:text-slate-700 transition">¿Olvidaste tu contraseña?</button>
-                    </div>
-                    <div className="relative">
-                      <input type={showPassword ? "text" : "password"} placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password"
-                        className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-4 pr-12 text-sm text-slate-700 shadow-sm outline-none transition focus:border-blue-300 focus:ring-4 focus:ring-blue-100" />
-                      <button type="button" tabIndex={-1} onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition">
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-1">
-                    <label className="flex items-center gap-2.5 text-sm text-slate-600 cursor-pointer">
-                      <span className="grid h-5 w-5 place-items-center rounded-md border border-slate-200 bg-white text-xs text-blue-600">✓</span>
-                      Recordarme en este equipo
-                    </label>
-                    <span className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">Acceso seguro</span>
-                  </div>
-
-                  <button type="submit" disabled={loading}
-                    className="group flex w-full items-center justify-center gap-3 rounded-2xl px-5 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5"
-                    style={{ background: "linear-gradient(90deg, #e11d48, #e11d48, #be123c)", boxShadow: "0 16px 35px rgba(190,24,93,0.28)" }}>
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-                      <>Ingresar al CRM <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></>
-                    )}
-                  </button>
-                </form>
-
-                <div className="my-5 flex items-center gap-4">
-                  <div className="h-px flex-1 bg-slate-200" />
-                  <span className="text-xs font-medium uppercase tracking-[0.25em] text-slate-400">Acceso rápido</span>
-                  <div className="h-px flex-1 bg-slate-200" />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {["Continuar con Google", "Entrar como demo"].map((label) => (
-                    <button key={label} type="button" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50">{label}</button>
-                  ))}
-                </div>
-
-                <div className="mt-5 rounded-[24px] p-4" style={{ border: "1px solid #fef3c7", background: "linear-gradient(135deg, #fffbeb, #fff1f2)" }}>
-                  <div className="text-sm font-medium text-slate-900 mb-2">Tu espacio comercial en un solo lugar</div>
-                  <div className="grid grid-cols-3 gap-2 text-xs text-slate-600">
-                    {["Clientes", "Pipeline", "Tareas"].map((item) => (
-                      <div key={item} className="rounded-xl px-3 py-2 text-center" style={{ background: "rgba(255,255,255,0.7)" }}>{item}</div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
+          <h1
+            className="font-extrabold text-[28px] tracking-tight text-white uppercase leading-none"
+            style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
+          >
+            ADVANCE
+          </h1>
+          <p
+            className="text-sm uppercase mt-1"
+            style={{ color: "#575e70", letterSpacing: "0.2em", fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
+          >
+            ESTATES
+          </p>
+          <p className="mt-8 text-base max-w-xs leading-relaxed" style={{ color: "#6b7280" }}>
+            El CRM que trabaja mientras tú cierras tratos.
+          </p>
         </div>
-      </div>
-    </div>
+
+        {/* Bottom Stats */}
+        <div className="flex flex-col gap-6">
+          {[
+            { value: "248", label: "contactos gestionados" },
+            { value: "RD$ 45M", label: "en pipeline activo" },
+            { value: "34", label: "tratos en curso" },
+          ].map((stat) => (
+            <div key={stat.label} className="flex items-center gap-4">
+              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="3" fill="#6b7280" />
+              </svg>
+              <div>
+                <span
+                  className="font-bold text-white text-lg leading-none"
+                  style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
+                >
+                  {stat.value}
+                </span>
+                <p
+                  className="text-xs uppercase tracking-widest font-semibold mt-1"
+                  style={{ color: "#6b7280" }}
+                >
+                  {stat.label}
+                </p>
+              </div>
+            </div>
+          ))}
+
+          <div className="flex items-center gap-2 mt-6">
+            <span
+              className="text-[10px] font-bold uppercase tracking-[0.15em]"
+              style={{ color: "#6b7280" }}
+            >
+              Powered by Advance Estate IA
+            </span>
+          </div>
+        </div>
+      </section>
+
+      {/* RIGHT PANEL: Form Side */}
+      <section
+        className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 relative"
+        style={{ background: "#FAFAF9" }}
+      >
+        {/* Version info */}
+        <div className="absolute top-8 right-12 flex items-center gap-3">
+          <span
+            className="font-bold text-[11px] tracking-tight"
+            style={{ color: "rgba(87,94,112,0.6)", fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
+          >
+            ADVANCE ESTATE
+          </span>
+          <span
+            className="font-medium text-[11px] px-2 py-0.5 rounded"
+            style={{ color: "rgba(87,94,112,0.4)", background: "#F5F4F2" }}
+          >
+            v2.1
+          </span>
+        </div>
+
+        <div className="w-full max-w-[380px] flex flex-col">
+          {/* Mobile logo */}
+          <div className="mb-8 flex items-center justify-center gap-3 md:hidden">
+            <div className="relative w-9 h-9 flex items-center justify-center">
+              <div
+                className="absolute w-full"
+                style={{ height: 3, background: "#e11d48", top: "50%", transform: "translateY(-50%)", zIndex: 10 }}
+              />
+              <svg className="w-full h-full fill-none stroke-[#1C1917]" strokeWidth="4" viewBox="0 0 100 100">
+                <path d="M20 80 L50 20 L80 80" />
+                <path d="M40 80 L40 20 L75 20 M40 80 L75 80" />
+              </svg>
+            </div>
+            <span
+              className="font-bold text-xl tracking-tight"
+              style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#1C1917" }}
+            >
+              Advance Estate
+            </span>
+          </div>
+
+          <header className="mb-10">
+            <h2
+              className="font-bold text-[28px] tracking-tight mb-1"
+              style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#1C1917" }}
+            >
+              Bienvenido de vuelta
+            </h2>
+            <p className="text-sm" style={{ color: "#575e70" }}>
+              Ingresa a tu espacio de trabajo
+            </p>
+          </header>
+
+          <form onSubmit={handleLogin} className="flex flex-col gap-6">
+            {/* Email */}
+            <div className="flex flex-col gap-1.5">
+              <label
+                htmlFor="email"
+                className="font-bold text-[11px] uppercase tracking-wider"
+                style={{ color: "rgba(28,25,23,0.7)" }}
+              >
+                Correo electrónico
+              </label>
+              <input
+                type="email"
+                id="email"
+                placeholder="ivan@advanceestate.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full h-12 px-4 rounded-lg text-sm transition-all duration-200"
+                style={{
+                  background: "#eeeeed",
+                  border: "none",
+                  borderBottom: "2px solid transparent",
+                  color: "#1C1917",
+                  outline: "none",
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderBottomColor = "#e11d48";
+                  e.target.style.background = "#ffffff";
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderBottomColor = "transparent";
+                  e.target.style.background = "#eeeeed";
+                }}
+              />
+            </div>
+
+            {/* Password */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex justify-between items-end">
+                <label
+                  htmlFor="password"
+                  className="font-bold text-[11px] uppercase tracking-wider"
+                  style={{ color: "rgba(28,25,23,0.7)" }}
+                >
+                  Contraseña
+                </label>
+                <a
+                  href="#"
+                  className="text-[11px] font-bold transition-opacity hover:opacity-70"
+                  style={{ color: "#e11d48" }}
+                >
+                  ¿Olvidaste tu contraseña?
+                </a>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="w-full h-12 px-4 pr-12 rounded-lg text-sm transition-all duration-200"
+                  style={{
+                    background: "#eeeeed",
+                    border: "none",
+                    borderBottom: "2px solid transparent",
+                    color: "#1C1917",
+                    outline: "none",
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderBottomColor = "#e11d48";
+                    e.target.style.background = "#ffffff";
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderBottomColor = "transparent";
+                    e.target.style.background = "#eeeeed";
+                  }}
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: "rgba(87,94,112,0.5)" }}
+                >
+                  {showPassword ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 text-white font-bold text-sm rounded-lg transition-all duration-200 hover:brightness-95 active:scale-[0.98] disabled:opacity-60 mt-2"
+              style={{
+                background: "#e11d48",
+                fontFamily: "var(--font-manrope), Manrope, sans-serif",
+              }}
+            >
+              {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-8 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t" style={{ borderColor: "#e8e8e7" }} />
+            </div>
+            <span
+              className="relative px-4 text-[10px] font-bold uppercase tracking-widest"
+              style={{ background: "#FAFAF9", color: "rgba(87,94,112,0.5)" }}
+            >
+              o continúa con
+            </span>
+          </div>
+
+          {/* Google OAuth */}
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            className="w-full h-12 bg-white text-sm font-bold rounded-lg flex items-center justify-center gap-3 transition-all duration-200 hover:bg-stone-50"
+            style={{
+              border: "1px solid rgba(229,189,190,0.3)",
+              color: "#1C1917",
+              fontFamily: "var(--font-manrope), Manrope, sans-serif",
+            }}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                fill="#4285F4"
+              />
+              <path
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                fill="#34A853"
+              />
+              <path
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
+                fill="#FBBC05"
+              />
+              <path
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                fill="#EA4335"
+              />
+            </svg>
+            Google
+          </button>
+
+          <footer className="mt-12 text-center">
+            <p className="text-[12px]" style={{ color: "#575e70" }}>
+              ¿No tienes cuenta?{" "}
+              <a
+                href="#"
+                className="font-bold transition-opacity hover:opacity-70"
+                style={{ color: "#1C1917" }}
+              >
+                Contacta a tu administrador
+              </a>
+            </p>
+          </footer>
+        </div>
+      </section>
+    </main>
   );
 }
