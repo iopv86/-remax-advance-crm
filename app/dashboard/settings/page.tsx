@@ -1,16 +1,41 @@
 import { createClient } from "@/lib/supabase/server";
-import { Settings, User, Shield, Bot, Palette } from "lucide-react";
+import { User, Shield, Bot, Palette } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { AvaConfigForm } from "./ava-config-form";
+
+const DEFAULT_AVA_CONFIG = {
+  ava_name: "Ava",
+  agency_name: "Advance Estate",
+  agency_tagline: "República Dominicana",
+  ava_markets:
+    "Santo Domingo: Piantini, Naco, Evaristo Morales, La Esperilla, Bella Vista\nSantiago: Jardines Metropolitanos, Los Jardines\nPunta Cana: Cap Cana, Bávaro\nCosta Norte: Las Terrenas, Samaná",
+  ava_custom_instructions: "",
+};
 
 export default async function SettingsPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  const { data: agent } = await supabase
-    .from("agents")
-    .select("*")
-    .eq("email", user?.email ?? "")
-    .single();
+  const [{ data: agent }, { data: avaRows }] = await Promise.all([
+    supabase
+      .from("agents")
+      .select("*")
+      .eq("email", user?.email ?? "")
+      .single(),
+    supabase
+      .from("agency_config")
+      .select("key, value")
+      .in("key", ["ava_name", "agency_name", "agency_tagline", "ava_markets", "ava_custom_instructions"]),
+  ]);
+
+  const avaMap = Object.fromEntries((avaRows ?? []).map((r) => [r.key, r.value ?? ""]));
+  const avaConfig = {
+    ava_name: avaMap.ava_name || DEFAULT_AVA_CONFIG.ava_name,
+    agency_name: avaMap.agency_name || DEFAULT_AVA_CONFIG.agency_name,
+    agency_tagline: avaMap.agency_tagline || DEFAULT_AVA_CONFIG.agency_tagline,
+    ava_markets: avaMap.ava_markets || DEFAULT_AVA_CONFIG.ava_markets,
+    ava_custom_instructions: avaMap.ava_custom_instructions || "",
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -22,7 +47,7 @@ export default async function SettingsPage() {
           </p>
           <h1
             style={{
-              fontFamily: "var(--font-playfair),Georgia,serif",
+              fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
               fontWeight: 700,
               fontSize: 30,
               letterSpacing: "-0.02em",
@@ -119,7 +144,7 @@ export default async function SettingsPage() {
             <div className="space-y-1">
               {[
                 { label: "WhatsApp Cloud API", status: true, icon: "💬" },
-                { label: "Claude claude-sonnet-4-6 (Ava Railway)", status: true, icon: "🤖" },
+                { label: "GPT-4o (Ava Railway + CRM)", status: true, icon: "🤖" },
                 { label: "Supabase PostgreSQL", status: true, icon: "🗄️" },
               ].map(({ label, status, icon }) => (
                 <div
@@ -158,6 +183,25 @@ export default async function SettingsPage() {
                 POST /api/ava
               </code>
             </div>
+          </div>
+
+          {/* Ava config card — spans full width */}
+          <div className="card-glow p-6 space-y-5 lg:col-span-2">
+            <div className="flex items-center gap-2 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
+              <Bot className="w-4 h-4" style={{ color: "var(--red)" }} />
+              <h2 className="font-sans font-semibold text-sm text-foreground">Configuración de Ava</h2>
+              <span
+                className="ml-auto inline-flex px-2 py-0.5 rounded text-[10px] font-sans font-semibold"
+                style={{ background: "oklch(0.58 0.14 145 / 10%)", color: "oklch(0.4 0.14 145)" }}
+              >
+                Sincronizado con Supabase
+              </span>
+            </div>
+            <p className="font-sans text-xs text-muted-foreground">
+              Estos valores se aplican al endpoint <code className="font-mono">/api/ava</code> del CRM en tiempo real.
+              Para aplicar cambios al agente Railway, actualiza también <code className="font-mono">config/prompts.yaml</code>.
+            </p>
+            <AvaConfigForm initial={avaConfig} />
           </div>
         </div>
       </div>

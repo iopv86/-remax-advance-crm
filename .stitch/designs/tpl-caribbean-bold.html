@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "navy-primary": "#0F2744",
+                        "coral-accent": "#FF5C3A",
+                        "cream-bg": "#FFF8F0",
+                        "teal-accent": "#0D9488",
+                        "slate-text": "#334155"
+                    },
+                    borderRadius: {
+                        "none": "0",
+                        "sm": "2px",
+                        "DEFAULT": "4px",
+                        "lg": "8px",
+                        "xl": "12px"
+                    },
+                    fontFamily: {
+                        "headline": ["Plus Jakarta Sans", "sans-serif"],
+                        "body": ["Plus Jakarta Sans", "sans-serif"],
+                        "display": ["Space Grotesk", "sans-serif"]
+                    }
+                },
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body { 
+                @apply bg-cream-bg font-body text-navy-primary;
+            }
+        }
+        .bento-card {
+            @apply bg-white border-2 border-navy-primary shadow-[4px_4px_0px_0px_rgba(15,39,68,1)] overflow-hidden transition-all hover:shadow-[6px_6px_0px_0px_rgba(15,39,68,1)] hover:-translate-x-0.5 hover:-translate-y-0.5;
+        }
+        .bento-header {
+            @apply bg-navy-primary text-white px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-between;
+        }
+        .coral-header {
+            @apply bg-coral-accent text-white px-4 py-2 text-xs font-bold uppercase tracking-wider flex items-center justify-between;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex">
+<aside class="fixed inset-y-0 left-0 w-64 bg-navy-primary text-white flex flex-col z-50">
+<div class="p-8">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-8 h-8 bg-coral-accent flex items-center justify-center">
+<span class="material-symbols-outlined text-white font-bold">home_work</span>
+</div>
+<h1 class="text-xl font-extrabold font-headline tracking-tighter">ADVANCE</h1>
+</div>
+<p class="text-coral-accent text-[10px] font-black uppercase tracking-[0.3em]">Estate CRM</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-coral-accent text-white font-bold" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-coral-accent transition-colors" href="#">
+<span class="material-symbols-outlined">contacts</span>
+<span class="text-sm font-semibold">Contactos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-coral-accent transition-colors" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+<span class="text-sm font-semibold">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-coral-accent transition-colors" href="#">
+<span class="material-symbols-outlined">real_estate_agent</span>
+<span class="text-sm font-semibold">Propiedades</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-coral-accent transition-colors" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="text-sm font-semibold">WhatsApp</span>
+</a>
+</nav>
+<div class="p-6 bg-navy-primary/50 mt-auto border-t border-white/10">
+<div class="flex items-center gap-3">
+<img alt="Ivan Pimentel" class="w-10 h-10 border-2 border-coral-accent object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV6R09Ph08QcQk-Xf__v07AE23DqWr4x52jA-CsrCFQfKNeJyKR1hzvNchxsQo619lXTPTVO-o8KmR_W18HnAtBukcFgeuCOFiF7idLZpwz-l1JnPxsWIBma3_H5hJETeb8qPzAffaVg9AIWoNXaSZfjvP79qOeSs4M9WLTbBYC4sDCut3Fl0cZnAbEOsZ8sd3NZOGO_w8J2_3cOtjX3aqDnEb4b1ugm03JzVqY0-0s2o61O5smbcfz8rcvaHK4hh_RmYiDGe2WUg"/>
+<div>
+<p class="text-white text-xs font-black uppercase">Ivan Pimentel</p>
+<p class="text-gray-500 text-[10px] font-bold">Admin Central</p>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 ml-64 p-8">
+<header class="flex justify-between items-end mb-12 border-b-4 border-navy-primary pb-6">
+<div>
+<h2 class="text-5xl font-black font-display uppercase tracking-tighter leading-none">Dashboard</h2>
+<p class="text-navy-primary/60 font-bold mt-2 uppercase tracking-widest text-xs">Resumen Regional • Santo Domingo, RD</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative">
+<input class="bg-white border-2 border-navy-primary px-4 py-2 w-64 text-sm font-bold focus:ring-0 focus:outline-none placeholder:text-navy-primary/30" placeholder="Buscar registros..." type="text"/>
+</div>
+<button class="bg-coral-accent text-white px-6 py-2.5 font-black uppercase text-sm border-2 border-navy-primary shadow-[3px_3px_0px_0px_rgba(15,39,68,1)] hover:translate-y-0.5 active:translate-y-1 active:shadow-none transition-all">
+                + Nuevo Trato
+            </button>
+</div>
+</header>
+<div class="grid grid-cols-12 gap-6">
+<div class="col-span-12 md:col-span-3 bento-card">
+<div class="bento-header">Contactos Activos <span class="text-coral-accent">↑ 12%</span></div>
+<div class="p-6">
+<span class="text-4xl font-black font-display tracking-tight">248</span>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase mt-1">Usuarios registrados</p>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3 bento-card">
+<div class="coral-header">Pipeline Total <span class="bg-white text-coral-accent px-1">+8%</span></div>
+<div class="p-6">
+<span class="text-4xl font-black font-display tracking-tight text-coral-accent">RD$ 45.2M</span>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase mt-1">Valor proyectado</p>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3 bento-card">
+<div class="bento-header">Tratos Activos <span class="text-red-400">↓ 2</span></div>
+<div class="p-6">
+<span class="text-4xl font-black font-display tracking-tight">34</span>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase mt-1">Propuestas en curso</p>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3 bento-card">
+<div class="bento-header">Conversión <span class="text-teal-400">+1.2pp</span></div>
+<div class="p-6">
+<span class="text-4xl font-black font-display tracking-tight">18.4%</span>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase mt-1">Tasa de cierre</p>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-7 bento-card">
+<div class="bento-header">Pipeline por Etapa <span class="material-symbols-outlined text-sm">analytics</span></div>
+<div class="p-8 space-y-6">
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-xs font-black uppercase tracking-tight">Nuevo Lead (42)</span>
+<span class="text-sm font-bold text-coral-accent">RD$ 8.4M</span>
+</div>
+<div class="h-6 bg-cream-bg border-2 border-navy-primary relative">
+<div class="h-full bg-navy-primary" style="width: 25%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-xs font-black uppercase tracking-tight">Calificado (28)</span>
+<span class="text-sm font-bold text-coral-accent">RD$ 12.1M</span>
+</div>
+<div class="h-6 bg-cream-bg border-2 border-navy-primary relative">
+<div class="h-full bg-navy-primary" style="width: 45%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-xs font-black uppercase tracking-tight">Propuesta (15)</span>
+<span class="text-sm font-bold text-coral-accent">RD$ 15.2M</span>
+</div>
+<div class="h-6 bg-cream-bg border-2 border-navy-primary relative">
+<div class="h-full bg-coral-accent" style="width: 65%"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-end">
+<span class="text-xs font-black uppercase tracking-tight">Negociación (8)</span>
+<span class="text-sm font-bold text-coral-accent">RD$ 6.5M</span>
+</div>
+<div class="h-6 bg-cream-bg border-2 border-navy-primary relative">
+<div class="h-full bg-navy-primary" style="width: 40%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-5 bento-card">
+<div class="coral-header">Seguimientos Pendientes <span class="material-symbols-outlined text-sm">calendar_month</span></div>
+<div class="divide-y-2 divide-navy-primary/10">
+<div class="p-4 flex items-center justify-between group hover:bg-cream-bg transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border-2 border-navy-primary bg-navy-primary text-white flex items-center justify-center font-black">RA</div>
+<div>
+<h4 class="text-sm font-black">Ricardo Almonte</h4>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase">Villa Las Terrenas</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[9px] font-black bg-coral-accent text-white px-2 py-0.5">VENCIDO</span>
+<button class="w-8 h-8 border-2 border-navy-primary flex items-center justify-center hover:bg-teal-accent hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">chat</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex items-center justify-between group hover:bg-cream-bg transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border-2 border-navy-primary bg-white text-navy-primary flex items-center justify-center font-black">SH</div>
+<div>
+<h4 class="text-sm font-black">Sofia Henríquez</h4>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase">Solar Cap Cana</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[9px] font-black bg-navy-primary text-white px-2 py-0.5">HOY</span>
+<button class="w-8 h-8 border-2 border-navy-primary flex items-center justify-center hover:bg-teal-accent hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">chat</span>
+</button>
+</div>
+</div>
+<div class="p-4 flex items-center justify-between group hover:bg-cream-bg transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 border-2 border-navy-primary bg-white text-navy-primary flex items-center justify-center font-black">JM</div>
+<div>
+<h4 class="text-sm font-black">Javier Mendez</h4>
+<p class="text-[10px] font-bold text-navy-primary/60 uppercase">Apt. Piantini</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[9px] font-black bg-teal-accent text-white px-2 py-0.5">MAÑANA</span>
+<button class="w-8 h-8 border-2 border-navy-primary flex items-center justify-center hover:bg-teal-accent hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">chat</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-12 bento-card">
+<div class="bento-header">Actividad Reciente <button class="text-[9px] underline decoration-coral-accent decoration-2 underline-offset-2">VER TODO</button></div>
+<div class="grid grid-cols-1 md:grid-cols-3 divide-x-2 divide-navy-primary/10">
+<div class="p-6">
+<div class="flex items-start gap-4">
+<img alt="Activity" class="w-12 h-12 border-2 border-navy-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkVM00hqhjeLlOT2egYeG68mIUy9m-aT5HiqzrR6OzmTgMlyarxvLV8tqADGbJp-raQCiHSkiEsd2W_r6Wt8xKqyY1wE4COmprNcJ63m2JSbLmMxR3wPk9Ijcr3dYRQyzPMJmd6N8cvkKv3pyeLxtvQ0FG05wZZd1aahBuSIm7CSFlzlfw1Nmi0FT4QhVUrU9Qby4pw2_iQjUP5LrQw-BS-xtGV7CToGrSTe-VwvZstPFAFEJvBcFSBaIkZiYaI78Ra6e4cLii4DU"/>
+<div>
+<p class="text-xs font-bold leading-tight"><span class="font-black uppercase">Ana Maria Torres</span> calificó como <span class="text-coral-accent font-black">Lead Caliente</span></p>
+<p class="text-[10px] text-navy-primary/60 font-bold mt-1">HACE 12 MIN • CASA DE CAMPO</p>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start gap-4">
+<img alt="Activity" class="w-12 h-12 border-2 border-navy-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwDq_1VVXB3Cl2ALwnhSV1QFdRl51St2nD51BKZXSgLiyXMaKqA7DIJ3tMoqp5w3IrV356rJLcKfCEzMvCet1vx3IQbHL-tVWht0dj4CbYvmUjJl4TIsaShpPxxIC-67IuKC24U6AQ7rQEl3DPdUFGRE7t6JZtaGwy2g2Oh723BGIfSgYaZIiEMNQBWQJGdNUIQT1okZMNuw9kXwi0-vj0QdSJU2ailgNuCRUloe5UCF81_CoTnTNquj95mplr3BGNBHmCCwshnqo"/>
+<div>
+<p class="text-xs font-bold leading-tight"><span class="font-black uppercase">Marco Tulio</span> cerró trato por <span class="text-teal-accent font-black">RD$ 4.2M</span></p>
+<p class="text-[10px] text-navy-primary/60 font-bold mt-1">HACE 45 MIN • PENTHOUSE NACO</p>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-start gap-4">
+<img alt="Activity" class="w-12 h-12 border-2 border-navy-primary" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGfcu9hyEeKr3oC4UjWSsu65HLmfn963fqoXak_4Ozp1rLRa-biKpx3QWaRc5KPmkDLE_xQrndYugoA7Dz8fLkprXv2krlCiHnqAI6IxR1tqLKfV2XFfk_mivE53lV6BANlduAVhgu-cFM-lA5iDowNaOeCqkpgB_JuPSPX3vxR0XtFKZ6vJvR_SF-L9q33BzZPY3z1gpgiVa4ZnXAcDydhKnZNQLDK9ocbzQf1xW9WWydp8CKgUleyezsDFcLIgJxl5hW09Q7T-Q"/>
+<div>
+<p class="text-xs font-bold leading-tight"><span class="font-black uppercase">Elena Rivas</span> envió propuesta comercial</p>
+<p class="text-[10px] text-navy-primary/60 font-bold mt-1">HACE 2 HORAS • VILLA PUNTA CANA</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

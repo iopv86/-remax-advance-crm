@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .serif-italic { font-family: 'Georgia', serif; font-style: italic; }
+        .serif-bold { font-family: 'Georgia', serif; font-weight: bold; }
+        body { font-family: 'Inter', sans-serif; }
+        .manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-container": "#543d0c",
+                      "on-secondary-container": "#656464",
+                      "on-secondary-fixed-variant": "#474646",
+                      "inverse-on-surface": "#f3f0ec",
+                      "outline-variant": "#d0c5b5",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#e5e2e1",
+                      "surface-dim": "#dcdad6",
+                      "on-surface": "#1c1c1a",
+                      "on-primary-fixed": "#261900",
+                      "on-error-container": "#93000a",
+                      "outline": "#7f7668",
+                      "background": "#fcf9f5",
+                      "on-secondary": "#ffffff",
+                      "surface-container-low": "#f6f3ef",
+                      "secondary": "#5f5e5e",
+                      "surface-container-highest": "#e5e2de",
+                      "tertiary": "#5f5e5e",
+                      "surface-container-high": "#ebe8e4",
+                      "on-tertiary-fixed-variant": "#474746",
+                      "primary-fixed-dim": "#e4c285",
+                      "surface-tint": "#745a27",
+                      "tertiary-fixed": "#e5e2e1",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#e5e2de",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-fixed-dim": "#c8c6c5",
+                      "secondary-container": "#e5e2e1",
+                      "on-surface-variant": "#4d463a",
+                      "surface": "#fcf9f5",
+                      "inverse-surface": "#31302e",
+                      "primary-container": "#c9a96e",
+                      "error-container": "#ffdad6",
+                      "surface-container": "#f0ede9",
+                      "on-secondary-fixed": "#1c1b1b",
+                      "tertiary-container": "#afadad",
+                      "on-background": "#1c1c1a",
+                      "primary": "#745a27",
+                      "on-primary-fixed-variant": "#5a4312",
+                      "error": "#ba1a1a",
+                      "primary-fixed": "#ffdea4",
+                      "on-tertiary": "#ffffff",
+                      "on-tertiary-container": "#414141",
+                      "inverse-primary": "#e4c285",
+                      "secondary-fixed-dim": "#c8c6c5",
+                      "surface-bright": "#fcf9f5",
+                      "on-tertiary-fixed": "#1c1b1b"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Noto Serif"],
+                      "body": ["Inter"],
+                      "label": ["Manrope"]
+              }
+            },
+          }
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar Navigation (The Anchor) -->
+<aside class="bg-[#0F0F0F] dark:bg-[#000000] h-screen w-72 left-0 top-0 fixed flex flex-col py-8 z-50">
+<div class="px-8 mb-12">
+<h1 class="text-2xl font-serif tracking-tighter text-[#fcf9f5] flex items-center gap-2">
+                    Advance <span class="text-[#c9a96e]">Estate</span>
+</h1>
+<p class="text-[10px] manrope font-bold text-[#c9a96e] tracking-widest mt-1 opacity-80 uppercase">The Private Office</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Nav Item: Dashboard -->
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 px-8 py-3 hover:opacity-100 hover:bg-[#1a1a1a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<!-- Nav Item: Pipeline (Active) -->
+<a class="text-[#c9a96e] font-semibold flex items-center gap-3 px-8 py-3 border-r-2 border-[#745a27] bg-[#1a1a1a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<!-- Nav Item: Contactos -->
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 px-8 py-3 hover:opacity-100 hover:bg-[#1a1a1a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">contacts</span>
+<span class="text-sm font-medium">Contactos</span>
+</a>
+<!-- Nav Item: Propiedades -->
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 px-8 py-3 hover:opacity-100 hover:bg-[#1a1a1a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">home_work</span>
+<span class="text-sm font-medium">Propiedades</span>
+</a>
+<!-- Nav Item: Actividades -->
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 px-8 py-3 hover:opacity-100 hover:bg-[#1a1a1a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">event_note</span>
+<span class="text-sm font-medium">Actividades</span>
+</a>
+<!-- Nav Item: Reportes -->
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 px-8 py-3 hover:opacity-100 hover:bg-[#1a1a1a] transition-all duration-300" href="#">
+<span class="material-symbols-outlined text-xl">bar_chart</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+</nav>
+<div class="mt-auto px-8 pt-8 border-t border-white/5 space-y-1">
+<div class="flex items-center gap-3 py-4 mb-4">
+<img class="w-10 h-10 rounded-full grayscale border border-[#c9a96e]/30 object-cover" data-alt="professional portrait of an executive real estate agent in a sharp suit with neutral lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdQBUTqqA3GP1s4PXkDfb9dFDDa4VZ5Rw8nVT9YNoPBhPAogJaQrWZksz4msOWSmItYWuUV_EG1mscmH7Sv2nGKt0SBC5yDbaq3yFa2GobIXLgcegRFlLbzJLEmOBV9f5KHF3aU-AUed7gzSfaB2Y5k2RC5I5YjzCvsNuufauS5LItgzZI-lTdVLt64pTTci-JpWX1CIreVOuw6bvk4TStOTO_pk4eNgCJvkZy_8GCAW8dB60UA44YZUPloShiYpcVHAJ9xRxpB54"/>
+<div>
+<p class="text-xs font-bold text-white tracking-tight">Carlos Mendez</p>
+<p class="text-[10px] text-[#c9a96e] manrope uppercase tracking-wider">Agente Senior</p>
+</div>
+</div>
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 py-2 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg">settings</span>
+<span class="text-sm">Ajustes</span>
+</a>
+<a class="text-[#d0c5b5] opacity-60 flex items-center gap-3 py-2 hover:opacity-100 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg">logout</span>
+<span class="text-sm">Cerrar Sesión</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-72 flex-1 h-screen overflow-y-auto bg-[#F5F2EE] p-10">
+<!-- Header Section -->
+<header class="flex justify-between items-end mb-10">
+<div>
+<h2 class="text-[32px] serif-italic text-on-surface leading-tight tracking-tight">Pipeline</h2>
+<p class="text-on-surface-variant font-medium mt-1">47 negocios activos · <span class="manrope text-primary font-bold">RD$ 284,500,000</span> en pipeline</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-lg">search</span>
+<input class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl pl-10 pr-4 py-2.5 text-sm w-64 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Buscar negocios..." type="text"/>
+</div>
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest border border-outline-variant/30 rounded-xl text-sm font-medium hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-lg">tune</span>
+                        Filtros
+                    </button>
+<button class="px-6 py-2.5 bg-[#0F0F0F] text-white rounded-xl text-sm font-semibold hover:bg-primary transition-all">
+                        + Nuevo Negocio
+                    </button>
+</div>
+</header>
+<!-- Pipeline Summary Tiles (Editorial Grid) -->
+<div class="grid grid-cols-5 gap-4 mb-8">
+<div class="bg-surface-container-lowest p-5 rounded-xl border-t-4 border-[#6366F1]">
+<p class="text-[10px] manrope font-extrabold text-on-secondary-container tracking-widest uppercase mb-1">Prospecto</p>
+<div class="flex items-baseline justify-between">
+<span class="text-2xl manrope font-bold">12</span>
+<span class="text-[13px] manrope text-outline-variant font-bold">RD$ 45M</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-xl border-t-4 border-[#3B82F6]">
+<p class="text-[10px] manrope font-extrabold text-on-secondary-container tracking-widest uppercase mb-1">Calificado</p>
+<div class="flex items-baseline justify-between">
+<span class="text-2xl manrope font-bold">8</span>
+<span class="text-[13px] manrope text-outline-variant font-bold">RD$ 32.5M</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-xl border-t-4 border-[#F59E0B]">
+<p class="text-[10px] manrope font-extrabold text-on-secondary-container tracking-widest uppercase mb-1">Propuesta</p>
+<div class="flex items-baseline justify-between">
+<span class="text-2xl manrope font-bold">15</span>
+<span class="text-[13px] manrope text-outline-variant font-bold">RD$ 98.2M</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-xl border-t-4 border-[#EF4444]">
+<p class="text-[10px] manrope font-extrabold text-on-secondary-container tracking-widest uppercase mb-1">Negociación</p>
+<div class="flex items-baseline justify-between">
+<span class="text-2xl manrope font-bold">9</span>
+<span class="text-[13px] manrope text-outline-variant font-bold">RD$ 84M</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-5 rounded-xl border-t-4 border-[#10B981]">
+<p class="text-[10px] manrope font-extrabold text-on-secondary-container tracking-widest uppercase mb-1">Cerrado</p>
+<div class="flex items-baseline justify-between">
+<span class="text-2xl manrope font-bold">3</span>
+<span class="text-[13px] manrope text-outline-variant font-bold">RD$ 24.8M</span>
+</div>
+</div>
+</div>
+<!-- Main Ledger Table -->
+<div class="bg-surface-container-lowest rounded-xl border border-[#E8E4DF] overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-[#E8E4DF]">
+<tr>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase">Negocio</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase">Contacto</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase text-center">Etapa</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase">Propiedad</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase text-right">Valor</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase text-right">Prob</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase text-right">Cierre Est</th>
+<th class="px-6 py-4 text-[10px] manrope font-extrabold text-outline tracking-[0.15em] uppercase text-right whitespace-nowrap">En Etapa</th>
+<th class="px-6 py-4 w-10"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#E8E4DF]/50">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5 font-semibold text-sm">Penthouse Torre Carioca</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Alejandro Marini</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#EF4444]/10 text-[#EF4444] text-[11px] font-bold rounded-full uppercase tracking-wider">Negociación</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Piantini, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 45,500,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">80%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">15 Nov 2024</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">12 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 2 (Open Dropdown Context) -->
+<tr class="bg-surface-container-low/60 relative">
+<td class="px-6 py-5 font-semibold text-sm">Villa Las Praderas</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Elena Rodriguez</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] text-[11px] font-bold rounded-full uppercase tracking-wider">Propuesta</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Las Praderas, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 28,200,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">60%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">02 Dic 2024</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">24 d</td>
+<td class="px-6 py-5 text-right relative">
+<button class="material-symbols-outlined text-primary">more_vert</button>
+<!-- Floating Dropdown (The Ghost Overlay) -->
+<div class="absolute right-6 top-14 w-52 bg-surface-container-lowest rounded-xl shadow-[0_32px_64px_-12px_rgba(28,28,26,0.08)] border border-outline-variant/20 z-50 py-2 text-left animate-in fade-in zoom-in duration-200">
+<button class="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">visibility</span> Ver negocio
+                                    </button>
+<button class="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">reorder</span> Mover etapa
+                                    </button>
+<button class="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">add_task</span> Agregar actividad
+                                    </button>
+<button class="w-full px-4 py-2 text-sm text-on-surface hover:bg-surface-container-low flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">edit</span> Editar
+                                    </button>
+<div class="my-1 border-t border-outline-variant/10"></div>
+<button class="w-full px-4 py-2 text-sm text-error hover:bg-error/5 flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">archive</span> Archivar negocio
+                                    </button>
+</div>
+</td>
+</tr>
+<!-- Row 3 (Stalled Alert) -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5 flex items-center gap-2">
+<span class="font-semibold text-sm">Apartamento Jardines del Norte</span>
+<span class="material-symbols-outlined text-error text-[18px]" title="Stalled deal">error</span>
+</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Juan Perez</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#3B82F6]/10 text-[#3B82F6] text-[11px] font-bold rounded-full uppercase tracking-wider">Calificado</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Arroyo Hondo, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 12,400,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">40%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">20 Nov 2024</td>
+<td class="px-6 py-5 text-right text-xs text-error font-bold">45 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5 font-semibold text-sm">Local Comercial Sambil</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Grupo Ramos</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#6366F1]/10 text-[#6366F1] text-[11px] font-bold rounded-full uppercase tracking-wider">Prospecto</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Kennedy, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 8,500,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">20%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">10 Ene 2025</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">5 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5 font-semibold text-sm">Casa Colonial Zona Colonial</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Isabel de los Santos</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#EF4444]/10 text-[#EF4444] text-[11px] font-bold rounded-full uppercase tracking-wider">Negociación</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Zona Colonial, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 35,000,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">85%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">05 Nov 2024</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">18 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5 font-semibold text-sm">Apartamento Bella Vista</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Marcos Ruiz</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#F59E0B]/10 text-[#F59E0B] text-[11px] font-bold rounded-full uppercase tracking-wider">Propuesta</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Bella Vista, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 15,900,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">55%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">12 Dic 2024</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">32 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group">
+<td class="px-6 py-5 font-semibold text-sm">Villa Los Cacicazgos</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Claudia Mendez</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#10B981]/10 text-[#10B981] text-[11px] font-bold rounded-full uppercase tracking-wider">Cerrado</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Los Cacicazgos, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 89,000,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">100%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">28 Oct 2024</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">0 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 8 -->
+<tr class="hover:bg-surface-container-low/40 transition-colors group border-b-0">
+<td class="px-6 py-5 font-semibold text-sm">PH Mirador Norte</td>
+<td class="px-6 py-5 text-sm text-on-surface-variant">Luis Tavarez</td>
+<td class="px-6 py-5">
+<div class="mx-auto w-fit px-3 py-1 bg-[#6366F1]/10 text-[#6366F1] text-[11px] font-bold rounded-full uppercase tracking-wider">Prospecto</div>
+</td>
+<td class="px-6 py-5 text-xs text-on-surface-variant italic">Mirador Norte, SD</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold">RD$ 22,100,000</td>
+<td class="px-6 py-5 text-right manrope text-sm font-bold text-primary">15%</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium uppercase tracking-tighter">15 Feb 2025</td>
+<td class="px-6 py-5 text-right text-xs text-outline font-medium">2 d</td>
+<td class="px-6 py-5 text-right">
+<button class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer Stats Overlay -->
+<footer class="mt-8 flex justify-end">
+<div class="flex items-center gap-8 bg-surface-container-highest/50 backdrop-blur-md border border-outline-variant/10 px-8 py-3 rounded-2xl">
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#10B981]"></span>
+<p class="text-[11px] manrope font-bold text-on-surface-variant uppercase tracking-widest">Ratio de Cierre: <span class="text-on-surface ml-1">32%</span></p>
+</div>
+<div class="flex items-center gap-3">
+<span class="w-2 h-2 rounded-full bg-[#3B82F6]"></span>
+<p class="text-[11px] manrope font-bold text-on-surface-variant uppercase tracking-widest">Días Promedio: <span class="text-on-surface ml-1">24 d</span></p>
+</div>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

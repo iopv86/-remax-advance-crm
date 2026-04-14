@@ -206,10 +206,10 @@ export function PropertySheet({
         >
           <SheetTitle
             style={{
-              fontFamily: "var(--font-playfair),Georgia,serif",
+              fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
               fontWeight: 700,
               fontSize: 20,
-              color: "#0f172a",
+              color: "var(--foreground)",
             }}
           >
             {isEdit ? "Editar propiedad" : "Nueva propiedad"}

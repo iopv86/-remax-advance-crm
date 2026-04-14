@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Trash2, DollarSign } from "lucide-react";
+import { Pencil, Trash2, GripVertical } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { DealSheet } from "@/components/deal-sheet";
-import { STAGE_LABELS, CLASSIFICATION_LABELS } from "@/lib/types";
+import { STAGE_LABELS } from "@/lib/types";
 import type { Deal, DealStage } from "@/lib/types";
 import Link from "next/link";
 import {
@@ -45,17 +45,18 @@ const STAGE_ORDER: DealStage[] = [
   "closed_lost",
 ];
 
-const STAGE_ACCENT: Record<DealStage, string> = {
-  lead_captured: "#94a3b8",
-  qualified: "#2563eb",
-  contacted: "#2563eb",
-  showing_scheduled: "#d97706",
-  showing_done: "#d97706",
-  offer_made: "#e11d48",
-  negotiation: "#e11d48",
-  contract: "#7c3aed",
-  closed_won: "#10b981",
-  closed_lost: "#94a3b8",
+// Simplified display names for Stitch-style headers
+const STAGE_SHORT: Record<DealStage, string> = {
+  lead_captured: "NUEVO LEAD",
+  qualified: "CALIFICADO",
+  contacted: "CONTACTADO",
+  showing_scheduled: "VISITA AGEND.",
+  showing_done: "VISITA HECHA",
+  offer_made: "OFERTA",
+  negotiation: "NEGOCIACIÓN",
+  contract: "CONTRATO",
+  closed_won: "CERRADO ✓",
+  closed_lost: "PERDIDO",
 };
 
 // ── Draggable deal card ───────────────────────────────────────────────────────
@@ -85,84 +86,89 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
     phone?: string;
   } | null;
   const contactId = typeof deal.contact_id === "string" ? deal.contact_id : null;
+  const contactName = [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Sin nombre";
+  const contactInitials =
+    [contact?.first_name?.[0], contact?.last_name?.[0]]
+      .filter(Boolean)
+      .join("")
+      .toUpperCase() || "?";
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className={`card-base p-3 space-y-2 transition-colors group ${
-        dragging || isDragging ? "opacity-50 cursor-grabbing" : "cursor-grab hover:border-[var(--red)]/30"
-      }`}
+      style={{
+        ...style,
+        background: "white",
+        border: "1px solid #e5e7eb",
+        borderRadius: 8,
+        padding: 12,
+        boxShadow: "0 1px 3px rgba(28,25,23,0.08)",
+        cursor: dragging || isDragging ? "grabbing" : "grab",
+        opacity: dragging || isDragging ? 0.5 : 1,
+        transition: "border-color 0.15s, box-shadow 0.15s",
+      }}
+      className="group hover:border-rose-300 hover:shadow-md"
     >
-      {/* Drag handle area */}
-      <div
-        {...listeners}
-        {...attributes}
-        className="flex items-start justify-between gap-1"
-      >
+      {/* Drag handle + info */}
+      <div {...listeners} {...attributes} className="flex justify-between items-start mb-2">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <div
-            className="w-6 h-6 rounded-full flex items-center justify-center font-sans font-bold text-[10px] shrink-0"
-            style={{ background: "var(--red-muted)", color: "var(--red)" }}
+            className="w-8 h-8 rounded-md shrink-0 flex items-center justify-center text-xs font-bold"
+            style={{ background: "#fee2e2", color: "#dc2626" }}
           >
-            {(contact?.first_name?.[0] ?? "?").toUpperCase()}
+            {contactInitials}
           </div>
-          <p className="font-sans text-xs font-medium text-foreground truncate leading-tight">
-            {contact?.first_name} {contact?.last_name}
-          </p>
         </div>
-        {contact?.lead_classification && (
-          <span
-            className={
-              "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-sans font-semibold border shrink-0 " +
-              (contact.lead_classification === "hot" ? "badge-hot" :
-              contact.lead_classification === "warm" ? "badge-warm" :
-              contact.lead_classification === "cold" ? "badge-cold" : "badge-unqualified")
-            }
-          >
-            {CLASSIFICATION_LABELS[contact.lead_classification as keyof typeof CLASSIFICATION_LABELS]}
-          </span>
-        )}
+        <GripVertical className="w-4 h-4 shrink-0 text-stone-300 group-hover:text-stone-400" />
       </div>
 
-      {deal.deal_value != null && (
-        <p className="font-mono text-xs font-semibold" style={{ color: "oklch(0.5 0.16 145)" }}>
-          ${deal.deal_value.toLocaleString()} {deal.currency ?? "USD"}
-        </p>
-      )}
-
-      {contactId && (
+      {/* Contact name */}
+      {contactId ? (
         <Link
           href={`/dashboard/contacts/${contactId}`}
           onClick={(e) => e.stopPropagation()}
-          className="block font-sans text-[10px] text-rose-500 hover:text-rose-700 transition-colors"
+          className="block text-sm font-semibold text-stone-900 leading-tight mb-1 hover:text-rose-600 transition-colors"
         >
-          Ver contacto →
+          {contactName}
         </Link>
+      ) : (
+        <p className="text-sm font-semibold text-stone-900 leading-tight mb-1">{contactName}</p>
       )}
 
-      {contact?.phone && (
-        <p className="font-sans text-[10px] text-muted-foreground">{contact.phone}</p>
+      {/* Deal value */}
+      {deal.deal_value != null && (
+        <div
+          className="flex justify-between items-end pt-3 mt-2"
+          style={{ borderTop: "1px solid #f5f5f4" }}
+        >
+          <span
+            className="font-bold text-sm"
+            style={{
+              fontFamily: "var(--font-manrope), Manrope, sans-serif",
+              color: "#1C1917",
+            }}
+          >
+            {deal.currency ?? "RD$"} {deal.deal_value.toLocaleString()}
+          </span>
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => onEdit(deal, e)}
+              title="Editar"
+              className="p-1 rounded hover:bg-stone-100 text-slate-400 hover:text-slate-700 transition-colors"
+            >
+              <Pencil className="w-3 h-3" />
+            </button>
+            <button
+              onClick={(e) => onDelete(deal, e)}
+              title="Eliminar"
+              disabled={deletingId === deal.id}
+              className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-40"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
       )}
-
-      {/* Actions */}
-      <div className="flex items-center gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity pt-0.5">
-        <button
-          onClick={(e) => onEdit(deal, e)}
-          title="Editar"
-          className="inline-flex items-center justify-center w-6 h-6 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors"
-        >
-          <Pencil className="h-3 w-3" />
-        </button>
-        <button
-          onClick={(e) => onDelete(deal, e)}
-          title="Eliminar"
-          disabled={deletingId === deal.id}
-          className="inline-flex items-center justify-center w-6 h-6 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-40"
-        >
-          <Trash2 className="h-3 w-3" />
-        </button>
-      </div>
     </div>
   );
 }
@@ -182,9 +188,8 @@ function DroppableColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`kanban-col p-2 space-y-2 transition-colors ${
-        isOver ? "ring-2 ring-inset ring-rose-300 bg-rose-50/30" : ""
-      }`}
+      className="flex flex-col gap-3 p-2 rounded-b-lg transition-colors min-h-[80px]"
+      style={isOver ? { background: "rgba(225,29,72,0.04)", outline: "2px dashed rgba(225,29,72,0.3)" } : {}}
     >
       {children}
     </div>
@@ -203,7 +208,6 @@ export function PipelineClient({ deals: initial }: Props) {
   const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
   const [overStage, setOverStage] = useState<DealStage | null>(null);
 
-  // Sync with server data when it changes
   useEffect(() => {
     setDeals(initial);
   }, [initial]);
@@ -273,9 +277,8 @@ export function PipelineClient({ deals: initial }: Props) {
 
     if (!draggedDeal || draggedDeal.stage === newStage) return;
 
-    // Optimistic update
     setDeals((prev) =>
-      prev.map((d) => d.id === draggedDeal.id ? { ...d, stage: newStage } : d)
+      prev.map((d) => (d.id === draggedDeal.id ? { ...d, stage: newStage } : d))
     );
 
     const supabase = createClient();
@@ -286,9 +289,8 @@ export function PipelineClient({ deals: initial }: Props) {
 
     if (error) {
       toast.error("Error al mover: " + error.message);
-      // Revert on failure
       setDeals((prev) =>
-        prev.map((d) => d.id === draggedDeal.id ? { ...d, stage: draggedDeal.stage } : d)
+        prev.map((d) => (d.id === draggedDeal.id ? { ...d, stage: draggedDeal.stage } : d))
       );
     } else {
       toast.success(`Movido a ${STAGE_LABELS[newStage]}`);
@@ -304,10 +306,13 @@ export function PipelineClient({ deals: initial }: Props) {
     }
   }
 
-  const grouped = STAGE_ORDER.reduce((acc, stage) => {
-    acc[stage] = deals.filter((d) => d.stage === stage);
-    return acc;
-  }, {} as Record<DealStage, Deal[]>);
+  const grouped = STAGE_ORDER.reduce(
+    (acc, stage) => {
+      acc[stage] = deals.filter((d) => d.stage === stage);
+      return acc;
+    },
+    {} as Record<DealStage, Deal[]>
+  );
 
   return (
     <>
@@ -318,42 +323,49 @@ export function PipelineClient({ deals: initial }: Props) {
         onDragOver={handleDragOver}
       >
         <div className="overflow-x-auto pb-4">
-          <div className="flex gap-3 min-w-max">
+          <div className="flex gap-5 min-w-max items-start">
             {STAGE_ORDER.map((stage) => {
               const stageDeals = grouped[stage];
               const stageValue = stageDeals.reduce((sum, d) => sum + (d.deal_value ?? 0), 0);
-              const accent = STAGE_ACCENT[stage];
+
               return (
-                <div key={stage} className="w-60 shrink-0">
+                <div
+                  key={stage}
+                  style={{ minWidth: 280, width: 280 }}
+                  className="flex flex-col gap-3"
+                >
                   {/* Column header */}
-                  <div
-                    className="flex items-center justify-between px-3 py-2 mb-2 rounded-t-lg"
-                    style={{ background: `${accent}12`, borderBottom: `2px solid ${accent}30` }}
-                  >
-                    <h3 className="font-sans text-xs font-semibold text-foreground truncate">
-                      {STAGE_LABELS[stage]}
-                    </h3>
-                    <span
-                      className="font-mono text-xs font-bold ml-2 shrink-0 px-1.5 py-0.5 rounded"
-                      style={{ background: `${accent}20`, color: accent }}
-                    >
-                      {stageDeals.length}
-                    </span>
+                  <div className="flex items-center justify-between px-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-xs text-stone-500 tracking-wider uppercase">
+                        {STAGE_SHORT[stage]}
+                      </h3>
+                      <span
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                        style={{ background: "#e5e7eb", color: "#6b7280" }}
+                      >
+                        {stageDeals.length}
+                      </span>
+                    </div>
+                    {stageValue > 0 && (
+                      <span className="text-[11px] font-bold text-stone-400">
+                        RD$ {(stageValue / 1_000_000).toFixed(1)}M
+                      </span>
+                    )}
                   </div>
-                  {stageValue > 0 && (
-                    <p
-                      className="font-mono text-xs px-3 mb-2 flex items-center gap-1"
-                      style={{ color: accent }}
-                    >
-                      <DollarSign className="w-3 h-3" />
-                      {stageValue.toLocaleString()}
-                    </p>
-                  )}
+
                   <DroppableColumn stage={stage} isOver={overStage === stage}>
                     {stageDeals.length === 0 && (
-                      <p className="font-sans text-xs text-muted-foreground text-center py-6">
+                      <div
+                        className="flex items-center justify-center py-6 rounded-lg"
+                        style={{
+                          border: "2px dashed #e5e7eb",
+                          color: "#94a3b8",
+                          fontSize: 12,
+                        }}
+                      >
                         {overStage === stage ? "Soltar aquí" : "Vacío"}
-                      </p>
+                      </div>
                     )}
                     {stageDeals.map((deal) => (
                       <DealCard
@@ -373,33 +385,29 @@ export function PipelineClient({ deals: initial }: Props) {
 
         {/* Drag overlay */}
         <DragOverlay>
-          {activeDeal && (
-            <div className="card-base p-3 space-y-2 opacity-95 shadow-xl rotate-1 cursor-grabbing w-60">
-              {(() => {
-                const contact = activeDeal.contact as { first_name?: string; last_name?: string } | null;
-                return (
-                  <>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-6 h-6 rounded-full flex items-center justify-center font-sans font-bold text-[10px] shrink-0"
-                        style={{ background: "var(--red-muted)", color: "var(--red)" }}
-                      >
-                        {(contact?.first_name?.[0] ?? "?").toUpperCase()}
-                      </div>
-                      <p className="font-sans text-xs font-medium text-foreground truncate">
-                        {contact?.first_name} {contact?.last_name}
-                      </p>
-                    </div>
-                    {activeDeal.deal_value != null && (
-                      <p className="font-mono text-xs font-semibold" style={{ color: "oklch(0.5 0.16 145)" }}>
-                        ${activeDeal.deal_value.toLocaleString()} {activeDeal.currency ?? "USD"}
-                      </p>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-          )}
+          {activeDeal && (() => {
+            const contact = activeDeal.contact as { first_name?: string; last_name?: string } | null;
+            const name = [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Sin nombre";
+            return (
+              <div
+                className="opacity-95 shadow-xl rotate-1 cursor-grabbing"
+                style={{
+                  background: "white",
+                  border: "1px solid #e5e7eb",
+                  borderRadius: 8,
+                  padding: 12,
+                  width: 280,
+                }}
+              >
+                <p className="text-sm font-semibold text-stone-900">{name}</p>
+                {activeDeal.deal_value != null && (
+                  <p className="text-sm font-bold mt-1" style={{ color: "#1C1917" }}>
+                    {activeDeal.currency ?? "RD$"} {activeDeal.deal_value.toLocaleString()}
+                  </p>
+                )}
+              </div>
+            );
+          })()}
         </DragOverlay>
       </DndContext>
 

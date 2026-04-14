@@ -12,11 +12,11 @@ export default function AvaPage() {
             </p>
             <h1
               style={{
-                fontFamily: "var(--font-playfair),Georgia,serif",
+                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
                 fontWeight: 700,
                 fontSize: 30,
                 letterSpacing: "-0.02em",
-                color: "#0f172a",
+                color: "var(--foreground)",
                 lineHeight: 1.1,
               }}
             >
@@ -48,7 +48,7 @@ export default function AvaPage() {
                   style={{ background: "oklch(0.6 0.2 145 / 15%)", color: "oklch(0.4 0.14 145)" }}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                  Python 3.11 · Claude claude-sonnet-4-6
+                  Python 3.11 · GPT-4o
                 </span>
               </div>
               <p className="font-sans text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ export default function AvaPage() {
             {
               icon: Brain,
               title: "Procesamiento",
-              desc: "Claude claude-sonnet-4-6 con herramientas en agent/tools.py",
+              desc: "GPT-4o con function calling — agent/tools.py en Railway",
               color: "var(--red)",
             },
             {

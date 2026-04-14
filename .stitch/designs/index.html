@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advance Estate CRM — Diseños</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: #111827;
+      color: #E5E7EB;
+      min-height: 100vh;
+    }
+    header {
+      padding: 32px 48px 24px;
+      border-bottom: 1px solid #1F2937;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-mark {
+      width: 40px; height: 40px;
+      background: #e11d48;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: Manrope, sans-serif;
+      font-weight: 800; font-size: 22px; color: white;
+    }
+    .brand { display: flex; flex-direction: column; }
+    .brand-name { font-family: Manrope, sans-serif; font-weight: 700; font-size: 18px; color: white; }
+    .brand-sub { font-size: 11px; color: #6B7280; letter-spacing: 0.08em; text-transform: uppercase; }
+    .subtitle { margin-left: auto; font-size: 13px; color: #6B7280; }
+
+    main { padding: 40px 48px; }
+    h2 { font-family: Manrope, sans-serif; font-size: 13px; font-weight: 600; color: #6B7280; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .card {
+      background: #1F2937;
+      border-radius: 12px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 1px solid #374151;
+    }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.4); border-color: #4B5563; }
+    .card-preview {
+      width: 100%; height: 160px;
+      background: #374151;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .card-preview iframe {
+      width: 200%; height: 200%;
+      transform: scale(0.5);
+      transform-origin: top left;
+      pointer-events: none;
+      border: none;
+    }
+    .card-body { padding: 16px 20px; }
+    .card-title { font-family: Manrope, sans-serif; font-weight: 600; font-size: 15px; color: white; margin-bottom: 4px; }
+    .card-meta { font-size: 12px; color: #6B7280; }
+    .badge {
+      display: inline-block; margin-top: 10px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.03em;
+    }
+    .badge-new { background: #e11d48; color: white; }
+    .badge-logo { background: #374151; color: #9CA3AF; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <div class="logo-mark">A</div>
+    <div class="brand">
+      <span class="brand-name">Advance Estate</span>
+      <span class="brand-sub">CRM — Diseños v1</span>
+    </div>
+    <span class="subtitle">16 pantallas · Stitch MCP · Abril 2025</span>
+  </header>
+  <main>
+    <h2>Pantallas principales</h2>
+    <div class="grid">
+      <a class="card" href="01-dashboard.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="01-dashboard.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Dashboard</div>
+          <div class="card-meta">KPIs · Pipeline · Actividad reciente · Seguimientos</div>
+          <span class="badge badge-new">Pantalla principal</span>
+        </div>
+      </a>
+      <a class="card" href="03-contactos.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="03-contactos.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Contactos</div>
+          <div class="card-meta">Tabla de leads · Filtros · Badges de estado · Paginación</div>
+          <span class="badge badge-new">Gestión de leads</span>
+        </div>
+      </a>
+      <a class="card" href="04-pipeline.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="04-pipeline.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Pipeline Kanban</div>
+          <div class="card-meta">5 etapas · Tarjetas de tratos · Totales por etapa · Alertas</div>
+          <span class="badge badge-logo">Original</span>
+        </div>
+      </a>
+      <a class="card" href="05-contacto-detalle.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="05-contacto-detalle.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Detalle de Contacto + WhatsApp</div>
+          <div class="card-meta">Split-pane · Chat Ava IA · Quick replies · Notas</div>
+          <span class="badge badge-new">CRM + IA</span>
+        </div>
+      </a>
+      <a class="card" href="06-propiedades.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="06-propiedades.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Catálogo de Propiedades</div>
+          <div class="card-meta">Grid de listings · Filtros · Estado de disponibilidad · Leads activos</div>
+          <span class="badge badge-new">Inventario</span>
+        </div>
+      </a>
+    </div>
+
+    <h2 style="margin-top:40px;">4 Templates de Diseño</h2>
+    <div class="grid">
+      <a class="card" href="01-dashboard.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="01-dashboard.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">The Attio Broker</div>
+          <div class="card-meta">Dark sidebar · Warm white content · Red accent · Manrope + Inter</div>
+          <span class="badge" style="background:#374151;color:#9CA3AF;">Template 1</span>
+        </div>
+      </a>
+      <a class="card" href="tpl-white-glove.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="tpl-white-glove.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">White Glove</div>
+          <div class="card-meta">Minimal luxury · Pure white · Gold accent · Cormorant Garamond</div>
+          <span class="badge" style="background:#B08D5722;color:#B08D57;border:1px solid #B08D57;">Template 2</span>
+        </div>
+      </a>
+      <a class="card" href="tpl-caribbean-bold.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="tpl-caribbean-bold.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Caribbean Bold</div>
+          <div class="card-meta">Editorial · Navy + Coral · Cream bg · Bento grid</div>
+          <span class="badge" style="background:#FF5C3A22;color:#FF5C3A;border:1px solid #FF5C3A;">Template 3</span>
+        </div>
+      </a>
+      <a class="card" href="tpl-obsidian.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="tpl-obsidian.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Obsidian</div>
+          <div class="card-meta">Full dark luxury · Near-black · Gold accent · Hairline borders</div>
+          <span class="badge" style="background:#C9A84C22;color:#C9A84C;border:1px solid #C9A84C;">Template 4</span>
+        </div>
+      </a>
+    </div>
+
+    <h2 style="margin-top:40px;">Round 2 — Nuevas pantallas</h2>
+    <div class="grid">
+      <a class="card" href="ae-logo-v4.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="ae-logo-v4.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">AE Logo v4 — Final</div>
+          <div class="card-meta">Logo generado · 3 fondos · Lockups · Escala · Paleta completa</div>
+          <span class="badge badge-new">Logo final ✓</span>
+        </div>
+      </a>
+      <a class="card" href="tpl-hybrid.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="tpl-hybrid.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Light / Dark — Comparativa</div>
+          <div class="card-meta">Attio Broker (claro) vs Obsidian (oscuro) · Misma UI · Side-by-side</div>
+          <span class="badge" style="background:linear-gradient(90deg,#374151 50%,#0D0D0D 50%);color:#fff;">Aprobado ✓</span>
+        </div>
+      </a>
+      <a class="card" href="04-pipeline.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="04-pipeline.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Pipeline Kanban</div>
+          <div class="card-meta">5 etapas · Tarjetas de tratos · Drag &amp; drop · Totales por etapa</div>
+          <span class="badge badge-new">Pipeline aprobado</span>
+        </div>
+      </a>
+    </div>
+
+    <h2 style="margin-top:40px;">Archivo — Pantallas anteriores</h2>
+    <div class="grid">
+      <a class="card" href="ae-logo-v3.html" target="_blank" style="opacity:0.55;">
+        <div class="card-preview">
+          <iframe src="ae-logo-v3.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">AE Monogram v3</div>
+          <div class="card-meta">SVG geométrico manual · Crossbar #e11d48 — Logo provisional</div>
+          <span class="badge" style="background:#374151;color:#9CA3AF;">Reemplazado por v4</span>
+        </div>
+      </a>
+      <a class="card" href="ae-logo.html" target="_blank" style="opacity:0.55;">
+        <div class="card-preview">
+          <iframe src="ae-logo.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">AE Logo v1</div>
+          <div class="card-meta">Monograma anterior · No aprobado</div>
+          <span class="badge" style="background:#374151;color:#9CA3AF;">Descartado</span>
+        </div>
+      </a>
+      <a class="card" href="pipeline-river.html" target="_blank" style="opacity:0.55;">
+        <div class="card-preview">
+          <iframe src="pipeline-river.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Pipeline River</div>
+          <div class="card-meta">Swimlanes horizontales · No aprobado</div>
+          <span class="badge" style="background:#374151;color:#9CA3AF;">Descartado</span>
+        </div>
+      </a>
+      <a class="card" href="login.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="login.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Login</div>
+          <div class="card-meta">Split-screen · Propiedad hero · Formulario de acceso</div>
+          <span class="badge badge-logo">Auth</span>
+        </div>
+      </a>
+      <a class="card" href="02-logo.html" target="_blank">
+        <div class="card-preview">
+          <iframe src="02-logo.html" scrolling="no" tabindex="-1"></iframe>
+        </div>
+        <div class="card-body">
+          <div class="card-title">Brand Sheet v1</div>
+          <div class="card-meta">Lockups · Variantes · Paleta · Tipografía</div>
+          <span class="badge badge-logo">Referencia</span>
+        </div>
+      </a>
+    </div>
+  </main>
+</body>
+</html>

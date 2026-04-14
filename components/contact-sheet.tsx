@@ -145,7 +145,7 @@ export function ContactSheet({
         >
           <SheetTitle
             style={{
-              fontFamily: "var(--font-playfair),Georgia,serif",
+              fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
               fontWeight: 700,
               fontSize: 20,
               color: "var(--foreground)",

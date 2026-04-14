@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-variant": "#e2e2e2",
+                    "tertiary-container": "#b05f00",
+                    "tertiary": "#8c4a00",
+                    "surface-tint": "#be0037",
+                    "primary-container": "#e11d48",
+                    "secondary-fixed": "#85f8c4",
+                    "inverse-primary": "#ffb3b6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed": "#002114",
+                    "inverse-on-surface": "#f1f1f0",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e8e8e7",
+                    "on-tertiary-fixed-variant": "#6e3900",
+                    "surface-container-low": "#f3f4f3",
+                    "surface-container": "#eeeeed",
+                    "outline-variant": "#e5bdbe",
+                    "on-primary-fixed": "#40000c",
+                    "secondary": "#006c4a",
+                    "surface": "#f9f9f8",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-primary-fixed-variant": "#920028",
+                    "primary-fixed-dim": "#ffb3b6",
+                    "secondary-container": "#82f5c1",
+                    "on-background": "#1a1c1c",
+                    "error-container": "#ffdad6",
+                    "on-surface": "#1a1c1c",
+                    "tertiary-fixed-dim": "#ffb77d",
+                    "error": "#ba1a1a",
+                    "outline": "#906f70",
+                    "surface-dim": "#dadad9",
+                    "secondary-fixed-dim": "#68dba9",
+                    "on-tertiary-fixed": "#2f1500",
+                    "on-secondary-container": "#00714e",
+                    "on-surface-variant": "#5c3f40",
+                    "tertiary-fixed": "#ffdcc3",
+                    "primary": "#b80035",
+                    "on-primary-container": "#fffaf9",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#005137",
+                    "background": "#f9f9f8",
+                    "on-tertiary-container": "#fffbfa",
+                    "surface-bright": "#f9f9f8",
+                    "inverse-surface": "#2f3130",
+                    "primary-fixed": "#ffdada",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .rotated-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+        /* Custom scrollbar for horizontal river flow */
+        .river-scroll::-webkit-scrollbar { height: 6px; }
+        .river-scroll::-webkit-scrollbar-track { background: transparent; }
+        .river-scroll::-webkit-scrollbar-thumb { background: #e2e2e2; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface overflow-hidden">
+<!-- SideNavBar Shell -->
+<aside class="fixed left-0 top-0 h-screen w-64 bg-gray-900 dark:bg-gray-950 flex flex-col py-8 shadow-2xl z-50">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold tracking-tight text-white">Estate CRM</h1>
+<p class="text-xs text-gray-500 font-medium tracking-widest uppercase mt-1">Surgical Pipeline</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-6 py-4 text-gray-400 hover:text-white transition-colors hover:bg-gray-800/30" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-manrope text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-4 text-gray-400 hover:text-white transition-colors hover:bg-gray-800/30" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-manrope text-sm font-medium">Contacts</span>
+</a>
+<!-- Active State: Pipeline -->
+<a class="flex items-center gap-3 px-6 py-4 bg-gray-800/50 text-white border-l-4 border-rose-600" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-manrope text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-4 text-gray-400 hover:text-white transition-colors hover:bg-gray-800/30" href="#">
+<span class="material-symbols-outlined">home_work</span>
+<span class="font-manrope text-sm font-medium">Properties</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-4 text-gray-400 hover:text-white transition-colors hover:bg-gray-800/30" href="#">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-manrope text-sm font-medium">WhatsApp</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-4 text-gray-400 hover:text-white transition-colors hover:bg-gray-800/30" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="font-manrope text-sm font-medium">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-6 py-4 text-gray-400 hover:text-white transition-colors hover:bg-gray-800/30" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-manrope text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="px-6 mt-auto">
+<button class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-rose-900/20">
+                New Deal
+            </button>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-64 h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center h-16 px-8 bg-stone-50/80 backdrop-blur-xl z-40 sticky top-0">
+<div class="flex items-center gap-6">
+<div>
+<h2 class="text-lg font-bold text-gray-900 font-headline">Pipeline River</h2>
+<p class="text-[10px] font-bold text-primary tracking-widest uppercase">RD$ 45.2M total</p>
+</div>
+<!-- Toggle River/Kanban -->
+<div class="flex bg-surface-container-low p-1 rounded-full">
+<button class="px-4 py-1 text-xs font-bold text-gray-500 rounded-full hover:bg-white transition-all">Kanban</button>
+<button class="px-4 py-1 text-xs font-bold text-primary bg-white shadow-sm rounded-full transition-all">River</button>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-5 py-2 bg-primary text-white rounded-full font-bold text-sm hover:opacity-90 transition-all shadow-md shadow-primary/20">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Agregar Trato
+                </button>
+<div class="flex items-center gap-2">
+<button class="p-2 text-gray-500 hover:bg-stone-200/50 rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-gray-500 hover:bg-stone-200/50 rounded-full transition-all">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden ml-2 border border-surface-container-highest">
+<img alt="User" data-alt="close-up portrait of a professional man in a tailored suit with a confident expression and soft office lighting background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFkMT-Qm9dS4_Y8I_ppmgPsAZRNoIp4zYD1Vdg_MrGk0YJsKNzzh84AneQtAM0Ra6xa_rHrK0wMXGbCR-f419ZNlb7S38d8ZijIAGmSoI1D67KAKZTHsH0ULVRA6fhZxP8fIqMqPBEruhHHqA33oNfWfHWcbTK-hdnht77MelTEY5cwioqUx3CdDb1xF38suYnjyZReIUHGXLeXPEaN5i0Lgwg5FKbVIAq32Ya1ahZmfOr2cgcarSj6T0SNiht-Uq5PmoLTkrhV_s"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Pipeline River Container -->
+<div class="flex-1 overflow-x-auto overflow-y-hidden river-scroll relative">
+<!-- Lane 1: Nuevo Lead -->
+<section class="h-[120px] flex items-center bg-white border-b border-surface-container-low relative group">
+<div class="w-12 h-full flex items-center justify-center bg-white sticky left-0 z-10 border-r border-surface-container-low">
+<span class="rotated-label text-[10px] font-extrabold tracking-widest text-gray-400 uppercase">NUEVO LEAD</span>
+</div>
+<div class="flex items-center gap-6 px-12 min-w-max">
+<!-- Pill Card 1 -->
+<div class="w-[220px] h-[68px] bg-white rounded-lg shadow-sm border border-surface-container-highest border-l-[6px] border-l-secondary flex items-center p-3 relative hover:bg-surface-container-low transition-all cursor-move">
+<div class="flex-1 min-w-0">
+<h4 class="text-xs font-bold truncate text-on-surface">Torre Loft Piantini</h4>
+<p class="text-primary font-extrabold text-[11px] mt-0.5">RD$ 4.2M</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="w-6 h-6 rounded-full border border-surface-container overflow-hidden">
+<img alt="Broker" data-alt="professional woman portrait headshot for corporate profile with warm natural lighting and blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfhm1CnDDuI45spY5it-K6s4nqWdoROftRYz9dj2e4-hSRsT_T7K9tnD3KwJF6clQuFZuTaWmRFRA05u07xzNZ-JHwuFoGLO_bnU9B4FkJ_ltGRi0Da39NZ9ab2ifsXEQT4kOnRbMPFpzBHyeZCT2OCzSGQwTjAMjgs-SO69vTf8s1r1IufLdX_xp7sibPRNOyGT833UhlGzmyLWgWMptsqg0x0gyZLlFValX5WLlCFHN4nIeH-7RNEWP5mdkAWbQqJJELru2jexU"/>
+</div>
+<span class="material-symbols-outlined text-gray-300 text-sm">drag_indicator</span>
+</div>
+<div class="absolute -top-2 -right-1 bg-secondary text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-tighter">HOT</div>
+</div>
+</div>
+</section>
+<!-- Lane 2: Calificado -->
+<section class="h-[120px] flex items-center bg-surface-container-low border-b border-surface-container-low relative">
+<div class="w-12 h-full flex items-center justify-center bg-surface-container-low sticky left-0 z-10 border-r border-surface-container">
+<span class="rotated-label text-[10px] font-extrabold tracking-widest text-gray-500 uppercase">CALIFICADO</span>
+</div>
+<div class="flex items-center gap-6 px-12 min-w-max">
+<!-- Pill Card 2 (Drifted) -->
+<div class="ml-40 w-[220px] h-[68px] bg-white rounded-lg shadow-sm border border-surface-container-highest border-l-[6px] border-l-sky-400 flex items-center p-3 relative hover:bg-surface-container transition-all cursor-move">
+<div class="flex-1 min-w-0">
+<h4 class="text-xs font-bold truncate">Penthouse Naco</h4>
+<p class="text-primary font-extrabold text-[11px] mt-0.5">RD$ 12.8M</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="flex -space-x-2">
+<div class="w-5 h-5 rounded-full border border-white overflow-hidden"><img data-alt="professional male profile photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZoqDYWxaHDor07NHBHjampWunxkB3EmKCP4m1AY16JCmVwZVioR0-dXpCTczy8NJOgU4ifIUPVGCXuAtoKbRXDA4kdvz6Z7sPahEhBwTw0O5sl1tp_h-g0B35LB4RoqasIVsj0ItQN4Yvk-X35x8jg_2omheMu3moQWYg8kiJcJtrQsyG63Rkiu6KoF-l5T8soMcTGiz5WTNn6DMzrvFj-n38TgPUbL3ZtPCw__l7LA3tqJTZYLc6Ocg3VZOhFGEVY0JkVsgbodg"/></div>
+</div>
+<span class="material-symbols-outlined text-gray-300 text-sm">drag_indicator</span>
+</div>
+<div class="absolute -top-2 -right-1 bg-sky-100 text-sky-700 text-[8px] font-bold px-1.5 py-0.5 rounded-full border border-sky-200">Interés Alto</div>
+</div>
+</div>
+</section>
+<!-- Lane 3: Propuesta Enviada -->
+<section class="h-[120px] flex items-center bg-surface-container border-b border-surface-container-low relative">
+<div class="w-12 h-full flex items-center justify-center bg-surface-container sticky left-0 z-10 border-r border-surface-container-high">
+<span class="rotated-label text-[10px] font-extrabold tracking-widest text-gray-600 uppercase">PROPUESTA</span>
+</div>
+<div class="flex items-center gap-6 px-12 min-w-max">
+<!-- Pill Card 3 (Further Drift) -->
+<div class="ml-[400px] w-[220px] h-[68px] bg-white rounded-lg shadow-sm border border-surface-container-highest border-l-[6px] border-l-amber-500 flex items-center p-3 relative hover:bg-surface-container-high transition-all cursor-move">
+<div class="flex-1 min-w-0">
+<h4 class="text-xs font-bold truncate">Local Corporativo A1</h4>
+<p class="text-primary font-extrabold text-[11px] mt-0.5">RD$ 6.1M</p>
+</div>
+<div class="flex flex-col items-end gap-1">
+<div class="w-6 h-6 rounded-full border border-surface-container-high overflow-hidden"><img data-alt="professional business man headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaGScBgr0MtH32M39gvckoqhtdIDWMYZPLF8MSxzxWptPXfW5Grn3NbHpH76ZiWYVbPsOCAPtOC4R5WpENqnIB1C2QzvIi4mhUK--gpFXqo59bnwe6RrYusalQ7PDFR02wIFnwtY3wFDehr7uGYXjVfUme1c2s3FB3zOsyZS0nYNAX8ekoZ9zGlShojgRf3XS0bWTmIeuveDfY4N2dSXhij1v_-x7BxiI67PJysODrnH5MCKNdb4A_rR3AKw70fQuROS0xe1dopgc"/></div>
+</div>
+<div class="absolute -bottom-2 right-2 bg-amber-50 text-amber-700 text-[8px] font-medium px-1.5 py-0.5 rounded-full border border-amber-200">3 días sin respuesta</div>
+</div>
+</div>
+</section>
+<!-- Lane 4: Negociación -->
+<section class="h-[120px] flex items-center bg-surface-container-high border-b border-surface-container-low relative">
+<div class="w-12 h-full flex items-center justify-center bg-surface-container-high sticky left-0 z-10 border-r border-surface-container-highest">
+<span class="rotated-label text-[10px] font-extrabold tracking-widest text-gray-700 uppercase">NEGOCIACIÓN</span>
+</div>
+<div class="flex items-center gap-6 px-12 min-w-max">
+<!-- Pill Card 4 (Deep Drift) -->
+<div class="ml-[700px] w-[220px] h-[68px] bg-white rounded-lg shadow-sm border border-surface-container-highest border-l-[6px] border-l-primary flex items-center p-3 relative hover:bg-surface-container-highest transition-all cursor-move">
+<div class="flex-1 min-w-0">
+<h4 class="text-xs font-bold truncate">Villa Punta Cana</h4>
+<div class="flex items-center gap-1 mt-0.5">
+<span class="text-gray-400 text-[9px] line-through">RD$4.2M</span>
+<span class="text-primary font-extrabold text-[11px]">RD$3.8M</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1">
+<span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+</div>
+<div class="absolute -top-2 left-2 bg-primary text-white text-[8px] font-bold px-2 py-0.5 rounded-full">URGENTE</div>
+</div>
+</div>
+</section>
+<!-- Lane 5: Cerrado -->
+<section class="h-[120px] flex items-center bg-[#E8F5EE] border-b border-white relative overflow-hidden">
+<!-- Emerald Strip Overlay -->
+<div class="absolute left-0 top-0 w-2 h-full bg-secondary opacity-20"></div>
+<div class="w-12 h-full flex items-center justify-center bg-[#E8F5EE] sticky left-0 z-10 border-r border-[#D1EAD9]">
+<span class="rotated-label text-[10px] font-extrabold tracking-widest text-secondary uppercase">CERRADO</span>
+</div>
+<div class="flex items-center gap-6 px-12 min-w-max">
+<!-- Pill Card 5 (Finalized) -->
+<div class="ml-[980px] w-[220px] h-[68px] bg-white rounded-lg shadow-sm border border-surface-container-highest border-l-[6px] border-l-secondary flex items-center p-3 relative hover:opacity-80 transition-all cursor-move">
+<div class="flex-1 min-w-0">
+<h4 class="text-xs font-bold truncate">Solar Samaná North</h4>
+<p class="text-secondary font-extrabold text-[11px] mt-0.5">RD$ 2.4M</p>
+</div>
+<div class="flex flex-col items-center justify-center w-8 h-8 bg-secondary-container rounded-full">
+<span class="material-symbols-outlined text-secondary text-base" style="font-variation-settings: 'FILL' 0, 'wght' 700;">check</span>
+</div>
+</div>
+<!-- Pill Card 6 (Finalized) -->
+<div class="w-[220px] h-[68px] bg-white rounded-lg shadow-sm border border-surface-container-highest border-l-[6px] border-l-secondary flex items-center p-3 relative hover:opacity-80 transition-all cursor-move">
+<div class="flex-1 min-w-0">
+<h4 class="text-xs font-bold truncate">Casa de Campo Luxury</h4>
+<p class="text-secondary font-extrabold text-[11px] mt-0.5">RD$ 15.9M</p>
+</div>
+<div class="flex flex-col items-center justify-center w-8 h-8 bg-secondary-container rounded-full">
+<span class="material-symbols-outlined text-secondary text-base" style="font-variation-settings: 'FILL' 0, 'wght' 700;">check</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Visual River Flow Gradient Overlay (Right edge) -->
+<div class="absolute top-0 right-0 h-full w-32 bg-gradient-to-l from-surface to-transparent pointer-events-none"></div>
+</div>
+<!-- Footer / Metadata Bar -->
+<footer class="h-10 bg-white border-t border-surface-container flex items-center px-8 justify-between text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+<div class="flex items-center gap-6">
+<span>6 Tratos en curso</span>
+<span>Promedio cierre: 18 días</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">sync</span>
+                Actualizado hace 2 min
+            </div>
+</footer>
+</main>
+</body></html>

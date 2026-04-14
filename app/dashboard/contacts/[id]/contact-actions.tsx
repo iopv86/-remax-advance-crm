@@ -60,7 +60,7 @@ export function ContactActions({ contactId, contactName, type }: Props) {
           <SheetHeader className="p-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
             <SheetTitle
               style={{
-                fontFamily: "var(--font-playfair),Georgia,serif",
+                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
                 fontWeight: 700,
                 fontSize: 20,
                 color: "var(--foreground)",

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advance Estate CRM — Theme Comparison</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar { width: 240px; height: 100%; flex-shrink: 0; }
+        .content { flex-grow: 1; padding: 24px; }
+        .kpi-card { flex: 1; padding: 20px; }
+        .divider { width: 2px; height: 100%; background-color: #2A2A2A; z-index: 50; }
+        .header-bar { height: 32px; background: #111111; display: flex; align-items: center; justify-content: center; width: 100%; }
+        .footer-bar { height: 72px; background: #111111; border-top: 1px solid #1F1F1F; display: flex; width: 100%; }
+        .pill { padding: 2px 8px; border-radius: 9999px; font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+        
+        /* Typography overrides */
+        .font-manrope-800 { font-family: 'Manrope', sans-serif; font-weight: 800; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 8px 16px; font-size: 14px; font-weight: 500; transition: all 0.2s; }
+        .mini-card { height: 36px; padding: 6px 8px; border-radius: 4px; font-size: 10px; display: flex; align-items: center; }
+    </style>
+</head>
+<body class="flex flex-col">
+
+    <!-- Top Header -->
+    <header class="header-bar">
+        <span class="text-[#888888] text-[12px] font-medium tracking-[0.08em] font-inter">Advance Estate CRM — Theme Comparison</span>
+    </header>
+
+    <!-- Main Comparison Area -->
+    <main class="flex flex-1 relative overflow-hidden">
+        
+        <!-- LEFT HALF: LIGHT MODE -->
+        <section class="flex-1 flex flex-col bg-[#FAFAF9] relative">
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+                <span class="pill bg-[#F3F4F6] border border-[#E5E7EB] text-[#6B7280]">LIGHT MODE</span>
+            </div>
+            
+            <div class="flex flex-1">
+                <!-- Sidebar -->
+                <aside class="sidebar bg-[#111827] flex flex-col py-6">
+                    <div class="px-6 mb-10 flex items-center gap-3">
+                        <div class="w-7 h-7 bg-[#e11d48] rounded-sm flex items-center justify-center text-white font-manrope-800 text-[14px]">A</div>
+                        <span class="text-white font-manrope-800 text-[13px] tracking-tight">Advance Estate</span>
+                    </div>
+                    
+                    <nav class="flex-1 flex flex-col gap-1">
+                        <div class="nav-item text-white bg-[rgba(225,29,72,0.08)] border-l-2 border-[#e11d48]">
+                            <span class="opacity-100">Dashboard</span>
+                        </div>
+                        <div class="nav-item text-[#9CA3AF]"><span>Propiedades</span></div>
+                        <div class="nav-item text-[#9CA3AF]"><span>Contactos</span></div>
+                        <div class="nav-item text-[#9CA3AF]"><span>Pipeline</span></div>
+                        <div class="nav-item text-[#9CA3AF]"><span>Reportes</span></div>
+                    </nav>
+                    
+                    <div class="px-6 mt-auto flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-[#374151]"></div>
+                        <span class="text-[#D1D5DB] text-[12px] font-medium">Ivan P.</span>
+                    </div>
+                </aside>
+                
+                <!-- Content Area -->
+                <div class="content flex flex-col">
+                    <header>
+                        <h1 class="text-[#111827] font-manrope-800 text-[20px]">Panel General</h1>
+                        <p class="text-[#9CA3AF] text-[12px]">Semana 14 — Abr 2026</p>
+                    </header>
+                    
+                    <!-- KPI Cards -->
+                    <div class="flex gap-4 mt-5">
+                        <div class="kpi-card bg-white border border-[#E5E7EB] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                            <span class="text-[#6B7280] text-[11px] font-medium uppercase tracking-wider">Propiedades Activas</span>
+                            <div class="flex items-end justify-between mt-1">
+                                <span class="text-[#111827] font-manrope-800 text-[32px] leading-none">142</span>
+                                <span class="text-[#10B981] text-[10px] font-semibold mb-1">+8 este mes</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card bg-white border border-[#E5E7EB] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                            <span class="text-[#6B7280] text-[11px] font-medium uppercase tracking-wider">Leads Nuevos</span>
+                            <div class="flex items-end justify-between mt-1">
+                                <span class="text-[#111827] font-manrope-800 text-[32px] leading-none">38</span>
+                                <span class="text-[#10B981] text-[10px] font-semibold mb-1">+12 vs sem. ant.</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card bg-white border border-[#E5E7EB] rounded-lg shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                            <span class="text-[#6B7280] text-[11px] font-medium uppercase tracking-wider">Cierres este mes</span>
+                            <div class="flex items-end justify-between mt-1">
+                                <span class="text-[#111827] font-manrope-800 text-[32px] leading-none">6</span>
+                                <span class="text-[#F59E0B] text-[10px] font-semibold mb-1">Meta: 8</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mini Pipeline -->
+                    <div class="mt-6 flex-1 flex flex-col">
+                        <h2 class="text-[#6B7280] text-[12px] font-semibold uppercase tracking-wider mb-4">Pipeline Activo</h2>
+                        <div class="grid grid-cols-4 gap-4 flex-1">
+                            <!-- Columns -->
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#9CA3AF] text-[10px] font-medium uppercase mb-1">Nuevo</span>
+                                <div class="mini-card bg-white border-l-2 border-[#e11d48] text-[#374151]">Lead #823 - Casa de Lujo</div>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #824 - Apartamento</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#9CA3AF] text-[10px] font-medium uppercase mb-1">Calificado</span>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #812 - Inversión</div>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #815 - Comercial</div>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #819 - Terreno</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#9CA3AF] text-[10px] font-medium uppercase mb-1">Propuesta</span>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #798 - Oficinas</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#9CA3AF] text-[10px] font-medium uppercase mb-1">Cierre</span>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #755 - Villa</div>
+                                <div class="mini-card bg-white border-l-2 border-[#E5E7EB] text-[#374151]">Lead #760 - Penthouse</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vertical Divider -->
+        <div class="divider"></div>
+
+        <!-- RIGHT HALF: DARK MODE -->
+        <section class="flex-1 flex flex-col bg-[#0D0D0D] relative">
+            <div class="absolute top-4 left-1/2 -translate-x-1/2 z-10">
+                <span class="pill bg-[rgba(201,168,76,0.1)] border border-[rgba(201,168,76,0.25)] text-[#C9A84C]">DARK MODE</span>
+            </div>
+            
+            <div class="flex flex-1">
+                <!-- Sidebar -->
+                <aside class="sidebar bg-[#141414] border-r border-[#1F1F1F] flex flex-col py-6">
+                    <div class="px-6 mb-10 flex items-center gap-3">
+                        <div class="w-7 h-7 bg-[#C9A84C] rounded-sm flex items-center justify-center text-black font-manrope-800 text-[14px]">A</div>
+                        <span class="text-[#E8E3D5] font-manrope-800 text-[13px] tracking-tight">Advance Estate</span>
+                    </div>
+                    
+                    <nav class="flex-1 flex flex-col gap-1">
+                        <div class="nav-item text-[#E8E3D5] bg-[rgba(201,168,76,0.06)] border-l border-[#C9A84C]">
+                            <span>Dashboard</span>
+                        </div>
+                        <div class="nav-item text-[#4A4A4A]"><span>Propiedades</span></div>
+                        <div class="nav-item text-[#4A4A4A]"><span>Contactos</span></div>
+                        <div class="nav-item text-[#4A4A4A]"><span>Pipeline</span></div>
+                        <div class="nav-item text-[#4A4A4A]"><span>Reportes</span></div>
+                    </nav>
+                    
+                    <div class="px-6 mt-auto flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-[#1F1F1F]"></div>
+                        <span class="text-[#6A6A6A] text-[12px] font-medium">Ivan P.</span>
+                    </div>
+                </aside>
+                
+                <!-- Content Area -->
+                <div class="content flex flex-col">
+                    <header>
+                        <h1 class="text-[#E8E3D5] font-manrope-800 text-[20px]">Panel General</h1>
+                        <p class="text-[#C9A84C] font-mono text-[11px] uppercase tracking-wider">Semana 14 — Abr 2026</p>
+                    </header>
+                    
+                    <!-- KPI Cards -->
+                    <div class="flex gap-4 mt-5">
+                        <div class="kpi-card bg-[#141414] border border-[#1F1F1F] rounded-md">
+                            <span class="text-[#4A4A4A] text-[11px] font-medium uppercase tracking-wider">Propiedades Activas</span>
+                            <div class="flex items-end justify-between mt-1">
+                                <span class="text-[#E8E3D5] font-manrope-800 text-[32px] leading-none">142</span>
+                                <span class="text-[#4A7C59] text-[10px] font-semibold mb-1">+8 este mes</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card bg-[#141414] border border-[#1F1F1F] rounded-md">
+                            <span class="text-[#4A4A4A] text-[11px] font-medium uppercase tracking-wider">Leads Nuevos</span>
+                            <div class="flex items-end justify-between mt-1">
+                                <span class="text-[#E8E3D5] font-manrope-800 text-[32px] leading-none">38</span>
+                                <span class="text-[#4A7C59] text-[10px] font-semibold mb-1">+12 vs sem. ant.</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card bg-[#141414] border border-[#1F1F1F] rounded-md">
+                            <span class="text-[#4A4A4A] text-[11px] font-medium uppercase tracking-wider">Cierres este mes</span>
+                            <div class="flex items-end justify-between mt-1">
+                                <span class="text-[#E8E3D5] font-manrope-800 text-[32px] leading-none">6</span>
+                                <span class="text-[#C9A84C] font-mono text-[10px] font-semibold mb-1">Meta: 8</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mini Pipeline -->
+                    <div class="mt-6 flex-1 flex flex-col">
+                        <h2 class="text-[#4A4A4A] text-[12px] font-semibold uppercase tracking-wider mb-4">Pipeline Activo</h2>
+                        <div class="grid grid-cols-4 gap-4 flex-1">
+                            <!-- Columns -->
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#4A4A4A] font-mono text-[10px] uppercase mb-1">Nuevo</span>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] border-l-[#C9A84C] text-[#B8B0A0]">Lead #823 - Casa de Lujo</div>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] text-[#6A6A6A]">Lead #824 - Apartamento</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#4A4A4A] font-mono text-[10px] uppercase mb-1">Calificado</span>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] border-l-[#C9A84C] text-[#B8B0A0]">Lead #812 - Inversión</div>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] text-[#6A6A6A]">Lead #815 - Comercial</div>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] text-[#6A6A6A]">Lead #819 - Terreno</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#4A4A4A] font-mono text-[10px] uppercase mb-1">Propuesta</span>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] border-l-[#C9A84C] text-[#B8B0A0]">Lead #798 - Oficinas</div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[#4A4A4A] font-mono text-[10px] uppercase mb-1">Cierre</span>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] border-l-[#C9A84C] text-[#B8B0A0]">Lead #755 - Villa</div>
+                                <div class="mini-card bg-[#141414] border border-[#1F1F1F] text-[#6A6A6A]">Lead #760 - Penthouse</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Legend -->
+    <footer class="footer-bar">
+        <!-- Light Palette -->
+        <div class="flex-1 flex items-center px-8 gap-8">
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#FAFAF9] border border-[#E5E7EB]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--surface<br/>#FAFAF9</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#111827]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--sidebar<br/>#111827</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#e11d48]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--accent<br/>#e11d48</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#111827]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--text<br/>#111827</span>
+            </div>
+        </div>
+
+        <!-- Vertical Divider -->
+        <div class="divider"></div>
+
+        <!-- Dark Palette -->
+        <div class="flex-1 flex items-center px-8 gap-8">
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#0D0D0D] border border-[#1F1F1F]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--surface<br/>#0D0D0D</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#141414]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--sidebar<br/>#141414</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#C9A84C]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--accent<br/>#C9A84C</span>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="w-5 h-5 rounded bg-[#E8E3D5]"></div>
+                <span class="text-[#555555] font-mono text-[9px]">--text<br/>#E8E3D5</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

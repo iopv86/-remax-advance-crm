@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#575e70",
+                    "outline": "#76777d",
+                    "primary-fixed": "#dce2f7",
+                    "background": "#f9f9ff",
+                    "surface-bright": "#f9f9ff",
+                    "on-secondary-container": "#fffbff",
+                    "on-surface-variant": "#45464c",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#261906",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-container": "#261906",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "on-tertiary-fixed-variant": "#55442d",
+                    "secondary-fixed-dim": "#ffb3b6",
+                    "inverse-primary": "#c0c6db",
+                    "inverse-surface": "#293040",
+                    "surface": "#f9f9ff",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "secondary": "#e11d48",
+                    "on-primary-fixed-variant": "#404758",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#dce2f7",
+                    "surface-container-high": "#e1e8fd",
+                    "on-surface": "#141b2b",
+                    "on-primary-fixed": "#141b2b",
+                    "on-secondary-fixed-variant": "#920028",
+                    "surface-container-low": "#f1f3ff",
+                    "surface-dim": "#d3daef",
+                    "primary-fixed-dim": "#c0c6db",
+                    "on-secondary-fixed": "#40000c",
+                    "primary": "#111827",
+                    "surface-container": "#e9edff",
+                    "tertiary": "#000000",
+                    "on-background": "#141b2b",
+                    "outline-variant": "#c6c6cd",
+                    "secondary-fixed": "#ffdada",
+                    "primary-container": "#141b2b",
+                    "surface-variant": "#dce2f7",
+                    "tertiary-fixed-dim": "#dcc2a4",
+                    "inverse-on-surface": "#edf0ff",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#7d8497",
+                    "on-tertiary-container": "#968065",
+                    "secondary-container": "#e21e49",
+                    "tertiary-fixed": "#f9debf"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .monogram-grid {
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .ae-mark-container {
+            display: inline-flex;
+            position: relative;
+            width: 1em;
+            height: 1em;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body class="bg-white text-primary font-body antialiased">
+<!-- TopNavBar from Shared Components -->
+<header class="bg-white dark:bg-slate-950 border-none bg-white dark:bg-slate-950 sticky top-0 z-50">
+<nav class="flex justify-between items-center w-full px-8 py-6 max-w-[1440px] mx-auto">
+<div class="text-xl font-black text-slate-900 dark:text-slate-50 tracking-[-0.02em] font-['Manrope'] uppercase tracking-tighter">
+                ADVANCE ESTATES
+            </div>
+<div class="hidden md:flex gap-10">
+<a class="text-rose-600 dark:text-rose-500 font-black border-b-2 border-rose-600 font-['Manrope'] uppercase tracking-tighter" href="#">Identity</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-100 font-['Manrope'] uppercase tracking-tighter" href="#">Portfolio</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-100 font-['Manrope'] uppercase tracking-tighter" href="#">Blueprint</a>
+<a class="text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-100 font-['Manrope'] uppercase tracking-tighter" href="#">Guidelines</a>
+</div>
+<button class="bg-primary text-white px-8 py-3 font-black uppercase text-xs tracking-widest hover:bg-secondary transition-colors duration-200">
+                Contact
+            </button>
+</nav>
+</header>
+<main class="max-w-[1440px] mx-auto px-8 py-20">
+<!-- Hero Title -->
+<section class="mb-32">
+<span class="text-[0.75rem] font-black uppercase tracking-[0.1em] text-secondary mb-4 block">Brand Architecture v1.0</span>
+<h1 class="text-[3.5rem] font-black leading-tight tracking-[-0.02em] max-w-4xl">
+                SYSTEMIC PRECISION: THE ADVANCE ESTATES VISUAL IDENTITY
+            </h1>
+</section>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-16">
+<!-- 1. Logo Construction -->
+<section class="md:col-span-12 bg-surface-container-low p-12 lg:p-24 relative overflow-hidden">
+<div class="mb-12">
+<h2 class="text-[1.75rem] font-black mb-4">01 LOGO CONSTRUCTION</h2>
+<p class="text-body-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                        The 'AE' monogram is built on a mathematical grid, utilizing 45° and 90° angles to convey architectural stability. The signature red crossbar signifies the shared vision and horizontal precision of our estates.
+                    </p>
+</div>
+<div class="monogram-grid w-full h-[500px] bg-white border border-outline-variant/20 relative flex items-center justify-center">
+<!-- Geometric Representation of AE Monogram -->
+<div class="relative w-80 h-80">
+<!-- 'A' Outer Slopes -->
+<div class="absolute inset-0 border-[24px] border-primary" style="clip-path: polygon(50% 0%, 0% 100%, 15% 100%, 50% 25%, 85% 100%, 100% 100%);"></div>
+<!-- 'E' Structure (Flush Right) -->
+<div class="absolute right-0 top-0 bottom-0 w-32 border-t-[24px] border-b-[24px] border-r-[24px] border-primary"></div>
+<!-- SHARED CROSSBAR (RED) -->
+<div class="absolute top-[60%] left-[28%] right-0 h-[24px] bg-secondary z-10"></div>
+<!-- Grid Annotations -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-8 text-[10px] font-black tracking-widest text-outline">90° ANGLE</div>
+<div class="absolute bottom-0 left-0 -translate-x-8 text-[10px] font-black tracking-widest text-outline rotate-[-45deg]">45° SLOPE</div>
+</div>
+</div>
+</section>
+<!-- 2. Monogram Only & 5. Favicon -->
+<section class="md:col-span-4 space-y-16">
+<div class="bg-white p-12 border border-outline-variant/10 flex flex-col items-center justify-center min-h-[300px]">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em] mb-12 self-start">02 MONOGRAM</h3>
+<!-- AE Monogram Symbol 120px -->
+<div class="relative w-[120px] h-[120px]">
+<div class="absolute inset-0 bg-primary" style="clip-path: polygon(50% 0%, 0% 100%, 18% 100%, 50% 30%, 82% 100%, 100% 100%);"></div>
+<div class="absolute right-0 top-0 bottom-0 w-12 border-t-[12px] border-b-[12px] border-r-[12px] border-primary"></div>
+<div class="absolute top-[60%] left-[30%] right-0 h-[12px] bg-secondary"></div>
+</div>
+</div>
+<div class="bg-white p-12 border border-outline-variant/10 flex flex-col items-center justify-center min-h-[300px]">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em] mb-12 self-start">05 APP ICON</h3>
+<!-- AE App Icon 64px -->
+<div class="w-16 h-16 bg-secondary flex items-center justify-center">
+<div class="relative w-10 h-10">
+<div class="absolute inset-0 bg-white" style="clip-path: polygon(50% 0%, 0% 100%, 20% 100%, 50% 35%, 80% 100%, 100% 100%);"></div>
+<div class="absolute right-0 top-0 bottom-0 w-3 border-t-[3px] border-b-[3px] border-r-[3px] border-white"></div>
+<div class="absolute top-[60%] left-[30%] right-0 h-[3px] bg-white"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3. Horizontal Lockup -->
+<section class="md:col-span-8 bg-surface-container-low p-12 flex flex-col justify-center min-h-[300px]">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em] mb-12">03 HORIZONTAL LOCKUP</h3>
+<div class="flex items-center gap-8 bg-white p-12">
+<!-- AE Mark 48px -->
+<div class="relative w-12 h-12 flex-shrink-0">
+<div class="absolute inset-0 bg-primary" style="clip-path: polygon(50% 0%, 0% 100%, 18% 100%, 50% 30%, 82% 100%, 100% 100%);"></div>
+<div class="absolute right-0 top-0 bottom-0 w-4 border-t-[4px] border-b-[4px] border-r-[4px] border-primary"></div>
+<div class="absolute top-[60%] left-[30%] right-0 h-[4px] bg-secondary"></div>
+</div>
+<div class="flex flex-col">
+<span class="text-3xl font-black tracking-tight leading-none">ADVANCE</span>
+<span class="text-xl font-normal tracking-[0.4em] leading-none mt-1">ESTATES</span>
+</div>
+</div>
+</section>
+<!-- 4. Dark Sidebar Variant -->
+<section class="md:col-span-12 bg-primary p-24">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em] mb-16 text-outline-variant">04 DARK VARIANT</h3>
+<div class="flex items-center gap-8">
+<!-- AE Mark 48px White -->
+<div class="relative w-12 h-12 flex-shrink-0">
+<div class="absolute inset-0 bg-white" style="clip-path: polygon(50% 0%, 0% 100%, 18% 100%, 50% 30%, 82% 100%, 100% 100%);"></div>
+<div class="absolute right-0 top-0 bottom-0 w-4 border-t-[4px] border-b-[4px] border-r-[4px] border-white"></div>
+<div class="absolute top-[60%] left-[30%] right-0 h-[4px] bg-secondary"></div>
+</div>
+<div class="flex flex-col text-white">
+<span class="text-3xl font-black tracking-tight leading-none">ADVANCE</span>
+<span class="text-xl font-normal tracking-[0.4em] leading-none mt-1">ESTATES</span>
+</div>
+</div>
+</section>
+<!-- 6. Brand Tokens -->
+<section class="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+<div class="space-y-8">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em]">06 COLOR PALETTE</h3>
+<div class="space-y-4">
+<div class="flex items-center gap-4">
+<div class="w-20 h-20 bg-secondary"></div>
+<div>
+<p class="font-black text-sm uppercase">Signal Red</p>
+<p class="text-xs text-outline font-mono">#E11D48</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-20 h-20 bg-primary"></div>
+<div>
+<p class="font-black text-sm uppercase">Near Black</p>
+<p class="text-xs text-outline font-mono">#111827</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-20 h-20 bg-white border border-outline-variant"></div>
+<div>
+<p class="font-black text-sm uppercase">Pure White</p>
+<p class="text-xs text-outline font-mono">#FFFFFF</p>
+</div>
+</div>
+</div>
+</div>
+<div class="space-y-8">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em]">06 TYPOGRAPHY</h3>
+<div class="space-y-6">
+<div>
+<p class="text-xs text-outline uppercase font-black mb-2">Primary Heading / ExtraBold 900</p>
+<p class="text-4xl font-black tracking-tight">MANROPE</p>
+</div>
+<div>
+<p class="text-xs text-outline uppercase font-black mb-2">Body / Regular 400</p>
+<p class="text-lg font-normal leading-relaxed">The architecture of the brand is built on a foundation of geometric clarity.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Spacing Guide & Brand Constraints -->
+<section class="md:col-span-4 space-y-16">
+<div class="bg-surface-container p-12">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em] mb-8">SPACING GUIDE</h3>
+<div class="relative border border-dashed border-secondary p-8 inline-block bg-white">
+<!-- AE Symbol representing 'x' height -->
+<div class="relative w-12 h-12 bg-primary/10 flex items-center justify-center">
+<span class="text-[10px] font-black">1.0X</span>
+</div>
+<div class="absolute -top-6 left-0 right-0 flex justify-center"><span class="bg-secondary text-white text-[8px] px-1 font-black">0.5X CLEAR SPACE</span></div>
+<div class="absolute -bottom-6 left-0 right-0 flex justify-center"><span class="bg-secondary text-white text-[8px] px-1 font-black">0.5X CLEAR SPACE</span></div>
+</div>
+</div>
+<div class="bg-error-container p-12">
+<h3 class="text-[0.75rem] font-black uppercase tracking-[0.1em] mb-8 text-on-error-container">07 BRAND CONSTRAINTS</h3>
+<div class="grid grid-cols-1 gap-6">
+<div class="flex items-center gap-4 text-on-error-container">
+<span class="material-symbols-outlined text-secondary" data-icon="block">block</span>
+<span class="text-xs font-black uppercase">NO GRADIENTS</span>
+</div>
+<div class="flex items-center gap-4 text-on-error-container">
+<span class="material-symbols-outlined text-secondary" data-icon="block">block</span>
+<span class="text-xs font-black uppercase">NO HOUSE ICONS</span>
+</div>
+<div class="flex items-center gap-4 text-on-error-container">
+<span class="material-symbols-outlined text-secondary" data-icon="block">block</span>
+<span class="text-xs font-black uppercase">NO ROUNDED LETTERS</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer from Shared Components -->
+<footer class="bg-slate-900 dark:bg-black text-white p-12 0px-radius tonal-shift">
+<div class="flex flex-col md:flex-row justify-between items-start w-full px-12 py-16 gap-8 max-w-[1440px] mx-auto">
+<div class="text-lg font-black text-white font-['Manrope'] uppercase tracking-tighter">
+                ADVANCE ESTATES
+            </div>
+<div class="flex flex-wrap gap-8">
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-[0.75rem] font-black uppercase tracking-[0.1em]" href="#">Privacy</a>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-[0.75rem] font-black uppercase tracking-[0.1em]" href="#">Terms</a>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-[0.75rem] font-black uppercase tracking-[0.1em]" href="#">Archive</a>
+<a class="text-slate-400 hover:text-white transition-colors font-['Manrope'] text-[0.75rem] font-black uppercase tracking-[0.1em]" href="#">Specs</a>
+</div>
+<div class="text-slate-400 font-['Manrope'] text-[0.75rem] font-black uppercase tracking-[0.1em]">
+                © 2024 ADVANCE ESTATES. ARCHITECTURAL PRECISION.
+            </div>
+</div>
+</footer>
+</body></html>

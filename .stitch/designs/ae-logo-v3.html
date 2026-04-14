@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advance Estate — AE Monogram v3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F8F8F8;
+      color: #111827;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 64px 24px;
+    }
+
+    .sheet {
+      background: #FFFFFF;
+      max-width: 920px;
+      width: 100%;
+      padding: 64px 72px;
+    }
+
+    /* ── HEADER ─────────────────────────────── */
+    .sheet-header {
+      margin-bottom: 0;
+    }
+    .sheet-header .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #9CA3AF;
+    }
+    .sheet-header h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+      margin-top: 6px;
+      letter-spacing: -0.01em;
+    }
+    .rule {
+      height: 1px;
+      background: #e11d48;
+      margin: 24px 0;
+    }
+
+    /* ── MONOGRAM DISPLAYS ───────────────────── */
+    .displays {
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .display-card {
+      flex: 1;
+      min-width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .display-inner {
+      width: 100%;
+      height: 280px;
+      border: 1px solid #E5E7EB;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .display-inner.dark {
+      background: #111827;
+      border-color: #111827;
+    }
+    .display-caption {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9CA3AF;
+    }
+
+    /* ── CONCEPT CALLOUT ─────────────────────── */
+    .callout {
+      background: #FFF1F2;
+      border-left: 3px solid #e11d48;
+      padding: 18px 22px;
+      border-radius: 0 2px 2px 0;
+      margin-top: 36px;
+    }
+    .callout .callout-label {
+      font-family: 'Manrope', sans-serif;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #e11d48;
+      margin-bottom: 7px;
+    }
+    .callout p {
+      font-size: 13px;
+      line-height: 1.65;
+      color: #374151;
+    }
+
+    /* ── SECTION HEADINGS ────────────────────── */
+    .section {
+      margin-top: 44px;
+    }
+    .section-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #111827;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    /* ── USAGE RULES ─────────────────────────── */
+    .rules-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .rule-block .rule-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #6B7280;
+      margin-bottom: 12px;
+    }
+    .rule-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #374151;
+    }
+    .rule-row .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #e11d48;
+      flex-shrink: 0;
+    }
+    .rule-note {
+      font-size: 11px;
+      color: #9CA3AF;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    /* ── PALETTE ─────────────────────────────── */
+    .palette {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .swatch-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .swatch {
+      width: 80px;
+      height: 80px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .swatch.warm-white {
+      border: 1px solid #E5E7EB;
+    }
+    .swatch-meta .swatch-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .swatch-meta .swatch-hex {
+      font-size: 11px;
+      color: #6B7280;
+      margin-top: 2px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+    }
+    .swatch-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: #FFF1F2;
+      color: #e11d48;
+      border: 1px solid #FECDD3;
+      margin-top: 4px;
+    }
+
+    /* ── LOCKUP SIZES ────────────────────────── */
+    .sizes-row {
+      display: flex;
+      gap: 40px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .size-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .size-label {
+      font-size: 10px;
+      color: #9CA3AF;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── FOOTER ──────────────────────────────── */
+    .sheet-footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid #F3F4F6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .sheet-footer span {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #D1D5DB;
+    }
+  </style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- HEADER -->
+  <div class="sheet-header">
+    <p class="label">Advance Estate — Brand Identity System</p>
+    <h1>AE Monogram — Identity Mark v3</h1>
+  </div>
+  <div class="rule"></div>
+
+  <!-- MONOGRAM DISPLAYS -->
+  <div class="displays">
+
+    <!-- WHITE VERSION -->
+    <div class="display-card">
+      <div class="display-inner">
+        <svg viewBox="0 0 200 200" height="180" width="180" xmlns="http://www.w3.org/2000/svg" aria-label="AE monogram, white version">
+          <!-- A — left diagonal stem -->
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <!-- A — right diagonal stem -->
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <!-- E — vertical stem -->
+          <rect x="132" y="22" width="13" height="156" fill="#111827"/>
+          <!-- E — top arm -->
+          <rect x="132" y="22" width="50" height="13" fill="#111827"/>
+          <!-- E — bottom arm -->
+          <rect x="132" y="165" width="50" height="13" fill="#111827"/>
+          <!-- SHARED CROSSBAR — A crossbar + E middle arm, one unbroken element -->
+          <rect id="shared-crossbar-light" x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+      </div>
+      <p class="display-caption">Primario — Fondo blanco</p>
+    </div>
+
+    <!-- DARK / INVERSE VERSION -->
+    <div class="display-card">
+      <div class="display-inner dark">
+        <svg viewBox="0 0 200 200" height="180" width="180" xmlns="http://www.w3.org/2000/svg" aria-label="AE monogram, dark version">
+          <!-- A — left diagonal stem (warm white) -->
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#FAFAF9" stroke-width="13" stroke-linecap="square"/>
+          <!-- A — right diagonal stem -->
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#FAFAF9" stroke-width="13" stroke-linecap="square"/>
+          <!-- E — vertical stem -->
+          <rect x="132" y="22" width="13" height="156" fill="#FAFAF9"/>
+          <!-- E — top arm -->
+          <rect x="132" y="22" width="50" height="13" fill="#FAFAF9"/>
+          <!-- E — bottom arm -->
+          <rect x="132" y="165" width="50" height="13" fill="#FAFAF9"/>
+          <!-- SHARED CROSSBAR — same red, does NOT invert -->
+          <rect id="shared-crossbar-dark" x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+      </div>
+      <p class="display-caption">Inverso — Fondo oscuro</p>
+    </div>
+
+  </div><!-- /displays -->
+
+  <!-- CONCEPT CALLOUT -->
+  <div class="callout">
+    <p class="callout-label">Concepto de diseño</p>
+    <p>La barra horizontal roja es un único elemento compartido que funciona simultáneamente como el travesaño de la A <em>y</em> el brazo medio de la E. Recorre el ancho total del monograma sin interrupción. Esta es la idea estructural central de la marca. La barra nunca debe dividirse, colorearse diferente en cada mitad, ni interrumpirse por ningún motivo.</p>
+  </div>
+
+  <!-- USAGE RULES -->
+  <div class="section">
+    <p class="section-title">Reglas de uso</p>
+    <div class="rules-grid">
+      <div class="rule-block">
+        <p class="rule-label">Tamaño mínimo</p>
+        <div class="rule-row"><span class="dot"></span><span>24 px — mínimo digital</span></div>
+        <div class="rule-row"><span class="dot"></span><span>8 mm — mínimo impreso</span></div>
+        <p class="rule-note">Por debajo de 24 px el travesaño compartido se vuelve ilegible. No reproducir en tamaños menores.</p>
+      </div>
+      <div class="rule-block">
+        <p class="rule-label">Espacio de respeto</p>
+        <div class="rule-row"><span class="dot"></span><span>Igual al grosor del travesaño en todos los lados</span></div>
+        <div class="rule-row"><span class="dot"></span><span>Ningún elemento puede entrar en esa zona</span></div>
+        <p class="rule-note">El espacio de respeto garantiza que el monograma respire y sea legible en cualquier contexto.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIZES PREVIEW -->
+  <div class="section">
+    <p class="section-title">Escala del monograma</p>
+    <div class="sizes-row">
+      <div class="size-item">
+        <svg viewBox="0 0 200 200" height="96" width="96" xmlns="http://www.w3.org/2000/svg">
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <rect x="132" y="22" width="13" height="156" fill="#111827"/>
+          <rect x="132" y="22" width="50" height="13" fill="#111827"/>
+          <rect x="132" y="165" width="50" height="13" fill="#111827"/>
+          <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+        <span class="size-label">96 px</span>
+      </div>
+      <div class="size-item">
+        <svg viewBox="0 0 200 200" height="64" width="64" xmlns="http://www.w3.org/2000/svg">
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <rect x="132" y="22" width="13" height="156" fill="#111827"/>
+          <rect x="132" y="22" width="50" height="13" fill="#111827"/>
+          <rect x="132" y="165" width="50" height="13" fill="#111827"/>
+          <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+        <span class="size-label">64 px</span>
+      </div>
+      <div class="size-item">
+        <svg viewBox="0 0 200 200" height="40" width="40" xmlns="http://www.w3.org/2000/svg">
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <rect x="132" y="22" width="13" height="156" fill="#111827"/>
+          <rect x="132" y="22" width="50" height="13" fill="#111827"/>
+          <rect x="132" y="165" width="50" height="13" fill="#111827"/>
+          <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+        <span class="size-label">40 px</span>
+      </div>
+      <div class="size-item">
+        <svg viewBox="0 0 200 200" height="24" width="24" xmlns="http://www.w3.org/2000/svg">
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <rect x="132" y="22" width="13" height="156" fill="#111827"/>
+          <rect x="132" y="22" width="50" height="13" fill="#111827"/>
+          <rect x="132" y="165" width="50" height="13" fill="#111827"/>
+          <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+        <span class="size-label">24 px — mín.</span>
+      </div>
+      <!-- Dark background variants -->
+      <div style="width:1px;background:#F3F4F6;align-self:stretch;margin:0 12px;"></div>
+      <div class="size-item">
+        <div style="background:#111827;padding:10px;border-radius:4px;display:flex;align-items:center;justify-content:center;">
+          <svg viewBox="0 0 200 200" height="64" width="64" xmlns="http://www.w3.org/2000/svg">
+            <line x1="38" y1="178" x2="94" y2="22" stroke="#FAFAF9" stroke-width="13" stroke-linecap="square"/>
+            <line x1="94" y1="22" x2="118" y2="178" stroke="#FAFAF9" stroke-width="13" stroke-linecap="square"/>
+            <rect x="132" y="22" width="13" height="156" fill="#FAFAF9"/>
+            <rect x="132" y="22" width="50" height="13" fill="#FAFAF9"/>
+            <rect x="132" y="165" width="50" height="13" fill="#FAFAF9"/>
+            <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+          </svg>
+        </div>
+        <span class="size-label">Inverso 64 px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- WORDMARK LOCKUPS -->
+  <div class="section">
+    <p class="section-title">Lockup con wordmark</p>
+    <div style="display:flex;gap:48px;align-items:center;flex-wrap:wrap;">
+      <!-- Horizontal lockup -->
+      <div style="display:flex;align-items:center;gap:14px;">
+        <svg viewBox="0 0 200 200" height="36" width="36" xmlns="http://www.w3.org/2000/svg">
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#111827" stroke-width="13" stroke-linecap="square"/>
+          <rect x="132" y="22" width="13" height="156" fill="#111827"/>
+          <rect x="132" y="22" width="50" height="13" fill="#111827"/>
+          <rect x="132" y="165" width="50" height="13" fill="#111827"/>
+          <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+        <div>
+          <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:#111827;letter-spacing:-0.01em;">Advance Estate</div>
+          <div style="font-size:9px;color:#9CA3AF;letter-spacing:0.1em;text-transform:uppercase;margin-top:1px;">Real Estate CRM</div>
+        </div>
+      </div>
+      <!-- Dark lockup -->
+      <div style="background:#111827;padding:14px 20px;border-radius:4px;display:flex;align-items:center;gap:14px;">
+        <svg viewBox="0 0 200 200" height="36" width="36" xmlns="http://www.w3.org/2000/svg">
+          <line x1="38" y1="178" x2="94" y2="22" stroke="#FAFAF9" stroke-width="13" stroke-linecap="square"/>
+          <line x1="94" y1="22" x2="118" y2="178" stroke="#FAFAF9" stroke-width="13" stroke-linecap="square"/>
+          <rect x="132" y="22" width="13" height="156" fill="#FAFAF9"/>
+          <rect x="132" y="22" width="50" height="13" fill="#FAFAF9"/>
+          <rect x="132" y="165" width="50" height="13" fill="#FAFAF9"/>
+          <rect x="38" y="96" width="144" height="13" fill="#e11d48"/>
+        </svg>
+        <div>
+          <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:15px;color:#FAFAF9;letter-spacing:-0.01em;">Advance Estate</div>
+          <div style="font-size:9px;color:#4B5563;letter-spacing:0.1em;text-transform:uppercase;margin-top:1px;">Real Estate CRM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PALETTE -->
+  <div class="section">
+    <p class="section-title">Paleta de la marca</p>
+    <div class="palette">
+      <div class="swatch-group">
+        <div class="swatch" style="background:#e11d48;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Primary Red</p>
+          <p class="swatch-hex">#E11D48</p>
+          <span class="swatch-tag">Elemento compartido</span>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch" style="background:#111827;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Obsidian</p>
+          <p class="swatch-hex">#111827</p>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch warm-white" style="background:#FAFAF9;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Warm White</p>
+          <p class="swatch-hex">#FAFAF9</p>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch" style="background:#C9A84C;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Obsidian Gold</p>
+          <p class="swatch-hex">#C9A84C</p>
+          <span class="swatch-tag" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">Modo oscuro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="sheet-footer">
+    <span>Advance Estate — Asset de marca confidencial</span>
+    <span>No modificar geometría ni color del travesaño</span>
+  </div>
+
+</div><!-- /sheet -->
+</body>
+</html>

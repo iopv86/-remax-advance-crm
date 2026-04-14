@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advance Estate CRM - Catálogo de Propiedades</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Manrope & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#575e70",
+                    "on-primary-fixed": "#40000c",
+                    "surface-container-low": "#f3f4f3",
+                    "surface-container": "#eeeeed",
+                    "outline-variant": "#e5bdbe",
+                    "on-tertiary-fixed-variant": "#005137",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e8e8e7",
+                    "inverse-on-surface": "#f1f1f0",
+                    "on-primary-fixed-variant": "#920028",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface": "#f9f9f8",
+                    "surface-tint": "#be0037",
+                    "primary-container": "#e11d48",
+                    "tertiary": "#006848",
+                    "tertiary-container": "#00845c",
+                    "surface-variant": "#e2e2e2",
+                    "on-secondary-fixed": "#141b2b",
+                    "on-primary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed": "#dce2f7",
+                    "inverse-primary": "#ffb3b6",
+                    "on-secondary-fixed-variant": "#404758",
+                    "background": "#f9f9f8",
+                    "on-primary-container": "#fffaf9",
+                    "on-error-container": "#93000a",
+                    "primary": "#b80035",
+                    "tertiary-fixed": "#85f8c4",
+                    "on-surface-variant": "#5c3f40",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#eefff3",
+                    "surface-bright": "#f9f9f8",
+                    "primary-fixed": "#ffdada",
+                    "inverse-surface": "#2f3130",
+                    "tertiary-fixed-dim": "#68dba9",
+                    "on-surface": "#1a1c1c",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#ffb3b6",
+                    "secondary-container": "#d9dff5",
+                    "on-background": "#1a1c1c",
+                    "on-secondary-container": "#5c6274",
+                    "surface-dim": "#dadad9",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "outline": "#906f70",
+                    "on-tertiary-fixed": "#002114",
+                    "error": "#ba1a1a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "8px",
+                    "lg": "12px",
+                    "xl": "16px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sidebar-item-active {
+            background-color: #1F2937;
+            color: #FFFFFF;
+            border-left: 3px solid #e11d48;
+        }
+        .content-shadow {
+            box-shadow: 0 1px 3px rgba(28, 25, 23, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface">
+<!-- Sidebar (Authority: Shared Components JSON + Design System Hybrid Rule) -->
+<aside class="w-[240px] h-screen fixed left-0 top-0 bg-gray-950 dark:bg-gray-950 flex flex-col py-6 px-4 border-r border-gray-800 z-50">
+<!-- Brand -->
+<div class="mb-10 px-4">
+<h1 class="text-lg font-black tracking-tighter text-white">Advance Estate</h1>
+<p class="text-xs text-gray-500 font-medium">CRM Terminal</p>
+</div>
+<!-- Navigation -->
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold tracking-tight text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold tracking-tight text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="account_tree">account_tree</span>
+                Pipeline
+            </a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold tracking-tight text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="person_search">person_search</span>
+                Leads
+            </a>
+<!-- Active State per Request -->
+<a class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold tracking-tight sidebar-item-active transition-all rounded" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="home_work" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                Properties
+            </a>
+</nav>
+<!-- Footer Nav -->
+<div class="pt-6 border-t border-gray-800 space-y-1">
+<a class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold tracking-tight text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="settings">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold tracking-tight text-gray-400 hover:text-gray-200 hover:bg-gray-900 transition-all rounded" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="help">help</span>
+                Support
+            </a>
+<div class="mt-4 px-4 py-3 flex items-center gap-3 bg-gray-900 rounded-lg">
+<div class="w-8 h-8 rounded bg-rose-600 flex items-center justify-center text-white font-bold text-xs">IP</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-bold text-white truncate">Ivan P.</p>
+<p class="text-[10px] text-gray-500 truncate">Senior Broker</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Content Area -->
+<main class="ml-[240px] min-h-screen">
+<!-- Top Navigation Bar (Authority: JSON + Layout Pattern) -->
+<header class="h-16 bg-white dark:bg-stone-900 border-b border-stone-200 dark:border-stone-800 flex items-center justify-between px-8 sticky top-0 z-40 shadow-sm">
+<div class="flex items-center gap-4 flex-1 max-w-xl">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
+<input class="w-full bg-[#F5F4F1] border-none rounded-full pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-primary-container outline-none placeholder:text-stone-400 transition-all" placeholder="Buscar por nombre, zona o precio..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex gap-4">
+<button class="text-stone-500 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-stone-500 hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="apps">apps</span>
+</button>
+</div>
+<div class="h-8 w-[1px] bg-stone-200"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-on-surface">Advance Estate</p>
+<p class="text-[10px] text-stone-500">Workspace Premium</p>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<div class="p-8 max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex items-end justify-between mb-8">
+<div>
+<h2 class="text-2xl font-bold font-headline tracking-tight text-on-surface">Catálogo de Propiedades</h2>
+<p class="text-stone-500 text-sm mt-1">124 propiedades gestionadas en tu terminal.</p>
+</div>
+<button class="bg-primary-container hover:bg-primary text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-bold text-sm shadow-md transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Agregar Propiedad
+                </button>
+</div>
+<!-- Filter Bar -->
+<div class="flex flex-col gap-6 mb-8">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2 bg-[#F5F4F1] p-1 rounded-lg">
+<button class="px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-primary-container text-white shadow-sm">Todas</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md transition-all text-stone-500 hover:bg-white">En Venta</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md transition-all text-stone-500 hover:bg-white">En Renta</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md transition-all text-stone-500 hover:bg-white">Disponible</button>
+<button class="px-4 py-1.5 text-xs font-bold rounded-md transition-all text-stone-500 hover:bg-white">Reservada</button>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 bg-[#F5F4F1] p-1 rounded-lg">
+<button class="p-1.5 rounded-md bg-white text-primary-container shadow-sm">
+<span class="material-symbols-outlined text-xl">grid_view</span>
+</button>
+<button class="p-1.5 rounded-md text-stone-400">
+<span class="material-symbols-outlined text-xl">list</span>
+</button>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-4 gap-4">
+<div class="relative group">
+<select class="w-full bg-white border-none content-shadow rounded-lg px-4 py-2.5 text-sm appearance-none focus:ring-2 focus:ring-primary-container/20">
+<option>Zona: Todas</option>
+<option>Piantini</option>
+<option>Naco</option>
+<option>Bella Vista</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">expand_more</span>
+</div>
+<div class="relative group">
+<select class="w-full bg-white border-none content-shadow rounded-lg px-4 py-2.5 text-sm appearance-none focus:ring-2 focus:ring-primary-container/20">
+<option>Tipo: Inmueble</option>
+<option>Apartamento</option>
+<option>Casa / Villa</option>
+<option>Oficina</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">expand_more</span>
+</div>
+<div class="relative group">
+<select class="w-full bg-white border-none content-shadow rounded-lg px-4 py-2.5 text-sm appearance-none focus:ring-2 focus:ring-primary-container/20">
+<option>Precio: Cualquiera</option>
+<option>USD 100k - 250k</option>
+<option>USD 250k - 500k</option>
+<option>USD 500k+</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none">expand_more</span>
+</div>
+<button class="flex items-center justify-center gap-2 bg-[#F5F4F1] hover:bg-stone-200 text-on-surface px-4 py-2.5 rounded-lg text-sm font-bold transition-colors">
+<span class="material-symbols-outlined text-lg">filter_alt</span>
+                        Filtros Avanzados
+                    </button>
+</div>
+</div>
+<!-- Property Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="bg-white rounded-xl overflow-hidden content-shadow group transition-all hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="luxury modern apartment interior with floor to ceiling windows, high-end furniture and city view at dusk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAHCLfERPP2terE-C3hwS_O8_a5deLKWXVo7QhZ7PplhKGyhFalUEHdiZ1uRLolZ3HI2xxidCOSuTvvj6at7VMeWIamggGSJv1ep7kgAJ6lrlIFuCTk9Rda1mudHtVNZsfKifup3GYPnzTgQn8LKib5zQ27KrFFTmAkVzA4Lq2laE18n2cJSD0qVPlge5Aeaibn7ov8AM8MLQoCCBwJd8qXAOMcuASfMgHGYPq8Hawg-uqtXk3Sd9Pbo-NzIZHVP0_F5iDWMx0EY0"/>
+<div class="absolute top-4 left-4 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Disponible</div>
+<div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+<button class="bg-white text-on-surface px-4 py-2 rounded-lg font-bold text-sm shadow-xl flex items-center gap-2">
+<span class="material-symbols-outlined text-lg">visibility</span>
+                                Ver detalles
+                            </button>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-on-surface group-hover:text-primary-container transition-colors">Apto 3H/2.5B — Torre Loft</h3>
+<p class="text-xs text-stone-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                                    Piantini, Santo Domingo
+                                </p>
+</div>
+</div>
+<div class="text-lg font-bold font-headline text-primary-container mb-4">RD$ 4,200,000</div>
+<div class="flex items-center gap-4 py-3 border-y border-stone-100 mb-4">
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bed</span> 3
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bathtub</span> 2.5
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">square_foot</span> 180m²
+                            </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold">IP</div>
+<span class="text-[11px] font-medium text-stone-600">Ivan P.</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-xs font-bold text-stone-400">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span> 12
+                                </div>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white rounded-xl overflow-hidden content-shadow group transition-all hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="expansive mediterranean style villa with white walls and red tile roof overlooking a blue swimming pool and tropical palms" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSa2ePPJzMQnFRZCW0RYNq-7cfe6idDP8Tn0267buusUaHIxoxhHrecZK_xwYPaWnYkEgfH_IVg4Nedo3OU4B6t4XF5_hMWivJ1IxeQ4jyiC9R8OUjZOMYt_Iap8yTBHTe7ly_X-hBUAKmpmWUwsaj7yvfOi1jntp1bq2-CSwI0w41TWf66T63_0L2S_gEKChvE-0mVMazXA23c-eJ8D-6n9g9t2GKcCadY2o3jGK0_jXd5mmgv1FKMG6rpF4085YGDznVuwQkq28"/>
+<div class="absolute top-4 left-4 bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Reservada</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-on-surface group-hover:text-primary-container transition-colors">Villa Casa de Campo</h3>
+<p class="text-xs text-stone-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                                    La Romana
+                                </p>
+</div>
+</div>
+<div class="text-lg font-bold font-headline text-primary-container mb-4">RD$ 18,500,000</div>
+<div class="flex items-center gap-4 py-3 border-y border-stone-100 mb-4">
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bed</span> 5
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bathtub</span> 4
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">square_foot</span> 450m²
+                            </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold">ML</div>
+<span class="text-[11px] font-medium text-stone-600">Maria L.</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-xs font-bold text-stone-400">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span> 3
+                                </div>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white rounded-xl overflow-hidden content-shadow group transition-all hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="sleek modern penthouse with open concept living space, polished concrete floors, and panoramic view of city skyline through glass walls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFeDd8v3M1ob0cJQPumHHY9VVxIfUsI36bWuKdyVvgt2swB85i-Dv94yZkqhxHCKvLRzFa_NR8ShotQIgrhaovo5T3UFG4xCgHg08hW4GKrTbpJFx1aF_VS9P8mVgKuLljNxpuElDeqT-_3Mi6X8iRxjRst8yyAquGl0-C4P3YQcPXQney7qvCi67p8Wwgjor8_FT9seVcFdtcodm6_YSFzSOoiWcw3jTHyKAKhUn6MXsObAIz_SMTwiRWYiyhVNtaM9ZRcUiTR9w"/>
+<div class="absolute top-4 left-4 bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">En Negociación</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-on-surface group-hover:text-primary-container transition-colors">Penthouse en Naco</h3>
+<p class="text-xs text-stone-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                                    Santo Domingo
+                                </p>
+</div>
+</div>
+<div class="text-lg font-bold font-headline text-primary-container mb-4">USD 850,000</div>
+<div class="flex items-center gap-4 py-3 border-y border-stone-100 mb-4">
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bed</span> 4
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bathtub</span> 3
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">square_foot</span> 320m²
+                            </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold">IP</div>
+<span class="text-[11px] font-medium text-stone-600">Ivan P.</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-xs font-bold text-stone-400">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span> 8
+                                </div>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-white rounded-xl overflow-hidden content-shadow group transition-all hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="stunning beachfront villa at sunset with infinity pool reflecting the orange sky and turquoise Caribbean sea in background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpoKOuxRwhFPve0fY48cBzSJ-_pujImyPaib9uSgBv1EOxBqKrgkhj76ksJKsA_0WgHUCEWvJbupbgKzWQasD0m6u_21LDi3aYeNKtWAlGIqVwvusiO9jp_pPoVjM-QJarFc70neDT7-5dm0RmFVZ7t3i3F1wUYGdAKT-fk_gXhs2wUUJVRYXYzmb5ZKDsctHoSdeMLvAeKVyxPotQZ7YkM2IXyOjMcxHuBxEd4hQZINTjnth4YtMEQMLkOAiivs-DkLoGXIv73FA"/>
+<div class="absolute top-4 left-4 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Disponible</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-on-surface group-hover:text-primary-container transition-colors">Beachfront Villa Cap Cana</h3>
+<p class="text-xs text-stone-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                                    Cap Cana, Punta Cana
+                                </p>
+</div>
+</div>
+<div class="text-lg font-bold font-headline text-primary-container mb-4">USD 2,400,000</div>
+<div class="flex items-center gap-4 py-3 border-y border-stone-100 mb-4">
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bed</span> 6
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bathtub</span> 6.5
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">square_foot</span> 1,200m²
+                            </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold">DR</div>
+<span class="text-[11px] font-medium text-stone-600">Diana R.</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-xs font-bold text-stone-400">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span> 5
+                                </div>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 5 -->
+<div class="bg-white rounded-xl overflow-hidden content-shadow group transition-all hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="contemporary minimalist townhouse with dark wood accents and large windows surrounded by lush green garden foliage" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc_TeCxaqxSkcikpj07f7GGIYM4YPMYItKWQVtTrZ0_vm_6ZQxQHQ_J8oEDmio4hjyB5_HYtU6euSep4R9-nlXWduXGtHJAU_4bcYvahuWq5w1n2zCh6aV1pztAh0xHToVehQbN0XQE34hiHTlV_l073gFnr00V-2VCVAUAR3B7CX0nP63AphXL_z9ytgBv5F-01mhpnOcYGzauKZV2xYKOzNi_Raf0-xL-c_kHXYm0aetz5BCYfVbUloNQgT3w0oSTsX3Zi5Do2Q"/>
+<div class="absolute top-4 left-4 bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Disponible</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-on-surface group-hover:text-primary-container transition-colors">Arroyo Hondo Townhouse</h3>
+<p class="text-xs text-stone-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                                    Arroyo Hondo, SD
+                                </p>
+</div>
+</div>
+<div class="text-lg font-bold font-headline text-primary-container mb-4">RD$ 12,900,000</div>
+<div class="flex items-center gap-4 py-3 border-y border-stone-100 mb-4">
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bed</span> 3
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bathtub</span> 3.5
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">square_foot</span> 245m²
+                            </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold">IP</div>
+<span class="text-[11px] font-medium text-stone-600">Ivan P.</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-xs font-bold text-stone-400">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span> 21
+                                </div>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">share</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 6 -->
+<div class="bg-white rounded-xl overflow-hidden content-shadow group transition-all hover:-translate-y-1">
+<div class="relative h-56 overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="luxury high rise apartment balcony with lounge chairs looking out over a metropolitan city skyline at golden hour" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2RmzmlGFDa3eEDEE1BNU0ONYhFThDwuQGlP_gL1uqN5stbOnvQFTCDd5HlEFr0DL_XLumn2PDv9bv_hOCmE99ztKBbLZfDQBScHbjgf2Ko1ziCe4c1XGV9NFUWEBuwH0TOvBtzW_mH-19SPQMQV9HbDArjsXMKXM7RFTEGtpwiXE4xNP59yYEkUllchxPHuZAaWIAtqNNQAoBisCjdzGGxkG1FiRjMIVcm8IuVXLrkdyLuJOG2igzDhSm_xpFB_hSj_W8V5aZWzk"/>
+<div class="absolute top-4 left-4 bg-amber-50 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">Reservada</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-bold text-on-surface group-hover:text-primary-container transition-colors">Bella Vista Modern Living</h3>
+<p class="text-xs text-stone-500 flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">location_on</span>
+                                    Bella Vista, Santo Domingo
+                                </p>
+</div>
+</div>
+<div class="text-lg font-bold font-headline text-primary-container mb-4">USD 345,000</div>
+<div class="flex items-center gap-4 py-3 border-y border-stone-100 mb-4">
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bed</span> 2
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">bathtub</span> 2
+                            </div>
+<div class="flex items-center gap-1 text-xs text-stone-600">
+<span class="material-symbols-outlined text-sm">square_foot</span> 120m²
+                            </div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-stone-100 flex items-center justify-center text-[10px] font-bold">ML</div>
+<span class="text-[11px] font-medium text-stone-600">Maria L.</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-xs font-bold text-stone-400">
+<span class="material-symbols-outlined text-sm" data-icon="person">person</span> 4
+                                </div>
+<button class="text-stone-400 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pagination/Footer Stats -->
+<div class="mt-12 flex items-center justify-between text-xs text-stone-400 font-medium pb-8">
+<div>Mostrando 1-6 de 124 propiedades</div>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center bg-white content-shadow rounded hover:bg-stone-50 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center bg-primary-container text-white content-shadow rounded font-bold">1</button>
+<button class="w-8 h-8 flex items-center justify-center bg-white content-shadow rounded hover:bg-stone-50 transition-colors">2</button>
+<button class="w-8 h-8 flex items-center justify-center bg-white content-shadow rounded hover:bg-stone-50 transition-colors">3</button>
+<span class="px-1">...</span>
+<button class="w-8 h-8 flex items-center justify-center bg-white content-shadow rounded hover:bg-stone-50 transition-colors">21</button>
+<button class="w-8 h-8 flex items-center justify-center bg-white content-shadow rounded hover:bg-stone-50 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

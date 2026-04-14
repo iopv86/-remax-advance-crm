@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advance Estate - Contactos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#002114",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "surface-container-highest": "#dce2f7",
+                      "on-tertiary-fixed-variant": "#005137",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "inverse-surface": "#293040",
+                      "secondary": "#505f76",
+                      "on-tertiary": "#ffffff",
+                      "outline-variant": "#e5bdbe",
+                      "tertiary-fixed-dim": "#68dba9",
+                      "primary-container": "#e11d48",
+                      "primary": "#b80035",
+                      "surface-dim": "#d3daef",
+                      "secondary-container": "#d0e1fb",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "on-surface": "#141b2b",
+                      "surface": "#f9f9ff",
+                      "on-secondary-container": "#54647a",
+                      "inverse-primary": "#ffb3b6",
+                      "on-primary": "#ffffff",
+                      "on-primary-fixed-variant": "#920028",
+                      "primary-fixed-dim": "#ffb3b6",
+                      "on-surface-variant": "#5c3f40",
+                      "tertiary-fixed": "#85f8c4",
+                      "surface-bright": "#f9f9ff",
+                      "on-background": "#141b2b",
+                      "surface-tint": "#be0037",
+                      "on-secondary-fixed": "#0b1c30",
+                      "surface-container-low": "#f1f3ff",
+                      "inverse-on-surface": "#edf0ff",
+                      "tertiary-container": "#00845c",
+                      "outline": "#906f70",
+                      "on-error": "#ffffff",
+                      "surface-variant": "#dce2f7",
+                      "surface-container": "#e9edff",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed": "#d3e4fe",
+                      "on-primary-container": "#fffaf9",
+                      "on-primary-fixed": "#40000c",
+                      "tertiary": "#006848",
+                      "surface-container-high": "#e1e8fd",
+                      "on-tertiary-container": "#eefff3",
+                      "background": "#f9f9ff",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#ffdada",
+                      "error": "#ba1a1a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3 { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-pill-primary {
+            background-color: #b80035;
+            color: white;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-[#FAFAF9] text-on-surface overflow-hidden">
+<!-- Fixed Sidebar (JSON-based Execution) -->
+<aside class="fixed h-full w-64 left-0 top-0 rounded-none bg-slate-950 flex flex-col py-8 px-0 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold tracking-tighter text-white">Advance Estate</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 mt-1 font-body">Precision CRM</p>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center px-6 py-3 text-slate-400 hover:text-white transition-colors hover:bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="dashboard">dashboard</span>
+<span class="text-[14px] font-medium tracking-tight">Dashboard</span>
+</a>
+<!-- Active Tab: Contactos -->
+<a class="flex items-center px-6 py-3 text-white font-semibold border-l-4 border-rose-600 bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="person">person</span>
+<span class="text-[14px] font-medium tracking-tight">Contactos</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-400 hover:text-white transition-colors hover:bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="analytics">analytics</span>
+<span class="text-[14px] font-medium tracking-tight">Pipeline</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-400 hover:text-white transition-colors hover:bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="home_work">home_work</span>
+<span class="text-[14px] font-medium tracking-tight">Propiedades</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-400 hover:text-white transition-colors hover:bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="chat">chat</span>
+<span class="text-[14px] font-medium tracking-tight">WhatsApp</span>
+</a>
+<a class="flex items-center px-6 py-3 text-slate-400 hover:text-white transition-colors hover:bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="bar_chart">bar_chart</span>
+<span class="text-[14px] font-medium tracking-tight">Reportes</span>
+</a>
+<div class="mt-auto pt-10">
+<a class="flex items-center px-6 py-3 text-slate-400 hover:text-white transition-colors hover:bg-slate-900 group" href="#">
+<span class="material-symbols-outlined mr-3 text-[20px]" data-icon="settings">settings</span>
+<span class="text-[14px] font-medium tracking-tight">Configuración</span>
+</a>
+</div>
+</nav>
+<div class="px-6 mt-8">
+<div class="bg-slate-900 p-3 rounded-lg flex items-center space-x-3">
+<div class="w-8 h-8 rounded bg-rose-600 flex items-center justify-center text-xs font-bold text-white">A</div>
+<div class="overflow-hidden">
+<p class="text-white text-xs font-semibold truncate">Precision CRM</p>
+<p class="text-slate-500 text-[10px] truncate">Admin Account</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top NavBar (JSON-based Execution) -->
+<header class="fixed top-0 right-0 left-64 h-16 flex justify-between items-center px-12 bg-stone-50/80 backdrop-blur-md z-40">
+<div class="flex items-center flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]" data-icon="search">search</span>
+<input class="w-full bg-stone-100 border-none rounded-full pl-10 pr-4 py-1.5 text-sm focus:ring-1 focus:ring-primary/20 placeholder:text-slate-400" placeholder="Buscar por nombre..." type="text"/>
+</div>
+</div>
+<div class="flex items-center space-x-6">
+<button class="text-slate-500 hover:text-rose-600 transition-colors">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-slate-500 hover:text-rose-600 transition-colors">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="User profile portrait, professional male headshot in soft studio lighting with neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVM0S15VWc3vyol6GhEtlB6HBouV3y20ln2bZvLDPzsoAuHe7zMEGdKTcCRe5o0c-In7_oFtkkg7Qgeh3fUph8lTnRsWAeMI69X9TDCSr993Cy0mAbcofOwIUuii8WUcGWMFRec-kKvFtyb_sC3U60oCK2caZMHRmEuqKhGjyUk3O2eXAI8GvkQEoafYQKk83WazpFrf9kWD9Re_Gz4ck22BTvyWUN1YvoWNETYzR9ryZtEYVL31ot0J4hUWfBCgXPoKEE4-LgpfQ"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="ml-64 mt-16 p-12 overflow-y-auto h-[calc(100vh-64px)]">
+<!-- Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="text-[28px] font-extrabold tracking-tight text-on-surface">Contactos</h2>
+<p class="text-slate-500 text-sm mt-1">Gestiona tu cartera de inversionistas y prospectos.</p>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined mr-2 text-[20px]" data-icon="add">add</span>
+                Nuevo Contacto
+            </button>
+</div>
+<!-- Filter Bar -->
+<div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-surface-container-low/50 p-1.5 rounded-full px-4">
+<div class="flex items-center space-x-2">
+<button class="px-4 py-1.5 text-xs font-semibold rounded-full bg-primary text-white transition-all">Todos</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded-full text-slate-500 hover:bg-white transition-all">Leads Calientes</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded-full text-slate-500 hover:bg-white transition-all">En Pipeline</button>
+<button class="px-4 py-1.5 text-xs font-medium rounded-full text-slate-500 hover:bg-white transition-all">Clientes</button>
+</div>
+<div class="flex items-center space-x-3">
+<button class="flex items-center text-xs font-medium text-slate-600 bg-white border border-transparent px-3 py-1.5 rounded-lg hover:border-slate-200 transition-all">
+<span class="material-symbols-outlined text-[18px] mr-2" data-icon="sort">sort</span>
+                    Última actividad
+                </button>
+<button class="flex items-center text-xs font-medium text-slate-400 hover:text-on-surface px-3 py-1.5 rounded-lg transition-all">
+<span class="material-symbols-outlined text-[18px] mr-2" data-icon="ios_share">ios_share</span>
+                    Exportar
+                </button>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-white rounded-2xl shadow-[0_4px_24px_-12px_rgba(0,0,0,0.05)] overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead class="bg-stone-50/50">
+<tr>
+<th class="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-slate-400">Contacto</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-slate-400">Origen</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-slate-400">Estado</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-slate-400">Interés</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-slate-400">Actividad</th>
+<th class="px-6 py-4 text-[10px] uppercase tracking-widest font-bold text-slate-400 text-right">Acciones</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-50">
+<!-- Row 1: Maria Santos -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-xs">MS</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">María Santos</p>
+<p class="text-[12px] text-slate-400">+1 (849) 555-0123</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">WhatsApp</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                🔥 Lead Caliente
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Aptos en Piantini</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 2h</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Carlos Reyes -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">CR</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Carlos Reyes</p>
+<p class="text-[12px] text-slate-400">+1 (809) 555-0456</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">Referido</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+                                En Pipeline
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Villas en Casa de Campo</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 5h</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3: Ana Jimenez -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center text-slate-600 font-bold text-xs">AJ</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Ana Jiménez</p>
+<p class="text-[12px] text-slate-400">+1 (829) 555-9012</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">Web</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-stone-100 text-slate-600">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+                                Nuevo
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Turístico Punta Cana</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 12h</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4: Roberto Perez -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold text-xs">RP</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Roberto Pérez</p>
+<p class="text-[12px] text-slate-400">+1 (849) 555-3344</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">Instagram</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700">
+<span class="w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5"></span>
+                                Cliente
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Re-inversión SDQ</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 1d</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5: Elena Vargas -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs">EV</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Elena Vargas</p>
+<p class="text-[12px] text-slate-400">+1 (809) 555-1122</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">WhatsApp</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                🔥 Lead Caliente
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Torre Naco</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 1d</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 6: Miguel Rosario -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 font-bold text-xs">MR</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Miguel Rosario</p>
+<p class="text-[12px] text-slate-400">+1 (829) 555-5566</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">Referido</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700">
+<span class="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5"></span>
+                                En Pipeline
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Terrenos Las Terrenas</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 2d</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 7: Sofia Mendez -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center text-pink-600 font-bold text-xs">SM</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Sofía Méndez</p>
+<p class="text-[12px] text-slate-400">+1 (809) 555-8899</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">Instagram</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-stone-100 text-slate-600">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5"></span>
+                                Nuevo
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">Boutique Hotel Samaná</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 3d</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 8: Ricardo Almonte -->
+<tr class="hover:bg-stone-50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center space-x-3">
+<div class="w-9 h-9 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 font-bold text-xs">RA</div>
+<div>
+<p class="text-sm font-semibold text-on-surface">Ricardo Almonte</p>
+<p class="text-[12px] text-slate-400">+1 (849) 555-0011</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 uppercase tracking-tight">Web</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-purple-50 text-purple-700">
+<span class="w-1.5 h-1.5 rounded-full bg-purple-500 mr-1.5"></span>
+                                Cliente
+                            </span>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-600 font-medium">PH Anacaona</p>
+</td>
+<td class="px-6 py-4">
+<p class="text-xs text-slate-400">hace 1 sem</p>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="p-1.5 hover:bg-stone-100 rounded text-rose-600"><span class="material-symbols-outlined text-[18px]" data-icon="chat">chat</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="edit">edit</span></button>
+<button class="p-1.5 hover:bg-stone-100 rounded text-slate-400"><span class="material-symbols-outlined text-[18px]" data-icon="more_vert">more_vert</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer / Pagination -->
+<div class="mt-8 flex items-center justify-between">
+<p class="text-xs text-slate-400 font-medium">Mostrando 1-8 de 248 contactos</p>
+<div class="flex items-center space-x-1">
+<button class="p-2 hover:bg-stone-100 rounded-lg text-slate-400 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-bold rounded-lg bg-primary text-white">1</button>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-medium rounded-lg text-slate-600 hover:bg-stone-100">2</button>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-medium rounded-lg text-slate-600 hover:bg-stone-100">3</button>
+<span class="px-2 text-slate-300">...</span>
+<button class="w-8 h-8 flex items-center justify-center text-xs font-medium rounded-lg text-slate-600 hover:bg-stone-100">31</button>
+<button class="p-2 hover:bg-stone-100 rounded-lg text-slate-400 transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Floating Quick Stats (Contextual Bento-style overlap) -->
+<div class="fixed bottom-10 right-10 flex flex-col space-y-4">
+<div class="bg-white/70 backdrop-blur-xl p-4 rounded-2xl shadow-2xl border border-white/50 w-64">
+<p class="text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-3">Actividad Hoy</p>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<span class="text-xs font-medium text-slate-600">Nuevos Leads</span>
+<span class="text-xs font-bold text-emerald-600">+12</span>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[65%]"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs font-medium text-slate-600">Seguimientos</span>
+<span class="text-xs font-bold text-rose-600">8 pendientes</span>
+</div>
+</div>
+</div>
+</div>
+</body></html>

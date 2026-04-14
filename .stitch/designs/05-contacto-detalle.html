@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalle de Contacto - María Santos | Advance Estate</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#b80035",
+                        "primary-container": "#e11d48",
+                        "on-primary-container": "#fffaf9",
+                        "surface": "#f9f9f8",
+                        "background": "#f9f9f8",
+                        "surface-container-low": "#f3f4f3",
+                        "surface-container": "#eeeeed",
+                        "on-surface": "#1a1c1c",
+                        "on-surface-variant": "#5c3f40",
+                        "outline": "#906f70",
+                    },
+                    fontFamily: {
+                        headline: ["Manrope", "sans-serif"],
+                        body: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    vertical-align: middle
+    }
+.whatsapp-bg {
+    background-color: #f0f2f5;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAwtZw_P_ajeKlIvHm4BDESrtDRjLSGVl3L9vRgrU0AeQf8jYLjL9xj49-osLXJ1KrbUNTzm9mV57ADrzt3Ut1blqzQUaVtoR2-xh9AllmPCm08t0wuulSHVIGk81ODZiK6uoa0zLfIJAd7eKDa0lsrS-jr_qR_Qu2yC3T7Fs3Le3Sl1uOev22wZj76Kl14PqYWPT6JyXhWulUlgPrYd4C1JguY_dBu8DYwyX-KbkMOMeSnwa5vJXh7_zuBIMWggGrh70-hJc51b9g);
+    opacity: 0.8
+    }</style>
+</head>
+<body class="bg-stone-50 font-body text-stone-900 h-full flex overflow-hidden">
+<!-- SideNavBar Component (JSON Reference) -->
+<aside class="fixed h-screen w-[240px] left-0 top-0 bg-slate-950 flex flex-col py-6 z-50">
+<div class="px-6 mb-10">
+<h1 class="text-xl font-bold tracking-tighter text-white font-headline">Advance Estate</h1>
+<p class="text-slate-500 text-xs uppercase tracking-widest mt-1">CRM Premium</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard -->
+<a class="text-slate-400 hover:bg-slate-900 px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<!-- Contactos - ACTIVE -->
+<a class="bg-slate-800 text-white border-l-4 border-rose-600 px-4 py-3 flex items-center gap-3" href="#">
+<span class="material-symbols-outlined text-rose-600" data-icon="contacts" style="font-variation-settings: 'FILL' 1;">contacts</span>
+<span class="text-sm font-semibold">Contactos</span>
+</a>
+<!-- Propiedades -->
+<a class="text-slate-400 hover:bg-slate-900 px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="home_work">home_work</span>
+<span class="text-sm font-medium">Propiedades</span>
+</a>
+<!-- Pipeline -->
+<a class="text-slate-400 hover:bg-slate-900 px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<!-- Tareas -->
+<a class="text-slate-400 hover:bg-slate-900 px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+<span class="text-sm font-medium">Tareas</span>
+</a>
+<!-- Configuración -->
+<a class="text-slate-400 hover:bg-slate-900 px-4 py-3 flex items-center gap-3 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm font-medium">Configuración</span>
+</a>
+</nav>
+<div class="mt-auto px-4">
+<button class="w-full bg-rose-600 text-white rounded-lg py-2.5 text-sm font-bold font-headline mb-6 hover:bg-rose-700 transition-all">
+                Nuevo Contacto
+            </button>
+<div class="flex items-center gap-3 px-2 py-3 border-t border-slate-800">
+<div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-white">IP</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-medium text-white truncate">Ivan Pimentel</p>
+<p class="text-xs text-slate-500 truncate">Broker Senior</p>
+</div>
+<span class="material-symbols-outlined text-slate-500 text-sm" data-icon="logout">logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Wrapper -->
+<main class="ml-[240px] flex-1 flex flex-col min-h-screen">
+<!-- TopNavBar Component (JSON Reference) -->
+<header class="flex justify-between items-center h-16 px-8 bg-white border-b border-stone-200 sticky top-0 z-40">
+<div class="flex items-center gap-4">
+<h2 class="text-stone-900 font-bold font-headline tracking-tight text-lg">Detalle de Contacto</h2>
+<nav class="hidden md:flex gap-6 ml-8">
+<a class="text-rose-600 border-b-2 border-rose-600 pb-4 font-semibold text-sm" href="#">Resumen</a>
+<a class="text-stone-500 hover:text-stone-900 pb-4 text-sm font-medium" href="#">Actividad</a>
+<a class="text-stone-500 hover:text-stone-900 pb-4 text-sm font-medium" href="#">Documentos</a>
+<a class="text-stone-500 hover:text-stone-900 pb-4 text-sm font-medium" href="#">WhatsApp</a>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-4 py-1.5 rounded-lg border border-stone-200 text-stone-700 text-sm font-semibold hover:bg-stone-50 transition-colors">Exportar</button>
+<button class="px-4 py-1.5 rounded-lg bg-rose-600 text-white text-sm font-semibold hover:bg-rose-700 shadow-sm transition-all">Editar</button>
+<div class="w-px h-6 bg-stone-200 mx-2"></div>
+<button class="text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined" data-icon="notifications">notifications</span></button>
+<button class="text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined" data-icon="more_vert">more_vert</span></button>
+</div>
+</header>
+<!-- Two-Pane Layout -->
+<div class="flex flex-1 overflow-hidden">
+<!-- LEFT PANE: Contact Profile (35%) -->
+<section class="w-[35%] bg-[#FAFAF9] border-r border-stone-200 overflow-y-auto custom-scrollbar">
+<div class="p-8">
+<!-- Profile Header -->
+<div class="flex flex-col items-center text-center mb-8">
+<div class="w-24 h-24 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center text-3xl font-extrabold font-headline mb-4 shadow-sm border border-rose-100">
+                            MS
+                        </div>
+<h3 class="text-2xl font-bold font-headline text-stone-900 mb-1">María Santos</h3>
+<div class="inline-flex items-center px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider mb-4 border border-emerald-100">
+                            Lead Caliente
+                        </div>
+<div class="flex gap-2 w-full mt-4">
+<button class="flex-1 bg-white border border-stone-200 p-3 rounded-xl hover:bg-stone-50 transition-all flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-[#25D366]" data-icon="chat">chat</span>
+<span class="text-[10px] font-bold text-stone-500 uppercase">WhatsApp</span>
+</button>
+<button class="flex-1 bg-white border border-stone-200 p-3 rounded-xl hover:bg-stone-50 transition-all flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-rose-600" data-icon="call">call</span>
+<span class="text-[10px] font-bold text-stone-500 uppercase">Llamar</span>
+</button>
+<button class="flex-1 bg-white border border-stone-200 p-3 rounded-xl hover:bg-stone-50 transition-all flex flex-col items-center gap-1">
+<span class="material-symbols-outlined text-blue-600" data-icon="mail">mail</span>
+<span class="text-[10px] font-bold text-stone-500 uppercase">Email</span>
+</button>
+</div>
+</div>
+<!-- Pipeline Card -->
+<div class="bg-white rounded-2xl p-5 shadow-sm mb-8 border border-stone-100">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-1">Pipeline State</p>
+<span class="text-sm font-bold text-rose-600">Propuesta Enviada</span>
+</div>
+<span class="material-symbols-outlined text-stone-300" data-icon="account_tree">account_tree</span>
+</div>
+<div class="mb-4">
+<p class="text-xs font-medium text-stone-500">Inmueble</p>
+<p class="text-sm font-bold text-stone-900">Apto 3H en Torre Loft, Piantini</p>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-xs font-medium text-stone-500">Valor Estimado</p>
+<p class="text-lg font-extrabold font-headline text-stone-900">RD$ 4.2M</p>
+</div>
+<div class="flex -space-x-2">
+<img alt="Broker" class="w-8 h-8 rounded-full border-2 border-white" data-alt="close-up portrait of a professional male real estate broker with a warm smile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9bEGuSfTDDLPummBYA7yuOE82Oa38t9Mj0iwJc98-vM8zqYUM-L_rkugWGFad-vf7xVaGLBBOdgJNmIBvlO4MnKHsJXKQsSTu3e6Xje6zP36sxGLFHy35tHO6dH_plSEKWx-ic175b9CvCh1aTNFFbFVnklaRet6643tb2RnXBU44zh-HrclmxAwibBxAUoUYGXrvGfjXki_fk_kcs2aOfbf9P-F1BvjdfSgvFB3RfOisQjMlAKIWw-5WJqopV4iNX4Vza9qaFoY"/>
+</div>
+</div>
+</div>
+<!-- Accordions -->
+<div class="space-y-4">
+<!-- Personal Info -->
+<div class="border-b border-stone-200 pb-4">
+<button class="w-full flex justify-between items-center py-2 text-stone-900 font-bold font-headline">
+<span>Info Personal</span>
+<span class="material-symbols-outlined text-stone-400" data-icon="expand_more">expand_more</span>
+</button>
+<div class="mt-3 grid grid-cols-2 gap-4">
+<div>
+<p class="text-xs text-stone-500">Celular</p>
+<p class="text-sm font-semibold">+1 (809) 555-0123</p>
+</div>
+<div>
+<p class="text-xs text-stone-500">Email</p>
+<p class="text-sm font-semibold">m.santos@gmail.com</p>
+</div>
+</div>
+</div>
+<!-- Propiedades Interés -->
+<div class="border-b border-stone-200 pb-4">
+<button class="w-full flex justify-between items-center py-2 text-stone-900 font-bold font-headline">
+<span>Propiedades de Interés</span>
+<span class="material-symbols-outlined text-stone-400" data-icon="expand_more">expand_more</span>
+</button>
+<div class="mt-4 flex gap-3 overflow-x-auto pb-2 custom-scrollbar">
+<div class="min-w-[140px] bg-white rounded-xl border border-stone-200 overflow-hidden group">
+<img alt="Loft" class="w-full h-20 object-cover" data-alt="modern industrial loft apartment with large windows and brick walls, bright natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxCj7QoMduTCYJ7-8KQ_xVw5zwpN8XwbDloniXw0pVo2KLlLfB-0du0TRSYxKRcc7QheBIfFa_RC1mRIQSHB3yYJastEHzRrAEklUKbLb0X53yjMlQ1u2M-2WYlf1lSuYiJIW-oybHnR0rFuusPbKbb24urkzF_5lU_YoWtFi9_3Hr8s6aXO9KLsL0o-WuzYhh_Qu85pTKp6r1FYyf1s9-NWA_O7jQPw_BkFEctF_sbGmw8472aEoeBBRZs7Fcw3w7iKWOz4hePEg"/>
+<div class="p-2">
+<p class="text-[10px] font-bold text-stone-800 truncate leading-tight">Torre Loft 3H</p>
+<p class="text-[10px] text-rose-600 font-bold">RD$ 4.2M</p>
+</div>
+</div>
+<div class="min-w-[140px] bg-white rounded-xl border border-stone-200 overflow-hidden group">
+<img alt="Villa" class="w-full h-20 object-cover" data-alt="luxury contemporary villa exterior with a pool at twilight, glowing interior lights" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRztVceMUls06a2dFy-KXSkw6Uu-98pUKd78wBfRyyZFsE-0l6gpN7u0WCO6rYTRyCeS_QcJjlfBq870gOyzZvS_ZBobqqJ-AGUiMNGmstHoZ1vmQRuQEtVpNYiD80Mf9oBsQ9ogWjJQi-m2WpFiXtMN7R8seRT8iJQQyTYc_RRIaEL33q0uTEncE9Ov5lPtWG6B_1sScdnVZDydWJ4_5uI5YzY45uw_N-gVRqVbZ5j8l9rlijW36lnbaw5QOz1V80EOBwfanh19k"/>
+<div class="p-2">
+<p class="text-[10px] font-bold text-stone-800 truncate leading-tight">Villa Mar Azul</p>
+<p class="text-[10px] text-rose-600 font-bold">RD$ 8.9M</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Notas -->
+<div class="border-b border-stone-200 pb-4">
+<button class="w-full flex justify-between items-center py-2 text-stone-900 font-bold font-headline">
+<span>Notas</span>
+<span class="material-symbols-outlined text-stone-400" data-icon="add_notes">add_notes</span>
+</button>
+<div class="mt-2">
+<textarea class="w-full bg-white border-stone-200 rounded-xl text-sm p-3 focus:ring-rose-600 focus:border-rose-600" placeholder="Añadir una nota privada..." rows="3"></textarea>
+</div>
+</div>
+<!-- Actividad Timeline -->
+<div>
+<button class="w-full flex justify-between items-center py-2 text-stone-900 font-bold font-headline">
+<span>Actividad Reciente</span>
+<span class="material-symbols-outlined text-stone-400" data-icon="history">history</span>
+</button>
+<div class="mt-4 space-y-4">
+<div class="flex gap-3">
+<div class="relative">
+<div class="w-8 h-8 rounded-full bg-rose-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-rose-600 text-sm" data-icon="send">send</span>
+</div>
+<div class="absolute top-8 left-1/2 -translate-x-1/2 w-px h-6 bg-stone-200"></div>
+</div>
+<div>
+<p class="text-xs font-bold">Propuesta enviada</p>
+<p class="text-[10px] text-stone-500">Hoy, 10:45 AM</p>
+</div>
+</div>
+<div class="flex gap-3">
+<div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-stone-500 text-sm" data-icon="call">call</span>
+</div>
+<div>
+<p class="text-xs font-bold">Llamada realizada (12 min)</p>
+<p class="text-[10px] text-stone-500">Ayer, 04:20 PM</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- RIGHT PANE: WhatsApp Chat (65%) -->
+<section class="w-[65%] flex flex-col bg-white relative">
+<!-- Chat Header -->
+<header class="h-16 flex items-center justify-between px-6 border-b border-stone-100 z-10">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<h4 class="font-bold font-headline text-stone-900">María Santos</h4>
+<div class="w-2 h-2 rounded-full bg-[#25D366]"></div>
+</div>
+<p class="text-xs text-stone-500">WhatsApp • En línea</p>
+</div>
+</div>
+<div class="flex items-center gap-4 text-stone-400">
+<span class="material-symbols-outlined cursor-pointer hover:text-stone-600" data-icon="search">search</span>
+<span class="material-symbols-outlined cursor-pointer hover:text-stone-600" data-icon="more_vert">more_vert</span>
+</div>
+</header>
+<!-- Chat History -->
+<div class="flex-1 overflow-y-auto p-6 whatsapp-bg flex flex-col gap-4">
+<!-- Date Separator -->
+<div class="flex justify-center my-4">
+<span class="px-3 py-1 bg-white/80 backdrop-blur-sm rounded-lg text-[10px] font-bold text-stone-500 uppercase tracking-widest">Hoy</span>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col max-w-[70%] self-start">
+<div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-stone-800">
+                            Hola Ivan, ¿tienes los detalles del mantenimiento de la Torre Loft? Me interesa mucho pero necesito confirmar los costos fijos.
+                        </div>
+<span class="text-[10px] text-stone-500 mt-1 ml-1">10:30 AM</span>
+</div>
+<!-- AI Message (Ava IA) -->
+<div class="flex flex-col max-w-[70%] self-end items-end">
+<div class="bg-rose-600 p-3 rounded-2xl rounded-tr-none shadow-md text-sm text-white">
+<div class="flex items-center gap-2 mb-1 opacity-80">
+<span class="material-symbols-outlined text-xs" data-icon="auto_awesome">auto_awesome</span>
+<span class="text-[10px] font-bold uppercase tracking-wider">Ava IA</span>
+</div>
+                            Hola María, claro que sí. El mantenimiento mensual de la unidad 3H es de US$ 250. Incluye seguridad 24/7, acceso al gym, piscina y mantenimiento de áreas comunes. ¿Te gustaría que agendemos una visita para mañana?
+                        </div>
+<span class="text-[10px] text-stone-500 mt-1 mr-1 flex items-center gap-1">
+                            10:31 AM <span class="material-symbols-outlined text-blue-500 text-xs" data-icon="done_all" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</span>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col max-w-[70%] self-start">
+<div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm text-sm text-stone-800">
+                            Perfecto, el precio está en mi presupuesto. Si puedo ir mañana a las 4:00 PM sería genial.
+                        </div>
+<span class="text-[10px] text-stone-500 mt-1 ml-1">10:35 AM</span>
+</div>
+<!-- Broker Message -->
+<div class="flex flex-col max-w-[70%] self-end items-end">
+<div class="bg-stone-800 p-3 rounded-2xl rounded-tr-none shadow-sm text-sm text-white">
+                            Excelente María, ya te agendé para las 4:00 PM. Nos vemos en el lobby de la torre. Te envío la ubicación ahora mismo.
+                        </div>
+<span class="text-[10px] text-stone-500 mt-1 mr-1 flex items-center gap-1">
+                            10:40 AM <span class="material-symbols-outlined text-blue-500 text-xs" data-icon="done_all" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</span>
+</div>
+</div>
+<!-- Chat Input & Quick Replies -->
+<div class="p-6 border-t border-stone-100 bg-white">
+<!-- Quick Reply Chips -->
+<div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+<button class="px-4 py-1.5 rounded-full bg-stone-100 text-stone-700 text-xs font-bold whitespace-nowrap hover:bg-stone-200 transition-colors">Agendar visita</button>
+<button class="px-4 py-1.5 rounded-full bg-stone-100 text-stone-700 text-xs font-bold whitespace-nowrap hover:bg-stone-200 transition-colors">Enviar PDF propuesta</button>
+<button class="px-4 py-1.5 rounded-full bg-stone-100 text-stone-700 text-xs font-bold whitespace-nowrap hover:bg-stone-200 transition-colors">Ver disponibilidad</button>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined" data-icon="mood">mood</span></button>
+<button class="text-stone-400 hover:text-stone-600"><span class="material-symbols-outlined" data-icon="attach_file">attach_file</span></button>
+<div class="flex-1">
+<input class="w-full bg-stone-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-rose-600" placeholder="Escribir mensaje..." type="text"/>
+</div>
+<button class="w-12 h-12 rounded-xl bg-rose-600 text-white flex items-center justify-center hover:bg-rose-700 transition-all shadow-md active:scale-95">
+<span class="material-symbols-outlined" data-icon="send">send</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+<style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e2e2;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #d1d1d1;
+        }
+    </style>
+</body></html>

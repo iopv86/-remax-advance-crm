@@ -51,8 +51,8 @@ export function Sidebar() {
     <aside
       className="flex flex-col w-[260px] shrink-0 min-h-screen overflow-y-auto"
       style={{
-        background: "#111827",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
+        background: "var(--sidebar)",
+        borderRight: "1px solid var(--sidebar-border)",
       }}
     >
       {/* Logo */}
@@ -77,7 +77,7 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 space-y-0.5">
+      <nav className="flex-1 space-y-0.5">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active =
             href === "/dashboard"
@@ -89,13 +89,13 @@ export function Sidebar() {
               key={href}
               href={href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all duration-150",
+                "flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
                 active
-                  ? "bg-rose-600 text-white shadow-[0_4px_12px_rgba(225,29,72,0.35)]"
-                  : "text-gray-400 hover:text-white hover:bg-white/5"
+                  ? "text-white border-[#e11d48] bg-[rgba(225,29,72,0.08)] dark:border-[#C9A84C] dark:bg-[rgba(201,168,76,0.06)]"
+                  : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-white" : "text-gray-500")} />
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#e11d48] dark:text-[#C9A84C]" : "text-gray-500")} />
               <span>{label}</span>
             </Link>
           );

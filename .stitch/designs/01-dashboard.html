@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "on-surface-variant": "#5c3f40",
+                        "inverse-surface": "#2f3130",
+                        "background": "#f9f9f8",
+                        "on-tertiary-container": "#eefff3",
+                        "surface-dim": "#dadad9",
+                        "tertiary-fixed": "#85f8c4",
+                        "on-secondary-fixed": "#141b2b",
+                        "on-secondary": "#ffffff",
+                        "primary": "#b80035",
+                        "inverse-on-surface": "#f1f1f0",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary-fixed-dim": "#68dba9",
+                        "on-tertiary-fixed": "#002114",
+                        "error": "#ba1a1a",
+                        "surface": "#f9f9f8",
+                        "on-secondary-container": "#5c6274",
+                        "on-background": "#1a1c1c",
+                        "surface-container-low": "#f3f4f3",
+                        "secondary": "#575e70",
+                        "surface-container-highest": "#e2e2e2",
+                        "secondary-fixed": "#dce2f7",
+                        "outline-variant": "#e5bdbe",
+                        "on-primary-fixed-variant": "#920028",
+                        "inverse-primary": "#ffb3b6",
+                        "secondary-fixed-dim": "#c0c6db",
+                        "primary-fixed-dim": "#ffb3b6",
+                        "surface-bright": "#f9f9f8",
+                        "on-surface": "#1a1c1c",
+                        "tertiary": "#006848",
+                        "tertiary-container": "#00845c",
+                        "surface-container-high": "#e8e8e7",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#404758",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eeeeed",
+                        "on-primary-container": "#fffaf9",
+                        "surface-tint": "#be0037",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#ffdada",
+                        "on-primary-fixed": "#40000c",
+                        "on-tertiary-fixed-variant": "#005137",
+                        "secondary-container": "#d9dff5",
+                        "primary-container": "#e11d48",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#906f70"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .font-manrope { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-background">
+<!-- SideNavBar Shell -->
+<aside class="fixed inset-y-0 left-0 flex flex-col z-50 h-screen w-64 bg-[#111827] overflow-y-auto">
+<div class="px-6 py-8">
+<h1 class="text-xl font-bold text-white font-manrope">Advance Estate</h1>
+<p class="text-gray-400 text-xs mt-1 uppercase tracking-widest font-label">Ivan Pimentel</p>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 text-white border-l-4 border-[#e11d48] bg-gray-800/50 hover:bg-gray-800 transition-colors duration-200 group" href="#">
+<span class="material-symbols-outlined text-[#e11d48]" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="contacts">contacts</span>
+<span class="text-sm font-medium">Contactos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="real_estate_agent">real_estate_agent</span>
+<span class="text-sm font-medium">Propiedades</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+<span class="text-sm font-medium">WhatsApp</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium">Reportes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors duration-200 mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm font-medium">Configuración</span>
+</a>
+</nav>
+<div class="p-4 bg-gray-900/50 flex items-center gap-3 border-t border-gray-800 mt-auto">
+<img alt="Ivan Pimentel" class="w-10 h-10 rounded-lg object-cover" data-alt="professional headshot of a businessman in a dark suit with soft office background lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV6R09Ph08QcQk-Xf__v07AE23DqWr4x52jA-CsrCFQfKNeJyKR1hzvNchxsQo619lXTPTVO-o8KmR_W18HnAtBukcFgeuCOFiF7idLZpwz-l1JnPxsWIBma3_H5hJETeb8qPzAffaVg9AIWoNXaSZfjvP79qOeSs4M9WLTbBYC4sDCut3Fl0cZnAbEOsZ8sd3NZOGO_w8J2_3cOtjX3aqDnEb4b1ugm03JzVqY0-0s2o61O5smbcfz8rcvaHK4hh_RmYiDGe2WUg"/>
+<div>
+<p class="text-white text-sm font-bold">Ivan Pimentel</p>
+<p class="text-gray-500 text-xs">Administrador</p>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 min-h-screen">
+<!-- TopNavBar Shell -->
+<header class="flex justify-between items-center h-16 px-8 bg-[#FAFAF9] sticky top-0 z-40 backdrop-blur-md bg-opacity-80 shadow-[0_10px_30px_-10px_rgba(17,24,39,0.08)]">
+<div class="flex items-center gap-4">
+<h2 class="text-2xl font-bold font-manrope tracking-tight">Dashboard</h2>
+<div class="relative ml-8">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary text-sm" data-icon="search">search</span>
+<input class="bg-surface-container border-none rounded-lg pl-10 pr-4 py-1.5 text-sm w-80 focus:ring-2 focus:ring-primary/20 transition-all" placeholder="Buscar contactos o propiedades..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-secondary hover:text-primary transition-colors relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-primary rounded-full border-2 border-surface"></span>
+</button>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container hover:shadow-lg transition-all active:shadow-inner">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+<span class="text-xs font-bold uppercase tracking-wider">Nuevo Trato</span>
+</button>
+</div>
+</header>
+<div class="p-8 space-y-8 max-w-[1400px] mx-auto">
+<!-- KPI Row -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Contactos Activos -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 hover:shadow-sm transition-all relative overflow-hidden group">
+<div class="absolute left-0 top-0 h-full w-0.5 bg-tertiary"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-[0.1em] font-label">Contactos Activos</span>
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 rounded text-[10px] font-bold">+12%</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-[32px] font-manrope font-extrabold leading-none">248</span>
+<span class="text-xs text-secondary font-medium">usuarios</span>
+</div>
+</div>
+<!-- Pipeline Total -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 hover:shadow-sm transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-0.5 bg-tertiary"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-[0.1em] font-label">Pipeline Total</span>
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 rounded text-[10px] font-bold">+8%</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[32px] font-manrope font-extrabold leading-none text-primary">RD$ 45.2M</span>
+</div>
+</div>
+<!-- Tratos Activos -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 hover:shadow-sm transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-0.5 bg-primary"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-[0.1em] font-label">Tratos Activos</span>
+<span class="bg-error/10 text-error px-2 py-0.5 rounded text-[10px] font-bold">-2</span>
+</div>
+<div class="flex items-baseline gap-2">
+<span class="text-[32px] font-manrope font-extrabold leading-none">34</span>
+<span class="text-xs text-secondary font-medium">propuestas</span>
+</div>
+</div>
+<!-- Tasa de Conversión -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 hover:shadow-sm transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 h-full w-0.5 bg-tertiary"></div>
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold text-secondary uppercase tracking-[0.1em] font-label">Tasa de Conversión</span>
+<span class="bg-tertiary/10 text-tertiary px-2 py-0.5 rounded text-[10px] font-bold">+1.2pp</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[32px] font-manrope font-extrabold leading-none">18.4%</span>
+</div>
+</div>
+</section>
+<!-- Pipeline Section -->
+<section class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15">
+<div class="flex justify-between items-end mb-8">
+<div>
+<h3 class="text-sm font-bold uppercase tracking-widest text-secondary mb-1 font-label">Pipeline por Etapa</h3>
+<p class="text-2xl font-manrope font-extrabold">Distribución de Ventas</p>
+</div>
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="text-[10px] font-bold text-secondary uppercase tracking-wider">Valor Proyectado</span>
+</div>
+</div>
+</div>
+<div class="space-y-6">
+<!-- Bar Chart Implementation -->
+<div class="space-y-4">
+<!-- Nuevo Lead -->
+<div class="group">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter mb-1.5 px-1">
+<span class="text-on-background">Nuevo Lead (42)</span>
+<span class="text-secondary">RD$ 8.4M</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/40 rounded-full transition-all group-hover:bg-primary" style="width: 25%"></div>
+</div>
+</div>
+<!-- Calificado -->
+<div class="group">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter mb-1.5 px-1">
+<span class="text-on-background">Calificado (28)</span>
+<span class="text-secondary">RD$ 12.1M</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/55 rounded-full transition-all group-hover:bg-primary" style="width: 45%"></div>
+</div>
+</div>
+<!-- Propuesta -->
+<div class="group">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter mb-1.5 px-1">
+<span class="text-on-background">Propuesta (15)</span>
+<span class="text-secondary">RD$ 15.2M</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/70 rounded-full transition-all group-hover:bg-primary" style="width: 65%"></div>
+</div>
+</div>
+<!-- Negociación -->
+<div class="group">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter mb-1.5 px-1">
+<span class="text-on-background">Negociación (8)</span>
+<span class="text-secondary">RD$ 6.5M</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary/85 rounded-full transition-all group-hover:bg-primary" style="width: 40%"></div>
+</div>
+</div>
+<!-- Cerrado -->
+<div class="group">
+<div class="flex justify-between text-xs font-bold uppercase tracking-tighter mb-1.5 px-1">
+<span class="text-on-background">Cerrado (5)</span>
+<span class="text-secondary">RD$ 3.0M</span>
+</div>
+<div class="h-3 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 20%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Layout: Two Columns -->
+<div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+<!-- Recent Activity (60%) -->
+<div class="lg:col-span-6 bg-surface-container-lowest rounded-xl border border-outline-variant/15 overflow-hidden flex flex-col">
+<div class="p-6 border-b border-surface-container flex justify-between items-center">
+<h3 class="text-lg font-manrope font-extrabold">Actividad Reciente</h3>
+<button class="text-xs font-bold text-primary uppercase tracking-widest hover:underline">Ver Todo</button>
+</div>
+<div class="flex-1">
+<!-- Feed Item 1 -->
+<div class="p-6 flex gap-4 hover:bg-surface-container-low transition-colors border-b border-surface-container/50">
+<div class="relative">
+<img alt="Activity avatar" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a focused professional woman in a modern office interior with warm ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkVM00hqhjeLlOT2egYeG68mIUy9m-aT5HiqzrR6OzmTgMlyarxvLV8tqADGbJp-raQCiHSkiEsd2W_r6Wt8xKqyY1wE4COmprNcJ63m2JSbLmMxR3wPk9Ijcr3dYRQyzPMJmd6N8cvkKv3pyeLxtvQ0FG05wZZd1aahBuSIm7CSFlzlfw1Nmi0FT4QhVUrU9Qby4pw2_iQjUP5LrQw-BS-xtGV7CToGrSTe-VwvZstPFAFEJvBcFSBaIkZiYaI78Ra6e4cLii4DU"/>
+<span class="absolute -bottom-1 -right-1 w-5 h-5 bg-tertiary rounded-full flex items-center justify-center text-white ring-2 ring-surface text-[10px]">
+<span class="material-symbols-outlined scale-75" data-icon="local_fire_department">local_fire_department</span>
+</span>
+</div>
+<div class="flex-1">
+<p class="text-sm text-on-background">
+<span class="font-bold">Ana Maria Torres</span> <span class="text-secondary">Calificó como</span> <span class="font-bold text-tertiary">lead caliente</span>
+</p>
+<p class="text-xs text-secondary mt-1">Casa de Lujo en Casa de Campo • Hace 12 min</p>
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Feed Item 2 -->
+<div class="p-6 flex gap-4 hover:bg-surface-container-low transition-colors border-b border-surface-container/50">
+<div class="relative">
+<img alt="Activity avatar" class="w-10 h-10 rounded-full object-cover" data-alt="portrait of a man in casual business attire with soft natural window lighting and blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwDq_1VVXB3Cl2ALwnhSV1QFdRl51St2nD51BKZXSgLiyXMaKqA7DIJ3tMoqp5w3IrV356rJLcKfCEzMvCet1vx3IQbHL-tVWht0dj4CbYvmUjJl4TIsaShpPxxIC-67IuKC24U6AQ7rQEl3DPdUFGRE7t6JZtaGwy2g2Oh723BGIfSgYaZIiEMNQBWQJGdNUIQT1okZMNuw9kXwi0-vj0QdSJU2ailgNuCRUloe5UCF81_CoTnTNquj95mplr3BGNBHmCCwshnqo"/>
+<span class="absolute -bottom-1 -right-1 w-5 h-5 bg-primary rounded-full flex items-center justify-center text-white ring-2 ring-surface text-[10px]">
+<span class="material-symbols-outlined scale-75" data-icon="task_alt" style="font-variation-settings: 'FILL' 1;">task_alt</span>
+</span>
+</div>
+<div class="flex-1">
+<p class="text-sm text-on-background">
+<span class="font-bold">Marco Tulio</span> <span class="text-secondary">Cerró trato por</span> <span class="font-bold">RD$ 4.2M</span>
+</p>
+<p class="text-xs text-secondary mt-1">Penthouse Naco • Hace 45 min</p>
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+<!-- Feed Item 3 -->
+<div class="p-6 flex gap-4 hover:bg-surface-container-low transition-colors">
+<div class="relative">
+<img alt="Activity avatar" class="w-10 h-10 rounded-full object-cover" data-alt="close up portrait of a smiling young professional woman against a warm neutral studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGfcu9hyEeKr3oC4UjWSsu65HLmfn963fqoXak_4Ozp1rLRa-biKpx3QWaRc5KPmkDLE_xQrndYugoA7Dz8fLkprXv2krlCiHnqAI6IxR1tqLKfV2XFfk_mivE53lV6BANlduAVhgu-cFM-lA5iDowNaOeCqkpgB_JuPSPX3vxR0XtFKZ6vJvR_SF-L9q33BzZPY3z1gpgiVa4ZnXAcDydhKnZNQLDK9ocbzQf1xW9WWydp8CKgUleyezsDFcLIgJxl5hW09Q7T-Q"/>
+<span class="absolute -bottom-1 -right-1 w-5 h-5 bg-secondary rounded-full flex items-center justify-center text-white ring-2 ring-surface text-[10px]">
+<span class="material-symbols-outlined scale-75" data-icon="mail">mail</span>
+</span>
+</div>
+<div class="flex-1">
+<p class="text-sm text-on-background">
+<span class="font-bold">Elena Rivas</span> <span class="text-secondary">Envió propuesta comercial</span>
+</p>
+<p class="text-xs text-secondary mt-1">Villa Punta Cana • Hace 2 horas</p>
+</div>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="more_horiz">more_horiz</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Pending Tasks (40%) -->
+<div class="lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant/15 flex flex-col">
+<div class="p-6 border-b border-surface-container flex justify-between items-center">
+<h3 class="text-lg font-manrope font-extrabold">Seguimientos Pendientes</h3>
+</div>
+<div class="p-2 space-y-1">
+<!-- Task Item 1 -->
+<div class="p-4 rounded-lg flex items-center justify-between hover:bg-surface-container transition-all group">
+<div class="flex items-center gap-3">
+<div class="w-1 h-8 bg-error rounded-full"></div>
+<div>
+<p class="text-sm font-bold">Ricardo Almonte</p>
+<p class="text-[10px] text-secondary font-medium truncate w-32">Villa Las Terrenas</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold py-1 px-2 rounded bg-error/10 text-error uppercase">Vencido</span>
+<button class="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#128C7E] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all group/wa">
+<span class="material-symbols-outlined text-sm" data-icon="chat">chat</span>
+</button>
+</div>
+</div>
+<!-- Task Item 2 -->
+<div class="p-4 rounded-lg flex items-center justify-between hover:bg-surface-container transition-all group">
+<div class="flex items-center gap-3">
+<div class="w-1 h-8 bg-secondary/30 rounded-full"></div>
+<div>
+<p class="text-sm font-bold">Sofia Henríquez</p>
+<p class="text-[10px] text-secondary font-medium truncate w-32">Solar Cap Cana</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold py-1 px-2 rounded bg-surface-container-high text-secondary uppercase">Hoy</span>
+<button class="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#128C7E] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chat">chat</span>
+</button>
+</div>
+</div>
+<!-- Task Item 3 -->
+<div class="p-4 rounded-lg flex items-center justify-between hover:bg-surface-container transition-all group">
+<div class="flex items-center gap-3">
+<div class="w-1 h-8 bg-secondary/30 rounded-full"></div>
+<div>
+<p class="text-sm font-bold">Javier Mendez</p>
+<p class="text-[10px] text-secondary font-medium truncate w-32">Apt. Piantini</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold py-1 px-2 rounded bg-surface-container-high text-secondary uppercase">Mañana</span>
+<button class="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#128C7E] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chat">chat</span>
+</button>
+</div>
+</div>
+<!-- Task Item 4 -->
+<div class="p-4 rounded-lg flex items-center justify-between hover:bg-surface-container transition-all group">
+<div class="flex items-center gap-3">
+<div class="w-1 h-8 bg-secondary/30 rounded-full"></div>
+<div>
+<p class="text-sm font-bold">Laura Vasquez</p>
+<p class="text-[10px] text-secondary font-medium truncate w-32">Residencial Naco</p>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold py-1 px-2 rounded bg-surface-container-high text-secondary uppercase">24 Ene</span>
+<button class="w-8 h-8 rounded-lg bg-[#25D366]/10 text-[#128C7E] flex items-center justify-center hover:bg-[#25D366] hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="chat">chat</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advance Estate CRM - Pipeline de Ventas</title>
+<!-- Typography -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-tint": "#be0037",
+                    "on-tertiary-container": "#eefff3",
+                    "on-surface": "#1a1c1c",
+                    "primary-fixed-dim": "#ffb3b6",
+                    "primary-fixed": "#ffdada",
+                    "on-background": "#1a1c1c",
+                    "surface-dim": "#dadad9",
+                    "primary-container": "#e11d48",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#5c3f40",
+                    "outline": "#906f70",
+                    "on-error-container": "#93000a",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-fixed": "#002114",
+                    "on-secondary-fixed": "#141b2b",
+                    "tertiary-fixed-dim": "#68dba9",
+                    "secondary": "#575e70",
+                    "surface-bright": "#f9f9f8",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "on-primary-fixed-variant": "#920028",
+                    "outline-variant": "#e5bdbe",
+                    "on-primary-fixed": "#40000c",
+                    "surface-container": "#eeeeed",
+                    "inverse-on-surface": "#f1f1f0",
+                    "secondary-container": "#d9dff5",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#404758",
+                    "tertiary-container": "#00845c",
+                    "background": "#f9f9f8",
+                    "inverse-primary": "#ffb3b6",
+                    "inverse-surface": "#2f3130",
+                    "surface": "#f9f9f8",
+                    "surface-container-low": "#f3f4f3",
+                    "surface-variant": "#e2e2e2",
+                    "on-tertiary-fixed-variant": "#005137",
+                    "tertiary-fixed": "#85f8c4",
+                    "on-primary": "#ffffff",
+                    "on-secondary-container": "#5c6274",
+                    "secondary-fixed": "#dce2f7",
+                    "tertiary": "#006848",
+                    "primary": "#b80035",
+                    "surface-container-highest": "#e2e2e2",
+                    "surface-container-high": "#e8e8e7",
+                    "on-primary-container": "#fffaf9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Manrope', sans-serif; }
+        .sidebar-item-active {
+            background-color: #1F2937;
+            color: #ffffff;
+            border-left: 4px solid #e11d48;
+        }
+        .kanban-column {
+            min-width: 320px;
+            width: 320px;
+        }
+    </style>
+</head>
+<body class="bg-[#FAFAF9] text-[#1C1917] flex overflow-hidden">
+<!-- SIDEBAR: Immutable Content from JSON & Design System -->
+<aside class="fixed left-0 top-0 h-screen w-[240px] bg-slate-950 flex flex-col justify-between py-6 px-4 shadow-xl z-50">
+<div>
+<!-- Brand Header -->
+<div class="flex items-center gap-3 px-2 mb-10">
+<div class="w-8 h-8 bg-primary-container rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">domain</span>
+</div>
+<div>
+<h1 class="text-xl font-black text-white tracking-tight">Advance Estate</h1>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Brokerage Portal</p>
+</div>
+</div>
+<!-- Navigation Cluster -->
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="text-sm font-medium">Properties</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person_search">person_search</span>
+<span class="text-sm font-medium">Leads</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-slate-800 text-white border-l-4 border-rose-600 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="view_kanban">view_kanban</span>
+<span class="text-sm font-medium">Pipeline</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-sm font-medium">Contacts</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium">Reports</span>
+</a>
+</nav>
+</div>
+<!-- Footer Actions -->
+<div class="space-y-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="text-sm font-medium">Support</span>
+</a>
+<div class="pt-4 mt-4 border-t border-slate-800 flex items-center gap-3 px-2">
+<img alt="Avatar" class="w-8 h-8 rounded-full border border-slate-700" data-alt="professional portrait of a male real estate broker with a warm smile in a corporate setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaexP_r4xO4_scUz_8hNbf_z7EoyWhtvZtrKdb9vMsT6z0qymOn6NeP14GdzlgNkosuB5TkVebIjHuuiVb3RzAEnEJMmYmXfaxdht3TLe4N1HtmBvLMIPaOz89bZN7G5neZqaHg5b17UIIo8V6L4k429ROWNFuwr-faIF1BbFfB-VgZiD14Ef1ZrVZg9q3fg4M7lNDCyfcvvw2TUXwpTZ9_hMc8OUEa-Xt-385S7NYxhBJ8UUKKo7Fa0APOEy2av3WoN6WtRaEfx0"/>
+<div class="overflow-hidden">
+<p class="text-sm font-medium text-white truncate">Carlos Méndez</p>
+<p class="text-[10px] text-slate-500 truncate">Socio Senior</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT AREA -->
+<main class="ml-[240px] flex-1 h-screen flex flex-col">
+<!-- TOP APP BAR -->
+<header class="h-16 flex justify-between items-center px-8 bg-white border-b border-[#E7E5E0] shrink-0">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-lg">search</span>
+<input class="w-full bg-[#F5F4F1] border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-0 focus:border-b-2 focus:border-rose-600 transition-all" placeholder="Buscar propiedades, clientes o tratos..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-stone-500 hover:bg-stone-50 rounded-lg transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-stone-500 hover:bg-stone-50 rounded-lg transition-colors">
+<span class="material-symbols-outlined">chat_bubble</span>
+</button>
+<div class="h-8 w-[1px] bg-stone-200 mx-2"></div>
+<button class="flex items-center gap-2 px-2 py-1 hover:bg-stone-50 rounded-lg transition-colors">
+<img alt="User" class="w-8 h-8 rounded-full" data-alt="professional portrait of a male real estate broker with a warm smile in a corporate setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuADUZr9xU2OgiHv41Lp7Inq9LZQfSRq7kvuAOOhSRt_bdZMTSUeshyZO8Zx-QCpRJ2JmS2m9JQQUhnCLWs4_Shunx4RBAIMl7Ch06qDxaJ5PKgceIa_RYHtXjJLotn9SN9_SvJyM81tIkf9nw-NMMWHoyWOCqFgTxvF5KVQwJcVC5ETuJdq-efct5NR4TqmyIv14GuaztBPgbY1daqmpfSQMOcn5avjZQhhmsiV8X63SiFi1EQjJgSA_B9RX5LNgif6G1KEb787Qm0"/>
+<span class="material-symbols-outlined text-stone-400">expand_more</span>
+</button>
+</div>
+</header>
+<!-- PAGE HEADER & FILTERS -->
+<section class="px-8 py-6 bg-[#FAFAF9] shrink-0">
+<div class="flex justify-between items-end mb-6">
+<div>
+<h2 class="text-2xl font-extrabold text-[#1C1917] tracking-tight mb-1">Pipeline de Ventas</h2>
+<div class="flex items-center gap-2">
+<span class="text-stone-500 text-sm">Valor Total en Pipeline:</span>
+<span class="text-stone-700 font-headline font-bold text-lg">RD$ 45.2M</span>
+</div>
+</div>
+<button class="bg-[#e11d48] text-white px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-rose-700 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-lg">add</span>
+                    Agregar Trato
+                </button>
+</div>
+<div class="flex items-center justify-between border-t border-[#E7E5E0] pt-5">
+<div class="flex items-center gap-3">
+<!-- Filter Pill: Agent -->
+<div class="flex items-center gap-2 px-3 py-1.5 bg-white border border-stone-200 rounded-lg cursor-pointer hover:border-stone-400 transition-colors">
+<span class="material-symbols-outlined text-stone-400 text-lg">person</span>
+<span class="text-sm font-medium text-stone-600">Todos los Agentes</span>
+<span class="material-symbols-outlined text-stone-400 text-lg">expand_more</span>
+</div>
+<!-- Filter Pill: Date -->
+<div class="flex items-center gap-2 px-3 py-1.5 bg-white border border-stone-200 rounded-lg cursor-pointer hover:border-stone-400 transition-colors">
+<span class="material-symbols-outlined text-stone-400 text-lg">calendar_today</span>
+<span class="text-sm font-medium text-stone-600">Este Mes</span>
+<span class="material-symbols-outlined text-stone-400 text-lg">expand_more</span>
+</div>
+</div>
+<div class="bg-stone-200 p-1 rounded-lg flex">
+<button class="bg-white px-4 py-1.5 rounded-md text-sm font-semibold shadow-sm flex items-center gap-2 text-stone-800">
+<span class="material-symbols-outlined text-sm">view_kanban</span>
+                        Kanban
+                    </button>
+<button class="px-4 py-1.5 rounded-md text-sm font-medium text-stone-500 flex items-center gap-2 hover:text-stone-700">
+<span class="material-symbols-outlined text-sm">view_list</span>
+                        Lista
+                    </button>
+</div>
+</div>
+</section>
+<!-- KANBAN BOARD CANVAS -->
+<section class="flex-1 overflow-x-auto px-8 pb-8 flex gap-5 items-start">
+<!-- Column 1: NUEVO LEAD -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-stone-500 tracking-wider uppercase">NUEVO LEAD</h3>
+<span class="bg-stone-200 text-stone-600 text-[10px] font-bold px-1.5 py-0.5 rounded">8</span>
+</div>
+<span class="text-[11px] font-bold text-stone-400">RD$ 12.4M</span>
+</div>
+<!-- Card 1.1 -->
+<div class="bg-white rounded-lg border border-stone-200 shadow-[0_1px_3px_rgba(28,25,23,0.08)] p-3 hover:border-rose-300 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-stone-100 shrink-0">
+<img alt="Property" class="w-full h-full object-cover" data-alt="modern luxury apartment interior with high ceilings and city views through large windows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCieivuJqJqciEFVFrrvASeJebpb19rbbr3L_qRUKYDybA0-2JxrdJ_s-Hz5ZJ1GUggsxFOj7kbeKPgf7A0QYQe6Bzth3AVVdeFuS7zV8b-ZhkcEK7OiCdnz8i6sDYYamqkEjeSCzG8mv4n4r3abG5zE3NDzR6Ut0-wwDd1pA-M1pA1CyMzR5_GalO3kgwcUoGK9ol9EoFesC2qQk1e4oa9URyIAxuGTDdZvIsrf1IthNK40MI9pO-wDL22cPA0dpkt27Czq1UB1hc"/>
+</div>
+<span class="material-symbols-outlined text-stone-300 group-hover:text-stone-400 cursor-grab">drag_indicator</span>
+</div>
+<h4 class="text-sm font-semibold text-stone-900 leading-tight mb-1">Apto 3H en Torre Loft, Piantini</h4>
+<div class="flex items-center gap-2 mb-3">
+<img alt="Client" class="w-5 h-5 rounded-full" data-alt="headshot of a smiling middle-aged woman with professional attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBc1l_o6XZv4XC0qEvaNJLFQ_Q5xNmmQHIrez4WBNf9pWXo4zOJyTYo_MPhtFc914AvXS-I7aZ2sZ8ilcnQ1ARovjTjRrHP8rOUqsJPInxi1Q7sRU4bB8xeZ4rDX73w-_p0PqtwsDCeUG9XP79VIfvVkYF3CspRJUEgWEXTjdynRgwJxR8ypcWL6aly6_ZKlFtBlQGeVP0zlesk8-wCBzD2NtBRaLV4-3yPbh-3QFm-jnWYEXiy94d8aTEQAoRvFNhp9UAANI2u0HY"/>
+<span class="text-xs text-stone-500 font-medium">Maria Santos</span>
+</div>
+<div class="flex justify-between items-end border-t border-stone-100 pt-3">
+<span class="font-headline font-bold text-[#1C1917]">RD$ 4.2M</span>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-stone-400 font-medium italic">Hace 2h</span>
+<div class="bg-emerald-50 text-emerald-600 p-1 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">chat</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column Add Placeholder -->
+<button class="w-full border-2 border-dashed border-stone-200 rounded-lg py-3 flex items-center justify-center text-stone-400 hover:border-stone-300 hover:text-stone-500 transition-all">
+<span class="material-symbols-outlined text-lg">add</span>
+</button>
+</div>
+<!-- Column 2: CALIFICADO -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-stone-500 tracking-wider uppercase">CALIFICADO</h3>
+<span class="bg-stone-200 text-stone-600 text-[10px] font-bold px-1.5 py-0.5 rounded">7</span>
+</div>
+<span class="text-[11px] font-bold text-stone-400">RD$ 10.8M</span>
+</div>
+<!-- Card 2.1 -->
+<div class="bg-white rounded-lg border border-stone-200 shadow-[0_1px_3px_rgba(28,25,23,0.08)] p-3 hover:border-rose-300 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-stone-100 shrink-0">
+<img alt="Property" class="w-full h-full object-cover" data-alt="exterior of a contemporary white house with manicured lawn and large glass panels" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5OCYyqKmRhDem0XM9LnnGH6j9bje1KjJt_qqXkBHN4t6dbjxkMp45ibJo-SmwPIXk9E7-C7tcF6YAXMetnnEow6TFmCZ2puD0ImPo1etsLLq1VrvR8eTXiqBD8RcJqXMzX9IMJ4epTiaKjnb5ubCDWJ0xL7ClTKwfC0PB1lWCPQKXLMRWVu4W8bzonUswOJicD31acBrJUFlp-WW3ndsV65eaKWiKLM0i-3RfXp0ywg2T1JD4G0PCb71K-EesBwO5bUkRrnbkvOQ"/>
+</div>
+<span class="bg-[#FEF2F2] text-[#e11d48] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Interés alto</span>
+</div>
+<h4 class="text-sm font-semibold text-stone-900 leading-tight mb-1">Villa en Casa de Campo, Romana</h4>
+<div class="flex items-center gap-2 mb-3">
+<img alt="Client" class="w-5 h-5 rounded-full" data-alt="headshot of a smiling young professional man in a blue shirt" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWT7EF63--UN2IgJ_qJGtgplDJk_nEgGjlQcUULrQbUhhG1UG_gWoeZPytDVGvJzMOu8QJ8UV8XGyKpKnZCKtdtvcE3Mt1_Ej6JT_OozdpAwjIQbwE7InNe-JkB56opPJSAkJ8UEJ8Mx-H_mOYGnEEI2moVjjz5CLdbPvAgyQ7_t-Ey9G2ZvZn5m2fwF29pqMj-N1ziELYb-ccu6GXb96hv1y92TDcvAfZe_2IWnrxdT2V468-umOcYPY5GsrX7wHjgfoOiohvQBU"/>
+<span class="text-xs text-stone-500 font-medium">Jose Rodriguez</span>
+</div>
+<div class="flex justify-between items-end border-t border-stone-100 pt-3">
+<span class="font-headline font-bold text-[#1C1917]">RD$ 2.1M</span>
+<div class="flex items-center gap-2">
+<span class="text-[10px] text-stone-400 font-medium">Hace 1 día</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 3: PROPUESTA ENVIADA -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-stone-500 tracking-wider uppercase">PROPUESTA ENVIADA</h3>
+<span class="bg-stone-200 text-stone-600 text-[10px] font-bold px-1.5 py-0.5 rounded">6</span>
+</div>
+<span class="text-[11px] font-bold text-stone-400">RD$ 9.1M</span>
+</div>
+<!-- Card 3.1 -->
+<div class="bg-white rounded-lg border border-stone-200 shadow-[0_1px_3px_rgba(28,25,23,0.08)] p-3 hover:border-rose-300 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-stone-100 shrink-0">
+<img alt="Property" class="w-full h-full object-cover" data-alt="spacious open plan living room with high-end designer furniture and warm evening lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCx8mAqpQOc2KPFCJLMeFAEXkyChk1QW6zwT_sOpHj-3Nlijf07Tr-4KwR8mLPmUNJ8haYqDN0i2LBA0jvCOjtz4a0Exp6ujynLa3QmvmOvXXmshJ-cx2dwb0AkINkeAuBoiGDhIaxWzqy9Qo7iRDUIA1k6neEIyhxQpANXBSDFQjwlE1G3BV_CMaME3WNXDvFcdi1kwTYcJaYD2-X8UTpXrZIVTyd3ov005Qd8_w2O7hoCOl1a0kgascmkSctE0VgEajEZ8_UurzY"/>
+</div>
+<span class="bg-[#FFFBEB] text-[#D97706] text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Respuesta pendiente 3 días</span>
+</div>
+<h4 class="text-sm font-semibold text-stone-900 leading-tight mb-1">Local Comercial, Av. Winston</h4>
+<div class="flex items-center gap-2 mb-3">
+<img alt="Client" class="w-5 h-5 rounded-full" data-alt="professional portrait of a woman with glasses and confident posture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVjqiw_nWUvRty9kNe7cYOU2tb08PkW0zTRF7A6IsHcvA7gEYY9-AU5HMxP6DjbIwt6fXOFdRbVW2YHi0Vjt3rRLFwZVqHEVwyg_mp0ORcL-_53gnWmgfCPb4FGSLw_eIeaMfcjyC7_xrQ-2TKzmHI5vRUvA56D-Y6IGaizit5z83WSwhtFEjjxJ19frVbvDhjpXaghAyUUgDMKzoa2CyWzFNfyW0oUX-zVW2e-6e4e_IttTRQmzav3Xuirwiz1GlNeUUEHh2VouE"/>
+<span class="text-xs text-stone-500 font-medium">Elena Guzman</span>
+</div>
+<div class="flex justify-between items-end border-t border-stone-100 pt-3">
+<span class="font-headline font-bold text-[#1C1917]">RD$ 3.5M</span>
+<div class="flex -space-x-1">
+<div class="w-5 h-5 rounded-full border-2 border-white bg-slate-300 flex items-center justify-center text-[8px] font-bold text-white">EP</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 4: NEGOCIACIÓN -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-stone-500 tracking-wider uppercase">NEGOCIACIÓN</h3>
+<span class="bg-stone-200 text-stone-600 text-[10px] font-bold px-1.5 py-0.5 rounded">7</span>
+</div>
+<span class="text-[11px] font-bold text-stone-400">RD$ 8.6M</span>
+</div>
+<!-- Card 4.1 -->
+<div class="bg-white rounded-lg border border-rose-200 shadow-[0_2px_8px_rgba(225,29,72,0.06)] p-3 hover:border-rose-400 transition-all cursor-pointer group ring-1 ring-rose-50">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-stone-100 shrink-0">
+<img alt="Property" class="w-full h-full object-cover" data-alt="modern minimalist bedroom with large windows overlooking a serene landscape at sunrise" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgajcIfryda62MuzY-nWnPVYrUGarROPYe05Clhx3w_ZF20vTCRaYlPkWIrF3Js931ymc3zyYeMKTvbCs5fvpf8FkdxJ3nhPoqEb2RJsllgeCzZ97s0MYZfRuRSehn27qx93V5tSF2KEZCQNW2HzR6m4yKOdh88yCxJRAvygmP-QGf5TSztQY-rDJz6JYrhX1xmcjVbLDTgBjuMBZjHgh8S-EXT5bwIqvZMe1lg8JB0F9LSzXs6oZKBXRMnrv7kmIB_mU_tG_mx7E"/>
+</div>
+<span class="bg-[#e11d48] text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">timer</span>
+                            Vence hoy
+                        </span>
+</div>
+<h4 class="text-sm font-semibold text-stone-900 leading-tight mb-1">Penthouse en Naco - Piso 12</h4>
+<div class="flex items-center gap-2 mb-2">
+<img alt="Client" class="w-5 h-5 rounded-full" data-alt="older distinguished gentleman with a friendly expression in formal attire" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD9tkWLotxqrV1shMqlfnj1gBVFcqaRe-LxJVvoqoKL8JxKlfysCO-ymx632pTNGwnjn0YDSXDhVReN5NKIcZrvTR1OTYIwBZRvGirBW9NtAb5T7MI6LjnP3K7YYe-nEEKf6EvpxzLcBbP72D0J5cwqink4Otr1BwsPH3IWP1SYKtxfHLxI7Xt_06Zbsdz2FKkuSF26LTi1win7zR6Rxa-eS9nTJ01yTfcWcvNyzOnb-mg1GJLfGozxTyyuvm-izTfsBuOiXhphybM"/>
+<span class="text-xs text-stone-500 font-medium">Pedro Martínez</span>
+</div>
+<div class="bg-[#F5F4F1] rounded p-2 mb-3">
+<div class="flex justify-between items-center text-[10px] mb-1">
+<span class="text-stone-400 uppercase font-bold tracking-tighter">Oferta</span>
+<span class="text-stone-700 font-bold">RD$ 3.8M</span>
+</div>
+<div class="flex justify-between items-center text-[10px]">
+<span class="text-stone-400 uppercase font-bold tracking-tighter">Pedido</span>
+<span class="text-stone-700 font-bold">RD$ 4.2M</span>
+</div>
+</div>
+<div class="flex justify-between items-end border-t border-stone-100 pt-3">
+<span class="font-headline font-bold text-[#1C1917]">RD$ 4.2M</span>
+<div class="flex items-center gap-1">
+<div class="h-1.5 w-8 bg-stone-200 rounded-full overflow-hidden">
+<div class="h-full w-4/5 bg-[#e11d48]"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Column 5: CERRADO ✓ -->
+<div class="kanban-column flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<div class="flex items-center gap-2">
+<h3 class="font-bold text-xs text-stone-500 tracking-wider uppercase">CERRADO ✓</h3>
+<span class="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded">6</span>
+</div>
+<span class="text-[11px] font-bold text-stone-400">RD$ 4.3M</span>
+</div>
+<!-- Card 5.1 -->
+<div class="bg-[#F0FDF4] rounded-lg border border-emerald-100 shadow-[0_1px_3px_rgba(5,150,105,0.05)] p-3 hover:border-emerald-200 transition-all cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-stone-100 shrink-0">
+<img alt="Property" class="w-full h-full object-cover" data-alt="front view of a large luxurious colonial style house at dusk with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQU4-H4Rpmpi4iIzRiECYqY6Wvv-RoyQt58RYRhtJ0WJiwaXCClCJbUguiIojRew66H41U6av4xqA9bgFUTLVzGL92SazXZBTO6EHpRefelAIz5SqLgwR70pQWZvngE_OvAjQVg7BZLDDg8z-JhYH95fS8Jj3OWEQ1FJhaI4Tu-oP2Y4rwxn47S1QxGeL9vBqj-wUnnEdQ1GDSnGifPoGtBIz9tiXTtx_8Arvl2nVNx7idAYUL4Nf-If4tbpDBrgsaV5Q-WucaFFI"/>
+</div>
+<div class="bg-emerald-500 text-white rounded-full p-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px]">check</span>
+</div>
+</div>
+<h4 class="text-sm font-semibold text-emerald-900 leading-tight mb-1">Townhouse, El Millón</h4>
+<div class="flex items-center gap-2 mb-3">
+<img alt="Client" class="w-5 h-5 rounded-full" data-alt="professional portrait of a young woman with a friendly gaze and natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtneqnETfIqWfr55OJw8yj8SXvM7iY6EZZBrAo9_ByOvY1MYZaYsIS1Ko8aVTsqzKQ8IIAYyy0FYuAUMX1XXTBq3-i8TfqMHFANvtNmqrtUJj2SDC7Nj0JcfeD60YETL69cF-DhAqfMG1aUQuRwYiRQ1BQPm1MvImM96mhAMKJQB64vHygGLuqVJqVh0yuGs-DKVhN4axFEbWObB3MA-f2qV09rJ1st42dUrXd8svIREYNuSA7KtPBkZ2P9jKr9WtEghbV112bgCY"/>
+<span class="text-xs text-emerald-700 font-medium">Sonia Ruiz</span>
+</div>
+<div class="flex justify-between items-end border-t border-emerald-100 pt-3">
+<span class="font-headline font-bold text-emerald-800">RD$ 1.8M</span>
+<span class="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">Cerrado Oct 12</span>
+</div>
+</div>
+<!-- Card 5.2 -->
+<div class="bg-[#F0FDF4] rounded-lg border border-emerald-100 shadow-[0_1px_3px_rgba(5,150,105,0.05)] p-3 hover:border-emerald-200 transition-all cursor-pointer group opacity-80">
+<div class="flex justify-between items-start mb-2">
+<div class="w-10 h-10 rounded-md overflow-hidden bg-stone-100 shrink-0">
+<img alt="Property" class="w-full h-full object-cover" data-alt="bright modern kitchen with marble island and sleek wood cabinetry" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB88b_N5fAPHC5hspX6XWiYfpgCOxxJmWDU4Hy1Vv7n2ufDtRjSsQS8gHEliZSj4VZ28rhaPQekeQUlwq0rppUjZAa_P0GCFDoIMFG-2_0lPzkdaQXIt5xXDV-VO7TjH9Sg0ULVA9JHFbwntC3C2VQzlH9jOs7XVUgLOmfJUsO6AUlmpxk_n3VmvHvH5Al66Rsro07PEoGn5imXM092AhOzFiZMJcldF8fbyr_NnpRtdXV7Dp3i7bU-ijx5qmlaD4b8TGd50w7fodQ"/>
+</div>
+<div class="bg-emerald-500 text-white rounded-full p-1 flex items-center justify-center">
+<span class="material-symbols-outlined text-[10px]">check</span>
+</div>
+</div>
+<h4 class="text-sm font-semibold text-emerald-900 leading-tight mb-1">Studio Loft, Zona Colonial</h4>
+<div class="flex items-center gap-2 mb-3">
+<img alt="Client" class="w-5 h-5 rounded-full" data-alt="headshot of a smiling man with facial hair in a relaxed setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDE-OHS9x_gcb5xdSHj9_SbZIAAjcjNoDswQYo2XcLy2PEoNqISIPD031dKKWAN7rziQ6JFQLHSs6RCEEQry2astaiy5zlLNODm8OxEylDx5mhCuAMGyH_A8syaZWBhfwzU2Dw3DN3WRbgnkA5LnSuCdP2wtVU5fLWIJf-WpsLMuJ3v-z1ISiY2F0kGalkhEth56Xzjt8DtlKDUv3ydNiN8lexJbIH3KOtvhnZcqiMXwA3SrA8YfweDYwC8NvSTMLapCfjf-9lLi0Q"/>
+<span class="text-xs text-emerald-700 font-medium">Marcio Diaz</span>
+</div>
+<div class="flex justify-between items-end border-t border-emerald-100 pt-3">
+<span class="font-headline font-bold text-emerald-800">RD$ 0.9M</span>
+<span class="text-[10px] text-emerald-600 font-bold uppercase tracking-tight">Cerrado Oct 05</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advance Estate — Brand Identity System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#d3daef",
+                    "on-background": "#141b2b",
+                    "inverse-on-surface": "#edf0ff",
+                    "on-secondary-container": "#5c6274",
+                    "on-secondary-fixed": "#141b2b",
+                    "inverse-surface": "#293040",
+                    "on-surface": "#141b2b",
+                    "surface-container-high": "#e1e8fd",
+                    "on-tertiary-fixed-variant": "#38485d",
+                    "primary-fixed-dim": "#ffb3b6",
+                    "primary-container": "#e11d48",
+                    "secondary": "#575e70",
+                    "tertiary-fixed": "#d3e4fe",
+                    "background": "#f9f9ff",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#dce2f7",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container": "#e9edff",
+                    "on-surface-variant": "#5c3f40",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "primary": "#b80035",
+                    "surface-tint": "#be0037",
+                    "on-tertiary-container": "#fcfbff",
+                    "secondary-container": "#d9dff5",
+                    "on-tertiary-fixed": "#0b1c30",
+                    "on-primary-fixed": "#40000c",
+                    "tertiary-container": "#65758c",
+                    "tertiary": "#4d5c72",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f1f3ff",
+                    "surface-variant": "#dce2f7",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#920028",
+                    "primary-fixed": "#ffdada",
+                    "on-primary-container": "#fffaf9",
+                    "secondary-fixed-dim": "#c0c6db",
+                    "surface-bright": "#f9f9ff",
+                    "outline": "#906f70",
+                    "inverse-primary": "#ffb3b6",
+                    "outline-variant": "#e5bdbe",
+                    "surface-container-highest": "#dce2f7",
+                    "on-secondary-fixed-variant": "#404758",
+                    "surface": "#f9f9ff",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#b7c8e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope", "sans-serif"],
+                    "body": ["Manrope", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .label-text {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopNavBar Implementation from JSON -->
+<nav class="bg-slate-950 flex justify-between items-center w-full px-8 h-16 fixed top-0 z-50">
+<div class="font-manrope text-xl tracking-tighter uppercase font-black text-white">
+            ADVANCE ESTATE
+        </div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-slate-400 font-medium pb-1 font-manrope text-sm tracking-tight hover:text-rose-500 transition-colors duration-200" href="#">Market</a>
+<a class="text-slate-400 font-medium pb-1 font-manrope text-sm tracking-tight hover:text-rose-500 transition-colors duration-200" href="#">Inventory</a>
+<a class="text-slate-400 font-medium pb-1 font-manrope text-sm tracking-tight hover:text-rose-500 transition-colors duration-200" href="#">Analytics</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white transition-all scale-95 active:opacity-80">notifications</span>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer hover:text-white transition-all scale-95 active:opacity-80">settings</span>
+<div class="w-8 h-8 bg-slate-800 flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="professional real estate agent profile headshot in high-end office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCA6o_DzC02rvKoNlsmtSwO0VSMNsVpEQ80pPCIpx_Uk3bgsq6lXJ2td0nQIweCfKbuKdnCPoKicMWn0AwnND4AsemG4tTerIdOLIzkbYRpRi8mojxRwMyGH9L0cFU_MNFMiiYxrGznSO8VafenzQBw6JWEtGsIgB1n7io6vTIYneFZrZUqntbaiLIMglbx67fP5fdhvHbaS6pzfdl_GROHpNN279P80fdBSF-TvQKGHAkDKjAy_-I2vDPJwlz1RhOIeY92JkCjbZU"/>
+</div>
+</div>
+</nav>
+<main class="max-w-[880px] mx-auto py-32 px-12 bg-surface-container-lowest min-h-screen">
+<!-- Section 1: Header -->
+<header class="mb-16">
+<h2 class="label-text text-[10px] tracking-[0.2em] font-semibold text-on-surface-variant mb-2 uppercase">
+                ADVANCE ESTATE — BRAND IDENTITY SYSTEM
+            </h2>
+<h1 class="font-headline text-4xl font-extrabold tracking-tighter text-on-background mb-6">
+                AE Monogram — Identity Mark v2
+            </h1>
+<div class="h-[1px] w-full bg-[#e11d48]"></div>
+</header>
+<!-- Section 2 & 3: Primary and Inverse Monogram Displays -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+<!-- Light Monogram Card -->
+<div class="w-[360px] h-[280px] border border-outline-variant flex items-center justify-center bg-white mx-auto md:mx-0">
+<svg fill="none" height="120" viewbox="0 0 120 120" width="120" xmlns="http://www.w3.org/2000/svg">
+<!-- A Stems -->
+<path d="M20 100L39 20" stroke="#111827" stroke-linecap="square" stroke-width="7"></path>
+<path d="M39 20L56 100" stroke="#111827" stroke-linecap="square" stroke-width="7"></path>
+<!-- E Stems -->
+<rect fill="#111827" height="80" width="7" x="64" y="20"></rect>
+<rect fill="#111827" height="7" width="36" x="64" y="20"></rect>
+<rect fill="#111827" height="7" width="36" x="64" y="93"></rect>
+<!-- Shared Crossbar -->
+<rect fill="#e11d48" height="7" id="shared-crossbar" width="80" x="20" y="56"></rect>
+</svg>
+</div>
+<!-- Dark Monogram Card -->
+<div class="w-[360px] h-[280px] bg-[#111827] flex items-center justify-center mx-auto md:mx-0">
+<svg fill="none" height="120" viewbox="0 0 120 120" width="120" xmlns="http://www.w3.org/2000/svg">
+<!-- A Stems (Inverse) -->
+<path d="M20 100L39 20" stroke="#FFFFFF" stroke-linecap="square" stroke-width="7"></path>
+<path d="M39 20L56 100" stroke="#FFFFFF" stroke-linecap="square" stroke-width="7"></path>
+<!-- E Stems (Inverse) -->
+<rect fill="#FFFFFF" height="80" width="7" x="64" y="20"></rect>
+<rect fill="#FFFFFF" height="7" width="36" x="64" y="20"></rect>
+<rect fill="#FFFFFF" height="7" width="36" x="64" y="93"></rect>
+<!-- Shared Crossbar (Static) -->
+<rect fill="#e11d48" height="7" id="shared-crossbar" width="80" x="20" y="56"></rect>
+</svg>
+</div>
+</section>
+<!-- Section 4: Concept Callout -->
+<section class="mb-16 p-8 bg-[#FFF1F2] border-l-[3px] border-[#e11d48]">
+<h3 class="label-text text-xs font-bold uppercase tracking-wider mb-3 text-[#e11d48]">The Horizontal Anchor</h3>
+<p class="font-body text-sm leading-relaxed text-on-surface max-w-xl">
+                The AE Monogram is anchored by a singular, uninterrupted horizontal stroke. This shared crossbar represents the "unyielding horizon" of luxury real estate—bridging the gap between architectural precision (the 'A') and the elegance of high-end estate management (the 'E'). This element must remain consistently rendered in <span class="font-bold">Primary Red (#e11d48)</span> regardless of background context.
+            </p>
+</section>
+<!-- Section 5: Usage Rules -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+<div>
+<h3 class="label-text text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-6">01 / Minimum Sizes</h3>
+<div class="space-y-4">
+<div class="flex items-end gap-6">
+<div class="flex flex-col items-center">
+<div class="w-6 h-6 bg-slate-900 mb-2"></div>
+<span class="label-text text-[9px] text-on-surface-variant">24PX DIGITAL</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 bg-slate-900 mb-2"></div>
+<span class="label-text text-[9px] text-on-surface-variant">8MM PRINT</span>
+</div>
+</div>
+</div>
+</div>
+<div>
+<h3 class="label-text text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-6">02 / Clear Space</h3>
+<p class="font-body text-xs leading-relaxed text-on-surface-variant">
+                    To maintain visual integrity, the monogram must be surrounded by a clear space zone equivalent to the width of the 'E' arm (36 units in the coordinate system). No other graphical elements should infringe upon this perimeter.
+                </p>
+</div>
+</section>
+<!-- Section 6: Color Palette -->
+<section class="mb-24">
+<h3 class="label-text text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-8">03 / Color Architecture</h3>
+<div class="grid grid-cols-1 gap-4">
+<!-- Red -->
+<div class="flex items-center gap-6 p-4 bg-surface-container-low">
+<div class="w-20 h-20 bg-[#e11d48]"></div>
+<div>
+<div class="font-headline font-extrabold text-lg tracking-tight">Primary Red</div>
+<div class="label-text text-[11px] text-on-surface-variant uppercase space-x-4">
+<span>HEX: #e11d48</span>
+<span>RGB: 225, 29, 72</span>
+<span>CMYK: 0, 95, 60, 0</span>
+</div>
+</div>
+</div>
+<!-- Obsidian -->
+<div class="flex items-center gap-6 p-4 bg-surface-container-low">
+<div class="w-20 h-20 bg-[#111827]"></div>
+<div>
+<div class="font-headline font-extrabold text-lg tracking-tight">Obsidian</div>
+<div class="label-text text-[11px] text-on-surface-variant uppercase space-x-4">
+<span>HEX: #111827</span>
+<span>RGB: 17, 24, 39</span>
+<span>CMYK: 85, 75, 55, 70</span>
+</div>
+</div>
+</div>
+<!-- Warm White -->
+<div class="flex items-center gap-6 p-4 bg-surface-container-low">
+<div class="w-20 h-20 bg-[#FAFAF9] border border-outline-variant"></div>
+<div>
+<div class="font-headline font-extrabold text-lg tracking-tight">Warm White</div>
+<div class="label-text text-[11px] text-on-surface-variant uppercase space-x-4">
+<span>HEX: #FAFAF9</span>
+<span>RGB: 250, 250, 249</span>
+<span>CMYK: 0, 0, 1, 2</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 7: Footer -->
+<footer class="pt-8 border-t border-surface-variant">
+<div class="flex justify-between items-start">
+<div class="label-text text-[9px] text-on-secondary-container tracking-widest uppercase">
+                    CONFIDENTIAL DOCUMENT / PROPERTY OF ADVANCE ESTATE LUXURY GROUP
+                </div>
+<div class="label-text text-[9px] text-on-secondary-container tracking-widest uppercase text-right max-w-[240px]">
+                    FOR INTERNAL USE ONLY. UNAUTHORIZED REPRODUCTION OR DISTRIBUTION IS STRICTLY PROHIBITED.
+                </div>
+</div>
+</footer>
+</main>
+<!-- SideNavBar Implementation from JSON (Contextually hidden on brand sheet but added for integrity) -->
+<aside class="hidden lg:flex fixed left-0 top-16 bg-slate-900 flex-col h-[calc(100vh-64px)] py-8 px-4 gap-4 w-64 border-r border-slate-800">
+<div class="px-4 mb-6">
+<div class="font-manrope text-lg tracking-tighter font-black text-white">ADVANCE ESTATE</div>
+<div class="font-manrope text-[10px] uppercase tracking-widest font-semibold text-slate-500">Luxury CRM Portal</div>
+</div>
+<nav class="space-y-1">
+<div class="bg-slate-800 text-rose-500 font-bold flex items-center gap-3 px-4 py-3 cursor-pointer group transition-all">
+<span class="material-symbols-outlined text-sm">dashboard</span>
+<span class="font-manrope text-xs uppercase tracking-widest">Dashboard</span>
+</div>
+<div class="text-slate-400 flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-slate-800 hover:text-white transition-all active:translate-x-1">
+<span class="material-symbols-outlined text-sm">domain</span>
+<span class="font-manrope text-xs uppercase tracking-widest">Listings</span>
+</div>
+<div class="text-slate-400 flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-slate-800 hover:text-white transition-all active:translate-x-1">
+<span class="material-symbols-outlined text-sm">group</span>
+<span class="font-manrope text-xs uppercase tracking-widest">Contacts</span>
+</div>
+<div class="text-slate-400 flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-slate-800 hover:text-white transition-all active:translate-x-1">
+<span class="material-symbols-outlined text-sm">leaderboard</span>
+<span class="font-manrope text-xs uppercase tracking-widest">Leads</span>
+</div>
+</nav>
+<div class="mt-auto space-y-1 pt-8 border-t border-slate-800">
+<div class="text-slate-400 flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-slate-800 hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">help</span>
+<span class="font-manrope text-xs uppercase tracking-widest">Support</span>
+</div>
+<div class="text-slate-400 flex items-center gap-3 px-4 py-3 cursor-pointer group hover:bg-slate-800 hover:text-white transition-all">
+<span class="material-symbols-outlined text-sm">logout</span>
+<span class="font-manrope text-xs uppercase tracking-widest">Logout</span>
+</div>
+</div>
+</aside>
+</body></html>

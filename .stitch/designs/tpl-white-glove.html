@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&amp;family=Inter:wght@300;400;500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#B08D57", // Warm Gold
+                        "background": "#FFFFFF",
+                        "surface": "#FFFFFF",
+                        "on-background": "#1A1A1A",
+                        "accent-gold": "#B08D57",
+                        "soft-gray": "#F4F4F4",
+                    },
+                    fontFamily: {
+                        "serif": ["Cormorant Garamond", "serif"],
+                        "sans": ["Inter", "sans-serif"],
+                    }
+                },
+            }
+        }
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                @apply bg-background text-on-background font-sans antialiased;
+            }
+            h1, h2, h3, .serif-display {
+                @apply font-serif;
+            }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;
+            font-size: 20px;
+        }
+        .kpi-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fcfcfc 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.02);}
+        .nav-icon-active {
+            color: #B08D57;
+            position: relative;
+        }
+        .nav-icon-active::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 25%;
+            height: 50%;
+            width: 1px;
+            background-color: #B08D57;
+        }.section-spacing {
+            padding-top: 5rem;
+            padding-bottom: 5rem;
+        }
+    </style>
+</head>
+<body>
+<aside class="fixed inset-y-0 left-0 w-[72px] bg-white border-r border-gray-50 flex flex-col items-center py-10 z-50">
+<div class="mb-12">
+<div class="w-8 h-8 border border-accent-gold flex items-center justify-center">
+<span class="font-serif text-accent-gold text-xs italic">A</span>
+</div>
+</div>
+<nav class="flex flex-col gap-10 items-center w-full">
+<a class="nav-icon-active text-accent-gold group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+</a>
+<a class="text-gray-300 hover:text-accent-gold transition-colors" href="#">
+<span class="material-symbols-outlined">contacts</span>
+</a>
+<a class="text-gray-300 hover:text-accent-gold transition-colors" href="#">
+<span class="material-symbols-outlined">account_tree</span>
+</a>
+<a class="text-gray-300 hover:text-accent-gold transition-colors" href="#">
+<span class="material-symbols-outlined">real_estate_agent</span>
+</a>
+<a class="text-gray-300 hover:text-accent-gold transition-colors" href="#">
+<span class="material-symbols-outlined">chat</span>
+</a>
+<a class="text-gray-300 hover:text-accent-gold transition-colors" href="#">
+<span class="material-symbols-outlined">analytics</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-8 items-center">
+<button class="text-gray-300 hover:text-accent-gold transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="Profile" class="w-8 h-8 rounded-full grayscale hover:grayscale-0 transition-all object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV6R09Ph08QcQk-Xf__v07AE23DqWr4x52jA-CsrCFQfKNeJyKR1hzvNchxsQo619lXTPTVO-o8KmR_W18HnAtBukcFgeuCOFiF7idLZpwz-l1JnPxsWIBma3_H5hJETeb8qPzAffaVg9AIWoNXaSZfjvP79qOeSs4M9WLTbBYC4sDCut3Fl0cZnAbEOsZ8sd3NZOGO_w8J2_3cOtjX3aqDnEb4b1ugm03JzVqY0-0s2o61O5smbcfz8rcvaHK4hh_RmYiDGe2WUg"/>
+</div>
+</aside>
+<main class="ml-[72px] min-h-screen bg-white selection:bg-accent-gold/20">
+<header class="px-16 pt-16 pb-8 flex justify-between items-end">
+<div>
+<span class="text-[10px] uppercase tracking-[0.4em] text-accent-gold mb-4 block">Private Portfolio</span>
+<h1 class="text-5xl font-light text-on-background italic">Resumen Ejecutivo</h1>
+</div>
+<div class="flex items-center gap-12">
+<div class="relative group">
+<input class="border-none focus:ring-0 text-sm font-light w-48 placeholder:text-gray-300 transition-all focus:w-64 bg-transparent" placeholder="Buscar..." type="text"/>
+<div class="absolute bottom-0 left-0 w-full h-[1px] bg-gray-100 group-focus-within:bg-accent-gold transition-all"></div>
+</div>
+<button class="flex items-center gap-3 group">
+<span class="text-[10px] uppercase tracking-[0.2em] font-medium group-hover:text-accent-gold transition-colors">Nuevo Registro</span>
+<span class="material-symbols-outlined text-accent-gold font-light">add</span>
+</button>
+</div>
+</header>
+<div class="px-16 pb-24 space-y-24">
+<section class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="kpi-card p-10 flex flex-col justify-between h-48">
+<span class="text-[10px] uppercase tracking-[0.3em] text-gray-400">Contactos</span>
+<div>
+<div class="serif-display text-4xl text-on-background">248</div>
+<div class="text-[10px] text-accent-gold mt-2">+12% Incremento mensual</div>
+</div>
+</div>
+<div class="kpi-card p-10 flex flex-col justify-between h-48">
+<span class="text-[10px] uppercase tracking-[0.3em] text-gray-400">Patrimonio en Pipeline</span>
+<div>
+<div class="serif-display text-4xl text-on-background">45.2M <span class="text-lg italic text-gray-400">RD$</span></div>
+<div class="text-[10px] text-accent-gold mt-2">+8% Valor proyectado</div>
+</div>
+</div>
+<div class="kpi-card p-10 flex flex-col justify-between h-48">
+<span class="text-[10px] uppercase tracking-[0.3em] text-gray-400">Operaciones</span>
+<div>
+<div class="serif-display text-4xl text-on-background">34</div>
+<div class="text-[10px] text-gray-400 mt-2">Propuestas activas</div>
+</div>
+</div>
+<div class="kpi-card p-10 flex flex-col justify-between h-48">
+<span class="text-[10px] uppercase tracking-[0.3em] text-gray-400">Conversión</span>
+<div>
+<div class="serif-display text-4xl text-on-background">18.4%</div>
+<div class="text-[10px] text-accent-gold mt-2">+1.2pp Eficiencia</div>
+</div>
+</div>
+</section>
+<section>
+<div class="flex items-baseline justify-between mb-16 border-b border-gray-50 pb-8">
+<h3 class="serif-display text-3xl italic">Distribución de Activos</h3>
+<span class="text-[10px] uppercase tracking-[0.2em] text-gray-400">Métricas por Etapa</span>
+</div>
+<div class="space-y-12 max-w-4xl">
+<div class="group">
+<div class="flex justify-between items-end mb-4">
+<span class="serif-display text-xl">Nuevo Lead</span>
+<div class="flex items-baseline gap-4">
+<span class="text-xs font-light text-gray-400">42 unidades</span>
+<span class="text-sm font-medium">8.4M RD$</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-gray-100 overflow-hidden">
+<div class="h-full bg-accent-gold w-1/4 origin-left transition-transform duration-1000"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-4">
+<span class="serif-display text-xl">Calificado</span>
+<div class="flex items-baseline gap-4">
+<span class="text-xs font-light text-gray-400">28 unidades</span>
+<span class="text-sm font-medium">12.1M RD$</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-gray-100 overflow-hidden">
+<div class="h-full bg-accent-gold w-[45%] origin-left"></div>
+</div>
+</div>
+<div class="group">
+<div class="flex justify-between items-end mb-4">
+<span class="serif-display text-xl">Negociación</span>
+<div class="flex items-baseline gap-4">
+<span class="text-xs font-light text-gray-400">8 unidades</span>
+<span class="text-sm font-medium">6.5M RD$</span>
+</div>
+</div>
+<div class="h-[1px] w-full bg-gray-100 overflow-hidden">
+<div class="h-full bg-accent-gold w-[40%] origin-left"></div>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-32">
+<div class="lg:col-span-7">
+<div class="flex items-center justify-between mb-12">
+<h3 class="serif-display text-3xl italic">Actividad Reciente</h3>
+<a class="text-[10px] uppercase tracking-[0.2em] text-accent-gold border-b border-accent-gold/30 pb-1" href="#">Ver Archivo</a>
+</div>
+<div class="space-y-12">
+<div class="flex gap-8 group">
+<img alt="Ana" class="w-12 h-12 rounded-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkVM00hqhjeLlOT2egYeG68mIUy9m-aT5HiqzrR6OzmTgMlyarxvLV8tqADGbJp-raQCiHSkiEsd2W_r6Wt8xKqyY1wE4COmprNcJ63m2JSbLmMxR3wPk9Ijcr3dYRQyzPMJmd6N8cvkKv3pyeLxtvQ0FG05wZZd1aahBuSIm7CSFlzlfw1Nmi0FT4QhVUrU9Qby4pw2_iQjUP5LrQw-BS-xtGV7CToGrSTe-VwvZstPFAFEJvBcFSBaIkZiYaI78Ra6e4cLii4DU"/>
+<div class="flex-1 border-b border-gray-50 pb-8">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-medium">Ana Maria Torres</span>
+<span class="text-[10px] uppercase text-gray-400">Hace 12 min</span>
+</div>
+<p class="serif-display text-lg text-gray-600 italic">Calificó como lead de alta prioridad para <span class="text-on-background not-italic font-light">Casa de Lujo en Casa de Campo</span></p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<img alt="Marco" class="w-12 h-12 rounded-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwDq_1VVXB3Cl2ALwnhSV1QFdRl51St2nD51BKZXSgLiyXMaKqA7DIJ3tMoqp5w3IrV356rJLcKfCEzMvCet1vx3IQbHL-tVWht0dj4CbYvmUjJl4TIsaShpPxxIC-67IuKC24U6AQ7rQEl3DPdUFGRE7t6JZtaGwy2g2Oh723BGIfSgYaZIiEMNQBWQJGdNUIQT1okZMNuw9kXwi0-vj0QdSJU2ailgNuCRUloe5UCF81_CoTnTNquj95mplr3BGNBHmCCwshnqo"/>
+<div class="flex-1 border-b border-gray-50 pb-8">
+<div class="flex justify-between items-start mb-2">
+<span class="text-sm font-medium">Marco Tulio</span>
+<span class="text-[10px] uppercase text-gray-400">Hace 45 min</span>
+</div>
+<p class="serif-display text-lg text-gray-600 italic">Cierre de operación exitoso por <span class="text-accent-gold not-italic">RD$ 4.2M</span> en Penthouse Naco</p>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-5">
+<div class="mb-12">
+<h3 class="serif-display text-3xl italic">Pendientes</h3>
+</div>
+<div class="space-y-6">
+<div class="p-8 kpi-card flex justify-between items-center group">
+<div>
+<div class="text-sm font-medium mb-1">Ricardo Almonte</div>
+<div class="text-[10px] uppercase tracking-widest text-gray-400">Villa Las Terrenas</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-[10px] text-accent-gold border border-accent-gold/20 px-2 py-1 italic">Vencido</span>
+<span class="material-symbols-outlined text-gray-300 group-hover:text-accent-gold transition-colors cursor-pointer">chat</span>
+</div>
+</div>
+<div class="p-8 kpi-card flex justify-between items-center group">
+<div>
+<div class="text-sm font-medium mb-1">Sofia Henríquez</div>
+<div class="text-[10px] uppercase tracking-widest text-gray-400">Solar Cap Cana</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-[10px] text-gray-300 italic">Hoy</span>
+<span class="material-symbols-outlined text-gray-300 group-hover:text-accent-gold transition-colors cursor-pointer">chat</span>
+</div>
+</div>
+<div class="p-8 kpi-card flex justify-between items-center group">
+<div>
+<div class="text-sm font-medium mb-1">Javier Mendez</div>
+<div class="text-[10px] uppercase tracking-widest text-gray-400">Apt. Piantini</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-[10px] text-gray-300 italic">Mañana</span>
+<span class="material-symbols-outlined text-gray-300 group-hover:text-accent-gold transition-colors cursor-pointer">chat</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

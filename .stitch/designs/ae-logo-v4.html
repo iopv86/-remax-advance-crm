@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advance Estate — AE Logo v4 (Final)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #F8F8F8;
+      color: #111827;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 64px 24px;
+    }
+
+    .sheet {
+      background: #FFFFFF;
+      max-width: 960px;
+      width: 100%;
+      padding: 64px 72px;
+    }
+
+    /* ── HEADER ─────────────────────────────── */
+    .sheet-header { margin-bottom: 0; }
+    .sheet-header .label {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #9CA3AF;
+    }
+    .sheet-header h1 {
+      font-family: 'Manrope', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+      margin-top: 6px;
+      letter-spacing: -0.01em;
+    }
+    .rule-line {
+      height: 1px;
+      background: #e11d48;
+      margin: 24px 0;
+    }
+
+    /* ── HERO DISPLAY ────────────────────────── */
+    .hero-displays {
+      display: flex;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .display-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .display-inner {
+      flex: 1;
+      min-height: 320px;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      background: #FFFFFF;
+    }
+    .display-inner.dark {
+      background: #111827;
+      border-color: #111827;
+    }
+    .display-inner img {
+      max-width: 240px;
+      max-height: 240px;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    /* Dark background version: CSS invert trick won't work for colored logos,
+       so we just show on dark bg as-is — the logo should have transparent bg */
+    .display-inner.dark img {
+      /* filter: brightness(0) invert(1); — only use if logo is pure black */
+    }
+    .display-caption {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #9CA3AF;
+      text-align: center;
+    }
+
+    /* ── FULL WIDTH HERO ─────────────────────── */
+    .hero-full {
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+      padding: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #FFFFFF;
+    }
+    .hero-full img {
+      max-width: 400px;
+      width: 100%;
+      height: auto;
+    }
+
+    /* ── SECTION HEADINGS ────────────────────── */
+    .section { margin-top: 48px; }
+    .section-title {
+      font-family: 'Manrope', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #111827;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #F3F4F6;
+    }
+
+    /* ── LOCKUPS ─────────────────────────────── */
+    .lockups-row {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 28px;
+      border: 1px solid #E5E7EB;
+      border-radius: 4px;
+    }
+    .lockup img {
+      width: 40px;
+      height: 40px;
+      object-fit: contain;
+    }
+    .lockup.dark-bg {
+      background: #111827;
+      border-color: #111827;
+    }
+    .lockup.obsidian-bg {
+      background: #0D0D0D;
+      border-color: #0D0D0D;
+    }
+    .lockup-text .brand-name {
+      font-family: 'Manrope', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      color: #111827;
+      letter-spacing: -0.01em;
+    }
+    .lockup.dark-bg .brand-name,
+    .lockup.obsidian-bg .brand-name {
+      color: #FAFAF9;
+    }
+    .lockup-text .brand-sub {
+      font-size: 9px;
+      color: #9CA3AF;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .lockup.obsidian-bg .brand-sub { color: #C9A84C; }
+
+    /* ── SIZE SCALE ──────────────────────────── */
+    .sizes-row {
+      display: flex;
+      gap: 32px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .size-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .size-item img { object-fit: contain; }
+    .size-label {
+      font-size: 10px;
+      color: #9CA3AF;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── PALETTE ─────────────────────────────── */
+    .palette { display: flex; gap: 28px; flex-wrap: wrap; }
+    .swatch-group { display: flex; flex-direction: column; gap: 10px; }
+    .swatch {
+      width: 80px;
+      height: 80px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .swatch.warm-white { border: 1px solid #E5E7EB; }
+    .swatch-meta .swatch-name {
+      font-family: 'Manrope', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .swatch-meta .swatch-hex {
+      font-size: 11px;
+      color: #6B7280;
+      margin-top: 2px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+    }
+    .swatch-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: #FFF1F2;
+      color: #e11d48;
+      border: 1px solid #FECDD3;
+      margin-top: 4px;
+    }
+
+    /* ── FOOTER ──────────────────────────────── */
+    .sheet-footer {
+      margin-top: 56px;
+      padding-top: 20px;
+      border-top: 1px solid #F3F4F6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .sheet-footer span {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #D1D5DB;
+    }
+    .badge-final {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e11d48;
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- HEADER -->
+  <div class="sheet-header">
+    <p class="label">Advance Estate — Brand Identity System</p>
+    <h1>AE Logo — Identity Mark v4 <span class="badge-final">✓ Aprobado</span></h1>
+  </div>
+  <div class="rule-line"></div>
+
+  <!-- HERO: FULL SIZE LOGO -->
+  <div class="hero-full">
+    <img src="ae-logo-final.svg" alt="Advance Estate AE logo — versión final">
+  </div>
+
+  <!-- LIGHT / DARK DISPLAYS -->
+  <div class="section">
+    <p class="section-title">Versiones primaria e inversa</p>
+    <div class="hero-displays">
+      <div class="display-card">
+        <div class="display-inner">
+          <img src="ae-logo-final.svg" alt="AE logo sobre fondo blanco">
+        </div>
+        <p class="display-caption">Primario — Fondo blanco</p>
+      </div>
+      <div class="display-card">
+        <div class="display-inner dark">
+          <img src="ae-logo-final.svg" alt="AE logo sobre fondo oscuro">
+        </div>
+        <p class="display-caption">Inverso — Fondo oscuro #111827</p>
+      </div>
+      <div class="display-card">
+        <div class="display-inner" style="background:#0D0D0D;border-color:#0D0D0D;">
+          <img src="ae-logo-final.svg" alt="AE logo sobre Obsidian">
+        </div>
+        <p class="display-caption">Obsidian — Fondo #0D0D0D</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOCKUPS -->
+  <div class="section">
+    <p class="section-title">Lockup con wordmark</p>
+    <div class="lockups-row">
+      <div class="lockup">
+        <img src="ae-logo-final.svg" alt="AE">
+        <div class="lockup-text">
+          <div class="brand-name">Advance Estate</div>
+          <div class="brand-sub">Real Estate CRM</div>
+        </div>
+      </div>
+      <div class="lockup dark-bg">
+        <img src="ae-logo-final.svg" alt="AE">
+        <div class="lockup-text">
+          <div class="brand-name">Advance Estate</div>
+          <div class="brand-sub">Real Estate CRM</div>
+        </div>
+      </div>
+      <div class="lockup obsidian-bg">
+        <img src="ae-logo-final.svg" alt="AE">
+        <div class="lockup-text">
+          <div class="brand-name">Advance Estate</div>
+          <div class="brand-sub" style="color:#C9A84C;">Real Estate CRM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIZE SCALE -->
+  <div class="section">
+    <p class="section-title">Escala del logo</p>
+    <div class="sizes-row">
+      <div class="size-item">
+        <img src="ae-logo-final.svg" width="96" height="96" alt="96px">
+        <span class="size-label">96 px</span>
+      </div>
+      <div class="size-item">
+        <img src="ae-logo-final.svg" width="64" height="64" alt="64px">
+        <span class="size-label">64 px</span>
+      </div>
+      <div class="size-item">
+        <img src="ae-logo-final.svg" width="40" height="40" alt="40px">
+        <span class="size-label">40 px</span>
+      </div>
+      <div class="size-item">
+        <img src="ae-logo-final.svg" width="24" height="24" alt="24px mín.">
+        <span class="size-label">24 px — mín.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PALETTE -->
+  <div class="section">
+    <p class="section-title">Paleta de la marca</p>
+    <div class="palette">
+      <div class="swatch-group">
+        <div class="swatch" style="background:#e11d48;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Primary Red</p>
+          <p class="swatch-hex">#E11D48</p>
+          <span class="swatch-tag">Acento</span>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch" style="background:#111827;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Obsidian</p>
+          <p class="swatch-hex">#111827</p>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch" style="background:#0D0D0D;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Deep Obsidian</p>
+          <p class="swatch-hex">#0D0D0D</p>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch warm-white" style="background:#FAFAF9;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Warm White</p>
+          <p class="swatch-hex">#FAFAF9</p>
+        </div>
+      </div>
+      <div class="swatch-group">
+        <div class="swatch" style="background:#C9A84C;"></div>
+        <div class="swatch-meta">
+          <p class="swatch-name">Obsidian Gold</p>
+          <p class="swatch-hex">#C9A84C</p>
+          <span class="swatch-tag" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;">Modo oscuro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="sheet-footer">
+    <span>Advance Estate — Asset de marca confidencial v4</span>
+    <span>Logo aprobado — Abril 2026</span>
+  </div>
+
+</div>
+</body>
+</html>

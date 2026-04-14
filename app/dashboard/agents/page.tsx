@@ -63,11 +63,11 @@ export default async function AgentsPage() {
             </p>
             <h1
               style={{
-                fontFamily: "var(--font-playfair),Georgia,serif",
+                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
                 fontWeight: 700,
                 fontSize: 30,
                 letterSpacing: "-0.02em",
-                color: "#0f172a",
+                color: "var(--foreground)",
                 lineHeight: 1.1,
               }}
             >
