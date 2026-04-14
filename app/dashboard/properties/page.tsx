@@ -44,49 +44,6 @@ export default async function PropertiesPage() {
           </button>
         </div>
 
-        {/* Filter tabs */}
-        <div className="flex items-center justify-between mb-8">
-          <div
-            className="flex items-center gap-1 p-1 rounded-lg"
-            style={{ background: "#F5F4F1" }}
-          >
-            {["Todas", "En Venta", "En Renta", "Disponible", "Reservada"].map((tab, i) => (
-              <button
-                key={tab}
-                className="px-4 py-1.5 text-xs font-bold rounded-md transition-all"
-                style={
-                  i === 0
-                    ? { background: "#e11d48", color: "white", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }
-                    : { color: "#6b7280" }
-                }
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
-          <div
-            className="flex items-center gap-1 p-1 rounded-lg"
-            style={{ background: "#F5F4F1" }}
-          >
-            <button
-              className="p-1.5 rounded-md"
-              style={{ background: "white", color: "#e11d48", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
-            >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-              </svg>
-            </button>
-            <button className="p-1.5 rounded-md text-stone-400 hover:text-stone-600 transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
-        </div>
-
         <PropertiesClient initialProperties={list} />
       </div>
     </div>

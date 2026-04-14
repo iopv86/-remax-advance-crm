@@ -9,6 +9,15 @@ import type { Deal, Task, Message, DealStage, LeadClassification } from "@/lib/t
 import { ContactActions } from "./contact-actions";
 import { ContactWhatsApp } from "./contact-whatsapp";
 
+type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
+
+const TABS: { key: ContactTab; label: string }[] = [
+  { key: "resumen", label: "Resumen" },
+  { key: "actividad", label: "Actividad" },
+  { key: "documentos", label: "Documentos" },
+  { key: "whatsapp", label: "WhatsApp" },
+];
+
 const STATUS_LABELS: Record<string, string> = {
   new: "Nuevo",
   contacted: "Contactado",
@@ -53,10 +62,17 @@ function getClassificationStyle(c?: string) {
 
 export default async function ContactDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { id } = await params;
+  const { tab: rawTab } = await searchParams;
+  const activeTab: ContactTab =
+    rawTab === "actividad" || rawTab === "documentos" || rawTab === "whatsapp"
+      ? rawTab
+      : "resumen";
   const supabase = await createClient();
 
   const { data: contact } = await supabase
@@ -137,19 +153,23 @@ export default async function ContactDetailPage({
           </h2>
           {/* Tabs */}
           <nav className="hidden md:flex gap-6 ml-8">
-            {["Resumen", "Actividad", "Documentos", "WhatsApp"].map((tab, i) => (
-              <span
-                key={tab}
-                className="pb-4 text-sm font-medium cursor-pointer transition-colors"
-                style={
-                  i === 0
-                    ? { color: "#e11d48", borderBottom: "2px solid #e11d48" }
-                    : { color: "#6b7280" }
-                }
-              >
-                {tab}
-              </span>
-            ))}
+            {TABS.map(({ key, label }) => {
+              const isActive = activeTab === key;
+              return (
+                <Link
+                  key={key}
+                  href={`/dashboard/contacts/${id}?tab=${key}`}
+                  className="pb-4 text-sm font-medium transition-colors"
+                  style={
+                    isActive
+                      ? { color: "#e11d48", borderBottom: "2px solid #e11d48" }
+                      : { color: "#6b7280" }
+                  }
+                >
+                  {label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
 
@@ -454,21 +474,149 @@ export default async function ContactDetailPage({
           </div>
         </section>
 
-        {/* RIGHT PANE: WhatsApp Chat (65%) */}
-        <section className="flex flex-col" style={{ width: "65%", background: "var(--card)" }}>
-          {contact.phone ? (
-            <ContactWhatsApp
-              contactId={id}
-              phone={contact.phone}
-              initialMessages={(messages ?? []) as unknown as Message[]}
-            />
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center" style={{ color: "#94a3b8" }}>
+        {/* RIGHT PANE: Tab content (65%) */}
+        <section className="flex flex-col overflow-y-auto" style={{ width: "65%", background: "var(--card)" }}>
+          {/* WhatsApp tab */}
+          {activeTab === "whatsapp" && (
+            contact.phone ? (
+              <ContactWhatsApp
+                contactId={id}
+                phone={contact.phone}
+                initialMessages={(messages ?? []) as unknown as Message[]}
+              />
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-12" style={{ color: "#94a3b8" }}>
+                <svg className="w-12 h-12 mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                </svg>
+                <p className="text-sm font-medium">Sin número de WhatsApp</p>
+                <p className="text-xs mt-1">Edita el contacto para agregar un número</p>
+              </div>
+            )
+          )}
+
+          {/* Resumen tab — deals overview */}
+          {activeTab === "resumen" && (
+            <div className="p-8 space-y-6">
+              <h3 className="text-sm font-bold uppercase tracking-widest" style={{ color: "#94a3b8" }}>
+                Tratos
+              </h3>
+              {(deals ?? []).length === 0 ? (
+                <div className="flex flex-col items-center py-16" style={{ color: "#94a3b8" }}>
+                  <svg className="w-10 h-10 mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  <p className="text-sm">Sin tratos registrados.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {(deals as unknown as Deal[]).map((d) => (
+                    <div
+                      key={d.id}
+                      className="p-4 rounded-xl border"
+                      style={{ background: "var(--background)", borderColor: "var(--border)" }}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <span
+                          className="text-sm font-bold"
+                          style={{ color: STAGE_ACCENT[d.stage] ?? "#94a3b8" }}
+                        >
+                          {STAGE_LABELS[d.stage]}
+                        </span>
+                        {d.deal_value != null && (
+                          <span className="text-sm font-extrabold" style={{ color: "#1C1917", fontFamily: "var(--font-manrope), Manrope, sans-serif" }}>
+                            {d.currency ?? "RD$"} {d.deal_value.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                      {d.expected_close_date && (
+                        <p className="text-xs" style={{ color: "#94a3b8" }}>
+                          Cierre: {format(new Date(d.expected_close_date), "d MMM yyyy", { locale: es })}
+                        </p>
+                      )}
+                      {d.notes && (
+                        <p className="text-xs mt-1 line-clamp-2" style={{ color: "#64748b" }}>{d.notes}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Actividad tab — tasks + timeline */}
+          {activeTab === "actividad" && (
+            <div className="p-8 space-y-6">
+              <h3 className="text-sm font-bold uppercase tracking-widest" style={{ color: "#94a3b8" }}>
+                Seguimientos
+              </h3>
+              {(tasks ?? []).length === 0 ? (
+                <p className="text-sm py-8 text-center" style={{ color: "#94a3b8" }}>Sin seguimientos.</p>
+              ) : (
+                <div className="space-y-2">
+                  {(tasks as unknown as Task[]).map((t) => (
+                    <div
+                      key={t.id}
+                      className="flex items-center justify-between p-4 rounded-xl border"
+                      style={{ background: "var(--background)", borderColor: "var(--border)" }}
+                    >
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div
+                          className="w-1.5 h-1.5 rounded-full mt-2 shrink-0"
+                          style={{
+                            background:
+                              t.status === "completed" ? "#10b981" :
+                              t.status === "in_progress" ? "#3b82f6" : "#94a3b8",
+                          }}
+                        />
+                        <div>
+                          <p className="text-sm font-semibold" style={{ color: "#1C1917" }}>{t.title}</p>
+                          {t.due_date && (
+                            <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
+                              {format(new Date(t.due_date), "d MMM yyyy", { locale: es })}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span
+                          className="text-[10px] font-bold uppercase px-2 py-0.5 rounded"
+                          style={{
+                            background: t.priority === "urgent" ? "#fef2f2" : "#f8fafc",
+                            color: t.priority === "urgent" ? "#dc2626" : "#64748b",
+                          }}
+                        >
+                          {PRIORITY_LABELS[t.priority] ?? t.priority}
+                        </span>
+                        <span
+                          className="text-[10px] font-bold uppercase px-2 py-0.5 rounded"
+                          style={{
+                            background: t.status === "completed" ? "#ecfdf5" :
+                              t.status === "in_progress" ? "#eff6ff" : "#f8fafc",
+                            color: t.status === "completed" ? "#059669" :
+                              t.status === "in_progress" ? "#2563eb" : "#64748b",
+                          }}
+                        >
+                          {t.status === "completed" ? "Completado" :
+                            t.status === "in_progress" ? "En progreso" :
+                            t.status === "cancelled" ? "Cancelado" : "Pendiente"}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Documentos tab — placeholder */}
+          {activeTab === "documentos" && (
+            <div className="flex-1 flex flex-col items-center justify-center p-12" style={{ color: "#94a3b8" }}>
               <svg className="w-12 h-12 mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
-              <p className="text-sm font-medium">Sin número de WhatsApp</p>
-              <p className="text-xs mt-1">Edita el contacto para agregar un número</p>
+              <p className="text-sm font-medium">Documentos — próximamente</p>
+              <p className="text-xs mt-1">Contratos, propuestas y fichas técnicas</p>
             </div>
           )}
         </section>

@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Search, SlidersHorizontal, Download } from "lucide-react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 
 interface Props {
   currentClassification?: string;
@@ -21,6 +21,7 @@ export function ContactsFilterBar({ currentClassification, currentSearch, totalC
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const createQueryString = useCallback(
     (updates: Record<string, string | null | undefined>) => {
@@ -39,9 +40,12 @@ export function ContactsFilterBar({ currentClassification, currentSearch, totalC
     router.push(`${pathname}?${qs}`);
   }
 
-  function setSearch(val: string) {
-    const qs = createQueryString({ q: val || undefined });
-    router.push(`${pathname}?${qs}`);
+  function handleSearchChange(val: string) {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      const qs = createQueryString({ q: val || undefined });
+      router.push(`${pathname}?${qs}`);
+    }, 300);
   }
 
   return (
@@ -79,7 +83,7 @@ export function ContactsFilterBar({ currentClassification, currentSearch, totalC
             type="text"
             placeholder="Buscar..."
             defaultValue={currentSearch ?? ""}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-9 pr-4 py-1.5 text-sm rounded-lg border-none transition-all"
             style={{
               background: "white",

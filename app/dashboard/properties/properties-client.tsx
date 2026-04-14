@@ -28,6 +28,26 @@ const STATUS_LABELS: Record<string, string> = {
   inactive: "Inactivo",
 };
 
+type FilterKey = "all" | "sale" | "rent" | "active" | "reserved";
+
+const FILTERS: { key: FilterKey; label: string }[] = [
+  { key: "all", label: "Todas" },
+  { key: "sale", label: "En Venta" },
+  { key: "rent", label: "En Renta" },
+  { key: "active", label: "Disponible" },
+  { key: "reserved", label: "Reservada" },
+];
+
+function applyFilter(properties: Property[], filter: FilterKey): Property[] {
+  switch (filter) {
+    case "sale": return properties.filter((p) => p.transaction_type === "sale");
+    case "rent": return properties.filter((p) => p.transaction_type === "rent");
+    case "active": return properties.filter((p) => p.status === "active");
+    case "reserved": return properties.filter((p) => p.status === "reserved");
+    default: return properties;
+  }
+}
+
 interface Props {
   initialProperties: Property[];
 }
@@ -35,11 +55,14 @@ interface Props {
 export function PropertiesClient({ initialProperties }: Props) {
   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>(initialProperties);
+  const [activeFilter, setActiveFilter] = useState<FilterKey>("all");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editProperty, setEditProperty] = useState<Property | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [generatingPdf, setGeneratingPdf] = useState(false);
+
+  const filteredProperties = applyFilter(properties, activeFilter);
 
   function openCreate() {
     setEditProperty(null);
@@ -118,6 +141,50 @@ export function PropertiesClient({ initialProperties }: Props) {
 
   return (
     <>
+      {/* Filter tabs + view toggle */}
+      <div className="flex items-center justify-between mb-6">
+        <div
+          className="flex items-center gap-1 p-1 rounded-lg"
+          style={{ background: "#F5F4F1" }}
+        >
+          {FILTERS.map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => { setActiveFilter(key); setSelectedIds(new Set()); }}
+              className="px-4 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer"
+              style={
+                activeFilter === key
+                  ? { background: "#e11d48", color: "white", boxShadow: "0 1px 2px rgba(0,0,0,0.1)" }
+                  : { color: "#6b7280" }
+              }
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div
+          className="flex items-center gap-1 p-1 rounded-lg"
+          style={{ background: "#F5F4F1" }}
+        >
+          <button
+            className="p-1.5 rounded-md cursor-pointer"
+            style={{ background: "white", color: "#e11d48", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+            </svg>
+          </button>
+          <button className="p-1.5 rounded-md text-stone-400 hover:text-stone-600 transition-colors cursor-pointer">
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
       {/* Action bar */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
@@ -157,18 +224,22 @@ export function PropertiesClient({ initialProperties }: Props) {
       </div>
 
       {/* Property grid */}
-      {properties.length === 0 ? (
+      {filteredProperties.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-muted-foreground">
           <Building2 className="w-12 h-12 mb-4 opacity-20" />
-          <p className="font-sans text-sm">No hay propiedades registradas.</p>
-          <Button onClick={openCreate} variant="outline" size="sm" className="mt-4 gap-1.5">
-            <Plus className="h-3.5 w-3.5" />
-            Agregar la primera propiedad
-          </Button>
+          <p className="font-sans text-sm">
+            {activeFilter === "all" ? "No hay propiedades registradas." : "Sin propiedades en esta categoría."}
+          </p>
+          {activeFilter === "all" && (
+            <Button onClick={openCreate} variant="outline" size="sm" className="mt-4 gap-1.5">
+              <Plus className="h-3.5 w-3.5" />
+              Agregar la primera propiedad
+            </Button>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {properties.map((p) => (
+          {filteredProperties.map((p) => (
             <div
               key={p.id}
               className={`card-glow overflow-hidden relative group cursor-pointer transition-all ${
