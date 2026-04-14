@@ -6,7 +6,7 @@ import { CLASSIFICATION_LABELS } from "@/lib/types";
 import type { Contact, Task } from "@/lib/types";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { ArrowUpRight, ArrowDownRight, Users, CheckSquare } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight, Users, Bell, Search, Plus, MessageCircle } from "lucide-react";
 
 interface KPI {
   label: string;
@@ -46,7 +46,7 @@ export default function DashboardPage() {
           .limit(7),
         supabase
           .from("tasks")
-          .select("id, title, due_date, priority, status, contact:contacts(first_name, last_name)")
+          .select("id, title, due_date, priority, status, contact:contacts(first_name, last_name, phone)")
           .eq("status", "pending")
           .lte("due_date", today)
           .order("due_date", { ascending: true })
@@ -135,20 +135,65 @@ export default function DashboardPage() {
           boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
         }}
       >
-        <h1
-          style={{
-            fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-            fontWeight: 800,
-            fontSize: 24,
-            letterSpacing: "-0.02em",
-            color: "var(--foreground)",
-          }}
-        >
-          Dashboard
-        </h1>
-        <p className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
-          Semana {Math.ceil(new Date().getDate() / 7)} — {new Date().toLocaleDateString("es-DO", { month: "short", year: "numeric" })}
-        </p>
+        <div className="flex items-center gap-6">
+          <h1
+            style={{
+              fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
+              fontWeight: 800,
+              fontSize: 24,
+              letterSpacing: "-0.02em",
+              color: "var(--foreground)",
+            }}
+          >
+            Dashboard
+          </h1>
+          {/* Search bar */}
+          <div className="relative hidden md:block">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5"
+              style={{ color: "var(--muted-foreground)" }}
+            />
+            <input
+              type="text"
+              placeholder="Buscar contactos o propiedades..."
+              className="h-9 w-72 rounded-lg pl-9 pr-4 text-sm outline-none transition-all"
+              style={{
+                background: "var(--muted)",
+                border: "1px solid transparent",
+                color: "var(--foreground)",
+              }}
+              onFocus={(e) => { e.target.style.borderColor = "var(--primary)"; }}
+              onBlur={(e) => { e.target.style.borderColor = "transparent"; }}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {/* Notification bell */}
+          <button
+            className="relative p-2 rounded-lg transition-colors hover:bg-muted cursor-pointer"
+            style={{ color: "var(--muted-foreground)" }}
+          >
+            <Bell className="h-4 w-4" />
+            <span
+              className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full"
+              style={{ background: "var(--red)", border: "2px solid var(--background)" }}
+            />
+          </button>
+          {/* Nuevo Trato CTA */}
+          <button
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover:brightness-95 active:scale-95 cursor-pointer"
+            style={{
+              background: "#e11d48",
+              color: "#ffffff",
+              boxShadow: "0 2px 8px rgba(225,29,72,0.25)",
+            }}
+            onClick={() => window.location.href = "/dashboard/pipeline"}
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Nuevo Trato
+          </button>
+        </div>
       </header>
 
       <div className="p-8 space-y-8 max-w-[1400px] mx-auto w-full">
@@ -399,7 +444,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Pending tasks (40%) */}
+          {/* Seguimientos Pendientes (40%) */}
           <div
             className="lg:col-span-4 overflow-hidden flex flex-col"
             style={{
@@ -412,76 +457,103 @@ export default function DashboardPage() {
               className="p-6 flex justify-between items-center"
               style={{ borderBottom: "1px solid #E5E7EB" }}
             >
-              <div className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4" style={{ color: "var(--red)" }} />
-                <h3
-                  style={{
-                    fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                    fontWeight: 800,
-                    fontSize: 16,
-                    color: "var(--foreground)",
-                  }}
+              <h3
+                style={{
+                  fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
+                  fontWeight: 800,
+                  fontSize: 16,
+                  color: "var(--foreground)",
+                }}
+              >
+                Seguimientos Pendientes
+              </h3>
+              {pendingTasks.length > 0 && (
+                <span
+                  className="text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider"
+                  style={{ background: "rgba(225,29,72,0.08)", color: "var(--red)" }}
                 >
-                  Tareas Pendientes
-                </h3>
-              </div>
-              <span className="text-xs font-semibold" style={{ color: "var(--muted-foreground)" }}>
-                {pendingTasks.length} vencidas
-              </span>
+                  {pendingTasks.length} vencidas
+                </span>
+              )}
             </div>
 
-            <div className="flex-1">
+            <div className="flex-1 p-2">
               {loading && (
-                <div className="p-6 space-y-4">
+                <div className="p-4 space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="animate-pulse h-10 bg-slate-100 rounded" />
+                    <div key={i} className="animate-pulse h-12 bg-slate-100 rounded-lg" />
                   ))}
                 </div>
               )}
               {!loading && pendingTasks.length === 0 && (
                 <p className="p-6 text-center text-sm" style={{ color: "var(--muted-foreground)" }}>
-                  Sin tareas pendientes.
+                  Sin seguimientos pendientes.
                 </p>
               )}
               {pendingTasks.map((t) => {
-                const contact = t.contact as { first_name?: string; last_name?: string } | null;
-                const isUrgent = t.priority === "urgent";
-                const isHigh = t.priority === "high";
+                const contact = t.contact as { first_name?: string; last_name?: string; phone?: string } | null;
+                const isOverdue = t.due_date ? new Date(t.due_date) < new Date() : false;
+                const isUrgent = t.priority === "urgent" || isOverdue;
+                const waPhone = contact?.phone?.replace(/\D/g, "");
+                const waHref = waPhone ? `https://wa.me/${waPhone}` : undefined;
+
                 return (
                   <div
                     key={t.id}
-                    className="px-6 py-4 table-row-hover transition-colors"
-                    style={{ borderBottom: "1px solid rgba(203,213,225,0.5)" }}
+                    className="p-4 rounded-lg flex items-center justify-between transition-colors hover:bg-muted/50 group"
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Left urgency bar */}
+                      <div
+                        className="w-1 h-8 rounded-full shrink-0"
+                        style={{ background: isUrgent ? "var(--red)" : "rgba(100,116,139,0.3)" }}
+                      />
                       <div className="min-w-0">
-                        <p
-                          className="text-sm font-medium truncate"
-                          style={{ color: "var(--foreground)" }}
-                        >
+                        <p className="text-sm font-bold truncate" style={{ color: "var(--foreground)" }}>
+                          {contact ? `${contact.first_name} ${contact.last_name}` : "—"}
+                        </p>
+                        <p className="text-[10px] font-medium truncate max-w-[140px]" style={{ color: "var(--muted-foreground)" }}>
                           {t.title}
                         </p>
-                        {contact && (
-                          <p className="text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>
-                            {contact.first_name} {contact.last_name}
-                          </p>
-                        )}
                       </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
                       {t.due_date && (
                         <span
-                          className="shrink-0 rounded px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                          className="text-[10px] font-bold py-1 px-2 rounded uppercase tracking-wider"
                           style={{
-                            background: isUrgent ? "rgba(225,29,72,0.08)"
-                              : isHigh ? "rgba(217,119,6,0.08)"
-                              : "rgba(100,116,139,0.08)",
-                            color: isUrgent ? "var(--red)"
-                              : isHigh ? "var(--amber)"
-                              : "var(--muted-foreground)",
+                            background: isUrgent ? "rgba(225,29,72,0.08)" : "rgba(100,116,139,0.08)",
+                            color: isUrgent ? "var(--red)" : "var(--muted-foreground)",
                           }}
                         >
-                          {new Date(t.due_date).toLocaleDateString("es-DO", { day: "2-digit", month: "short" })}
+                          {isOverdue
+                            ? "Vencido"
+                            : new Date(t.due_date).toLocaleDateString("es-DO", { day: "2-digit", month: "short" })}
                         </span>
                       )}
+                      {/* WhatsApp button */}
+                      <a
+                        href={waHref}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-8 h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+                        style={{
+                          background: "rgba(37,211,102,0.1)",
+                          color: "#128C7E",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.background = "#25D366";
+                          (e.currentTarget as HTMLElement).style.color = "#ffffff";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.background = "rgba(37,211,102,0.1)";
+                          (e.currentTarget as HTMLElement).style.color = "#128C7E";
+                        }}
+                        onClick={(e) => { if (!waHref) e.preventDefault(); }}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </a>
                     </div>
                   </div>
                 );
