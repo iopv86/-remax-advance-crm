@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advance Estate CRM — Login Dual Theme</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Top control bar ── */
+    .topbar {
+      height: 40px;
+      background: #111;
+      border-bottom: 1px solid #222;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+    .topbar-label { font-size: 11px; color: #555; letter-spacing: 0.1em; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; }
+    .theme-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .badge-light { background: #F3F4F6; border: 1px solid #E5E7EB; color: #374151; }
+    .badge-dark  { background: #1a1a1a; border: 1px solid #2A2A2A; color: #C9A84C; }
+
+    /* ── Split layout ── */
+    .split {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .divider {
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, #333 20%, #333 80%, transparent);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .divider::after {
+      content: '⟷';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #444;
+      font-size: 14px;
+      background: #0a0a0a;
+      padding: 6px 4px;
+    }
+
+    /* ── Shared login layout ── */
+    .login-wrap {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .brand-panel {
+      width: 42%;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .form-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+    }
+    .form-inner { width: 100%; max-width: 340px; }
+
+    /* ── LIGHT MODE ── */
+    .light-side { flex: 1; display: flex; overflow: hidden; }
+
+    .light-brand {
+      background: #111827;
+      position: relative;
+    }
+    .light-brand::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('../../nanobanana-output/minimalist_luxury_real_estate_ab.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.07;
+    }
+    .light-brand::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 30% 20%, rgba(225,29,72,0.10) 0%, transparent 70%),
+        linear-gradient(to bottom, rgba(17,24,39,0.5) 0%, rgba(17,24,39,0.1) 50%, rgba(17,24,39,0.6) 100%);
+    }
+    .light-form {
+      background: #FAFAF9;
+    }
+
+    /* ── DARK MODE ── */
+    .dark-side { flex: 1; display: flex; overflow: hidden; }
+
+    .dark-brand {
+      background: #0D0D0D;
+      position: relative;
+    }
+    .dark-brand::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url('../../nanobanana-output/luxury_real_estate_agency_login_.png');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.18;
+    }
+    .dark-brand::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 20% 30%, rgba(201,168,76,0.10) 0%, transparent 60%),
+        linear-gradient(to bottom, rgba(13,13,13,0.6) 0%, rgba(13,13,13,0.2) 50%, rgba(13,13,13,0.7) 100%);
+    }
+    .dark-form {
+      background: #0F0F0E;
+      border-left: 1px solid #1F1F1D;
+    }
+
+    /* ── Logo ── */
+    .ae-logo {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Stats block ── */
+    .stats { display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 1; }
+    .stat-row { display: flex; align-items: center; gap: 12px; }
+    .stat-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .stat-dot-light { background: #e11d48; }
+    .stat-dot-dark  { background: #C9A84C; }
+    .stat-value { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 18px; line-height: 1; }
+    .stat-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; margin-top: 2px; }
+    .light-stat .stat-value { color: #fff; }
+    .light-stat .stat-label { color: #6B7280; }
+    .dark-stat .stat-value { color: #E5E5E5; }
+    .dark-stat .stat-label { color: #555; }
+
+    /* ── Tagline ── */
+    .tagline {
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 240px;
+      position: relative;
+      z-index: 1;
+    }
+    .light-tagline { color: #4B5563; }
+    .dark-tagline  { color: #444; }
+
+    /* ── Form elements ── */
+    .form-heading { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .form-sub     { font-size: 13px; margin-bottom: 32px; }
+    .light-form-heading { color: #111827; }
+    .light-form-sub     { color: #6B7280; }
+    .dark-form-heading  { color: #E5E5E5; }
+    .dark-form-sub      { color: #555; }
+
+    .field { margin-bottom: 16px; }
+    .field-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    .light-label { color: #374151; }
+    .dark-label  { color: #666; }
+
+    .field-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .light-input {
+      background: #fff;
+      border: 1px solid #E5E7EB;
+      color: #111827;
+    }
+    .light-input:focus { border-color: #e11d48; }
+    .dark-input {
+      background: #1A1A18;
+      border: 1px solid #2A2A28;
+      color: #E5E5E5;
+    }
+    .dark-input:focus { border-color: #C9A84C; }
+    .dark-input::placeholder { color: #444; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.02em;
+    }
+    .btn-light {
+      background: #e11d48;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(225,29,72,0.25);
+    }
+    .btn-light:hover { background: #be123c; }
+    .btn-dark {
+      background: #C9A84C;
+      color: #0D0D0D;
+      box-shadow: 0 4px 12px rgba(201,168,76,0.2);
+    }
+    .btn-dark:hover { background: #B8973B; }
+
+    .form-footer { margin-top: 24px; text-align: center; font-size: 12px; }
+    .light-footer { color: #9CA3AF; }
+    .dark-footer  { color: #444; }
+
+    .version-tag {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .v-brand { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .v-num   { font-size: 10px; padding: 2px 8px; border-radius: 4px; }
+    .light-v-brand { color: #9CA3AF; }
+    .light-v-num   { background: #F3F4F6; color: #6B7280; border: 1px solid #E5E7EB; }
+    .dark-v-brand  { color: #3A3A38; }
+    .dark-v-num    { background: #1A1A18; color: #444; border: 1px solid #2A2A28; }
+
+    /* ── AE wordmark in brand panel ── */
+    .ae-wordmark {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+    .ae-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 20px; letter-spacing: 0.15em; text-transform: uppercase; }
+    .ae-sub   { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2px; }
+    .ae-crm   { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 6px; padding: 2px 8px; display: inline-block; border-radius: 2px; }
+    .light-ae-title { color: #fff; }
+    .light-ae-sub   { color: #6B7280; }
+    .light-ae-crm   { background: rgba(225,29,72,0.15); color: #e11d48; border: 1px solid rgba(225,29,72,0.3); }
+    .dark-ae-title  { color: #C9A84C; }
+    .dark-ae-sub    { color: #444; }
+    .dark-ae-crm    { background: rgba(201,168,76,0.08); color: #C9A84C; border: 1px solid rgba(201,168,76,0.2); }
+
+    /* ── Powered by ── */
+    .powered {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+    }
+    .powered-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+    .light-powered { color: #374151; }
+    .light-powered .powered-dot { background: #e11d48; }
+    .dark-powered  { color: #333; }
+    .dark-powered .powered-dot { background: #C9A84C; animation: pulse-gold 2s infinite; }
+
+    @keyframes pulse-gold {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Scrollbar hidden */
+    ::-webkit-scrollbar { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <span class="topbar-label">Advance Estate CRM — Login Page · Dual Theme Preview</span>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <span class="theme-badge badge-light">Light Mode</span>
+      <span style="color:#333;font-size:10px;">vs</span>
+      <span class="theme-badge badge-dark">Dark Mode</span>
+    </div>
+  </div>
+
+  <!-- Split area -->
+  <div class="split">
+
+    <!-- ═══════════════════════════════════
+         LIGHT MODE — Left half
+    ═══════════════════════════════════ -->
+    <div class="light-side">
+
+      <!-- Brand Panel -->
+      <div class="brand-panel light-brand">
+
+        <!-- Top: wordmark -->
+        <div class="ae-wordmark">
+          <span class="ae-title light-ae-title">Advance</span>
+          <span class="ae-sub light-ae-sub">Estate Group</span>
+          <span class="ae-crm light-ae-crm">CRM Inmobiliario</span>
+        </div>
+
+        <!-- Center: Logo -->
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;">
+          <img src="../../../public/ae-logo.svg" alt="Advance Estate" class="ae-logo" />
+          <p class="tagline light-tagline" style="margin-top:20px;text-align:center;">
+            El CRM que trabaja mientras tú cierras tratos.
+          </p>
+        </div>
+
+        <!-- Bottom: Stats -->
+        <div class="stats">
+          <div class="stat-row light-stat">
+            <div class="stat-dot stat-dot-light"></div>
+            <div>
+              <div class="stat-value">248</div>
+              <div class="stat-label">contactos gestionados</div>
+            </div>
+          </div>
+          <div class="stat-row light-stat">
+            <div class="stat-dot stat-dot-light"></div>
+            <div>
+              <div class="stat-value">RD$ 45M</div>
+              <div class="stat-label">pipeline activo</div>
+            </div>
+          </div>
+          <div class="stat-row light-stat">
+            <div class="stat-dot stat-dot-light"></div>
+            <div>
+              <div class="stat-value">34</div>
+              <div class="stat-label">tratos en curso</div>
+            </div>
+          </div>
+          <div class="powered light-powered" style="margin-top:8px;">
+            <div class="powered-dot"></div>
+            Powered by Advance IA
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Panel -->
+      <div class="form-panel light-form" style="position:relative;">
+        <div class="version-tag">
+          <span class="v-brand light-v-brand">Advance Estate</span>
+          <span class="v-num light-v-num">v2.1</span>
+        </div>
+        <div class="form-inner">
+          <h1 class="form-heading light-form-heading">Bienvenido de vuelta</h1>
+          <p class="form-sub light-form-sub">Inicia sesión en tu cuenta</p>
+
+          <div class="field">
+            <label class="field-label light-label">Correo electrónico</label>
+            <input class="field-input light-input" type="email" placeholder="tu@remaxadvance.com" value="ipimentel@remaxadvance.com" />
+          </div>
+          <div class="field">
+            <label class="field-label light-label">Contraseña</label>
+            <input class="field-input light-input" type="password" placeholder="••••••••••" value="password" />
+          </div>
+
+          <button class="btn-primary btn-light">Iniciar sesión</button>
+
+          <div class="form-footer light-footer">
+            <a href="#" style="color:#e11d48;text-decoration:none;font-weight:500;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /light-side -->
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- ═══════════════════════════════════
+         DARK MODE — Right half
+    ═══════════════════════════════════ -->
+    <div class="dark-side">
+
+      <!-- Brand Panel -->
+      <div class="brand-panel dark-brand">
+
+        <!-- Top: wordmark -->
+        <div class="ae-wordmark">
+          <span class="ae-title dark-ae-title">Advance</span>
+          <span class="ae-sub dark-ae-sub">Estate Group</span>
+          <span class="ae-crm dark-ae-crm">CRM Inmobiliario</span>
+        </div>
+
+        <!-- Center: Logo with gold glow -->
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;position:relative;z-index:1;">
+          <div style="position:relative;">
+            <div style="
+              position:absolute;
+              inset:-20px;
+              background:radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+              pointer-events:none;
+            "></div>
+            <img src="../../../public/ae-logo.svg" alt="Advance Estate" class="ae-logo" style="filter:drop-shadow(0 0 20px rgba(201,168,76,0.25));" />
+          </div>
+          <p class="tagline dark-tagline" style="margin-top:20px;text-align:center;">
+            El CRM que trabaja mientras tú cierras tratos.
+          </p>
+        </div>
+
+        <!-- Bottom: Stats -->
+        <div class="stats">
+          <div class="stat-row dark-stat">
+            <div class="stat-dot stat-dot-dark"></div>
+            <div>
+              <div class="stat-value">248</div>
+              <div class="stat-label">contactos gestionados</div>
+            </div>
+          </div>
+          <div class="stat-row dark-stat">
+            <div class="stat-dot stat-dot-dark"></div>
+            <div>
+              <div class="stat-value">RD$ 45M</div>
+              <div class="stat-label">pipeline activo</div>
+            </div>
+          </div>
+          <div class="stat-row dark-stat">
+            <div class="stat-dot stat-dot-dark"></div>
+            <div>
+              <div class="stat-value">34</div>
+              <div class="stat-label">tratos en curso</div>
+            </div>
+          </div>
+          <div class="powered dark-powered" style="margin-top:8px;">
+            <div class="powered-dot"></div>
+            Powered by Advance IA
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Panel -->
+      <div class="form-panel dark-form" style="position:relative;">
+        <div class="version-tag">
+          <span class="v-brand dark-v-brand">Advance Estate</span>
+          <span class="v-num dark-v-num">v2.1</span>
+        </div>
+        <div class="form-inner">
+          <h1 class="form-heading dark-form-heading">Bienvenido de vuelta</h1>
+          <p class="form-sub dark-form-sub">Inicia sesión en tu cuenta</p>
+
+          <div class="field">
+            <label class="field-label dark-label">Correo electrónico</label>
+            <input class="field-input dark-input" type="email" placeholder="tu@remaxadvance.com" value="ipimentel@remaxadvance.com" />
+          </div>
+          <div class="field">
+            <label class="field-label dark-label">Contraseña</label>
+            <input class="field-input dark-input" type="password" placeholder="••••••••••" value="password" />
+          </div>
+
+          <button class="btn-primary btn-dark">Iniciar sesión</button>
+
+          <div class="form-footer dark-footer">
+            <a href="#" style="color:#C9A84C;text-decoration:none;font-weight:500;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /dark-side -->
+
+  </div><!-- /split -->
+
+</body>
+</html>

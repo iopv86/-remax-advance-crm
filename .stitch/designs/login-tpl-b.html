@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE CRM — Login Tpl B · Photography Hero</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar { height: 38px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; }
+    .tl { font-size: 10px; color: #444; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+    .badge { padding: 2px 8px; border-radius: 99px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .split { flex: 1; display: flex; min-height: 0; }
+    .half { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+    /* ── LIGHT: Photo full-bleed left, card right ── */
+    .light-half { background: #FAFAF9; }
+    .light-photo-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #111827 0%, #1f2937 60%, #374151 100%);
+    }
+    .light-photo-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(17,24,39,0.3) 0%, rgba(250,250,249,1) 65%);
+    }
+
+    /* Brand mark on photo side */
+    .brand-over {
+      position: absolute;
+      left: 32px; top: 40px;
+      z-index: 2;
+    }
+    .brand-over-name { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .brand-over-sub  { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; margin-top: 2px; }
+
+    /* Form card */
+    .form-card {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 52%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      z-index: 3;
+    }
+    .form-inner { width: 100%; max-width: 320px; }
+
+    .f-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; display: block; }
+    .f-input { width: 100%; padding: 10px 14px; border-radius: 6px; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; margin-bottom: 14px; }
+    .f-btn { width: 100%; padding: 12px; border-radius: 6px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; }
+
+    /* Light form */
+    .light-card-bg { background: #FAFAF9; }
+    .f-title-l { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 22px; color: #111827; margin-bottom: 4px; }
+    .f-sub-l { font-size: 13px; color: #6B7280; margin-bottom: 28px; }
+    .f-label-l { color: #374151; }
+    .f-input-l { background: #fff; border: 1px solid #E5E7EB; color: #111827; }
+    .f-btn-l { background: #e11d48; color: #fff; box-shadow: 0 4px 14px rgba(225,29,72,0.3); }
+    .f-link-l { color: #e11d48; }
+
+    /* ── DARK half ── */
+    .dark-half { background: #0D0D0D; }
+    .dark-photo-bg {
+      position: absolute; inset: 0;
+      background-image: url('../../nanobanana-output/luxury_real_estate_agency_login_.png');
+      background-size: cover;
+      background-position: center right;
+      opacity: 0.25;
+    }
+    .dark-photo-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      opacity: 1;
+      background: linear-gradient(to right, rgba(13,13,13,0.4) 0%, rgba(13,13,13,1) 60%);
+    }
+
+    .dark-card-bg { background: rgba(15,15,14,0.95); backdrop-filter: blur(12px); border: 1px solid #1A1A18; border-radius: 12px; padding: 40px; }
+    .f-title-d { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 22px; color: #E5E5E5; margin-bottom: 4px; }
+    .f-sub-d { font-size: 13px; color: #555; margin-bottom: 28px; }
+    .f-label-d { color: #555; }
+    .f-input-d { background: #1A1A18; border: 1px solid #2A2A28; color: #E5E5E5; }
+    .f-btn-d { background: #C9A84C; color: #0D0D0D; box-shadow: 0 4px 14px rgba(201,168,76,0.2); }
+    .f-link-d { color: #C9A84C; }
+
+    .divider { width: 2px; background: #1a1a1a; flex-shrink: 0; }
+    .logo-img { width: 72px; height: 72px; object-fit: contain; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="tl">Template B — Photography Hero · Dual Theme</span>
+    <div style="display:flex;gap:8px;">
+      <span class="badge" style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;">Light</span>
+      <span class="badge" style="background:#1a1a1a;color:#C9A84C;border:1px solid #2A2A28;">Dark</span>
+    </div>
+  </div>
+
+  <div class="split">
+
+    <!-- LIGHT -->
+    <div class="half light-half">
+      <div class="light-photo-bg"></div>
+      <div class="brand-over">
+        <div class="brand-over-name" style="color:#fff;">Advance Estate</div>
+        <div class="brand-over-sub" style="color:#6B7280;">CRM Inmobiliario</div>
+      </div>
+      <div class="form-card light-card-bg">
+        <div class="form-inner">
+          <img src="../../../public/ae-logo.svg" alt="AE" class="logo-img" />
+          <h1 class="f-title-l">Bienvenido de vuelta</h1>
+          <p class="f-sub-l">Inicia sesión en tu cuenta</p>
+          <label class="f-label f-label-l">Correo electrónico</label>
+          <input class="f-input f-input-l" type="email" value="ipimentel@remaxadvance.com" />
+          <label class="f-label f-label-l">Contraseña</label>
+          <input class="f-input f-input-l" type="password" value="••••••••" />
+          <button class="f-btn f-btn-l">Iniciar sesión</button>
+          <p style="margin-top:20px;text-align:center;font-size:12px;color:#9CA3AF;">
+            <a class="f-link-l" style="text-decoration:none;font-weight:500;">¿Olvidaste tu contraseña?</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DARK -->
+    <div class="half dark-half">
+      <div class="dark-photo-bg"></div>
+      <div style="position:absolute;left:32px;top:40px;z-index:2;">
+        <div style="font-family:'Manrope',sans-serif;font-weight:800;font-size:16px;letter-spacing:0.1em;text-transform:uppercase;color:#C9A84C;">Advance Estate</div>
+        <div style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;margin-top:2px;color:#333;">CRM Inmobiliario</div>
+      </div>
+      <div style="position:absolute;right:32px;top:0;bottom:0;width:58%;display:flex;align-items:center;z-index:3;">
+        <div class="dark-card-bg" style="width:100%;">
+          <img src="../../../public/ae-logo.svg" alt="AE" class="logo-img" style="filter:drop-shadow(0 0 16px rgba(201,168,76,0.3));" />
+          <h1 class="f-title-d">Bienvenido de vuelta</h1>
+          <p class="f-sub-d">Inicia sesión en tu cuenta</p>
+          <label class="f-label f-label-d" style="display:block;margin-bottom:6px;">Correo electrónico</label>
+          <input class="f-input f-input-d" type="email" value="ipimentel@remaxadvance.com" style="margin-bottom:14px;" />
+          <label class="f-label f-label-d" style="display:block;margin-bottom:6px;">Contraseña</label>
+          <input class="f-input f-input-d" type="password" value="••••••••" style="margin-bottom:0;" />
+          <button class="f-btn f-btn-d" style="margin-top:16px;">Iniciar sesión</button>
+          <p style="margin-top:20px;text-align:center;font-size:12px;color:#444;">
+            <a class="f-link-d" style="text-decoration:none;font-weight:500;">¿Olvidaste tu contraseña?</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

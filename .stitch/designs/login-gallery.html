@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE CRM — Logo + Template Gallery</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Josefin+Sans:wght@400;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Josefin Sans', sans-serif; background: #0a0a0a; color: #E5E5E5; min-height: 100vh; }
+
+    .topbar {
+      height: 48px; background: #000; border-bottom: 1px solid #1a1a1a;
+      display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+    }
+    .tl { font-family: 'Cinzel', serif; font-weight: 700; font-size: 13px; color: #fff; letter-spacing: 0.08em; }
+    .subtitle { font-size: 9px; color: #444; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.15em; text-transform: uppercase; }
+
+    .content { padding: 40px 32px; max-width: 1500px; margin: 0 auto; }
+
+    .section-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #CA8A04;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, #CA8A04 0%, transparent 100%);
+      opacity: 0.3;
+    }
+
+    .section-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #333;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-sub::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #1a1a1a;
+    }
+
+    /* ── Logo Grid ── */
+    .logo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+    .logo-card {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+      cursor: pointer;
+    }
+    .logo-card:hover { border-color: #CA8A04; }
+    .logo-img-wrap {
+      height: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+    .logo-img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .logo-card-footer {
+      padding: 12px 14px;
+      border-top: 1px solid #1a1a1a;
+    }
+    .logo-name { font-size: 11px; font-weight: 600; color: #E5E5E5; margin-bottom: 2px; font-family: 'Josefin Sans', sans-serif; }
+    .logo-desc { font-size: 9px; color: #555; font-family: 'JetBrains Mono', monospace; margin-bottom: 6px; }
+    .logo-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    /* ── Template Grid ── */
+    .tpl-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 48px; }
+    .tpl-card {
+      background: #111;
+      border: 1px solid #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .tpl-card:hover { border-color: #CA8A04; }
+    .tpl-preview {
+      height: 260px;
+      overflow: hidden;
+      position: relative;
+    }
+    .tpl-preview iframe {
+      width: 200%;
+      height: 200%;
+      border: none;
+      transform: scale(0.5);
+      transform-origin: top left;
+      pointer-events: none;
+    }
+    .tpl-card-footer {
+      padding: 14px 16px;
+      border-top: 1px solid #1a1a1a;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .tpl-name { font-size: 12px; font-weight: 600; color: #E5E5E5; font-family: 'Josefin Sans', sans-serif; }
+    .tpl-desc { font-size: 9px; color: #555; margin-top: 2px; font-family: 'JetBrains Mono', monospace; }
+    .tpl-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 2px;
+      border: 1px solid #292524;
+      font-size: 10px;
+      font-weight: 600;
+      color: #E5E5E5;
+      text-decoration: none;
+      transition: all 0.15s;
+      white-space: nowrap;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.08em;
+    }
+    .tpl-link:hover { background: #1a1a1a; border-color: #CA8A04; color: #CA8A04; }
+
+    .mb-48 { margin-bottom: 48px; }
+    .new-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 2px;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(202,138,4,0.15);
+      color: #CA8A04;
+      border: 1px solid rgba(202,138,4,0.25);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="tl">Advance Estate CRM — Design Gallery</div>
+    <span class="subtitle">8 logos · 8 templates · dual theme</span>
+  </div>
+
+  <div class="content">
+
+    <!-- LOGOS ORIGINAL -->
+    <div class="section-sub">Logos — Set A (Nano Banana v1)</div>
+    <div class="logo-grid mb-48">
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#0a0a0a;">
+          <img src="../../nanobanana-output/ae_monogram_luxury_real_estate_g.png" alt="Logo A1" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">A1 — Diamante Geométrico</div>
+          <div class="logo-desc">AE monogram · oro · negro</div>
+          <span class="logo-badge" style="background:rgba(201,168,76,0.1);color:#C9A84C;border:1px solid rgba(201,168,76,0.2);">Dark Premium</span>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#fff;">
+          <img src="../../nanobanana-output/advance_estate_real_estate_logo_.png" alt="Logo A2" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">A2 — Casa Moderna</div>
+          <div class="logo-desc">house icon · rose accent · clean</div>
+          <span class="logo-badge" style="background:rgba(225,29,72,0.1);color:#e11d48;border:1px solid rgba(225,29,72,0.2);">Light Modern</span>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#080808;">
+          <img src="../../nanobanana-output/luxury_real_estate_wordmark_logo.png" alt="Logo A3" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">A3 — Wordmark Premium</div>
+          <div class="logo-desc">tipografía serif · oro · emboss</div>
+          <span class="logo-badge" style="background:rgba(201,168,76,0.1);color:#C9A84C;border:1px solid rgba(201,168,76,0.2);">Luxury Print</span>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#0a0a0a;">
+          <img src="../../nanobanana-output/ae_monogram_abstract_art_deco_st.png" alt="Logo A4" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">A4 — Art Déco Circular</div>
+          <div class="logo-desc">emblema · simétrico · rose + gold</div>
+          <span class="logo-badge" style="background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.2);">Heritage</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LOGOS NEW -->
+    <div class="section-sub">Logos — Set B (Nano Banana v2) <span class="new-badge">Nuevo</span></div>
+    <div class="logo-grid mb-48">
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#0a0a0a;">
+          <img src="../../nanobanana-output/abstract_geometric_logo_for_prem.png" alt="Logo B1" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">B1 — Geométrico Abstracto</div>
+          <div class="logo-desc">formas · premium · moderno</div>
+          <span class="logo-badge" style="background:rgba(201,168,76,0.1);color:#C9A84C;border:1px solid rgba(201,168,76,0.2);">Geometric</span>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#0a0a0a;">
+          <img src="../../nanobanana-output/luxury_brand_logo_seal_circular_.png" alt="Logo B2" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">B2 — Sello Circular</div>
+          <div class="logo-desc">seal · circular · luxury brand</div>
+          <span class="logo-badge" style="background:rgba(201,168,76,0.1);color:#C9A84C;border:1px solid rgba(201,168,76,0.2);">Seal</span>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#0a0a0a;">
+          <img src="../../nanobanana-output/premium_real_estate_monogram_log.png" alt="Logo B3" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">B3 — Monograma Premium</div>
+          <div class="logo-desc">monogram · elegante · intertwined</div>
+          <span class="logo-badge" style="background:rgba(201,168,76,0.1);color:#C9A84C;border:1px solid rgba(201,168,76,0.2);">Monogram</span>
+        </div>
+      </div>
+
+      <div class="logo-card">
+        <div class="logo-img-wrap" style="background:#0a0a0a;">
+          <img src="../../nanobanana-output/real_estate_logo_shield_crest_wi.png" alt="Logo B4" />
+        </div>
+        <div class="logo-card-footer">
+          <div class="logo-name">B4 — Escudo Heráldico</div>
+          <div class="logo-desc">shield · crest · heritage authority</div>
+          <span class="logo-badge" style="background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.2);">Crest</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TEMPLATES ORIGINAL -->
+    <div class="section-title">Templates Set A — Classic Dual Theme</div>
+    <div class="tpl-grid mb-48">
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-dual.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template A-1 — Classic Split</div>
+            <div class="tpl-desc">50/50 · navy brand + white form · obsidian dark</div>
+          </div>
+          <a class="tpl-link" href="login-dual.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-tpl-b.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template A-2 — Photography Hero</div>
+            <div class="tpl-desc">foto full-bleed · form card flotante</div>
+          </div>
+          <a class="tpl-link" href="login-tpl-b.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-tpl-c.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template A-3 — Minimal Centered</div>
+            <div class="tpl-desc">sin panel lateral · logo grande · ultra clean</div>
+          </div>
+          <a class="tpl-link" href="login-tpl-c.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-tpl-d.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template A-4 — Premium Strip</div>
+            <div class="tpl-desc">38/62 split · strip estrecho · KPIs verticales</div>
+          </div>
+          <a class="tpl-link" href="login-tpl-d.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TEMPLATES NEW V2 -->
+    <div class="section-title">Templates Set B — Exaggerated Minimalism <span class="new-badge">Nuevo</span></div>
+    <div class="tpl-grid">
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-v2-a.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template B-1 — Monument</div>
+            <div class="tpl-desc">watermark AE · Cinzel oversized · underline fields</div>
+          </div>
+          <a class="tpl-link" href="login-v2-a.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-v2-b.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template B-2 — Partition</div>
+            <div class="tpl-desc">Swiss editorial · brand column · gold vertical rule</div>
+          </div>
+          <a class="tpl-link" href="login-v2-b.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-v2-c.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template B-3 — Atlas</div>
+            <div class="tpl-desc">horizontal band · dark brand top · clean form bottom</div>
+          </div>
+          <a class="tpl-link" href="login-v2-c.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-preview">
+          <iframe src="login-v2-d.html" loading="lazy"></iframe>
+        </div>
+        <div class="tpl-card-footer">
+          <div>
+            <div class="tpl-name">Template B-4 — Terminal</div>
+            <div class="tpl-desc">ultra minimal · corner marks · JetBrains Mono fields</div>
+          </div>
+          <a class="tpl-link" href="login-v2-d.html" target="_blank">→ Abrir</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE CRM — Login Tpl D · Premium Split</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar { height: 38px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; }
+    .tl { font-size: 10px; color: #444; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+    .badge { padding: 2px 8px; border-radius: 99px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+    .split { flex: 1; display: flex; min-height: 0; }
+    .divider { width: 2px; background: #111; flex-shrink: 0; }
+
+    /* Template D: Premium 60/40 split — wider form, narrow brand strip */
+    .brand-strip { width: 38%; display: flex; flex-direction: column; padding: 0; position: relative; overflow: hidden; }
+    .form-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 48px 44px; position: relative; }
+
+    /* Light brand strip: full diagonal gradient */
+    .brand-l {
+      background: linear-gradient(160deg, #0f172a 0%, #111827 40%, #1e293b 100%);
+    }
+    .brand-l::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          transparent 0px, transparent 30px,
+          rgba(225,29,72,0.04) 30px, rgba(225,29,72,0.04) 31px
+        );
+    }
+
+    /* Dark brand strip */
+    .brand-d {
+      background: #080808;
+      border-right: 1px solid #1A1A18;
+    }
+    .brand-d::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        repeating-linear-gradient(
+          45deg,
+          transparent 0px, transparent 30px,
+          rgba(201,168,76,0.03) 30px, rgba(201,168,76,0.03) 31px
+        );
+    }
+
+    /* Brand content */
+    .brand-content { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 44px 32px; }
+    .brand-top { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 24px; }
+    .brand-bottom { padding-top: 24px; border-top-width: 1px; border-top-style: solid; }
+
+    .logo-img { width: 100px; height: 100px; object-fit: contain; }
+    .brand-name { font-family: 'Manrope', sans-serif; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+    .brand-crm  { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; padding: 3px 10px; border-radius: 2px; }
+    .kpi-row { display: flex; flex-direction: column; gap: 14px; width: 100%; }
+    .kpi { display: flex; justify-content: space-between; align-items: baseline; }
+    .kpi-val  { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px; }
+    .kpi-lbl  { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* Light form area */
+    .form-l { background: #FAFAF9; }
+    .brand-bottom-l { border-top-color: rgba(255,255,255,0.08); }
+    .brand-name-l { color: #fff; font-size: 13px; }
+    .brand-crm-l  { background: rgba(225,29,72,0.15); color: #f87171; border: 1px solid rgba(225,29,72,0.2); }
+    .kpi-val-l  { color: #fff; }
+    .kpi-lbl-l  { color: #4B5563; }
+
+    /* Dark form area */
+    .form-d { background: #111110; }
+    .brand-bottom-d { border-top-color: #1F1F1D; }
+    .brand-name-d { color: #C9A84C; font-size: 13px; }
+    .brand-crm-d  { background: rgba(201,168,76,0.08); color: #C9A84C; border: 1px solid rgba(201,168,76,0.15); }
+    .kpi-val-d  { color: #E5E5E5; }
+    .kpi-lbl-d  { color: #3A3A38; }
+
+    /* Form fields */
+    .form-inner { width: 100%; max-width: 340px; }
+    .f-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -0.02em; margin-bottom: 4px; }
+    .f-sub   { font-size: 13px; margin-bottom: 32px; }
+    .f-lbl   { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+    .f-inp   { width: 100%; padding: 11px 14px; border-radius: 6px; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; display: block; margin-bottom: 14px; }
+    .f-btn   { width: 100%; padding: 13px; border-radius: 6px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 4px; }
+
+    .f-title-l { color: #111827; } .f-sub-l { color: #6B7280; }
+    .f-lbl-l   { color: #374151; }
+    .f-inp-l   { background: #fff; border: 1px solid #E5E7EB; color: #111827; }
+    .f-btn-l   { background: #e11d48; color: #fff; box-shadow: 0 4px 16px rgba(225,29,72,0.28); }
+    .foot-l    { color: #9CA3AF; } .link-l { color: #e11d48; }
+
+    .f-title-d { color: #E5E5E5; } .f-sub-d { color: #555; }
+    .f-lbl-d   { color: #555; }
+    .f-inp-d   { background: #1A1A18; border: 1px solid #2A2A28; color: #E5E5E5; }
+    .f-btn-d   { background: #C9A84C; color: #0D0D0D; box-shadow: 0 4px 16px rgba(201,168,76,0.2); }
+    .foot-d    { color: #333; } .link-d { color: #C9A84C; }
+
+    /* Powered line */
+    .powered { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .powered-l { color: #374151; }
+    .powered-d { color: #2A2A28; }
+    .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+    .dot-l { background: #e11d48; }
+    .dot-d { background: #C9A84C; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="tl">Template D — Premium Split 38/62 · Dual Theme</span>
+    <div style="display:flex;gap:8px;">
+      <span class="badge" style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;">Light</span>
+      <span class="badge" style="background:#1a1a1a;color:#C9A84C;border:1px solid #2A2A28;">Dark</span>
+    </div>
+  </div>
+
+  <div class="split">
+
+    <!-- ── LIGHT ── -->
+    <div style="flex:1;display:flex;overflow:hidden;">
+
+      <div class="brand-strip brand-l">
+        <div class="brand-content">
+          <div class="brand-top">
+            <img src="../../../public/ae-logo.svg" alt="AE" class="logo-img" />
+            <div>
+              <div class="brand-name brand-name-l">Advance Estate</div>
+              <span class="brand-crm brand-crm-l" style="display:inline-block;margin-top:6px;">CRM Inmobiliario</span>
+            </div>
+          </div>
+          <div class="kpi-row" style="margin-bottom:24px;">
+            <div class="kpi">
+              <span class="kpi-val kpi-val-l">248</span>
+              <span class="kpi-lbl kpi-lbl-l">contactos</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-val kpi-val-l">RD$45M</span>
+              <span class="kpi-lbl kpi-lbl-l">pipeline</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-val kpi-val-l">34</span>
+              <span class="kpi-lbl kpi-lbl-l">tratos</span>
+            </div>
+          </div>
+          <div class="brand-bottom brand-bottom-l">
+            <div class="powered powered-l" style="padding-top:20px;">
+              <span class="dot dot-l"></span>Powered by Advance IA
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-area form-l">
+        <div class="form-inner">
+          <h1 class="f-title f-title-l">Bienvenido de vuelta</h1>
+          <p class="f-sub f-sub-l">Inicia sesión en tu cuenta</p>
+          <label class="f-lbl f-lbl-l">Correo electrónico</label>
+          <input class="f-inp f-inp-l" type="email" value="ipimentel@remaxadvance.com" />
+          <label class="f-lbl f-lbl-l">Contraseña</label>
+          <input class="f-inp f-inp-l" type="password" value="••••••••" />
+          <button class="f-btn f-btn-l">Iniciar sesión</button>
+          <p class="foot-l" style="margin-top:20px;font-size:12px;text-align:center;">
+            <a class="link-l" style="text-decoration:none;font-weight:500;">¿Olvidaste tu contraseña?</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ── DARK ── -->
+    <div style="flex:1;display:flex;overflow:hidden;">
+
+      <div class="brand-strip brand-d">
+        <div class="brand-content">
+          <div class="brand-top">
+            <img src="../../../public/ae-logo.svg" alt="AE" class="logo-img" style="filter:drop-shadow(0 0 20px rgba(201,168,76,0.25));" />
+            <div>
+              <div class="brand-name brand-name-d">Advance Estate</div>
+              <span class="brand-crm brand-crm-d" style="display:inline-block;margin-top:6px;">CRM Inmobiliario</span>
+            </div>
+          </div>
+          <div class="kpi-row" style="margin-bottom:24px;">
+            <div class="kpi">
+              <span class="kpi-val kpi-val-d">248</span>
+              <span class="kpi-lbl kpi-lbl-d">contactos</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-val kpi-val-d">RD$45M</span>
+              <span class="kpi-lbl kpi-lbl-d">pipeline</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-val kpi-val-d">34</span>
+              <span class="kpi-lbl kpi-lbl-d">tratos</span>
+            </div>
+          </div>
+          <div class="brand-bottom brand-bottom-d">
+            <div class="powered powered-d" style="padding-top:20px;">
+              <span class="dot dot-d"></span>Powered by Advance IA
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-area form-d">
+        <div class="form-inner">
+          <h1 class="f-title f-title-d">Bienvenido de vuelta</h1>
+          <p class="f-sub f-sub-d">Inicia sesión en tu cuenta</p>
+          <label class="f-lbl f-lbl-d">Correo electrónico</label>
+          <input class="f-inp f-inp-d" type="email" value="ipimentel@remaxadvance.com" />
+          <label class="f-lbl f-lbl-d">Contraseña</label>
+          <input class="f-inp f-inp-d" type="password" value="••••••••" />
+          <button class="f-btn f-btn-d">Iniciar sesión</button>
+          <p class="foot-d" style="margin-top:20px;font-size:12px;text-align:center;">
+            <a class="link-d" style="text-decoration:none;font-weight:500;">¿Olvidaste tu contraseña?</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>

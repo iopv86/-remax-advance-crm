@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE CRM — V2-B · Partition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Josefin+Sans:wght@300;400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Josefin Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      height: 36px; background: #000; border-bottom: 1px solid #1a1a1a;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; flex-shrink: 0;
+    }
+    .tl { font-size: 9px; color: #444; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+    .badge { padding: 2px 8px; border-radius: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .main { flex: 1; display: flex; min-height: 0; }
+    .divider-v { width: 1px; background: #1a1a1a; flex-shrink: 0; }
+    .half { flex: 1; display: flex; position: relative; overflow: hidden; }
+
+    /* === Partition layout: brand column + form column within each half === */
+    .brand-col {
+      width: 140px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 40px 0;
+    }
+
+    /* Gold vertical partition line */
+    .brand-col::after {
+      content: '';
+      position: absolute;
+      top: 60px; bottom: 60px;
+      right: 0;
+      width: 1px;
+    }
+
+    .form-col {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 44px;
+    }
+
+    /* Rotated brand name */
+    .brand-name-rotated {
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      transform: rotate(-90deg);
+      white-space: nowrap;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      transform: none;
+      writing-mode: vertical-lr;
+    }
+
+    .ae-glyph {
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: 40px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .brand-tagline {
+      writing-mode: vertical-lr;
+      text-orientation: mixed;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 20px;
+    }
+
+    /* LIGHT */
+    .light { background: #FAFAF9; }
+    .light .brand-col { background: #F0EDE9; }
+    .light .brand-col::after { background: #CA8A04; opacity: 0.4; }
+    .ae-glyph-l { color: #1C1917; }
+    .brand-name-l { color: #78716C; }
+    .brand-tagline-l { color: #C4BCBA; }
+
+    /* KPI vertical stack */
+    .kpi-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      padding: 0 20px;
+      margin-top: 32px;
+    }
+    .kpi-item { text-align: center; }
+    .kpi-val {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 1;
+      display: block;
+    }
+    .kpi-lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      display: block;
+      margin-top: 3px;
+    }
+    .kpi-val-l { color: #1C1917; }
+    .kpi-lbl-l { color: #B5ADA9; }
+
+    /* DARK */
+    .dark { background: #0A0A0A; }
+    .dark .brand-col { background: #050505; }
+    .dark .brand-col::after { background: #CA8A04; opacity: 0.6; }
+    .ae-glyph-d { color: #CA8A04; }
+    .brand-name-d { color: #404040; }
+    .brand-tagline-d { color: #1A1A1A; }
+    .kpi-val-d { color: #FAFAFA; }
+    .kpi-lbl-d { color: #292524; }
+
+    /* Form content */
+    .form-inner { width: 100%; max-width: 300px; }
+
+    .f-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+      display: inline-block;
+      margin-bottom: 32px;
+    }
+    .f-tag-l { background: rgba(202,138,4,0.1); color: #CA8A04; border: 1px solid rgba(202,138,4,0.2); }
+    .f-tag-d { background: rgba(202,138,4,0.08); color: #CA8A04; border: 1px solid rgba(202,138,4,0.15); }
+
+    .f-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 28px;
+      letter-spacing: 0.02em;
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .f-title-l { color: #1C1917; }
+    .f-title-d { color: #FAFAFA; }
+
+    .f-sub {
+      font-size: 11px;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+    .f-sub-l { color: #A8A29E; }
+    .f-sub-d { color: #3A3A3A; }
+
+    .field { margin-bottom: 22px; }
+    .f-label {
+      display: block;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .f-label-l { color: #78716C; }
+    .f-label-d { color: #525252; }
+
+    .f-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 0;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .f-input-l { background: #fff; border: 1px solid #E7E5E4; color: #1C1917; border-left: 2px solid transparent; }
+    .f-input-l:focus { border-left-color: #CA8A04; border-color: #D6D3D1; border-left-color: #CA8A04; }
+    .f-input-d { background: #111; border: 1px solid #1C1917; color: #E5E5E5; border-left: 2px solid transparent; }
+    .f-input-d:focus { border-left-color: #CA8A04; border-color: #292524; border-left-color: #CA8A04; }
+
+    .f-btn {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 28px;
+      transition: opacity 0.2s;
+    }
+    .f-btn:hover { opacity: 0.88; }
+    .f-btn-l { background: #1C1917; color: #FAFAF9; }
+    .f-btn-d { background: #CA8A04; color: #000; }
+
+    .f-foot {
+      margin-top: 18px;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .f-foot-l { color: #A8A29E; }
+    .f-foot-d { color: #3A3A3A; }
+    .f-link-l { color: #CA8A04; text-decoration: none; }
+    .f-link-d { color: #CA8A04; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="tl">V2-B — Partition · Swiss Editorial · Dual Theme</span>
+    <div style="display:flex;gap:8px;">
+      <span class="badge" style="background:#F5F5F4;color:#1C1917;border:1px solid #E7E5E4;">Light</span>
+      <span class="badge" style="background:#111;color:#CA8A04;border:1px solid #292524;">Dark</span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- LIGHT -->
+    <div class="half light">
+
+      <div class="brand-col">
+        <div class="ae-glyph ae-glyph-l">AE</div>
+        <div class="kpi-stack">
+          <div class="kpi-item">
+            <span class="kpi-val kpi-val-l">248</span>
+            <span class="kpi-lbl kpi-lbl-l">Contactos</span>
+          </div>
+          <div class="kpi-item">
+            <span class="kpi-val kpi-val-l">34</span>
+            <span class="kpi-lbl kpi-lbl-l">Tratos</span>
+          </div>
+          <div class="kpi-item">
+            <span class="kpi-val kpi-val-l">45M</span>
+            <span class="kpi-lbl kpi-lbl-l">Pipeline</span>
+          </div>
+        </div>
+        <div class="brand-tagline brand-tagline-l">Advance Estate</div>
+      </div>
+
+      <div class="form-col">
+        <div class="form-inner">
+          <span class="f-tag f-tag-l">CRM Inmobiliario</span>
+          <h1 class="f-title f-title-l">Iniciar<br/>sesión</h1>
+          <p class="f-sub f-sub-l">Accede a tu cuenta</p>
+          <div class="field">
+            <label class="f-label f-label-l">Correo electrónico</label>
+            <input class="f-input f-input-l" type="email" value="ipimentel@remaxadvance.com" />
+          </div>
+          <div class="field">
+            <label class="f-label f-label-l">Contraseña</label>
+            <input class="f-input f-input-l" type="password" value="••••••••" />
+          </div>
+          <button class="f-btn f-btn-l">Iniciar sesión</button>
+          <p class="f-foot f-foot-l"><a class="f-link-l">¿Olvidaste tu contraseña?</a></p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="divider-v"></div>
+
+    <!-- DARK -->
+    <div class="half dark">
+
+      <div class="brand-col">
+        <div class="ae-glyph ae-glyph-d">AE</div>
+        <div class="kpi-stack">
+          <div class="kpi-item">
+            <span class="kpi-val kpi-val-d">248</span>
+            <span class="kpi-lbl kpi-lbl-d">Contactos</span>
+          </div>
+          <div class="kpi-item">
+            <span class="kpi-val kpi-val-d">34</span>
+            <span class="kpi-lbl kpi-lbl-d">Tratos</span>
+          </div>
+          <div class="kpi-item">
+            <span class="kpi-val kpi-val-d">45M</span>
+            <span class="kpi-lbl kpi-lbl-d">Pipeline</span>
+          </div>
+        </div>
+        <div class="brand-tagline brand-tagline-d">Advance Estate</div>
+      </div>
+
+      <div class="form-col">
+        <div class="form-inner">
+          <span class="f-tag f-tag-d">CRM Inmobiliario</span>
+          <h1 class="f-title f-title-d">Iniciar<br/>sesión</h1>
+          <p class="f-sub f-sub-d">Accede a tu cuenta</p>
+          <div class="field">
+            <label class="f-label f-label-d">Correo electrónico</label>
+            <input class="f-input f-input-d" type="email" value="ipimentel@remaxadvance.com" />
+          </div>
+          <div class="field">
+            <label class="f-label f-label-d">Contraseña</label>
+            <input class="f-input f-input-d" type="password" value="••••••••" />
+          </div>
+          <button class="f-btn f-btn-d">Iniciar sesión</button>
+          <p class="f-foot f-foot-d"><a class="f-link-d">¿Olvidaste tu contraseña?</a></p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>

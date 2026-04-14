@@ -130,9 +130,9 @@ export default function DashboardPage() {
       <header
         className="flex justify-between items-center h-16 px-8 sticky top-0 z-40 backdrop-blur-md"
         style={{
-          background: "rgba(250,250,249,0.85)",
-          borderBottom: "1px solid rgba(203,213,225,0.6)",
-          boxShadow: "0 1px 3px rgba(17,24,39,0.05)",
+          background: "color-mix(in srgb, var(--background) 85%, transparent)",
+          borderBottom: "1px solid color-mix(in srgb, var(--border) 60%, transparent)",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
         }}
       >
         <h1

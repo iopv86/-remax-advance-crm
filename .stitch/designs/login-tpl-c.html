@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE CRM — Login Tpl C · Minimal Centered</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;700;800&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar { height: 38px; background: #0a0a0a; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; flex-shrink: 0; }
+    .tl { font-size: 10px; color: #444; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; }
+    .badge { padding: 2px 8px; border-radius: 99px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .split { flex: 1; display: flex; min-height: 0; }
+    .divider { width: 2px; background: #1a1a1a; flex-shrink: 0; }
+
+    /* ── Template C: Minimal centered, no left panel ── */
+    /* Grid of 3 lines subtly in bg */
+    .half {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 40px;
+    }
+
+    /* Background grid */
+    .half::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* LIGHT */
+    .light-half {
+      background: #FAFAF9;
+    }
+    .light-half::before {
+      background-image:
+        linear-gradient(rgba(17,24,39,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17,24,39,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    /* DARK */
+    .dark-half {
+      background: #0D0D0D;
+    }
+
+    /* Accent blur blobs */
+    .blob-l { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: rgba(225,29,72,0.06); top: -60px; right: -60px; filter: blur(80px); }
+    .blob-l2 { position: absolute; width: 200px; height: 200px; border-radius: 50%; background: rgba(225,29,72,0.04); bottom: -40px; left: -40px; filter: blur(60px); }
+    .blob-d { position: absolute; width: 300px; height: 300px; border-radius: 50%; background: rgba(201,168,76,0.07); top: -60px; right: -60px; filter: blur(80px); }
+    .blob-d2 { position: absolute; width: 200px; height: 200px; border-radius: 50%; background: rgba(201,168,76,0.04); bottom: -40px; left: -40px; filter: blur(60px); }
+
+    .form-box { position: relative; z-index: 1; width: 100%; max-width: 360px; text-align: center; }
+
+    .logo-wrap { display: flex; justify-content: center; margin-bottom: 32px; }
+    .logo-img { width: 100px; height: 100px; object-fit: contain; }
+
+    .f-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -0.02em; margin-bottom: 6px; }
+    .f-sub   { font-size: 13px; margin-bottom: 32px; }
+    .f-divider { height: 1px; margin: 0 0 28px; }
+
+    .field { text-align: left; margin-bottom: 16px; }
+    .f-label { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px; }
+    .f-input { width: 100%; padding: 11px 14px; border-radius: 8px; font-size: 14px; outline: none; font-family: 'Inter', sans-serif; }
+    .f-btn { width: 100%; padding: 13px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Inter', sans-serif; margin-top: 8px; letter-spacing: 0.02em; }
+
+    /* Light */
+    .f-title-l { color: #111827; }
+    .f-sub-l   { color: #6B7280; }
+    .f-divider-l { background: #E5E7EB; }
+    .f-label-l { color: #374151; }
+    .f-input-l { background: #fff; border: 1px solid #E5E7EB; color: #111827; }
+    .f-btn-l   { background: #e11d48; color: #fff; box-shadow: 0 4px 20px rgba(225,29,72,0.25); }
+    .f-link-l  { color: #e11d48; }
+    .f-footer-l { color: #9CA3AF; }
+
+    /* Dark */
+    .f-title-d { color: #E5E5E5; }
+    .f-sub-d   { color: #555; }
+    .f-divider-d { background: #1F1F1D; }
+    .f-label-d { color: #555; }
+    .f-input-d { background: #1A1A18; border: 1px solid #2A2A28; color: #E5E5E5; }
+    .f-btn-d   { background: #C9A84C; color: #0D0D0D; box-shadow: 0 4px 20px rgba(201,168,76,0.18); }
+    .f-link-d  { color: #C9A84C; }
+    .f-footer-d { color: #3A3A38; }
+
+    /* Tagline */
+    .tagline { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; margin-top: 28px; }
+    .tagline-l { color: #D1D5DB; }
+    .tagline-d { color: #2A2A28; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span class="tl">Template C — Minimal Centered · Dual Theme</span>
+    <div style="display:flex;gap:8px;">
+      <span class="badge" style="background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;">Light</span>
+      <span class="badge" style="background:#1a1a1a;color:#C9A84C;border:1px solid #2A2A28;">Dark</span>
+    </div>
+  </div>
+
+  <div class="split">
+
+    <!-- LIGHT -->
+    <div class="half light-half">
+      <div class="blob-l"></div><div class="blob-l2"></div>
+      <div class="form-box">
+        <div class="logo-wrap">
+          <img src="../../../public/ae-logo.svg" alt="AE" class="logo-img" />
+        </div>
+        <h1 class="f-title f-title-l">Bienvenido de vuelta</h1>
+        <p class="f-sub f-sub-l">Inicia sesión para continuar</p>
+        <div class="f-divider f-divider-l"></div>
+        <div class="field">
+          <label class="f-label f-label-l">Correo electrónico</label>
+          <input class="f-input f-input-l" type="email" value="ipimentel@remaxadvance.com" />
+        </div>
+        <div class="field">
+          <label class="f-label f-label-l">Contraseña</label>
+          <input class="f-input f-input-l" type="password" value="••••••••" />
+        </div>
+        <button class="f-btn f-btn-l">Iniciar sesión</button>
+        <p class="tagline tagline-l">Advance Estate · RE/MAX Dominican Republic</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- DARK -->
+    <div class="half dark-half">
+      <div class="blob-d"></div><div class="blob-d2"></div>
+      <div class="form-box">
+        <div class="logo-wrap">
+          <img src="../../../public/ae-logo.svg" alt="AE" class="logo-img" style="filter:drop-shadow(0 0 24px rgba(201,168,76,0.3));" />
+        </div>
+        <h1 class="f-title f-title-d">Bienvenido de vuelta</h1>
+        <p class="f-sub f-sub-d">Inicia sesión para continuar</p>
+        <div class="f-divider f-divider-d"></div>
+        <div class="field">
+          <label class="f-label f-label-d">Correo electrónico</label>
+          <input class="f-input f-input-d" type="email" value="ipimentel@remaxadvance.com" />
+        </div>
+        <div class="field">
+          <label class="f-label f-label-d">Contraseña</label>
+          <input class="f-input f-input-d" type="password" value="••••••••" />
+        </div>
+        <button class="f-btn f-btn-d">Iniciar sesión</button>
+        <p class="tagline tagline-d">Advance Estate · RE/MAX Dominican Republic</p>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

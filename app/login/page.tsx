@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
+import Image from "next/image";
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,156 +38,102 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen overflow-hidden bg-[#FAFAF9] text-[#1C1917]">
-      {/* LEFT PANEL: Brand Side */}
+    <main className="flex min-h-screen overflow-hidden">
+
+      {/* ══════════════════════════════════════════
+          BRAND STRIP — 38% width, always dark
+      ══════════════════════════════════════════ */}
       <section
-        className="hidden md:flex md:w-1/2 flex-col justify-between p-16 relative overflow-hidden"
-        style={{ background: "#111827" }}
+        className="hidden md:flex md:flex-col relative overflow-hidden flex-shrink-0"
+        style={{ width: "38%" }}
       >
-        {/* Top spacer */}
-        <div />
-
-        {/* Center Content */}
-        <div className="flex flex-col items-center text-center">
-          {/* AE Monogram */}
-          <div className="relative w-20 h-20 flex items-center justify-center mb-8">
-            <div
-              className="absolute w-full"
-              style={{
-                height: 4,
-                background: "#e11d48",
-                top: "50%",
-                transform: "translateY(-50%)",
-                zIndex: 10,
-              }}
-            />
-            <svg
-              className="w-full h-full fill-none stroke-white"
-              strokeWidth="4"
-              viewBox="0 0 100 100"
-            >
-              <path d="M20 80 L50 20 L80 80" />
-              <path d="M40 80 L40 20 L75 20 M40 80 L75 80" />
-            </svg>
-          </div>
-
-          <h1
-            className="font-extrabold text-[28px] tracking-tight text-white uppercase leading-none"
-            style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
-          >
-            ADVANCE
-          </h1>
-          <p
-            className="text-sm uppercase mt-1"
-            style={{ color: "#575e70", letterSpacing: "0.2em", fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
-          >
-            ESTATES
-          </p>
-          <p className="mt-8 text-base max-w-xs leading-relaxed" style={{ color: "#6b7280" }}>
-            El CRM que trabaja mientras tú cierras tratos.
-          </p>
-        </div>
-
-        {/* Bottom Stats */}
-        <div className="flex flex-col gap-6">
-          {[
-            { value: "248", label: "contactos gestionados" },
-            { value: "RD$ 45M", label: "en pipeline activo" },
-            { value: "34", label: "tratos en curso" },
-          ].map((stat) => (
-            <div key={stat.label} className="flex items-center gap-4">
-              <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none">
-                <circle cx="12" cy="12" r="3" fill="#6b7280" />
-              </svg>
-              <div>
-                <span
-                  className="font-bold text-white text-lg leading-none"
-                  style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
-                >
-                  {stat.value}
-                </span>
-                <p
-                  className="text-xs uppercase tracking-widest font-semibold mt-1"
-                  style={{ color: "#6b7280" }}
-                >
-                  {stat.label}
-                </p>
-              </div>
-            </div>
-          ))}
-
-          <div className="flex items-center gap-2 mt-6">
-            <span
-              className="text-[10px] font-bold uppercase tracking-[0.15em]"
-              style={{ color: "#6b7280" }}
-            >
-              Powered by Advance Estate IA
-            </span>
-          </div>
+        {/* Light mode bg: navy gradient */}
+        <div
+          className="absolute inset-0 dark:hidden"
+          style={{
+            background:
+              "linear-gradient(160deg, #0f172a 0%, #111827 40%, #1e293b 100%)",
+          }}
+        />
+        {/* Dark mode bg: near-OLED */}
+        <div
+          className="absolute inset-0 hidden dark:block"
+          style={{ background: "#080808", borderRight: "1px solid #1A1A18" }}
+        />
+        {/* Strip content — logo only, centered */}
+        <div className="relative z-10 flex h-full items-center justify-center px-6">
+          <Image
+            src="/ae-logo-final.svg"
+            alt="Advance Estate"
+            width={260}
+            height={260}
+            className="object-contain w-full max-w-[260px]"
+            priority
+          />
         </div>
       </section>
 
-      {/* RIGHT PANEL: Form Side */}
+      {/* ══════════════════════════════════════════
+          FORM AREA — 62% (flex-1)
+      ══════════════════════════════════════════ */}
       <section
-        className="w-full md:w-1/2 flex flex-col items-center justify-center p-8 relative"
-        style={{ background: "#FAFAF9" }}
+        className="flex-1 flex flex-col items-center justify-center px-10 py-12 relative"
+        style={{ background: "var(--background)" }}
       >
-        {/* Version info */}
-        <div className="absolute top-8 right-12 flex items-center gap-3">
+        {/* Version badge */}
+        <div className="absolute top-7 right-10">
           <span
-            className="font-bold text-[11px] tracking-tight"
-            style={{ color: "rgba(87,94,112,0.6)", fontFamily: "var(--font-manrope), Manrope, sans-serif" }}
-          >
-            ADVANCE ESTATE
-          </span>
-          <span
-            className="font-medium text-[11px] px-2 py-0.5 rounded"
-            style={{ color: "rgba(87,94,112,0.4)", background: "#F5F4F2" }}
+            className="text-[10px] tracking-[0.08em] uppercase px-2 py-0.5 rounded"
+            style={{
+              color: "color-mix(in srgb, var(--muted-foreground) 60%, transparent)",
+              background: "color-mix(in srgb, var(--muted) 80%, transparent)",
+            }}
           >
             v2.1
           </span>
         </div>
 
-        <div className="w-full max-w-[380px] flex flex-col">
-          {/* Mobile logo */}
-          <div className="mb-8 flex items-center justify-center gap-3 md:hidden">
-            <div className="relative w-9 h-9 flex items-center justify-center">
-              <div
-                className="absolute w-full"
-                style={{ height: 3, background: "#e11d48", top: "50%", transform: "translateY(-50%)", zIndex: 10 }}
-              />
-              <svg className="w-full h-full fill-none stroke-[#1C1917]" strokeWidth="4" viewBox="0 0 100 100">
-                <path d="M20 80 L50 20 L80 80" />
-                <path d="M40 80 L40 20 L75 20 M40 80 L75 80" />
-              </svg>
-            </div>
-            <span
-              className="font-bold text-xl tracking-tight"
-              style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#1C1917" }}
-            >
-              Advance Estate
-            </span>
+        <div className="w-full max-w-[340px] flex flex-col">
+
+          {/* Mobile logo (hidden on desktop) */}
+          <div className="mb-8 flex items-center gap-3 md:hidden">
+            <Image
+              src="/ae-logo-final.svg"
+              alt="Advance Estate"
+              width={48}
+              height={48}
+              className="object-contain"
+            />
           </div>
 
-          <header className="mb-10">
-            <h2
-              className="font-bold text-[28px] tracking-tight mb-1"
-              style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#1C1917" }}
+          {/* Heading */}
+          <header className="mb-8">
+            <h1
+              className="font-bold text-[26px] tracking-tight mb-1.5"
+              style={{
+                fontFamily: "var(--font-manrope), Manrope, sans-serif",
+                color: "var(--foreground)",
+              }}
             >
               Bienvenido de vuelta
-            </h2>
-            <p className="text-sm" style={{ color: "#575e70" }}>
-              Ingresa a tu espacio de trabajo
+            </h1>
+            <p
+              className="text-sm"
+              style={{ color: "var(--muted-foreground)" }}
+            >
+              Inicia sesión en tu cuenta
             </p>
           </header>
 
-          <form onSubmit={handleLogin} className="flex flex-col gap-6">
+          {/* Form */}
+          <form onSubmit={handleLogin} className="flex flex-col gap-5">
+
             {/* Email */}
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="email"
-                className="font-bold text-[11px] uppercase tracking-wider"
-                style={{ color: "rgba(28,25,23,0.7)" }}
+                className="text-[11px] font-bold uppercase tracking-wider"
+                style={{ color: "var(--muted-foreground)" }}
               >
                 Correo electrónico
               </label>
@@ -197,21 +145,22 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full h-12 px-4 rounded-lg text-sm transition-all duration-200"
+                className="w-full h-11 px-4 rounded-md text-sm transition-all duration-200"
                 style={{
-                  background: "#eeeeed",
-                  border: "none",
-                  borderBottom: "2px solid transparent",
-                  color: "#1C1917",
+                  background: "color-mix(in srgb, var(--muted) 70%, transparent)",
+                  border: "1px solid color-mix(in srgb, var(--border) 60%, transparent)",
+                  color: "var(--foreground)",
                   outline: "none",
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderBottomColor = "#e11d48";
-                  e.target.style.background = "#ffffff";
+                  e.target.style.borderColor = "#e11d48";
+                  e.target.style.background = "var(--background)";
                 }}
                 onBlur={(e) => {
-                  e.target.style.borderBottomColor = "transparent";
-                  e.target.style.background = "#eeeeed";
+                  e.target.style.borderColor =
+                    "color-mix(in srgb, var(--border) 60%, transparent)";
+                  e.target.style.background =
+                    "color-mix(in srgb, var(--muted) 70%, transparent)";
                 }}
               />
             </div>
@@ -221,14 +170,14 @@ export default function LoginPage() {
               <div className="flex justify-between items-end">
                 <label
                   htmlFor="password"
-                  className="font-bold text-[11px] uppercase tracking-wider"
-                  style={{ color: "rgba(28,25,23,0.7)" }}
+                  className="text-[11px] font-bold uppercase tracking-wider"
+                  style={{ color: "var(--muted-foreground)" }}
                 >
                   Contraseña
                 </label>
                 <a
                   href="#"
-                  className="text-[11px] font-bold transition-opacity hover:opacity-70"
+                  className="text-[11px] font-semibold transition-opacity hover:opacity-70"
                   style={{ color: "#e11d48" }}
                 >
                   ¿Olvidaste tu contraseña?
@@ -243,34 +192,35 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="w-full h-12 px-4 pr-12 rounded-lg text-sm transition-all duration-200"
+                  className="w-full h-11 px-4 pr-12 rounded-md text-sm transition-all duration-200"
                   style={{
-                    background: "#eeeeed",
-                    border: "none",
-                    borderBottom: "2px solid transparent",
-                    color: "#1C1917",
+                    background: "color-mix(in srgb, var(--muted) 70%, transparent)",
+                    border: "1px solid color-mix(in srgb, var(--border) 60%, transparent)",
+                    color: "var(--foreground)",
                     outline: "none",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderBottomColor = "#e11d48";
-                    e.target.style.background = "#ffffff";
+                    e.target.style.borderColor = "#e11d48";
+                    e.target.style.background = "var(--background)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderBottomColor = "transparent";
-                    e.target.style.background = "#eeeeed";
+                    e.target.style.borderColor =
+                      "color-mix(in srgb, var(--border) 60%, transparent)";
+                    e.target.style.background =
+                      "color-mix(in srgb, var(--muted) 70%, transparent)";
                   }}
                 />
                 <button
                   type="button"
                   tabIndex={-1}
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
-                  style={{ color: "rgba(87,94,112,0.5)" }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors cursor-pointer"
+                  style={{ color: "var(--muted-foreground)" }}
                 >
                   {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
+                    <EyeOff className="w-4 h-4" />
                   ) : (
-                    <Eye className="w-5 h-5" />
+                    <Eye className="w-4 h-4" />
                   )}
                 </button>
               </div>
@@ -280,10 +230,11 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 text-white font-bold text-sm rounded-lg transition-all duration-200 hover:brightness-95 active:scale-[0.98] disabled:opacity-60 mt-2"
+              className="w-full h-11 text-white font-bold text-sm rounded-md transition-all duration-200 hover:brightness-95 active:scale-[0.98] disabled:opacity-60 cursor-pointer mt-1"
               style={{
                 background: "#e11d48",
                 fontFamily: "var(--font-manrope), Manrope, sans-serif",
+                boxShadow: "0 4px 16px rgba(225,29,72,0.28)",
               }}
             >
               {loading ? "Iniciando sesión..." : "Iniciar sesión"}
@@ -291,13 +242,23 @@ export default function LoginPage() {
           </form>
 
           {/* Divider */}
-          <div className="relative my-8 flex items-center justify-center">
+          <div className="relative my-6 flex items-center justify-center">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t" style={{ borderColor: "#e8e8e7" }} />
+              <div
+                className="w-full"
+                style={{
+                  height: 1,
+                  background:
+                    "color-mix(in srgb, var(--border) 50%, transparent)",
+                }}
+              />
             </div>
             <span
               className="relative px-4 text-[10px] font-bold uppercase tracking-widest"
-              style={{ background: "#FAFAF9", color: "rgba(87,94,112,0.5)" }}
+              style={{
+                background: "var(--background)",
+                color: "var(--muted-foreground)",
+              }}
             >
               o continúa con
             </span>
@@ -307,48 +268,44 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={handleGoogleLogin}
-            className="w-full h-12 bg-white text-sm font-bold rounded-lg flex items-center justify-center gap-3 transition-all duration-200 hover:bg-stone-50"
+            className="w-full h-11 text-sm font-semibold rounded-md flex items-center justify-center gap-3 transition-all duration-200 hover:opacity-90 cursor-pointer"
             style={{
-              border: "1px solid rgba(229,189,190,0.3)",
-              color: "#1C1917",
+              border:
+                "1px solid color-mix(in srgb, var(--border) 70%, transparent)",
+              background:
+                "color-mix(in srgb, var(--background) 95%, transparent)",
+              color: "var(--foreground)",
               fontFamily: "var(--font-manrope), Manrope, sans-serif",
             }}
           >
-            <svg className="w-5 h-5" viewBox="0 0 24 24">
-              <path
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                fill="#4285F4"
-              />
-              <path
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                fill="#34A853"
-              />
-              <path
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"
-                fill="#FBBC05"
-              />
-              <path
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                fill="#EA4335"
-              />
+            <svg className="w-4 h-4" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
             </svg>
             Google
           </button>
 
-          <footer className="mt-12 text-center">
-            <p className="text-[12px]" style={{ color: "#575e70" }}>
+          <footer className="mt-8 text-center">
+            <p
+              className="text-[12px]"
+              style={{ color: "var(--muted-foreground)" }}
+            >
               ¿No tienes cuenta?{" "}
               <a
                 href="#"
-                className="font-bold transition-opacity hover:opacity-70"
-                style={{ color: "#1C1917" }}
+                className="font-semibold transition-opacity hover:opacity-70"
+                style={{ color: "var(--foreground)" }}
               >
                 Contacta a tu administrador
               </a>
             </p>
           </footer>
+
         </div>
       </section>
+
     </main>
   );
 }

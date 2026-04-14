@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AE CRM — V2-D · Terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Josefin+Sans:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Josefin Sans', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      height: 36px; background: #000; border-bottom: 1px solid #1a1a1a;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; flex-shrink: 0;
+    }
+    .tl { font-size: 9px; color: #444; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+    .badge { padding: 2px 8px; border-radius: 2px; font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+
+    .main { flex: 1; display: flex; min-height: 0; }
+    .divider-v { width: 1px; background: #1a1a1a; flex-shrink: 0; }
+
+    .half {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 48px 40px;
+    }
+
+    /* === LIGHT === */
+    .light { background: #FAFAF9; }
+
+    /* Subtle corner marks */
+    .light::before, .light::after {
+      content: '';
+      position: absolute;
+      width: 40px; height: 40px;
+      border-color: rgba(202,138,4,0.3);
+      border-style: solid;
+    }
+    .light::before { top: 28px; left: 28px; border-width: 1px 0 0 1px; }
+    .light::after  { bottom: 28px; right: 28px; border-width: 0 1px 1px 0; }
+
+    /* === DARK === */
+    .dark { background: #000; }
+    .dark::before, .dark::after {
+      content: '';
+      position: absolute;
+      width: 40px; height: 40px;
+      border-color: rgba(202,138,4,0.5);
+      border-style: solid;
+    }
+    .dark::before { top: 28px; left: 28px; border-width: 1px 0 0 1px; }
+    .dark::after  { bottom: 28px; right: 28px; border-width: 0 1px 1px 0; }
+
+    /* Content wrapper */
+    .content { position: relative; z-index: 1; width: 100%; max-width: 320px; }
+
+    /* System tag */
+    .sys-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 48px;
+    }
+    .sys-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .sys-tag-l { color: #B5ADA9; }
+    .sys-dot-l { background: #CA8A04; }
+    .sys-tag-d { color: #404040; }
+    .sys-dot-d { background: #CA8A04; }
+
+    /* Giant AE as leading mark */
+    .brand-mark {
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: clamp(48px, 7vw, 80px);
+      letter-spacing: 0.12em;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .brand-mark-l { color: #1C1917; }
+    .brand-mark-d { color: #FAFAFA; }
+
+    .brand-full {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: 11px;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+    .brand-full-l { color: #C4BCBA; }
+    .brand-full-d { color: #292524; }
+
+    /* Gold rule */
+    .rule {
+      width: 100%;
+      height: 1px;
+      margin-bottom: 40px;
+    }
+    .rule-l { background: linear-gradient(90deg, #CA8A04, transparent); }
+    .rule-d { background: linear-gradient(90deg, #CA8A04 60%, transparent); opacity: 0.6; }
+
+    /* Fields — underline only, ultra minimal */
+    .field { margin-bottom: 28px; }
+    .f-label {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .f-label-l { color: #A8A29E; }
+    .f-label-d { color: #404040; }
+
+    .f-input {
+      width: 100%;
+      padding: 10px 0;
+      border: none;
+      border-bottom-width: 1px;
+      border-bottom-style: solid;
+      background: transparent;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .f-input-l { border-bottom-color: #E7E5E4; color: #1C1917; }
+    .f-input-l:focus { border-bottom-color: #CA8A04; }
+    .f-input-d { border-bottom-color: #1C1917; color: #E5E5E5; }
+    .f-input-d:focus { border-bottom-color: #CA8A04; }
+
+    /* Button — outline style */
+    .f-btn {
+      width: 100%;
+      padding: 13px;
+      font-family: 'Josefin Sans', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+      background: transparent;
+    }
+    .f-btn-l {
+      border: 1px solid #1C1917;
+      color: #1C1917;
+    }
+    .f-btn-l:hover {
+      background: #1C1917;
+      color: #FAFAF9;
+    }
+    .f-btn-d {
+      border: 1px solid #CA8A04;
+      color: #CA8A04;
+    }
+    .f-btn-d:hover {
+      background: #CA8A04;
+      color: #000;
+    }
+
+    /* Foot */
+    .f-foot {
+      margin-top: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .f-foot-l { color: #C4BCBA; }
+    .f-foot-d { color: #292524; }
+    .f-link-l { color: #CA8A04; text-decoration: none; }
+    .f-link-d { color: #CA8A04; text-decoration: none; }
+
+    /* Bottom status line */
+    .status-line {
+      position: absolute;
+      bottom: 32px;
+      left: 40px; right: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .status-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+    .status-l { color: #D4CCC8; }
+    .status-d { color: #1C1917; }
+    .status-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 7px;
+      letter-spacing: 0.12em;
+      padding: 2px 6px;
+      border-radius: 2px;
+    }
+    .status-pill-l { background: rgba(202,138,4,0.1); color: #CA8A04; border: 1px solid rgba(202,138,4,0.2); }
+    .status-pill-d { background: rgba(202,138,4,0.08); color: #CA8A04; border: 1px solid rgba(202,138,4,0.15); }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <span class="tl">V2-D — Terminal · Ultra Minimal · Dual Theme</span>
+    <div style="display:flex;gap:8px;">
+      <span class="badge" style="background:#F5F5F4;color:#1C1917;border:1px solid #E7E5E4;">Light</span>
+      <span class="badge" style="background:#111;color:#CA8A04;border:1px solid #292524;">Dark</span>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- LIGHT -->
+    <div class="half light">
+
+      <div class="content">
+        <div class="sys-tag sys-tag-l">
+          <span class="sys-dot sys-dot-l"></span>
+          CRM — Sistema activo
+        </div>
+
+        <div class="brand-mark brand-mark-l">AE</div>
+        <div class="brand-full brand-full-l">Advance Estate</div>
+
+        <div class="rule rule-l"></div>
+
+        <div class="field">
+          <label class="f-label f-label-l">→ Correo electrónico</label>
+          <input class="f-input f-input-l" type="email" value="ipimentel@remaxadvance.com" />
+        </div>
+        <div class="field">
+          <label class="f-label f-label-l">→ Contraseña</label>
+          <input class="f-input f-input-l" type="password" value="••••••••" />
+        </div>
+
+        <button class="f-btn f-btn-l">Iniciar sesión</button>
+        <p class="f-foot f-foot-l"><a class="f-link-l">¿Olvidaste tu contraseña?</a></p>
+      </div>
+
+      <div class="status-line">
+        <span class="status-text status-l">RE/MAX Dominican Republic</span>
+        <span class="status-pill status-pill-l">Powered by Advance IA</span>
+      </div>
+
+    </div>
+
+    <div class="divider-v"></div>
+
+    <!-- DARK -->
+    <div class="half dark">
+
+      <div class="content">
+        <div class="sys-tag sys-tag-d">
+          <span class="sys-dot sys-dot-d"></span>
+          CRM — Sistema activo
+        </div>
+
+        <div class="brand-mark brand-mark-d">AE</div>
+        <div class="brand-full brand-full-d">Advance Estate</div>
+
+        <div class="rule rule-d"></div>
+
+        <div class="field">
+          <label class="f-label f-label-d">→ Correo electrónico</label>
+          <input class="f-input f-input-d" type="email" value="ipimentel@remaxadvance.com" />
+        </div>
+        <div class="field">
+          <label class="f-label f-label-d">→ Contraseña</label>
+          <input class="f-input f-input-d" type="password" value="••••••••" />
+        </div>
+
+        <button class="f-btn f-btn-d">Iniciar sesión</button>
+        <p class="f-foot f-foot-d"><a class="f-link-d">¿Olvidaste tu contraseña?</a></p>
+      </div>
+
+      <div class="status-line">
+        <span class="status-text status-d">RE/MAX Dominican Republic</span>
+        <span class="status-pill status-pill-d">Powered by Advance IA</span>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>
