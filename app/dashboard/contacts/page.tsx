@@ -41,16 +41,15 @@ export default async function ContactsPage({
         <div className="flex justify-between items-end">
           <div>
             <h2
-              className="font-extrabold tracking-tight"
+              className="font-extrabold tracking-tight text-foreground"
               style={{
                 fontFamily: "var(--font-manrope), Manrope, sans-serif",
                 fontSize: 28,
-                color: "#1C1917",
               }}
             >
               Contactos
             </h2>
-            <p className="text-sm mt-1" style={{ color: "#64748b" }}>
+            <p className="text-sm mt-1 text-muted-foreground">
               Gestiona tu cartera de inversionistas y prospectos.
             </p>
           </div>

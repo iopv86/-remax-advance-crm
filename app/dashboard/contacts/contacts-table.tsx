@@ -106,7 +106,7 @@ export function ContactsTable({ contacts: initial }: Props) {
       <div
         className="overflow-hidden"
         style={{
-          background: "white",
+          background: "var(--card)",
           borderRadius: 16,
           boxShadow: "0 4px 24px -12px rgba(0,0,0,0.05)",
         }}
@@ -134,7 +134,7 @@ export function ContactsTable({ contacts: initial }: Props) {
               </th>
             </tr>
           </thead>
-          <tbody style={{ borderTop: "1px solid #f8f8f7" }}>
+          <tbody style={{ borderTop: "1px solid var(--border)" }}>
             {initial.length === 0 && (
               <tr>
                 <td
@@ -169,9 +169,9 @@ export function ContactsTable({ contacts: initial }: Props) {
                 <tr
                   key={c.id}
                   className="group transition-colors"
-                  style={{ borderTop: "1px solid #f8f8f7" }}
+                  style={{ borderTop: "1px solid var(--border)" }}
                   onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = "#fafaf9")
+                    (e.currentTarget.style.background = "var(--muted)")
                   }
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.background = "transparent")
@@ -193,7 +193,7 @@ export function ContactsTable({ contacts: initial }: Props) {
                         {initials}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-stone-900">{name}</p>
+                        <p className="text-sm font-semibold text-foreground">{name}</p>
                         {c.phone && (
                           <p className="text-[12px] text-slate-400">{c.phone}</p>
                         )}
