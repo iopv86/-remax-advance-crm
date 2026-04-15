@@ -118,6 +118,61 @@ export const STAGE_LABELS: Record<DealStage, string> = {
   closed_lost: "Cerrado/Perdido",
 };
 
+/** Raw row from agent_monthly_kpis view */
+export interface AgentKPIView {
+  agent_id: string;
+  full_name: string;
+  deals_closed: number;
+  deals_active: number;
+  total_revenue: number;
+  pipeline_value: number;
+  avg_ticket_value: number | null;
+  stalled_deals_count: number;
+  conversion_rate: number | null;
+}
+
+/** Raw row from agent_response_times view */
+export interface AgentResponseTimeView {
+  agent_id: string;
+  full_name: string;
+  avg_response_minutes: number | null;
+  contacts_responded: number;
+  lead_to_contact_rate: number | null;
+}
+
+/** Raw row from agent_historical_kpis view */
+export interface AgentHistoricalKPIView {
+  agent_id: string;
+  full_name: string;
+  month: string;
+  year: number;
+  deals_closed: number;
+  total_revenue: number;
+  total_deals: number;
+  avg_ticket_value: number | null;
+}
+
+/**
+ * Processed type consumed by AgentsClient.
+ * Built explicitly from AgentKPIView + AgentResponseTimeView + deal fallback.
+ * Never cast to this type — always construct with toAgentKPISummary().
+ */
+export interface AgentKPISummary {
+  id: string;
+  name: string;
+  role: AgentRole;
+  closedDeals: number;
+  activeDeals: number;
+  revenue: number;
+  pipelineValue: number;
+  avgTicketValue: number | null;
+  stalledDeals: number;
+  conversionRate: number | null;
+  avgResponseMinutes: number | null;
+  leadToContactRate: number | null;
+  history: AgentHistoricalKPIView[];
+}
+
 export const CLASSIFICATION_COLORS: Record<LeadClassification, string> = {
   hot: "bg-red-100 text-red-800 border-red-200",
   warm: "bg-orange-100 text-orange-800 border-orange-200",
