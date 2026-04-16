@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logos Preview — Advance Estate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: white;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #C9963A;
+      margin-bottom: 40px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+    .card {
+      border-radius: 12px;
+      padding: 32px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .card label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+    .card img {
+      max-width: 100%;
+      height: auto;
+    }
+    .bg-dark { background: #0D0E14; border: 1px solid rgba(255,255,255,0.08); }
+    .bg-mid  { background: #1C1917; border: 1px solid rgba(255,255,255,0.08); }
+    .bg-white { background: #F8F5F0; border: 1px solid rgba(0,0,0,0.1); }
+
+    h2 {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 8px;
+    }
+    .section { margin-bottom: 48px; }
+
+    /* Side by side comparison */
+    .compare-row {
+      display: flex;
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 24px;
+    }
+    .compare-card {
+      flex: 1;
+      border-radius: 12px;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      min-height: 200px;
+    }
+    .compare-card label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    .compare-card.light-bg label {
+      color: rgba(0,0,0,0.4);
+    }
+    .compare-card img {
+      max-width: 280px;
+      height: auto;
+    }
+
+    /* Context mockups */
+    .mockup-login {
+      background: #0D0E14;
+      border-radius: 16px;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      border: 1px solid rgba(255,255,255,0.06);
+      max-width: 360px;
+    }
+    .mockup-sidebar {
+      background: #1C1917;
+      border-radius: 16px;
+      padding: 24px 20px;
+      width: 240px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .sidebar-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .sidebar-logo-area img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+    .sidebar-text { display: flex; flex-direction: column; }
+    .sidebar-text strong { font-size: 14px; color: white; }
+    .sidebar-text span { font-size: 9px; color: rgba(255,255,255,0.3); letter-spacing: 0.12em; text-transform: uppercase; }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
+    .nav-item {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+    }
+    .nav-item.active {
+      background: rgba(201,150,58,0.1);
+      color: #C9963A;
+      border-left: 2px solid #C9963A;
+    }
+  </style>
+</head>
+<body>
+  <h1>Advance Estate — Logo Asset Review</h1>
+
+  <!-- Section 1: All 3 logos on dark -->
+  <div class="section">
+    <h2>1 · Los tres archivos — fondo oscuro</h2>
+    <div class="grid">
+      <div class="card bg-dark">
+        <label>Logotipo.svg</label>
+        <img src="/logos/logotipo.svg" alt="Logotipo">
+      </div>
+      <div class="card bg-dark">
+        <label>Monograma.svg</label>
+        <img src="/logos/monograma.svg" alt="Monograma">
+      </div>
+      <div class="card bg-dark">
+        <label>Wordmark.svg</label>
+        <img src="/logos/wordmark.svg" alt="Wordmark">
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: On mid and light backgrounds -->
+  <div class="section">
+    <h2>2 · Wordmark — variantes de fondo</h2>
+    <div class="compare-row">
+      <div class="compare-card bg-dark">
+        <img src="/logos/wordmark.svg" alt="Wordmark dark">
+        <label>Obsidian #0D0E14</label>
+      </div>
+      <div class="compare-card bg-mid">
+        <img src="/logos/wordmark.svg" alt="Wordmark mid">
+        <label>Stone #1C1917</label>
+      </div>
+      <div class="compare-card light-bg" style="background:#F8F5F0; border-radius:12px; border:1px solid rgba(0,0,0,0.08);">
+        <img src="/logos/wordmark.svg" alt="Wordmark light">
+        <label>Crema #F8F5F0</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Context mockups -->
+  <div class="section">
+    <h2>3 · En contexto — Login + Sidebar</h2>
+    <div style="display:flex; gap:32px; align-items:flex-start; flex-wrap:wrap;">
+
+      <!-- Login panel -->
+      <div>
+        <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:12px;">Panel login</div>
+        <div class="mockup-login">
+          <img src="/logos/logotipo.svg" alt="Logo" style="width:220px; height:auto;">
+          <div style="width:100%; height:1px; background:rgba(255,255,255,0.06);"></div>
+          <div style="width:100%; background:rgba(255,255,255,0.06); border-radius:8px; height:40px;"></div>
+          <div style="width:100%; background:rgba(255,255,255,0.06); border-radius:8px; height:40px;"></div>
+          <div style="width:100%; background:#C9963A; border-radius:8px; height:44px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#0D0E14;">Iniciar sesión</div>
+        </div>
+      </div>
+
+      <!-- Sidebar panel -->
+      <div>
+        <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:12px;">Sidebar con monograma</div>
+        <div class="mockup-sidebar">
+          <div class="sidebar-logo-area">
+            <img src="/logos/monograma.svg" alt="Monograma" style="width:40px; height:40px; object-fit:contain;">
+            <div class="sidebar-text">
+              <strong>Advance Estate</strong>
+              <span>Real Estate CRM</span>
+            </div>
+          </div>
+          <div class="sidebar-nav">
+            <div class="nav-item active">Dashboard</div>
+            <div class="nav-item">Contactos</div>
+            <div class="nav-item">Pipeline</div>
+            <div class="nav-item">Propiedades</div>
+            <div class="nav-item">Agentes</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logotipo standalone sizes -->
+      <div>
+        <div style="font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:12px;">Logotipo a distintos tamaños</div>
+        <div style="display:flex; flex-direction:column; gap:20px; background:#0D0E14; border-radius:12px; padding:24px; border:1px solid rgba(255,255,255,0.06);">
+          <img src="/logos/logotipo.svg" alt="Logo 320px" style="width:320px; height:auto;">
+          <img src="/logos/logotipo.svg" alt="Logo 200px" style="width:200px; height:auto;">
+          <img src="/logos/logotipo.svg" alt="Logo 120px" style="width:120px; height:auto;">
+          <img src="/logos/logotipo.svg" alt="Logo 60px" style="width:60px; height:auto;">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Monogram sizes -->
+  <div class="section">
+    <h2>4 · Monograma — tamaños de uso</h2>
+    <div style="display:flex; gap:24px; align-items:center; background:#1C1917; border-radius:12px; padding:32px; border:1px solid rgba(255,255,255,0.06);">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <img src="/logos/monograma.svg" alt="" style="width:64px; height:64px; object-fit:contain;">
+        <span style="font-size:9px; color:rgba(255,255,255,0.3);">64px</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <img src="/logos/monograma.svg" alt="" style="width:48px; height:48px; object-fit:contain;">
+        <span style="font-size:9px; color:rgba(255,255,255,0.3);">48px</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <img src="/logos/monograma.svg" alt="" style="width:36px; height:36px; object-fit:contain;">
+        <span style="font-size:9px; color:rgba(255,255,255,0.3);">36px</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <img src="/logos/monograma.svg" alt="" style="width:28px; height:28px; object-fit:contain;">
+        <span style="font-size:9px; color:rgba(255,255,255,0.3);">28px</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+        <img src="/logos/monograma.svg" alt="" style="width:20px; height:20px; object-fit:contain;">
+        <span style="font-size:9px; color:rgba(255,255,255,0.3);">20px</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

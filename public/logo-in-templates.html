@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logos en Templates — Advance Estate</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Manrope', system-ui, sans-serif; background: #080A0F; color: white; padding: 40px; }
+
+    h1 { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: #C9963A; margin-bottom: 40px; }
+
+    /* ─── Section labels ─── */
+    .section { margin-bottom: 56px; }
+    .section-label {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(255,255,255,0.25); border-left: 2px solid #C9963A;
+      padding-left: 10px; margin-bottom: 20px;
+    }
+
+    /* ─── LOGIN TEMPLATE ─── */
+    .login-mock {
+      display: flex;
+      height: 560px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      box-shadow: 0 32px 64px rgba(0,0,0,0.6);
+    }
+    .login-brand {
+      width: 42%;
+      background: linear-gradient(160deg, #0f172a 0%, #111827 40%, #1e293b 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-brand::before {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: -60px;
+      width: 280px; height: 280px;
+      background: radial-gradient(circle, rgba(201,150,58,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .login-brand img {
+      width: 260px;
+      height: auto;
+      position: relative;
+      z-index: 1;
+    }
+    .login-form {
+      flex: 1;
+      background: #0D0E14;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      gap: 20px;
+    }
+    .login-heading { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; color: white; align-self: flex-start; }
+    .login-sub { font-size: 13px; color: rgba(255,255,255,0.4); align-self: flex-start; margin-top: -12px; }
+    .field {
+      width: 100%; height: 44px; border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-gold {
+      width: 100%; height: 44px; border-radius: 8px;
+      background: #C9963A; color: #0D0E14;
+      font-size: 14px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .divider {
+      width: 100%; height: 1px;
+      background: rgba(255,255,255,0.08);
+    }
+
+    /* ─── SIDEBAR TEMPLATE ─── */
+    .sidebar-mock {
+      display: flex;
+      height: 520px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.07);
+      box-shadow: 0 32px 64px rgba(0,0,0,0.6);
+    }
+    .sidebar-panel {
+      width: 260px;
+      background: #0D0E14;
+      border-right: 1px solid rgba(255,255,255,0.07);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      gap: 0;
+    }
+    .sidebar-logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 4px 20px;
+    }
+    .sidebar-logo-area img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+    .sidebar-logo-text { display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-name {
+      font-size: 14px; font-weight: 800; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #F5E6C8 0%, #C9963A 60%, #A67828 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .sidebar-sub {
+      font-size: 8.5px; font-weight: 400; letter-spacing: 0.18em;
+      text-transform: uppercase; color: rgba(255,255,255,0.28);
+    }
+
+    /* Ava pill */
+    .ava-pill {
+      background: rgba(201,150,58,0.08);
+      border: 1px solid rgba(201,150,58,0.2);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #C9963A;
+    }
+    .ava-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #C9963A; flex-shrink: 0;
+    }
+    .nav-list { display: flex; flex-direction: column; gap: 2px; }
+    .nav-item {
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-item.active {
+      background: rgba(201,150,58,0.08);
+      color: #C9963A;
+      font-weight: 700;
+      border-right: 2px solid #C9963A;
+    }
+    .nav-dot { width: 16px; height: 16px; border-radius: 4px; background: currentColor; opacity: 0.4; flex-shrink: 0; }
+    .nav-dot.active { opacity: 1; }
+
+    .main-content {
+      flex: 1;
+      background: #0A0B10;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      gap: 16px;
+    }
+    .main-header { font-size: 18px; font-weight: 700; color: white; }
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi-card {
+      background: #0D0E14;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .kpi-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); }
+    .kpi-value { font-size: 22px; font-weight: 800; color: #C9963A; letter-spacing: -0.03em; }
+    .kpi-sub { font-size: 11px; color: rgba(255,255,255,0.3); }
+    .content-row {
+      flex: 1;
+      background: #0D0E14;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      opacity: 0.5;
+    }
+
+    /* ─── Transparency test ─── */
+    .transparency-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    .bg-test {
+      border-radius: 12px;
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .bg-test img { width: 140px; height: auto; }
+    .bg-test label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); }
+    .bg-test.light label { color: rgba(0,0,0,0.4); }
+    .bg-test.light { border: 1px solid rgba(0,0,0,0.08); }
+
+  </style>
+</head>
+<body>
+  <h1>Advance Estate · Logos en Templates · Preview</h1>
+
+  <!-- 1. LOGIN TEMPLATE -->
+  <div class="section">
+    <div class="section-label">1 · Pantalla de Login — Brand Strip</div>
+    <div class="login-mock">
+      <div class="login-brand">
+        <img src="/logos/logotipo.svg" alt="Advance Estate">
+      </div>
+      <div class="login-form">
+        <div class="login-heading">Bienvenido de vuelta</div>
+        <div class="login-sub">Inicia sesión en tu cuenta</div>
+        <div class="field"></div>
+        <div class="field"></div>
+        <div class="btn-gold">Iniciar sesión</div>
+        <div class="divider"></div>
+        <div class="field" style="background:rgba(255,255,255,0.03);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. SIDEBAR + DASHBOARD -->
+  <div class="section">
+    <div class="section-label">2 · Sidebar — Monograma + Gold Wordmark</div>
+    <div class="sidebar-mock">
+      <div class="sidebar-panel">
+        <!-- Logo area -->
+        <div class="sidebar-logo-area">
+          <img src="/logos/monograma.svg" alt="AE">
+          <div class="sidebar-logo-text">
+            <span class="sidebar-name">Advance Estate</span>
+            <span class="sidebar-sub">Luxury Real Estate</span>
+          </div>
+        </div>
+
+        <!-- Ava pill -->
+        <div class="ava-pill">
+          <div class="ava-dot"></div>
+          Ava activa
+        </div>
+
+        <!-- Nav -->
+        <div class="nav-list">
+          <div class="nav-item active">
+            <div class="nav-dot active"></div>
+            Dashboard
+          </div>
+          <div class="nav-item">
+            <div class="nav-dot"></div>
+            Clientes
+          </div>
+          <div class="nav-item">
+            <div class="nav-dot"></div>
+            Oportunidades
+          </div>
+          <div class="nav-item">
+            <div class="nav-dot"></div>
+            Propiedades
+          </div>
+          <div class="nav-item">
+            <div class="nav-dot"></div>
+            Conversaciones
+          </div>
+          <div class="nav-item">
+            <div class="nav-dot"></div>
+            KPIs Agentes
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <div class="main-header">Dashboard</div>
+        <div class="kpi-row">
+          <div class="kpi-card">
+            <div class="kpi-label">Pipeline Total</div>
+            <div class="kpi-value">RD$ 84.5M</div>
+            <div class="kpi-sub">+12% vs. mes anterior</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Contactos activos</div>
+            <div class="kpi-value">487</div>
+            <div class="kpi-sub">23 nuevos esta semana</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Deals cerrados</div>
+            <div class="kpi-value">14</div>
+            <div class="kpi-sub">Este mes</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Tasa conversión</div>
+            <div class="kpi-value">18.4%</div>
+            <div class="kpi-sub">+3.2% vs. meta</div>
+          </div>
+        </div>
+        <div class="content-row"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. TRANSPARENCY TEST -->
+  <div class="section">
+    <div class="section-label">3 · Test de Transparencia — Logotipo en distintos fondos</div>
+    <div class="transparency-row">
+      <div class="bg-test" style="background:#0D0E14; border:1px solid rgba(255,255,255,0.07);">
+        <img src="/logos/logotipo.svg">
+        <label>Obsidian #0D0E14</label>
+      </div>
+      <div class="bg-test" style="background:#1C1917; border:1px solid rgba(255,255,255,0.07);">
+        <img src="/logos/logotipo.svg">
+        <label>Stone #1C1917</label>
+      </div>
+      <div class="bg-test" style="background:linear-gradient(135deg,#0f172a,#1e293b); border:1px solid rgba(255,255,255,0.07);">
+        <img src="/logos/logotipo.svg">
+        <label>Navy gradient</label>
+      </div>
+      <div class="bg-test light" style="background:#F8F5F0;">
+        <img src="/logos/logotipo.svg">
+        <label>Crema (test invertido)</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MONOGRAM TRANSPARENCY TEST -->
+  <div class="section">
+    <div class="section-label">4 · Test de Transparencia — Monograma</div>
+    <div class="transparency-row">
+      <div class="bg-test" style="background:#0D0E14; border:1px solid rgba(255,255,255,0.07);">
+        <img src="/logos/monograma.svg" style="width:80px;">
+        <label>64px · Obsidian</label>
+      </div>
+      <div class="bg-test" style="background:rgba(201,150,58,0.1); border:1px solid rgba(201,150,58,0.2); border-radius:12px;">
+        <img src="/logos/monograma.svg" style="width:48px;">
+        <label>48px · Gold tint</label>
+      </div>
+      <div class="bg-test" style="background:#1C1917; border:1px solid rgba(255,255,255,0.07);">
+        <img src="/logos/monograma.svg" style="width:36px;">
+        <label>36px · Stone</label>
+      </div>
+      <div class="bg-test" style="background:#1C1917; border:1px solid rgba(255,255,255,0.07);">
+        <img src="/logos/monograma.svg" style="width:24px;">
+        <label>24px · mínimo</label>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
