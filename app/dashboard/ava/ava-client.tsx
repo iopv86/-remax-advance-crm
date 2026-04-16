@@ -7,6 +7,7 @@ import { es } from "date-fns/locale";
 import { Bot, Zap, Activity, MessageSquare, Save } from "lucide-react";
 
 interface AvaConfig {
+  id: string;
   is_active: boolean;
   custom_instructions: string;
   updated_at: string;
@@ -66,7 +67,7 @@ export function AvaClient({ initialConfig, recentMessages, convToday, responseRa
     const newVal = !isActive;
     setIsActive(newVal); // optimistic
     try {
-      await supabase.from("ava_config").update({ is_active: newVal }).eq("id", 1);
+      await supabase.from("ava_config").update({ is_active: newVal }).eq("id", initialConfig.id);
     } catch {
       setIsActive(!newVal); // rollback
     } finally {
@@ -81,7 +82,7 @@ export function AvaClient({ initialConfig, recentMessages, convToday, responseRa
       await supabase
         .from("ava_config")
         .update({ custom_instructions: instructions })
-        .eq("id", 1);
+        .eq("id", initialConfig.id);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } finally {

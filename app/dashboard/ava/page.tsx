@@ -12,7 +12,7 @@ export default async function AvaPage() {
   try {
     const { data, error } = await supabase
       .from("ava_config")
-      .select("is_active, custom_instructions, updated_at")
+      .select("id, is_active, custom_instructions, updated_at")
       .single();
     if (!error) avaConfig = data;
   } catch {

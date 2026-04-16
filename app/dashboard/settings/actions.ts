@@ -23,17 +23,15 @@ export async function saveAvaConfig(
     return { ok: false, error: "Las instrucciones no pueden superar 5000 caracteres" };
   }
 
-  const entries = Object.entries(config) as [keyof AvaConfig, string][];
+  const rows = (Object.entries(config) as [keyof AvaConfig, string][]).map(
+    ([key, value]) => ({ key, value })
+  );
 
-  for (const [key, value] of entries) {
-    const { error } = await supabase
-      .from("agency_config")
-      .upsert({ key, value }, { onConflict: "key" });
+  const { error } = await supabase
+    .from("agency_config")
+    .upsert(rows, { onConflict: "key" });
 
-    if (error) {
-      return { ok: false, error: error.message };
-    }
-  }
+  if (error) return { ok: false, error: error.message };
 
   return { ok: true };
 }
