@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Logo Gallery v2 — Advance Estate</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0D0E14;
+    --surface: #14151C;
+    --border: rgba(201,150,58,0.15);
+    --gold: #C9963A;
+    --gold-muted: rgba(201,150,58,0.12);
+    --cream: #F5F0E8;
+    --muted: #6B7280;
+    --green: #22c55e;
+    --amber: #f59e0b;
+    --red: #ef4444;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 48px 32px;
+  }
+
+  /* Page header */
+  .page-header {
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 24px;
+  }
+  .page-header h1 {
+    font-family: 'Georgia', serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+  }
+  .page-header p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* Section */
+  .section { margin-bottom: 56px; }
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .grid-wide {
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(201,150,58,0.35); }
+  .card.recommended { border-color: rgba(201,150,58,0.5); }
+  .card.recommended::before {
+    content: 'RECOMENDADO';
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--gold);
+    color: #0D0E14;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 4px;
+    z-index: 2;
+  }
+  .card.direction { border-color: rgba(201,150,58,0.25); }
+  .card.direction::before {
+    content: 'DIRECCIÓN';
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(201,150,58,0.2);
+    color: var(--gold);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* Preview area */
+  .preview {
+    background: #0D0E14;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    min-height: 200px;
+    position: relative;
+  }
+  .preview.light-bg { background: #F5F0E8; }
+  .preview.checkered {
+    background-image:
+      linear-gradient(45deg, #1a1b22 25%, transparent 25%),
+      linear-gradient(-45deg, #1a1b22 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #1a1b22 75%),
+      linear-gradient(-45deg, transparent 75%, #1a1b22 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    background-color: #0D0E14;
+  }
+  .preview img {
+    max-height: 160px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+  .preview img.sidebar-size {
+    max-height: 40px;
+    max-width: 160px;
+  }
+
+  /* Size demos */
+  .size-demo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+  .size-demo .size-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .size-demo .size-item img { object-fit: contain; }
+  .size-demo .size-label {
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Card footer */
+  .card-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+  .card-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tag {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 500;
+  }
+  .tag-green { background: rgba(34,197,94,0.12); color: var(--green); }
+  .tag-amber { background: rgba(245,158,11,0.12); color: var(--amber); }
+  .tag-red   { background: rgba(239,68,68,0.12);  color: var(--red); }
+  .tag-gold  { background: var(--gold-muted); color: var(--gold); }
+
+  /* Login preview */
+  .login-preview {
+    background: #14151C;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 380px;
+  }
+  .login-preview .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .login-preview .logo-area img {
+    height: 40px;
+    object-fit: contain;
+  }
+  .login-preview .brand-text .name {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--cream);
+    letter-spacing: -0.01em;
+  }
+  .login-preview .brand-text .sub {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .login-preview .divider { height: 1px; background: var(--border); }
+  .login-preview .input-mock {
+    height: 36px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .login-preview .btn-mock {
+    height: 44px;
+    border-radius: 6px;
+    background: var(--gold);
+  }
+
+  /* Sidebar preview */
+  .sidebar-preview {
+    background: #14151C;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    width: 240px;
+    padding: 16px;
+  }
+  .sidebar-preview .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 12px;
+  }
+  .sidebar-preview .logo-area img { height: 32px; object-fit: contain; }
+  .sidebar-preview .nav-item {
+    height: 32px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+    background: rgba(255,255,255,0.03);
+  }
+  .sidebar-preview .nav-item.active { background: var(--gold-muted); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 40px 0;
+  }
+
+  /* Background preview */
+  .bg-preview {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 320px;
+  }
+  .bg-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .bg-preview .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.7) 50%, transparent 100%);
+    display: flex;
+    align-items: center;
+    padding: 40px;
+  }
+  .bg-preview .overlay .login-form-ghost {
+    background: rgba(20,21,28,0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .bg-preview .overlay .login-form-ghost .title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--cream);
+  }
+  .bg-preview .overlay .login-form-ghost .sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .bg-preview .overlay .login-form-ghost .field {
+    height: 36px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .bg-preview .overlay .login-form-ghost .btn {
+    height: 40px;
+    border-radius: 6px;
+    background: var(--gold);
+    margin-top: 4px;
+  }
+
+  .footnote {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Logo Gallery v2 — Advance Estate</h1>
+  <p>Gemini-generated candidates · Obsidian Edge dark theme · 2026-04-16</p>
+</div>
+
+<!-- ─── SECTION 1: TOP CANDIDATES ─────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Candidatos Principales</div>
+  <div class="grid grid-wide">
+
+    <!-- BEST: Cinzel serif wordmark on obsidian -->
+    <div class="card recommended">
+      <div class="preview" style="background:#0D0E14;padding:40px 48px;">
+        <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" alt="Cinzel Wordmark" style="max-height:180px;"/>
+      </div>
+      <div class="size-demo">
+        <div class="size-item">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:56px;width:180px;object-fit:contain;" alt="login"/>
+          <span class="size-label">Login</span>
+        </div>
+        <div class="size-item">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:28px;width:110px;object-fit:contain;" alt="sidebar"/>
+          <span class="size-label">Sidebar</span>
+        </div>
+        <div class="size-item">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:18px;width:80px;object-fit:contain;" alt="compact"/>
+          <span class="size-label">Compact</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">★ Wordmark Serif Cinzel — MEJOR OPCIÓN</div>
+        <div class="card-desc">ADVANCE en crema grande / línea dorada / ESTATE espaciado en oro. Obsidian puro. Exactamente los colores del design system. Tipografía de inscripción romana — clase máxima para real estate de lujo.</div>
+        <div class="card-tags">
+          <span class="tag tag-green">Colores exactos del sistema</span>
+          <span class="tag tag-green">Brand name correcto</span>
+          <span class="tag tag-gold">Login ✓</span>
+          <span class="tag tag-gold">Sidebar ✓</span>
+          <span class="tag tag-gold">Header ✓</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Art Deco AE badge (correct colors) -->
+    <div class="card recommended">
+      <div class="preview" style="background:#0D0E14;padding:24px;">
+        <img src="../../nanobanana-output/ae_art_deco_monogram_logo_obsidi.png" alt="Art Deco Badge"/>
+      </div>
+      <div class="size-demo">
+        <div class="size-item">
+          <img src="../../nanobanana-output/ae_art_deco_monogram_logo_obsidi.png" style="height:80px;width:80px;object-fit:contain;" alt="80px"/>
+          <span class="size-label">80px</span>
+        </div>
+        <div class="size-item">
+          <img src="../../nanobanana-output/ae_art_deco_monogram_logo_obsidi.png" style="height:48px;width:48px;object-fit:contain;" alt="48px"/>
+          <span class="size-label">48px</span>
+        </div>
+        <div class="size-item">
+          <img src="../../nanobanana-output/ae_art_deco_monogram_logo_obsidi.png" style="height:32px;width:32px;object-fit:contain;" alt="32px"/>
+          <span class="size-label">32px</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">AE Art Déco — Sello Circular Obsidian</div>
+        <div class="card-desc">"ADVANCE ESTATE · LUXURY REAL ESTATE" en círculo. AE grande con ornamentación Art Déco. Colores obsidian + oro correctos. Perfecto como badge, app icon, o hero mark.</div>
+        <div class="card-tags">
+          <span class="tag tag-green">Colores correctos</span>
+          <span class="tag tag-green">Brand name correcto</span>
+          <span class="tag tag-gold">App icon ✓</span>
+          <span class="tag tag-gold">Favicon ✓</span>
+          <span class="tag tag-amber">Sidebar — solo si hay espacio</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: Bold AE Monogram (icon/favicon) -->
+    <div class="card recommended">
+      <div class="preview">
+        <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" alt="AE Monogram"/>
+      </div>
+      <div class="size-demo">
+        <div class="size-item">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:64px;width:64px;" alt="64px"/>
+          <span class="size-label">64px</span>
+        </div>
+        <div class="size-item">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:40px;width:40px;" alt="40px"/>
+          <span class="size-label">40px</span>
+        </div>
+        <div class="size-item">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:24px;width:24px;" alt="24px"/>
+          <span class="size-label">24px</span>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">AE Monograma — Geométrico Bold</div>
+        <div class="card-desc">A+E superpuestas, obsidian negro, oro estate. Ultra-legible en tamaños pequeños. Ideal en combinación con el wordmark: usar este para favicon/sidebar collapsed, wordmark para login/header.</div>
+        <div class="card-tags">
+          <span class="tag tag-green">Legible 24px</span>
+          <span class="tag tag-green">Colores correctos</span>
+          <span class="tag tag-gold">Sidebar collapsed ✓</span>
+          <span class="tag tag-gold">Favicon ✓</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── SECTION 2: OTRAS OPCIONES ─────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Otras Opciones</div>
+  <div class="grid">
+
+    <!-- Geometric AE with grid 1 -->
+    <div class="card direction">
+      <div class="preview checkered">
+        <img src="../../nanobanana-output/ae_monogram_luxury_real_estate_g.png" alt="AE Grid 1"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">AE Monograma — Construcción Angular</div>
+        <div class="card-desc">Monograma geométrico con grid de construcción. Moderno, premium. Fondo redondeado que lo contiene bien.</div>
+        <div class="card-tags">
+          <span class="tag tag-green">Colores correctos</span>
+          <span class="tag tag-amber">App icon OK</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Geometric AE with grid 2 -->
+    <div class="card direction">
+      <div class="preview checkered">
+        <img src="../../nanobanana-output/premium_real_estate_monogram_log.png" alt="AE Grid 2"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">AE Monograma — Premium Construction v2</div>
+        <div class="card-desc">Variación similar con letras más anchas. Misma dirección de diseño, ligeramente diferente proporción.</div>
+        <div class="card-tags">
+          <span class="tag tag-green">Colores correctos</span>
+          <span class="tag tag-amber">Muy similar al anterior</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Art Deco seal -->
+    <div class="card direction">
+      <div class="preview light-bg">
+        <img src="../../nanobanana-output/ae_monogram_abstract_art_deco_st.png" alt="Art Deco"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">AE Art Déco — Sello Circular</div>
+        <div class="card-desc">Sello circular con ornamentación Art Déco, palm trees, texto "DOMINICAN REPUBLIC · LUXURY REAL ESTATE". Dirección interesante pero colores rosa/vino incorrectos para Obsidian Edge.</div>
+        <div class="card-tags">
+          <span class="tag tag-amber">Dirección = excelente</span>
+          <span class="tag tag-red">Colores incorrectos</span>
+          <span class="tag tag-amber">Regenerar en oscuro</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D Seal -->
+    <div class="card">
+      <div class="preview checkered">
+        <img src="../../nanobanana-output/luxury_brand_logo_seal_circular_.png" alt="3D Seal"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title">Sello 3D Fotorrealista</div>
+        <div class="card-desc">Diamond AE embossed, circular, photorealistic leather. Premium feel pero demasiado fotorrealista — no escala bien como vector.</div>
+        <div class="card-tags">
+          <span class="tag tag-amber">Estilo premium</span>
+          <span class="tag tag-red">No escala a 24px</span>
+          <span class="tag tag-red">No vectorizable</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── SECTION 3: CONTEXTO EN APP ────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Vista en Contexto — ¿Cómo se vería en la app?</div>
+
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px;">
+
+    <!-- Login panel with new Cinzel wordmark -->
+    <div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">★ Mejor — Login con Wordmark Cinzel</p>
+      <div class="login-preview">
+        <div class="logo-area" style="padding-bottom:4px;">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:52px;max-width:220px;object-fit:contain;" alt="logo"/>
+        </div>
+        <div class="divider"></div>
+        <div class="input-mock"></div>
+        <div class="input-mock"></div>
+        <div class="btn-mock"></div>
+      </div>
+    </div>
+
+    <!-- Login panel with AE monogram + wordmark combo -->
+    <div>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">Alternativa — Monograma AE + Texto</p>
+      <div class="login-preview">
+        <div class="logo-area">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:40px;width:40px;object-fit:contain;" alt="logo"/>
+          <div class="brand-text">
+            <div class="name">Advance Estate</div>
+            <div class="sub">RE/MAX Advance · RD</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="input-mock"></div>
+        <div class="input-mock"></div>
+        <div class="btn-mock"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Sidebar previews -->
+  <p style="font-size:11px;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">Sidebar — Tamaños reales</p>
+  <div style="display:flex;gap:24px;flex-wrap:wrap;">
+
+    <div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:8px;">AE Monograma en sidebar</p>
+      <div class="sidebar-preview">
+        <div class="logo-area">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:32px;width:32px;object-fit:contain;" alt="logo"/>
+          <span style="font-size:13px;font-weight:600;color:var(--cream);">Advance Estate</span>
+        </div>
+        <div class="nav-item active"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+      </div>
+    </div>
+
+    <div>
+      <p style="font-size:10px;color:var(--muted);margin-bottom:8px;">Wordmark Cinzel en sidebar</p>
+      <div class="sidebar-preview">
+        <div class="logo-area">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:28px;max-width:130px;object-fit:contain;" alt="logo"/>
+        </div>
+        <div class="nav-item active"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ─── SECTION 4: BONUS — FOTO DE FONDO LOGIN ───────────────────── -->
+<div class="section">
+  <div class="section-title">Bonus — Foto de Fondo para Login (Generada)</div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Villa de lujo en República Dominicana al atardecer — generada como background para el panel izquierdo del login</p>
+
+  <div class="bg-preview">
+    <img src="../../nanobanana-output/luxury_real_estate_agency_login_.png" alt="Login Background"/>
+    <div class="overlay">
+      <div class="login-form-ghost">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:32px;max-width:150px;object-fit:contain;" alt="logo"/>
+        </div>
+        <div class="title">Bienvenido</div>
+        <div class="sub">Portal exclusivo de gestión</div>
+        <div class="field"></div>
+        <div class="field"></div>
+        <div class="btn"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;">
+    <p style="font-size:12px;color:var(--muted);">
+      Esta foto puede reemplazar al fondo blanco actual del login. El panel izquierdo (55% de pantalla) tiene esta foto desaturada como fondo,
+      con un overlay oscuro. El panel derecho (45%) mantiene el fondo obsidian con el formulario.
+    </p>
+  </div>
+</div>
+
+<!-- ─── SECTION 5: DESCARTADOS ────────────────────────────────────── -->
+<div class="section">
+  <div class="section-title">Descartados</div>
+  <div class="grid">
+    <div class="card">
+      <div class="preview light-bg" style="opacity:0.5;">
+        <img src="../../nanobanana-output/advance_estate_real_estate_logo_.png" alt="rejected"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title" style="color:var(--muted);">Casa + E genérica</div>
+        <div class="card-tags"><span class="tag tag-red">Cliché inmobiliario</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="preview" style="opacity:0.5;">
+        <img src="../../nanobanana-output/real_estate_logo_shield_crest_wi.png" alt="rejected"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title" style="color:var(--muted);">Escudo rojo genérico</div>
+        <div class="card-tags"><span class="tag tag-red">Marca incorrecta</span><span class="tag tag-red">Colores incorrectos</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="preview light-bg" style="opacity:0.5;">
+        <img src="../../nanobanana-output/minimalist_luxury_real_estate_ab.png" alt="rejected"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title" style="color:var(--muted);">Ilustración abstracta rosa</div>
+        <div class="card-tags"><span class="tag tag-red">No es un logo</span><span class="tag tag-red">Colores incorrectos</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="preview" style="opacity:0.5;">
+        <img src="../../nanobanana-output/abstract_geometric_logo_for_prem.png" alt="rejected"/>
+      </div>
+      <div class="card-footer">
+        <div class="card-title" style="color:var(--muted);">Apex Skyline Properties</div>
+        <div class="card-tags"><span class="tag tag-red">Marca incorrecta</span><span class="tag tag-amber">Estilo de referencia válido</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="footnote">Advance Estate · RE/MAX Advance · República Dominicana · Obsidian Edge Design System</p>
+
+</body>
+</html>

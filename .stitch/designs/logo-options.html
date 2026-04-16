@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Logo Options — Advance Estate CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:      #0D0E14;
+  --surface: #14151C;
+  --surface2:#1a1b22;
+  --border:  rgba(201,150,58,0.18);
+  --gold:    #C9963A;
+  --gold-bg: rgba(201,150,58,0.12);
+  --cream:   #F5F0E8;
+  --muted:   #6B7280;
+}
+body {
+  background: var(--bg);
+  color: var(--cream);
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  padding: 40px 24px 60px;
+}
+
+/* ─── Page Header ────────────────────────────────── */
+.ph { text-align:center; margin-bottom:48px; padding-bottom:28px; border-bottom:1px solid var(--border); }
+.ph h1 { font-family:'Cinzel',serif; font-size:22px; font-weight:600; letter-spacing:0.06em; color:var(--cream); }
+.ph p  { font-size:12px; color:var(--muted); margin-top:6px; letter-spacing:0.04em; }
+.pill  { display:inline-flex; align-items:center; gap:6px; margin-top:14px; padding:6px 14px; border-radius:6px; background:var(--gold-bg); border:1px solid rgba(201,150,58,0.3); font-size:10px; color:var(--gold); letter-spacing:0.06em; text-transform:uppercase; }
+
+/* ─── Grid ───────────────────────────────────────── */
+.grid { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; max-width:1320px; margin:0 auto; }
+@media(max-width:860px){ .grid{ grid-template-columns:1fr; } }
+
+/* ─── Card ───────────────────────────────────────── */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
+.card-head { display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--border); }
+.opt-tag { font-size:10px; font-weight:700; letter-spacing:0.18em; color:var(--gold); text-transform:uppercase; }
+.opt-style { font-size:10px; color:var(--muted); }
+
+/* ─── Monogram strip ─────────────────────────────── */
+.mono-strip { background:var(--bg); display:flex; align-items:center; justify-content:center; gap:24px; padding:20px 16px; border-bottom:1px solid var(--border); }
+.mc { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.mc img { object-fit:contain; flex-shrink:0; }
+.mc span { font-size:9px; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; }
+
+/* ─── Context row ────────────────────────────────── */
+.ctx-row { display:grid; grid-template-columns:1fr 1fr; border-bottom:1px solid var(--border); }
+.ctx-col { padding:14px; }
+.ctx-col + .ctx-col { border-left:1px solid var(--border); }
+.ctx-label { font-size:9px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+
+/* ─── Login mockup ───────────────────────────────── */
+.login-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:14px; display:flex; flex-direction:column; gap:7px; }
+.lockup { display:flex; align-items:center; gap:9px; padding-bottom:10px; border-bottom:1px solid var(--border); }
+.lockup img { object-fit:contain; flex-shrink:0; }
+.lockup-text .name { font-family:'Cinzel',serif; font-size:12px; font-weight:600; color:var(--cream); letter-spacing:0.03em; line-height:1.2; }
+.lockup-text .sub  { font-size:9px; letter-spacing:0.1em; text-transform:uppercase; color:var(--gold); margin-top:2px; }
+.fld  { height:26px; border-radius:4px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); }
+.btn  { height:30px; border-radius:4px; background:var(--gold); margin-top:2px; }
+
+/* ─── Sidebar mockup ─────────────────────────────── */
+.sb { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px; }
+.sb-top { display:flex; align-items:center; gap:8px; padding-bottom:8px; border-bottom:1px solid var(--border); margin-bottom:6px; }
+.sb-top img { object-fit:contain; flex-shrink:0; }
+.sb-name { font-family:'Cinzel',serif; font-size:10px; font-weight:600; color:var(--cream); letter-spacing:0.02em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.nav { height:20px; border-radius:4px; background:rgba(255,255,255,0.03); margin-bottom:3px; }
+.nav.on { background:var(--gold-bg); }
+
+/* ─── Header bar ─────────────────────────────────── */
+.hdr-wrap { padding:12px 16px; border-bottom:1px solid var(--border); }
+.hdr { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; }
+.hdr img { object-fit:contain; }
+.hdr-dots { display:flex; gap:5px; }
+.hdr-dot { width:32px; height:7px; border-radius:3px; background:rgba(255,255,255,0.06); }
+.hdr-dot.on { background:var(--gold-bg); }
+
+/* ─── Card footer ────────────────────────────────── */
+.cfoot { padding:12px 18px; font-size:11px; color:var(--muted); line-height:1.65; }
+.cfoot strong { color:var(--cream); }
+.cfoot em { color:var(--gold); font-style:normal; }
+
+/* ─── Bottom note ────────────────────────────────── */
+.bnote { max-width:1320px; margin:28px auto 0; padding:18px 22px; background:var(--surface); border:1px solid var(--border); border-radius:12px; font-size:11px; color:var(--muted); line-height:1.7; }
+.bnote strong { color:var(--cream); }
+.bnote .g { color:var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="ph">
+  <h1>Logo Options — Advance Estate CRM</h1>
+  <p>Monograma AE + Lockup Login · Header Wordmark · Sidebar / Favicon / App Icon</p>
+  <div class="pill">En la app: SVG fondo transparente — se muestra sobre oscuro para legibilidad</div>
+</div>
+
+<div class="grid">
+
+<!-- ══════════════════════════════════════════════════
+     A  GEOMÉTRICO BOLD
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head">
+    <span class="opt-tag">Opción A · Geométrico Bold</span>
+    <span class="opt-style">Moderno · Arquitectónico</span>
+  </div>
+
+  <div class="mono-strip">
+    <div class="mc">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:96px;width:96px;" alt="A 96"/>
+      <span>96px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:56px;width:56px;" alt="A 56"/>
+      <span>56px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:36px;width:36px;" alt="A 36"/>
+      <span>36px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:24px;width:24px;" alt="A 24"/>
+      <span>24px fav</span>
+    </div>
+  </div>
+
+  <div class="ctx-row">
+    <div class="ctx-col">
+      <div class="ctx-label">Login — Lockup</div>
+      <div class="login-box">
+        <div class="lockup">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:36px;width:36px;" alt=""/>
+          <div class="lockup-text">
+            <div class="name">Advance Estate</div>
+            <div class="sub">RE/MAX · CRM</div>
+          </div>
+        </div>
+        <div class="fld"></div>
+        <div class="fld"></div>
+        <div class="btn"></div>
+      </div>
+    </div>
+    <div class="ctx-col">
+      <div class="ctx-label">Sidebar + Favicon</div>
+      <div class="sb">
+        <div class="sb-top">
+          <img src="../../nanobanana-output/advance_estate_luxury_real_estat.png" style="height:26px;width:26px;" alt=""/>
+          <span class="sb-name">Advance Estate</span>
+        </div>
+        <div class="nav on"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr-wrap">
+    <div class="ctx-label" style="margin-bottom:8px;">Header — Wordmark</div>
+    <div class="hdr">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:22px;max-width:130px;" alt="wordmark"/>
+      <div class="hdr-dots">
+        <div class="hdr-dot on"></div>
+        <div class="hdr-dot"></div>
+        <div class="hdr-dot"></div>
+        <div class="hdr-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfoot">
+    <strong>Geométrico Bold</strong> — A+E angulares superpuestos, trazo compartido.
+    <em>Máxima legibilidad a 24px.</em> Sensación: fintech premium, arquitectura de autor.
+    Probado — es el que más gustó en la sesión anterior.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     B  SERIF CINZEL
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head">
+    <span class="opt-tag">Opción B · Serif Cinzel</span>
+    <span class="opt-style">Clásico · Bancario</span>
+  </div>
+
+  <div class="mono-strip">
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_serif_monogram_luxury_real_es_1.png" style="height:96px;width:96px;object-fit:cover;object-position:center 20%;" alt="B 96"/>
+      <span>96px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_serif_monogram_luxury_real_es_1.png" style="height:56px;width:56px;object-fit:cover;object-position:center 20%;" alt="B 56"/>
+      <span>56px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_serif_monogram_luxury_real_es_1.png" style="height:36px;width:36px;object-fit:cover;object-position:center 20%;" alt="B 36"/>
+      <span>36px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_serif_monogram_luxury_real_es_1.png" style="height:24px;width:24px;object-fit:cover;object-position:center 20%;" alt="B 24"/>
+      <span>24px fav</span>
+    </div>
+  </div>
+
+  <div class="ctx-row">
+    <div class="ctx-col">
+      <div class="ctx-label">Login — Lockup</div>
+      <div class="login-box">
+        <div class="lockup">
+          <img src="../../nanobanana-output/ae_serif_monogram_luxury_real_es_1.png" style="height:36px;width:36px;object-fit:cover;object-position:center 20%;" alt=""/>
+          <div class="lockup-text">
+            <div class="name">Advance Estate</div>
+            <div class="sub">RE/MAX · CRM</div>
+          </div>
+        </div>
+        <div class="fld"></div>
+        <div class="fld"></div>
+        <div class="btn"></div>
+      </div>
+    </div>
+    <div class="ctx-col">
+      <div class="ctx-label">Sidebar + Favicon</div>
+      <div class="sb">
+        <div class="sb-top">
+          <img src="../../nanobanana-output/ae_serif_monogram_luxury_real_es_1.png" style="height:26px;width:26px;object-fit:cover;object-position:center 20%;flex-shrink:0;" alt=""/>
+          <span class="sb-name">Advance Estate</span>
+        </div>
+        <div class="nav on"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr-wrap">
+    <div class="ctx-label" style="margin-bottom:8px;">Header — Wordmark</div>
+    <div class="hdr">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:22px;max-width:130px;" alt="wordmark"/>
+      <div class="hdr-dots">
+        <div class="hdr-dot on"></div>
+        <div class="hdr-dot"></div>
+        <div class="hdr-dot"></div>
+        <div class="hdr-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfoot">
+    <strong>Serif Cinzel</strong> — AE en serifas romanas clásicas, elegante y airoso.
+    Sensación: <em>banca privada, portfolio de inversión, notaría de lujo.</em>
+    La serifa le da carácter único frente a las sans-serif de la competencia.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     C1  A SOBRE E — FLAT GEOMÉTRICO
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head">
+    <span class="opt-tag">Opción C1 · A sobre E — Flat</span>
+    <span class="opt-style">Overlap geométrico · Moderno</span>
+  </div>
+
+  <div class="mono-strip">
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_overlapping_monogram_large_bo.png" style="height:96px;width:96px;" alt="C1 96"/>
+      <span>96px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_overlapping_monogram_large_bo.png" style="height:56px;width:56px;" alt="C1 56"/>
+      <span>56px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_overlapping_monogram_large_bo.png" style="height:36px;width:36px;" alt="C1 36"/>
+      <span>36px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_overlapping_monogram_large_bo.png" style="height:24px;width:24px;" alt="C1 24"/>
+      <span>24px fav</span>
+    </div>
+  </div>
+
+  <div class="ctx-row">
+    <div class="ctx-col">
+      <div class="ctx-label">Login — Lockup</div>
+      <div class="login-box">
+        <div class="lockup">
+          <img src="../../nanobanana-output/ae_overlapping_monogram_large_bo.png" style="height:36px;width:36px;" alt=""/>
+          <div class="lockup-text">
+            <div class="name">Advance Estate</div>
+            <div class="sub">RE/MAX · CRM</div>
+          </div>
+        </div>
+        <div class="fld"></div>
+        <div class="fld"></div>
+        <div class="btn"></div>
+      </div>
+    </div>
+    <div class="ctx-col">
+      <div class="ctx-label">Sidebar + Favicon</div>
+      <div class="sb">
+        <div class="sb-top">
+          <img src="../../nanobanana-output/ae_overlapping_monogram_large_bo.png" style="height:26px;width:26px;flex-shrink:0;" alt=""/>
+          <span class="sb-name">Advance Estate</span>
+        </div>
+        <div class="nav on"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr-wrap">
+    <div class="ctx-label" style="margin-bottom:8px;">Header — Wordmark</div>
+    <div class="hdr">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:22px;max-width:130px;" alt="wordmark"/>
+      <div class="hdr-dots">
+        <div class="hdr-dot on"></div><div class="hdr-dot"></div><div class="hdr-dot"></div><div class="hdr-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfoot">
+    <strong>C1 — A sobre E, geométrico flat.</strong> A en primer plano oro pleno, E detrás en oro oscuro.
+    Dos tonos del mismo color crean la profundidad. Limpio, directo, legible a cualquier tamaño.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     C2  A SOBRE E — METÁLICO PREMIUM ★
+══════════════════════════════════════════════════ -->
+<div class="card" style="border-color:rgba(201,150,58,0.5);">
+  <div class="card-head">
+    <span class="opt-tag">Opción C2 · A sobre E — Metálico ★</span>
+    <span class="opt-style">Profundidad · Ultra-premium</span>
+  </div>
+
+  <div class="mono-strip">
+    <div class="mc">
+      <img src="../../nanobanana-output/monogram_letter_a_large_bold_in_.png" style="height:96px;width:96px;object-fit:cover;object-position:center 30%;" alt="C2 96"/>
+      <span>96px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/monogram_letter_a_large_bold_in_.png" style="height:56px;width:56px;object-fit:cover;object-position:center 30%;" alt="C2 56"/>
+      <span>56px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/monogram_letter_a_large_bold_in_.png" style="height:36px;width:36px;object-fit:cover;object-position:center 30%;" alt="C2 36"/>
+      <span>36px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/monogram_letter_a_large_bold_in_.png" style="height:24px;width:24px;object-fit:cover;object-position:center 30%;" alt="C2 24"/>
+      <span>24px fav</span>
+    </div>
+  </div>
+
+  <div class="ctx-row">
+    <div class="ctx-col">
+      <div class="ctx-label">Login — Lockup</div>
+      <div class="login-box">
+        <div class="lockup">
+          <img src="../../nanobanana-output/monogram_letter_a_large_bold_in_.png" style="height:36px;width:36px;object-fit:cover;object-position:center 30%;" alt=""/>
+          <div class="lockup-text">
+            <div class="name">Advance Estate</div>
+            <div class="sub">RE/MAX · CRM</div>
+          </div>
+        </div>
+        <div class="fld"></div>
+        <div class="fld"></div>
+        <div class="btn"></div>
+      </div>
+    </div>
+    <div class="ctx-col">
+      <div class="ctx-label">Sidebar + Favicon</div>
+      <div class="sb">
+        <div class="sb-top">
+          <img src="../../nanobanana-output/monogram_letter_a_large_bold_in_.png" style="height:26px;width:26px;object-fit:cover;object-position:center 30%;flex-shrink:0;" alt=""/>
+          <span class="sb-name">Advance Estate</span>
+        </div>
+        <div class="nav on"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr-wrap">
+    <div class="ctx-label" style="margin-bottom:8px;">Header — Wordmark</div>
+    <div class="hdr">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:22px;max-width:130px;" alt="wordmark"/>
+      <div class="hdr-dots">
+        <div class="hdr-dot on"></div><div class="hdr-dot"></div><div class="hdr-dot"></div><div class="hdr-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfoot">
+    <strong>C2 — A sobre E, tratamiento metálico.</strong> A en oro cálido en primer plano,
+    E en champagne dorado detrás. El relieve crea profundidad real. <em>La más premium de todas las variantes.</em>
+    En SVG final: sin el texto de la IA, solo el mark puro con fondo transparente.
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     D  ESPACIO NEGATIVO
+══════════════════════════════════════════════════ -->
+<div class="card">
+  <div class="card-head">
+    <span class="opt-tag">Opción D · Espacio Negativo</span>
+    <span class="opt-style">Audaz · Alto Impacto</span>
+  </div>
+
+  <div class="mono-strip">
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_monogram_minimal_two_bold_cap.png" style="height:96px;width:96px;" alt="D 96"/>
+      <span>96px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_monogram_minimal_two_bold_cap.png" style="height:56px;width:56px;" alt="D 56"/>
+      <span>56px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_monogram_minimal_two_bold_cap.png" style="height:36px;width:36px;" alt="D 36"/>
+      <span>36px</span>
+    </div>
+    <div class="mc">
+      <img src="../../nanobanana-output/ae_monogram_minimal_two_bold_cap.png" style="height:24px;width:24px;" alt="D 24"/>
+      <span>24px fav</span>
+    </div>
+  </div>
+
+  <div class="ctx-row">
+    <div class="ctx-col">
+      <div class="ctx-label">Login — Lockup</div>
+      <div class="login-box">
+        <div class="lockup">
+          <img src="../../nanobanana-output/ae_monogram_minimal_two_bold_cap.png" style="height:36px;width:36px;" alt=""/>
+          <div class="lockup-text">
+            <div class="name">Advance Estate</div>
+            <div class="sub">RE/MAX · CRM</div>
+          </div>
+        </div>
+        <div class="fld"></div>
+        <div class="fld"></div>
+        <div class="btn"></div>
+      </div>
+    </div>
+    <div class="ctx-col">
+      <div class="ctx-label">Sidebar + Favicon</div>
+      <div class="sb">
+        <div class="sb-top">
+          <img src="../../nanobanana-output/ae_monogram_minimal_two_bold_cap.png" style="height:26px;width:26px;flex-shrink:0;" alt=""/>
+          <span class="sb-name">Advance Estate</span>
+        </div>
+        <div class="nav on"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+        <div class="nav"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr-wrap">
+    <div class="ctx-label" style="margin-bottom:8px;">Header — Wordmark</div>
+    <div class="hdr">
+      <img src="../../nanobanana-output/advance_estate_luxury_real_estat_1.png" style="height:22px;max-width:130px;" alt="wordmark"/>
+      <div class="hdr-dots">
+        <div class="hdr-dot on"></div>
+        <div class="hdr-dot"></div>
+        <div class="hdr-dot"></div>
+        <div class="hdr-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cfoot">
+    <strong>Espacio Negativo</strong> — Bloque dorado con AE recortadas en crema sobre negro.
+    <em>Máximo impacto visual, inconfundible.</em> Sensación: agencia global, seguridad, autoridad.
+    Bold y directo — para lideres que no pasan desapercibidos.
+  </div>
+</div>
+
+</div><!-- /grid -->
+
+<div class="bnote">
+  <strong>Implementación tras elegir:</strong> El monograma y el wordmark se construirán como
+  <span class="g">SVG con fondo transparente</span> — se verán idénticos sobre cualquier superficie sin romper la línea gráfica.
+  El wordmark (ADVANCE / línea / ESTATE) es el mismo para las 4 opciones.
+  El lockup del login combina el monograma SVG + tipografía Cinzel en código, no como PNG.
+</div>
+
+</body>
+</html>

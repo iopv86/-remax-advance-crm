@@ -1,13 +1,17 @@
+import { Suspense } from "react";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ConversationsClient } from "./conversations-client";
 
 export default async function ConversationsPage() {
   const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
 
   const { data: messages } = await supabase
     .from("messages")
     .select(
-      "id, contact_id, direction, channel, content, is_automated, created_at, contact:contacts(first_name, last_name, phone, lead_classification)"
+      "id, contact_id, direction, channel, content, is_automated, created_at, contact:contacts(id, first_name, last_name, phone, lead_classification)"
     )
     .eq("channel", "whatsapp")
     .order("created_at", { ascending: false })
@@ -24,5 +28,9 @@ export default async function ConversationsPage() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return <ConversationsClient initialConversations={conversations as any} />;
+  return (
+    <Suspense fallback={<div className="p-8 text-sm" style={{ color: "var(--muted-foreground)" }}>Cargando conversaciones…</div>}>
+      <ConversationsClient initialConversations={conversations as any} />
+    </Suspense>
+  );
 }
