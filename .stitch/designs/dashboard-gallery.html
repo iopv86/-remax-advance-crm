@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Advance Estate CRM — 4 Theme Concepts</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --gold: #C9963A;
+      --bg: #0D0D0D;
+      --surface: #161616;
+      --border: #2a2a2a;
+      --text: #F5F0E8;
+      --text-muted: #888;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(13,13,13,0.95);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #C9963A 0%, #E8B84B 60%, #A07228 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 15px;
+      color: #000;
+      letter-spacing: -0.5px;
+    }
+
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .header-badge {
+      background: rgba(201,150,58,0.12);
+      border: 1px solid rgba(201,150,58,0.3);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+
+    /* ── Theme Nav ── */
+    .theme-nav {
+      display: flex;
+      gap: 2px;
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      overflow-x: auto;
+    }
+
+    .theme-tab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .theme-tab:hover {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+
+    .theme-tab.active {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+    }
+
+    .theme-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-a { background: linear-gradient(135deg, #1A1A2E 0%, #C9963A 100%); border: 1px solid #C9963A; }
+    .dot-b { background: linear-gradient(135deg, #F5F0E8 0%, #C9963A 100%); border: 1px solid #C9963A; }
+    .dot-c { background: linear-gradient(135deg, #0D1F0D 0%, #00FF41 100%); border: 1px solid #00FF41; }
+    .dot-d { background: linear-gradient(135deg, #1A0A04 0%, #C0392B 50%, #C9963A 100%); border: 1px solid #C0392B; }
+
+    .show-all-btn {
+      margin-left: auto;
+      padding: 8px 18px;
+      background: rgba(201,150,58,0.1);
+      border: 1px solid rgba(201,150,58,0.25);
+      color: var(--gold);
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .show-all-btn:hover {
+      background: rgba(201,150,58,0.2);
+    }
+
+    /* ── Single theme view ── */
+    .single-view {
+      display: block;
+    }
+
+    .single-view iframe {
+      width: 100%;
+      height: calc(100vh - 120px);
+      border: none;
+      display: block;
+    }
+
+    /* ── Grid view (all 4) ── */
+    .grid-view {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      background: var(--border);
+    }
+
+    .grid-view.visible {
+      display: grid;
+    }
+
+    .theme-cell {
+      background: var(--bg);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .theme-cell-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(13,13,13,0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .theme-cell iframe {
+      width: 200%;
+      height: 200%;
+      transform: scale(0.5);
+      transform-origin: top left;
+      border: none;
+      pointer-events: none;
+    }
+
+    .theme-cell-overlay {
+      position: absolute;
+      inset: 0;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .theme-cell:hover .theme-cell-label {
+      background: rgba(201,150,58,0.15);
+      border-color: rgba(201,150,58,0.4);
+      color: var(--gold);
+    }
+
+    /* ── Theme descriptions ── */
+    .theme-info {
+      padding: 20px 40px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .theme-info.hidden { display: none; }
+
+    .theme-info-content {
+      flex: 1;
+    }
+
+    .theme-info-name {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .theme-info-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .theme-palette {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .swatch-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'Menlo', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-brand">
+      <div class="logo-mark">AE</div>
+      <div>
+        <div class="header-title">Advance Estate CRM</div>
+        <div class="header-subtitle">Dashboard — 4 Theme Directions</div>
+      </div>
+    </div>
+    <span class="header-badge">Design Exploration v1</span>
+  </header>
+
+  <nav class="theme-nav">
+    <button class="theme-tab active" data-theme="a" onclick="showTheme('a')">
+      <span class="theme-dot dot-a"></span>
+      A · Obsidian Edge
+    </button>
+    <button class="theme-tab" data-theme="b" onclick="showTheme('b')">
+      <span class="theme-dot dot-b"></span>
+      B · Carta Blanca
+    </button>
+    <button class="theme-tab" data-theme="c" onclick="showTheme('c')">
+      <span class="theme-dot dot-c"></span>
+      C · Phosphor
+    </button>
+    <button class="theme-tab" data-theme="d" onclick="showTheme('d')">
+      <span class="theme-dot dot-d"></span>
+      D · Cinnabar
+    </button>
+    <button class="show-all-btn" onclick="toggleGrid()">Ver 2×2</button>
+  </nav>
+
+  <!-- Theme info banners -->
+  <div class="theme-info" id="info-a">
+    <div class="theme-dot dot-a" style="margin-top:4px;flex-shrink:0"></div>
+    <div class="theme-info-content">
+      <div class="theme-info-name" style="color:#C9963A">A · Obsidian Edge — Dark Luxury</div>
+      <div class="theme-info-desc">Charcoal near-black base, Estate Gold accents, Manrope 700 headlines. Premium dark UI for brokers who want gravitas. Inspired by Bloomberg Terminal meets luxury watchmaker website.</div>
+      <div class="theme-palette">
+        <div class="swatch" style="background:#1A1A2E"></div><span class="swatch-label">#1A1A2E</span>
+        <div class="swatch" style="background:#C9963A"></div><span class="swatch-label">#C9963A</span>
+        <div class="swatch" style="background:#F5F0E8"></div><span class="swatch-label">#F5F0E8</span>
+        <div class="swatch" style="background:#2A2A3E"></div><span class="swatch-label">#2A2A3E</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-info hidden" id="info-b">
+    <div class="theme-dot dot-b" style="margin-top:4px;flex-shrink:0"></div>
+    <div class="theme-info-content">
+      <div class="theme-info-name" style="color:#C9963A">B · Carta Blanca — Light Editorial</div>
+      <div class="theme-info-desc">Off-white cream ground, Estate Gold hierarchy, high contrast typographic layout. Magazine-meets-dashboard energy. Perfect for client-facing demos or offices with lots of natural light.</div>
+      <div class="theme-palette">
+        <div class="swatch" style="background:#FAFAF7"></div><span class="swatch-label">#FAFAF7</span>
+        <div class="swatch" style="background:#C9963A"></div><span class="swatch-label">#C9963A</span>
+        <div class="swatch" style="background:#1A1A1A"></div><span class="swatch-label">#1A1A1A</span>
+        <div class="swatch" style="background:#F0EDE5"></div><span class="swatch-label">#F0EDE5</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-info hidden" id="info-c">
+    <div class="theme-dot dot-c" style="margin-top:4px;flex-shrink:0"></div>
+    <div class="theme-info-content">
+      <div class="theme-info-name" style="color:#00FF41">C · Phosphor — Tech Terminal</div>
+      <div class="theme-info-desc">Deep forest-black base, phosphor green primary, monospace + geometric typography. Maximum information density, zero visual noise. The "control room" for agents who live in data.</div>
+      <div class="theme-palette">
+        <div class="swatch" style="background:#0A1A0A"></div><span class="swatch-label">#0A1A0A</span>
+        <div class="swatch" style="background:#00FF41"></div><span class="swatch-label">#00FF41</span>
+        <div class="swatch" style="background:#C9963A"></div><span class="swatch-label">#C9963A</span>
+        <div class="swatch" style="background:#1A2E1A"></div><span class="swatch-label">#1A2E1A</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="theme-info hidden" id="info-d">
+    <div class="theme-dot dot-d" style="margin-top:4px;flex-shrink:0"></div>
+    <div class="theme-info-content">
+      <div class="theme-info-name" style="color:#E67E22">D · Cinnabar — Vanguard Chromatic</div>
+      <div class="theme-info-desc">Volcanic near-black base, crimson→amber→gold chromatic gradients, copper glows, Epilogue 700 bold headlines. Maximum ambition energy. Formula 1 dashboard for Dominican achievers. No cold colors — all thermal.</div>
+      <div class="theme-palette">
+        <div class="swatch" style="background:#1A0A04"></div><span class="swatch-label">#1A0A04</span>
+        <div class="swatch" style="background:#C0392B"></div><span class="swatch-label">#C0392B</span>
+        <div class="swatch" style="background:#E67E22"></div><span class="swatch-label">#E67E22</span>
+        <div class="swatch" style="background:#C9963A"></div><span class="swatch-label">#C9963A</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Single theme view -->
+  <div class="single-view" id="single-view">
+    <iframe id="theme-frame" src="dashboard-obsidian-edge.html" title="Theme preview"></iframe>
+  </div>
+
+  <!-- 2x2 grid view -->
+  <div class="grid-view" id="grid-view">
+    <div class="theme-cell">
+      <div class="theme-cell-label"><span class="theme-dot dot-a"></span> A · Obsidian Edge</div>
+      <div class="theme-cell-overlay" onclick="showTheme('a'); toggleGrid()"></div>
+      <iframe src="dashboard-obsidian-edge.html" title="Obsidian Edge"></iframe>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-cell-label"><span class="theme-dot dot-b"></span> B · Carta Blanca</div>
+      <div class="theme-cell-overlay" onclick="showTheme('b'); toggleGrid()"></div>
+      <iframe src="dashboard-carta-blanca.html" title="Carta Blanca"></iframe>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-cell-label"><span class="theme-dot dot-c"></span> C · Phosphor</div>
+      <div class="theme-cell-overlay" onclick="showTheme('c'); toggleGrid()"></div>
+      <iframe src="dashboard-phosphor.html" title="Phosphor"></iframe>
+    </div>
+    <div class="theme-cell">
+      <div class="theme-cell-label"><span class="theme-dot dot-d"></span> D · Cinnabar</div>
+      <div class="theme-cell-overlay" onclick="showTheme('d'); toggleGrid()"></div>
+      <iframe src="dashboard-cinnabar.html" title="Cinnabar"></iframe>
+    </div>
+  </div>
+
+  <script>
+    const themes = {
+      a: { file: 'dashboard-obsidian-edge.html', info: 'info-a' },
+      b: { file: 'dashboard-carta-blanca.html',  info: 'info-b' },
+      c: { file: 'dashboard-phosphor.html',       info: 'info-c' },
+      d: { file: 'dashboard-cinnabar.html',        info: 'info-d' },
+    };
+
+    let gridVisible = false;
+
+    function showTheme(key) {
+      // Update iframe
+      document.getElementById('theme-frame').src = themes[key].file;
+
+      // Update tabs
+      document.querySelectorAll('.theme-tab').forEach(t => t.classList.remove('active'));
+      document.querySelector(`[data-theme="${key}"]`).classList.add('active');
+
+      // Update info banners
+      document.querySelectorAll('.theme-info').forEach(el => el.classList.add('hidden'));
+      document.getElementById(themes[key].info).classList.remove('hidden');
+
+      // Ensure single view is visible
+      if (gridVisible) toggleGrid();
+    }
+
+    function toggleGrid() {
+      gridVisible = !gridVisible;
+      document.getElementById('single-view').style.display = gridVisible ? 'none' : 'block';
+      const grid = document.getElementById('grid-view');
+      grid.classList.toggle('visible', gridVisible);
+      document.querySelectorAll('.theme-info').forEach(el => el.classList.toggle('hidden', gridVisible));
+      document.querySelector('.show-all-btn').textContent = gridVisible ? 'Vista Individual' : 'Ver 2×2';
+
+      // Set grid height
+      if (gridVisible) {
+        grid.style.height = 'calc(100vh - 120px)';
+        grid.querySelectorAll('.theme-cell').forEach(c => {
+          c.style.height = 'calc((100vh - 124px) / 2)';
+          c.querySelector('iframe').style.height = 'calc((100vh - 124px))';
+        });
+      }
+    }
+  </script>
+</body>
+</html>

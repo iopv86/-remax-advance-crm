@@ -62,11 +62,13 @@ export function Sidebar() {
 
       {/* Ava status pill */}
       <div className="mx-3 mb-4 rounded-2xl px-4 py-3"
-        style={{ background: "rgba(225,29,72,0.1)", border: "1px solid rgba(225,29,72,0.2)" }}>
-        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#fda4af" }}>
+        style={{ background: "var(--sidebar-accent)", border: "1px solid var(--sidebar-accent-border)" }}>
+        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--sidebar-primary)" }}>
           <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              style={{ background: "var(--sidebar-primary)" }}></span>
+            <span className="relative inline-flex rounded-full h-2 w-2"
+              style={{ background: "var(--sidebar-primary)" }}></span>
           </span>
           <Sparkles className="h-3.5 w-3.5" />
           Ava activa
@@ -91,11 +93,11 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
                 active
-                  ? "text-white border-[#e11d48] bg-[rgba(225,29,72,0.08)] dark:border-[#C9A84C] dark:bg-[rgba(201,168,76,0.06)]"
+                  ? "text-white border-[#e11d48] bg-[rgba(225,29,72,0.08)] dark:border-[#C9963A] dark:bg-[rgba(201,150,58,0.1)] dark:text-[#C9963A]"
                   : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#e11d48] dark:text-[#C9A84C]" : "text-gray-500")} />
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#e11d48] dark:text-[#C9963A]" : "text-gray-500")} />
               <span>{label}</span>
             </Link>
           );

@@ -2,7 +2,8 @@
 
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
-import { Search, TrendingUp, DollarSign, Target, Clock, AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { Search, TrendingUp, DollarSign, Target, Clock, AlertTriangle, ChevronRight } from "lucide-react";
 import type { AgentKPISummary } from "@/lib/types";
 
 const AgentSparkline = dynamic(
@@ -94,7 +95,7 @@ export function AgentsClient({ agents }: Props) {
               className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
               style={
                 sortKey === key
-                  ? { background: "var(--red-muted)", color: "var(--red)" }
+                  ? { background: "var(--amber-muted)", color: "var(--amber)" }
                   : { background: "var(--secondary)", color: "var(--muted-foreground)" }
               }
             >
@@ -138,9 +139,11 @@ export function AgentsClient({ agents }: Props) {
               : String(index + 1);
 
             return (
-              <div
+              <Link
                 key={agent.id}
-                className="flex items-center gap-4 px-6 py-4 table-row-hover transition-colors"
+                href={`/dashboard/agents/${agent.id}`}
+                className="flex items-center gap-4 px-6 py-4 table-row-hover transition-colors cursor-pointer group"
+                style={{ textDecoration: "none", color: "inherit" }}
               >
                 {/* Rank */}
                 <span
@@ -153,7 +156,7 @@ export function AgentsClient({ agents }: Props) {
                 {/* Avatar */}
                 <div
                   className="h-9 w-9 shrink-0 rounded-full flex items-center justify-center font-semibold text-sm"
-                  style={{ background: "var(--red-muted)", color: "var(--red)" }}
+                  style={{ background: "var(--amber-muted)", color: "var(--amber)" }}
                 >
                   {agent.name[0].toUpperCase()}
                 </div>
@@ -174,7 +177,7 @@ export function AgentsClient({ agents }: Props) {
                   <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--secondary)" }}>
                     <div
                       className="h-full rounded-full transition-all"
-                      style={{ width: `${barWidth}%`, background: "var(--red)" }}
+                      style={{ width: `${barWidth}%`, background: "var(--amber)" }}
                     />
                   </div>
                 </div>
@@ -224,7 +227,13 @@ export function AgentsClient({ agents }: Props) {
                     <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>comisión</p>
                   </div>
                 </div>
-              </div>
+
+                {/* Drill-down indicator */}
+                <ChevronRight
+                  className="h-4 w-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ color: "var(--amber)" }}
+                />
+              </Link>
             );
           })}
         </div>

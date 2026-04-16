@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advance CRM — Opciones de Diseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; font-family: 'Plus Jakarta Sans', sans-serif; color: #fff; }
+
+/* ── Selector nav ── */
+.selector {
+  position: sticky; top: 0; z-index: 100;
+  background: #111; border-bottom: 1px solid #222;
+  padding: 16px 32px;
+  display: flex; align-items: center; gap: 12px;
+}
+.selector-label { font-size: 11px; letter-spacing: .15em; text-transform: uppercase; color: #666; margin-right: 8px; }
+.opt-btn {
+  padding: 8px 20px; border-radius: 6px; border: 1px solid #333;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  background: transparent; color: #888; transition: all .2s;
+}
+.opt-btn:hover { border-color: #666; color: #fff; }
+.opt-btn.active { color: #fff; }
+
+/* ── Wrapper ── */
+.preview { display: none; width: 100%; min-height: 100vh; }
+.preview.active { display: flex; }
+
+/* ════════════════════════════════════════
+   OPCIÓN A — IVORY LUXE
+   Fondo crema, serif elegante, dorado
+════════════════════════════════════════ */
+#optA { background: #f7f4ef; font-family: 'Cormorant Garamond', serif; }
+#optA .sidebar {
+  width: 220px; min-height: 100vh; background: #1a1612; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+#optA .sidebar-logo {
+  padding: 28px 24px 24px; border-bottom: 1px solid rgba(255,255,255,.08);
+}
+#optA .sidebar-logo .mark {
+  width: 36px; height: 36px; background: #c9a84c; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 18px; color: #1a1612;
+}
+#optA .sidebar-logo .name {
+  font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600;
+  color: #f0e8d8; margin-top: 10px; letter-spacing: .06em;
+}
+#optA .sidebar-logo .sub {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9px;
+  letter-spacing: .18em; text-transform: uppercase; color: rgba(240,232,216,.35);
+  margin-top: 3px;
+}
+#optA .nav { flex: 1; padding: 20px 12px; }
+#optA .nav-section { margin-bottom: 28px; }
+#optA .nav-section-label {
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 9px;
+  text-transform: uppercase; letter-spacing: .15em; color: rgba(240,232,216,.3);
+  padding: 0 12px 10px;
+}
+#optA .nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 6px; font-size: 13px;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 500;
+  color: rgba(240,232,216,.55); cursor: pointer; margin-bottom: 1px;
+}
+#optA .nav-item.active {
+  background: rgba(201,168,76,.12); color: #c9a84c;
+  position: relative;
+}
+#optA .nav-item.active::before {
+  content:''; position:absolute; left:0; top:20%; bottom:20%;
+  width:3px; border-radius:0 3px 3px 0; background:#c9a84c;
+}
+#optA .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+#optA .main { flex: 1; }
+#optA .page-header {
+  padding: 28px 36px; border-bottom: 1px solid #e8e0d4; background: #faf8f4;
+}
+#optA .eyebrow { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #a0907a; margin-bottom: 6px; }
+#optA h1 { font-size: 32px; font-weight: 600; color: #1a1612; letter-spacing: -.01em; }
+#optA .content { padding: 32px 36px; }
+#optA .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+#optA .kpi-card {
+  background: #fff; border: 1px solid #ede6d8; border-radius: 10px;
+  padding: 22px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+#optA .kpi-icon {
+  width: 36px; height: 36px; border-radius: 8px; background: rgba(201,168,76,.1);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+}
+#optA .kpi-icon svg { width: 16px; height: 16px; stroke: #c9a84c; }
+#optA .kpi-value { font-size: 36px; font-weight: 600; color: #1a1612; line-height: 1; font-family: 'Cormorant Garamond', serif; }
+#optA .kpi-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: #9a8a76; margin-top: 6px; }
+#optA .card {
+  background: #fff; border: 1px solid #ede6d8; border-radius: 10px; overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+#optA .card-header {
+  padding: 16px 20px; border-bottom: 1px solid #ede6d8;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#optA .card-header-title { display: flex; align-items: center; gap: 8px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: 13px; color: #1a1612; }
+#optA .card-header-title svg { width: 14px; height: 14px; stroke: #c9a84c; }
+#optA .card-header-meta { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; color: #a0907a; }
+#optA .table-row {
+  display: flex; align-items: center; padding: 12px 20px;
+  border-bottom: 1px solid #f2ece2; gap: 12px;
+}
+#optA .avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: rgba(201,168,76,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 13px; color: #c9a84c; flex-shrink: 0;
+}
+#optA .row-name { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 500; color: #1a1612; flex: 1; }
+#optA .badge { padding: 3px 8px; border-radius: 4px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 10px; font-weight: 600; }
+#optA .badge-hot { background: rgba(201,168,76,.1); color: #b08c34; border: 1px solid rgba(201,168,76,.25); }
+#optA .badge-warm { background: rgba(180,120,60,.1); color: #a06830; border: 1px solid rgba(180,120,60,.25); }
+#optA .badge-cold { background: rgba(80,120,160,.1); color: #507098; border: 1px solid rgba(80,120,160,.2); }
+
+
+/* ════════════════════════════════════════
+   OPCIÓN B — CARBON PRO
+   Todo oscuro, muy denso, profesional
+════════════════════════════════════════ */
+#optB { background: #0d0d0d; font-family: 'DM Sans', sans-serif; }
+#optB .sidebar {
+  width: 220px; min-height: 100vh; background: #0d0d0d; flex-shrink: 0;
+  border-right: 1px solid #1e1e1e; display: flex; flex-direction: column;
+}
+#optB .sidebar-logo {
+  padding: 24px 20px 22px; border-bottom: 1px solid #1e1e1e;
+}
+#optB .sidebar-logo .mark {
+  width: 34px; height: 34px; background: linear-gradient(135deg,#cc1f1f,#ff3838);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 16px; color: #fff; letter-spacing: -.02em;
+}
+#optB .sidebar-logo .name {
+  font-weight: 700; font-size: 14px; color: #f0f0f0; margin-top: 10px;
+}
+#optB .sidebar-logo .sub {
+  font-size: 9px; letter-spacing: .15em; text-transform: uppercase;
+  color: #444; margin-top: 3px;
+}
+#optB .nav { flex: 1; padding: 16px 10px; }
+#optB .nav-section { margin-bottom: 24px; }
+#optB .nav-section-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: .15em;
+  color: #444; padding: 0 10px 8px;
+}
+#optB .nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border-radius: 6px; font-size: 12px; font-weight: 500; color: #666; cursor: pointer; margin-bottom: 1px;
+}
+#optB .nav-item.active {
+  background: rgba(220,30,30,.12); color: #ff4444;
+  position: relative;
+}
+#optB .nav-item.active::before {
+  content:''; position:absolute; left:0; top:20%; bottom:20%;
+  width:2px; border-radius:0 2px 2px 0; background:#ff4444;
+  box-shadow: 0 0 8px rgba(255,68,68,.6);
+}
+#optB .nav-item svg { width: 13px; height: 13px; flex-shrink: 0; }
+#optB .main { flex: 1; background: #111; }
+#optB .page-header {
+  padding: 24px 32px; border-bottom: 1px solid #1e1e1e; background: #111;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#optB .eyebrow { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: #555; margin-bottom: 4px; }
+#optB h1 { font-size: 22px; font-weight: 700; color: #f0f0f0; }
+#optB .live-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; background: rgba(220,30,30,.1); border-radius: 6px; border: 1px solid rgba(220,30,30,.2);
+}
+#optB .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff4444; animation: pulse 2s infinite; }
+#optB .live-text { font-size: 11px; font-weight: 600; color: #ff4444; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+#optB .content { padding: 24px 32px; }
+#optB .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
+#optB .kpi-card {
+  background: #151515; border: 1px solid #1e1e1e; border-radius: 8px; padding: 20px;
+}
+#optB .kpi-icon { width: 32px; height: 32px; border-radius: 7px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+#optB .kpi-icon svg { width: 15px; height: 15px; }
+#optB .kpi-value { font-size: 30px; font-weight: 700; color: #f0f0f0; line-height: 1; }
+#optB .kpi-label { font-size: 11px; color: #555; margin-top: 5px; }
+#optB .card {
+  background: #151515; border: 1px solid #1e1e1e; border-radius: 8px; overflow: hidden;
+}
+#optB .card-header {
+  padding: 14px 20px; border-bottom: 1px solid #1e1e1e;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#optB .card-header-title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 12px; color: #ccc; }
+#optB .card-header-title svg { width: 13px; height: 13px; }
+#optB .card-header-meta { font-size: 10px; color: #444; font-family: monospace; }
+#optB .table-row {
+  display: flex; align-items: center; padding: 10px 20px;
+  border-bottom: 1px solid #1a1a1a; gap: 12px;
+}
+#optB .table-row:hover { background: #181818; }
+#optB .avatar {
+  width: 28px; height: 28px; border-radius: 6px; background: rgba(220,30,30,.15);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 11px; color: #ff4444; flex-shrink: 0;
+}
+#optB .row-name { font-size: 12px; font-weight: 500; color: #ccc; flex: 1; }
+#optB .badge { padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; font-family: monospace; }
+#optB .badge-hot { background: rgba(255,68,68,.1); color: #ff6666; border: 1px solid rgba(255,68,68,.2); }
+#optB .badge-warm { background: rgba(255,165,0,.1); color: #ffaa44; border: 1px solid rgba(255,165,0,.2); }
+#optB .badge-cold { background: rgba(64,160,255,.1); color: #66aaff; border: 1px solid rgba(64,160,255,.2); }
+
+
+/* ════════════════════════════════════════
+   OPCIÓN C — REMAX BOLD
+   Blanco + Rojo dominante, muy marca
+════════════════════════════════════════ */
+#optC { background: #f5f5f5; font-family: 'Outfit', sans-serif; }
+#optC .sidebar {
+  width: 220px; min-height: 100vh; background: #cc1f1f; flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+#optC .sidebar-logo {
+  padding: 24px 20px 22px; border-bottom: 1px solid rgba(255,255,255,.15);
+}
+#optC .sidebar-logo .mark {
+  width: 40px; height: 40px; background: #fff; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 18px; color: #cc1f1f;
+}
+#optC .sidebar-logo .name {
+  font-weight: 700; font-size: 15px; color: #fff; margin-top: 10px; letter-spacing: -.01em;
+}
+#optC .sidebar-logo .sub {
+  font-size: 9px; letter-spacing: .18em; text-transform: uppercase;
+  color: rgba(255,255,255,.45); margin-top: 3px;
+}
+#optC .nav { flex: 1; padding: 16px 10px; }
+#optC .nav-section { margin-bottom: 24px; }
+#optC .nav-section-label {
+  font-size: 9px; text-transform: uppercase; letter-spacing: .15em;
+  color: rgba(255,255,255,.4); padding: 0 10px 8px;
+}
+#optC .nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 9px 10px;
+  border-radius: 6px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.65); cursor: pointer; margin-bottom: 2px;
+}
+#optC .nav-item:hover { background: rgba(255,255,255,.1); color: #fff; }
+#optC .nav-item.active {
+  background: rgba(255,255,255,.18); color: #fff; font-weight: 600;
+}
+#optC .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+#optC .main { flex: 1; }
+#optC .page-header {
+  padding: 28px 36px; background: #fff; border-bottom: 1px solid #e8e8e8;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#optC .eyebrow { font-size: 10px; letter-spacing: .15em; text-transform: uppercase; color: #cc1f1f; margin-bottom: 4px; font-weight: 600; }
+#optC h1 { font-size: 28px; font-weight: 700; color: #1a1a1a; }
+#optC .live-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px; background: #cc1f1f; border-radius: 6px;
+}
+#optC .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; animation: pulse 2s infinite; }
+#optC .live-text { font-size: 11px; font-weight: 700; color: #fff; }
+#optC .content { padding: 28px 36px; }
+#optC .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+#optC .kpi-card {
+  background: #fff; border-radius: 10px; padding: 22px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  border-top: 3px solid #cc1f1f;
+}
+#optC .kpi-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(204,31,31,.08); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+#optC .kpi-icon svg { width: 16px; height: 16px; stroke: #cc1f1f; }
+#optC .kpi-value { font-size: 34px; font-weight: 700; color: #1a1a1a; line-height: 1; }
+#optC .kpi-label { font-size: 12px; color: #888; margin-top: 6px; }
+#optC .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+#optC .card-header {
+  padding: 16px 20px; border-bottom: 2px solid #cc1f1f;
+  display: flex; align-items: center; justify-content: space-between;
+  background: #fff;
+}
+#optC .card-header-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 13px; color: #1a1a1a; }
+#optC .card-header-title svg { width: 14px; height: 14px; stroke: #cc1f1f; }
+#optC .card-header-meta { font-size: 11px; color: #aaa; }
+#optC .table-row {
+  display: flex; align-items: center; padding: 12px 20px;
+  border-bottom: 1px solid #f0f0f0; gap: 12px;
+}
+#optC .table-row:hover { background: #fef8f8; }
+#optC .avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: rgba(204,31,31,.1);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px; color: #cc1f1f; flex-shrink: 0;
+}
+#optC .row-name { font-size: 13px; font-weight: 500; color: #1a1a1a; flex: 1; }
+#optC .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+#optC .badge-hot { background: rgba(204,31,31,.1); color: #cc1f1f; border: 1px solid rgba(204,31,31,.2); }
+#optC .badge-warm { background: rgba(240,140,0,.1); color: #d07000; border: 1px solid rgba(240,140,0,.2); }
+#optC .badge-cold { background: rgba(0,100,200,.08); color: #0064c8; border: 1px solid rgba(0,100,200,.15); }
+
+
+/* ════════════════════════════════════════
+   OPCIÓN D — NORDIC FROST
+   Gris azulado suave, muy limpio, Notion-like
+════════════════════════════════════════ */
+#optD { background: #eef1f6; font-family: 'Inter', sans-serif; }
+#optD .sidebar {
+  width: 240px; min-height: 100vh; background: #fff; flex-shrink: 0;
+  border-right: 1px solid #e4e8f0; display: flex; flex-direction: column;
+}
+#optD .sidebar-logo {
+  padding: 24px 20px 20px; border-bottom: 1px solid #e4e8f0;
+}
+#optD .sidebar-logo .mark {
+  width: 36px; height: 36px; background: linear-gradient(135deg, #c8102e, #e84060);
+  border-radius: 9px; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 16px; color: #fff; box-shadow: 0 4px 12px rgba(200,16,46,.3);
+}
+#optD .sidebar-logo .name {
+  font-weight: 600; font-size: 14px; color: #1a2035; margin-top: 10px;
+}
+#optD .sidebar-logo .sub {
+  font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+  color: #94a0b8; margin-top: 2px;
+}
+#optD .nav { flex: 1; padding: 16px 12px; }
+#optD .nav-section { margin-bottom: 20px; }
+#optD .nav-section-label {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .1em;
+  color: #b0b8cc; padding: 0 10px 8px; font-weight: 600;
+}
+#optD .nav-item {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+  border-radius: 7px; font-size: 13px; font-weight: 500; color: #64748b; cursor: pointer; margin-bottom: 2px;
+}
+#optD .nav-item:hover { background: #f1f4f9; color: #1a2035; }
+#optD .nav-item.active {
+  background: rgba(200,16,46,.07); color: #c8102e; font-weight: 600;
+}
+#optD .nav-item svg { width: 14px; height: 14px; flex-shrink: 0; }
+#optD .main { flex: 1; background: #eef1f6; }
+#optD .page-header {
+  padding: 24px 32px; background: #fff; border-bottom: 1px solid #e4e8f0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#optD .eyebrow { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #94a0b8; margin-bottom: 4px; font-weight: 600; }
+#optD h1 { font-size: 24px; font-weight: 700; color: #1a2035; }
+#optD .live-badge {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px; background: rgba(34,197,94,.08); border-radius: 6px;
+  border: 1px solid rgba(34,197,94,.2);
+}
+#optD .live-dot { width: 6px; height: 6px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+#optD .live-text { font-size: 11px; font-weight: 600; color: #16a34a; }
+#optD .content { padding: 24px 32px; }
+#optD .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+#optD .kpi-card {
+  background: #fff; border: 1px solid #e4e8f0; border-radius: 10px; padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+}
+#optD .kpi-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+#optD .kpi-icon svg { width: 15px; height: 15px; }
+#optD .kpi-value { font-size: 30px; font-weight: 700; color: #1a2035; line-height: 1; }
+#optD .kpi-label { font-size: 11px; color: #94a0b8; margin-top: 5px; font-weight: 500; }
+#optD .card { background: #fff; border: 1px solid #e4e8f0; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,.04); }
+#optD .card-header {
+  padding: 15px 20px; border-bottom: 1px solid #e4e8f0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#optD .card-header-title { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; color: #1a2035; }
+#optD .card-header-title svg { width: 14px; height: 14px; }
+#optD .card-header-meta { font-size: 11px; color: #94a0b8; font-weight: 500; }
+#optD .table-row {
+  display: flex; align-items: center; padding: 11px 20px;
+  border-bottom: 1px solid #f0f3f8; gap: 12px;
+}
+#optD .table-row:hover { background: #f7f9fc; }
+#optD .avatar {
+  width: 30px; height: 30px; border-radius: 8px; background: rgba(200,16,46,.08);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 12px; color: #c8102e; flex-shrink: 0;
+}
+#optD .row-name { font-size: 13px; font-weight: 500; color: #1a2035; flex: 1; }
+#optD .row-time { font-size: 11px; color: #94a0b8; }
+#optD .badge { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 600; }
+#optD .badge-hot { background: rgba(200,16,46,.08); color: #c8102e; border: 1px solid rgba(200,16,46,.15); }
+#optD .badge-warm { background: rgba(234,179,8,.1); color: #a16207; border: 1px solid rgba(234,179,8,.2); }
+#optD .badge-cold { background: rgba(59,130,246,.08); color: #2563eb; border: 1px solid rgba(59,130,246,.15); }
+
+/* Shared grid for two-col layout */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+</style>
+</head>
+<body>
+
+<div class="selector">
+  <span class="selector-label">Elige diseño</span>
+  <button class="opt-btn active" onclick="show('A')" id="btnA" style="border-color:#c9a84c;color:#c9a84c">A — Ivory Luxe</button>
+  <button class="opt-btn" onclick="show('B')" id="btnB">B — Carbon Pro</button>
+  <button class="opt-btn" onclick="show('C')" id="btnC">C — RE/MAX Bold</button>
+  <button class="opt-btn" onclick="show('D')" id="btnD">D — Nordic Frost</button>
+</div>
+
+<!-- ═══ OPCIÓN A — IVORY LUXE ═══ -->
+<div class="preview active" id="optA">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">A</div>
+      <div class="name">Advance Estate</div>
+      <div class="sub">CRM Inmobiliario</div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Principal</div>
+        <div class="nav-item active">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Contactos
+        </div>
+        <div class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="4"/><rect x="3" y="9" width="10" height="4"/><rect x="3" y="15" width="14" height="4"/></svg>
+          Pipeline
+        </div>
+        <div class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Propiedades
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Análisis</div>
+        <div class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          KPIs Agentes
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="eyebrow">Resumen operativo</div>
+        <h1>Dashboard</h1>
+      </div>
+    </div>
+    <div class="content">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="kpi-value">248</div>
+          <div class="kpi-label">Total contactos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+          <div class="kpi-value">14</div>
+          <div class="kpi-label">Leads esta semana</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div>
+          <div class="kpi-value">31</div>
+          <div class="kpi-label">Leads HOT</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="kpi-value">$4.2M</div>
+          <div class="kpi-label">Pipeline activo</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+              Leads recientes
+            </div>
+            <div class="card-header-meta">7 mostrados</div>
+          </div>
+          <div class="table-row"><div class="avatar">M</div><div class="row-name">María González</div><span class="badge badge-hot">🔥 HOT</span></div>
+          <div class="table-row"><div class="avatar">C</div><div class="row-name">Carlos Pérez</div><span class="badge badge-warm">WARM</span></div>
+          <div class="table-row"><div class="avatar">A</div><div class="row-name">Ana Rodríguez</div><span class="badge badge-cold">COLD</span></div>
+          <div class="table-row"><div class="avatar">J</div><div class="row-name">José Martínez</div><span class="badge badge-hot">🔥 HOT</span></div>
+          <div class="table-row"><div class="avatar">L</div><div class="row-name">Laura Sánchez</div><span class="badge badge-warm">WARM</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              Tareas pendientes
+            </div>
+            <div class="card-header-meta">3 vencidas</div>
+          </div>
+          <div class="table-row"><div class="avatar" style="background:rgba(204,31,31,.08);color:#c9a84c">!</div><div class="row-name">Llamar a María González</div><span style="color:#c9a84c;font-size:11px">08 abr</span></div>
+          <div class="table-row"><div class="avatar" style="background:rgba(201,168,76,.1);color:#c9a84c">→</div><div class="row-name">Enviar propuesta Carlos P.</div><span style="color:#999;font-size:11px">09 abr</span></div>
+          <div class="table-row"><div class="avatar" style="background:rgba(201,168,76,.1);color:#c9a84c">→</div><div class="row-name">Visita propiedad Piantini</div><span style="color:#999;font-size:11px">10 abr</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OPCIÓN B — CARBON PRO ═══ -->
+<div class="preview" id="optB">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">RE</div>
+      <div class="name">Advance Estate</div>
+      <div class="sub">CRM Inmobiliario</div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Principal</div>
+        <div class="nav-item active">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          Dashboard
+        </div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Contactos</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="4"/><rect x="3" y="9" width="10" height="4"/><rect x="3" y="15" width="14" height="4"/></svg>Pipeline</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Propiedades</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Análisis</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>KPIs Agentes</div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="eyebrow">Resumen operativo</div>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="live-badge"><div class="live-dot"></div><div class="live-text">EN VIVO</div></div>
+    </div>
+    <div class="content">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(255,68,68,.1)"><svg fill="none" stroke="#ff4444" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
+          <div class="kpi-value">248</div><div class="kpi-label">Total contactos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(0,220,180,.1)"><svg fill="none" stroke="#00dcb4" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div>
+          <div class="kpi-value">14</div><div class="kpi-label">Leads esta semana</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(255,165,0,.1)"><svg fill="none" stroke="#ffaa44" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div>
+          <div class="kpi-value">31</div><div class="kpi-label">Leads HOT</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon" style="background:rgba(100,160,255,.1)"><svg fill="none" stroke="#64a0ff" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <div class="kpi-value">$4.2M</div><div class="kpi-label">Pipeline activo</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title"><svg fill="none" stroke="#ff4444" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads recientes</div>
+            <div class="card-header-meta">07 mostrados</div>
+          </div>
+          <div class="table-row"><div class="avatar">M</div><div class="row-name">María González</div><span class="badge badge-hot">HOT</span></div>
+          <div class="table-row"><div class="avatar">C</div><div class="row-name">Carlos Pérez</div><span class="badge badge-warm">WARM</span></div>
+          <div class="table-row"><div class="avatar">A</div><div class="row-name">Ana Rodríguez</div><span class="badge badge-cold">COLD</span></div>
+          <div class="table-row"><div class="avatar">J</div><div class="row-name">José Martínez</div><span class="badge badge-hot">HOT</span></div>
+          <div class="table-row"><div class="avatar">L</div><div class="row-name">Laura Sánchez</div><span class="badge badge-warm">WARM</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title"><svg fill="none" stroke="#ff4444" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas pendientes</div>
+            <div class="card-header-meta">03 vencidas</div>
+          </div>
+          <div class="table-row"><div class="avatar" style="background:rgba(255,68,68,.15);color:#ff4444">!</div><div class="row-name">Llamar a María González</div><span style="color:#ff4444;font-size:11px;font-family:monospace">08 abr</span></div>
+          <div class="table-row"><div class="avatar" style="background:rgba(255,165,0,.12);color:#ffaa44">→</div><div class="row-name">Enviar propuesta Carlos P.</div><span style="color:#555;font-size:11px;font-family:monospace">09 abr</span></div>
+          <div class="table-row"><div class="avatar" style="background:rgba(100,160,255,.1);color:#64a0ff">→</div><div class="row-name">Visita propiedad Piantini</div><span style="color:#555;font-size:11px;font-family:monospace">10 abr</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OPCIÓN C — REMAX BOLD ═══ -->
+<div class="preview" id="optC">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">RE</div>
+      <div class="name">Advance Estate</div>
+      <div class="sub">CRM Inmobiliario</div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Principal</div>
+        <div class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Contactos</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="4"/><rect x="3" y="9" width="10" height="4"/><rect x="3" y="15" width="14" height="4"/></svg>Pipeline</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Propiedades</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Análisis</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>KPIs Agentes</div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="eyebrow">Resumen operativo</div>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="live-badge"><div class="live-dot"></div><div class="live-text">En vivo</div></div>
+    </div>
+    <div class="content">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="kpi-value">248</div><div class="kpi-label">Total contactos</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="kpi-value">14</div><div class="kpi-label">Leads esta semana</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="kpi-value">31</div><div class="kpi-label">Leads HOT</div></div>
+        <div class="kpi-card"><div class="kpi-icon"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="kpi-value">$4.2M</div><div class="kpi-label">Pipeline activo</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads recientes</div>
+            <div class="card-header-meta">7 mostrados</div>
+          </div>
+          <div class="table-row"><div class="avatar">M</div><div class="row-name">María González</div><span class="badge badge-hot">🔥 HOT</span></div>
+          <div class="table-row"><div class="avatar">C</div><div class="row-name">Carlos Pérez</div><span class="badge badge-warm">WARM</span></div>
+          <div class="table-row"><div class="avatar">A</div><div class="row-name">Ana Rodríguez</div><span class="badge badge-cold">COLD</span></div>
+          <div class="table-row"><div class="avatar">J</div><div class="row-name">José Martínez</div><span class="badge badge-hot">🔥 HOT</span></div>
+          <div class="table-row"><div class="avatar">L</div><div class="row-name">Laura Sánchez</div><span class="badge badge-warm">WARM</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas pendientes</div>
+            <div class="card-header-meta">3 vencidas</div>
+          </div>
+          <div class="table-row"><div class="avatar">!</div><div class="row-name">Llamar a María González</div><span style="color:#cc1f1f;font-size:11px;font-weight:700">08 abr</span></div>
+          <div class="table-row"><div class="avatar">→</div><div class="row-name">Enviar propuesta Carlos P.</div><span style="color:#aaa;font-size:11px">09 abr</span></div>
+          <div class="table-row"><div class="avatar">→</div><div class="row-name">Visita propiedad Piantini</div><span style="color:#aaa;font-size:11px">10 abr</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ OPCIÓN D — NORDIC FROST ═══ -->
+<div class="preview" id="optD">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">RE</div>
+      <div class="name">Advance Estate</div>
+      <div class="sub">CRM Inmobiliario</div>
+    </div>
+    <div class="nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Principal</div>
+        <div class="nav-item active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Contactos</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="4"/><rect x="3" y="9" width="10" height="4"/><rect x="3" y="15" width="14" height="4"/></svg>Pipeline</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Propiedades</div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-label">Análisis</div>
+        <div class="nav-item"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>KPIs Agentes</div>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="page-header">
+      <div>
+        <div class="eyebrow">Resumen operativo</div>
+        <h1>Dashboard</h1>
+      </div>
+      <div class="live-badge"><div class="live-dot"></div><div class="live-text">En vivo</div></div>
+    </div>
+    <div class="content">
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(200,16,46,.08)"><svg fill="none" stroke="#c8102e" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="kpi-value">248</div><div class="kpi-label">Total contactos</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(20,184,166,.08)"><svg fill="none" stroke="#14b8a6" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><div class="kpi-value">14</div><div class="kpi-label">Leads esta semana</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(234,179,8,.08)"><svg fill="none" stroke="#ca8a04" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg></div><div class="kpi-value">31</div><div class="kpi-label">Leads HOT</div></div>
+        <div class="kpi-card"><div class="kpi-icon" style="background:rgba(99,102,241,.08)"><svg fill="none" stroke="#6366f1" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="kpi-value">$4.2M</div><div class="kpi-label">Pipeline activo</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title" style="color:#1a2035"><svg fill="none" stroke="#c8102e" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Leads recientes</div>
+            <div class="card-header-meta">7 mostrados</div>
+          </div>
+          <div class="table-row"><div class="avatar">M</div><div class="row-name">María González</div><span class="badge badge-hot">🔥 HOT</span></div>
+          <div class="table-row"><div class="avatar">C</div><div class="row-name">Carlos Pérez</div><span class="badge badge-warm">WARM</span></div>
+          <div class="table-row"><div class="avatar">A</div><div class="row-name">Ana Rodríguez</div><span class="badge badge-cold">COLD</span></div>
+          <div class="table-row"><div class="avatar">J</div><div class="row-name">José Martínez</div><span class="badge badge-hot">🔥 HOT</span></div>
+          <div class="table-row"><div class="avatar">L</div><div class="row-name">Laura Sánchez</div><span class="badge badge-warm">WARM</span></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-title" style="color:#1a2035"><svg fill="none" stroke="#c8102e" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Tareas pendientes</div>
+            <div class="card-header-meta">3 vencidas</div>
+          </div>
+          <div class="table-row"><div class="avatar">!</div><div class="row-name">Llamar a María González</div><span style="color:#c8102e;font-size:11px;font-weight:600">08 abr</span></div>
+          <div class="table-row"><div class="avatar" style="background:rgba(234,179,8,.1);color:#ca8a04">→</div><div class="row-name">Enviar propuesta Carlos P.</div><span class="row-time">09 abr</span></div>
+          <div class="table-row"><div class="avatar" style="background:rgba(99,102,241,.08);color:#6366f1">→</div><div class="row-name">Visita propiedad Piantini</div><span class="row-time">10 abr</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const colors = { A:'#c9a84c', B:'#ff4444', C:'#cc1f1f', D:'#c8102e' };
+function show(opt) {
+  document.querySelectorAll('.preview').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.opt-btn').forEach(b => {
+    b.classList.remove('active');
+    b.style.borderColor = '#333';
+    b.style.color = '#888';
+  });
+  document.getElementById('opt' + opt).classList.add('active');
+  const btn = document.getElementById('btn' + opt);
+  btn.classList.add('active');
+  btn.style.borderColor = colors[opt];
+  btn.style.color = colors[opt];
+}
+// init
+show('A');
+</script>
+</body>
+</html>

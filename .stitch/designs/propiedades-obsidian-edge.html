@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(28, 29, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(201, 150, 58, 0.15);
+        }
+        .ambient-glow {
+            box-shadow: 0 0 40px rgba(245, 189, 93, 0.04);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            background: #C9963A;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        body {
+            background-color: #0E0E0E;
+            color: #E8E3DC;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "background": "#131313",
+                      "tertiary-container": "#989fae",
+                      "outline-variant": "#4f4537",
+                      "on-secondary": "#32302c",
+                      "error": "#ffb4ab",
+                      "surface-container-highest": "#353534",
+                      "on-background": "#e5e2e1",
+                      "surface-dim": "#131313",
+                      "outline": "#9c8f7d",
+                      "on-tertiary-container": "#2f3643",
+                      "surface-tint": "#f5bd5d",
+                      "on-primary-container": "#4a3100",
+                      "inverse-primary": "#7e5700",
+                      "secondary-fixed": "#e7e2db",
+                      "secondary-container": "#494742",
+                      "on-secondary-container": "#b9b5ae",
+                      "surface": "#131313",
+                      "surface-bright": "#3a3939",
+                      "surface-container": "#201f1f",
+                      "on-primary-fixed-variant": "#604100",
+                      "inverse-on-surface": "#313030",
+                      "tertiary-fixed-dim": "#c0c7d6",
+                      "inverse-surface": "#e5e2e1",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-secondary-fixed-variant": "#494742",
+                      "tertiary": "#c0c7d6",
+                      "primary-container": "#c9963a",
+                      "primary": "#f5bd5d",
+                      "primary-fixed-dim": "#f5bd5d",
+                      "tertiary-fixed": "#dce2f3",
+                      "error-container": "#93000a",
+                      "on-primary-fixed": "#281900",
+                      "secondary-fixed-dim": "#cac6bf",
+                      "primary-fixed": "#ffdeac",
+                      "surface-variant": "#353534",
+                      "secondary": "#cac6bf",
+                      "on-tertiary": "#2a313d",
+                      "on-secondary-fixed": "#1d1b17",
+                      "on-error-container": "#ffdad6",
+                      "on-surface-variant": "#d3c4b1",
+                      "on-tertiary-fixed": "#151c27",
+                      "on-error": "#690005",
+                      "on-tertiary-fixed-variant": "#404754",
+                      "surface-container-low": "#1c1b1b",
+                      "on-surface": "#e5e2e1",
+                      "surface-container-high": "#2a2a2a",
+                      "on-primary": "#432c00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "fontFamily": {
+                      "headline": ["Manrope"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="flex min-h-screen">
+<!-- Shared SideNavBar -->
+<aside class="fixed left-0 top-0 h-screen w-[240px] bg-[#0E0E0E] bg-opacity-80 backdrop-blur-xl flex flex-col h-full py-8 px-6 tonal-shift bg-[#131313] ambient-glow-primary-4% shadow-none z-50">
+<div class="mb-10">
+<h1 class="text-2xl font-bold tracking-widest text-[#C9963A] uppercase font-['Manrope']">Advance Estate</h1>
+<p class="text-[10px] text-[#6B7280] tracking-[0.2em] mt-1">ELITE PORTFOLIO</p>
+</div>
+<!-- Filter Pill Group -->
+<div class="mb-8 space-y-2">
+<div class="bg-[#1C1D27] p-1 rounded-full flex flex-wrap gap-1">
+<button class="px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#C9963A] text-[#0D0E12] transition-all">Todos</button>
+<button class="px-3 py-1.5 rounded-full text-[11px] font-medium text-[#6B7280] hover:text-[#E8E3DC] transition-all">COL</button>
+<button class="px-3 py-1.5 rounded-full text-[11px] font-medium text-[#6B7280] hover:text-[#E8E3DC] transition-all">Green Valley</button>
+<button class="px-3 py-1.5 rounded-full text-[11px] font-medium text-[#6B7280] hover:text-[#E8E3DC] transition-all">BCR</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar space-y-8 pr-2">
+<!-- Filter Group: Tipo -->
+<section>
+<label class="block text-[11px] font-semibold text-[#9899A8] uppercase tracking-wider mb-4 font-['Manrope']">Tipo</label>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 rounded-lg bg-[#201f1f] text-[11px] font-medium text-[#E8E3DC] cursor-pointer hover:bg-[#353534]">Casa</span>
+<span class="px-3 py-1.5 rounded-lg bg-[#C9963A] text-[11px] font-bold text-[#0D0E12] cursor-pointer">Apto</span>
+<span class="px-3 py-1.5 rounded-lg bg-[#201f1f] text-[11px] font-medium text-[#E8E3DC] cursor-pointer hover:bg-[#353534]">Terreno</span>
+</div>
+</section>
+<!-- Filter Group: Precio -->
+<section>
+<label class="block text-[11px] font-semibold text-[#9899A8] uppercase tracking-wider mb-4 font-['Manrope']">Precio (USD)</label>
+<input class="w-full h-1 bg-[#201f1f] rounded-lg appearance-none cursor-pointer accent-[#C9963A]" max="5000000" min="50000" type="range"/>
+<div class="flex justify-between mt-2 text-[10px] text-[#6B7280] font-['Manrope']">
+<span>50k</span>
+<span>5M</span>
+</div>
+</section>
+<!-- Filter Group: Dormitorios -->
+<section>
+<label class="block text-[11px] font-semibold text-[#9899A8] uppercase tracking-wider mb-4 font-['Manrope']">Dormitorios</label>
+<div class="grid grid-cols-4 gap-2">
+<button class="h-8 rounded bg-[#201f1f] text-[11px] hover:bg-[#C9963A] hover:text-[#0D0E12] transition-colors">1</button>
+<button class="h-8 rounded bg-[#201f1f] text-[11px] hover:bg-[#C9963A] hover:text-[#0D0E12] transition-colors">2</button>
+<button class="h-8 rounded bg-[#C9963A] text-[#0D0E12] text-[11px] font-bold">3+</button>
+<button class="h-8 rounded bg-[#201f1f] text-[11px] hover:bg-[#C9963A] hover:text-[#0D0E12] transition-colors">4+</button>
+</div>
+</section>
+<!-- Filter Group: Estado -->
+<section>
+<label class="block text-[11px] font-semibold text-[#9899A8] uppercase tracking-wider mb-4 font-['Manrope']">Estado</label>
+<div class="flex flex-col gap-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-4 h-4 rounded-sm border border-[#4f4537] bg-transparent group-hover:border-[#C9963A] flex items-center justify-center">
+<div class="w-2 h-2 bg-[#C9963A] rounded-full"></div>
+</div>
+<span class="text-[12px] text-[#E8E3DC]">Disponible</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-4 h-4 rounded-sm border border-[#4f4537] bg-transparent group-hover:border-[#C9963A]"></div>
+<span class="text-[12px] text-[#6B7280]">Reservado</span>
+</label>
+</div>
+</section>
+</div>
+<div class="pt-6 border-t border-[#201f1f]">
+<button class="w-full bg-[#C9963A] text-[#0D0E12] py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-[#C9963A]/10">
+                Request Private Viewing
+            </button>
+</div>
+</aside>
+<!-- Main Area -->
+<main class="ml-[240px] flex-1 bg-[#0D0E12] min-h-screen pb-20">
+<!-- Shared TopAppBar -->
+<header class="sticky top-0 z-40 bg-[#0D0E12]/80 backdrop-blur-xl flex justify-between items-center px-12 py-6 border-b border-[#201f1f]/50">
+<div class="flex items-center gap-12">
+<nav class="flex gap-8">
+<a class="text-[#C9963A] font-semibold border-b border-[#C9963A] pb-1 text-sm tracking-wide font-['Inter']" href="#">Residential</a>
+<a class="text-[#6B7280] hover:text-[#E8E3DC] transition-colors text-sm tracking-wide font-['Inter']" href="#">Commercial</a>
+<a class="text-[#6B7280] hover:text-[#E8E3DC] transition-colors text-sm tracking-wide font-['Inter']" href="#">Industrial</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#6B7280] text-sm">search</span>
+<input class="bg-[#1C1D27] border-none rounded-full py-2 pl-10 pr-4 text-xs w-[240px] focus:ring-1 focus:ring-[#C9963A] transition-all" placeholder="Search property..." type="text"/>
+</div>
+<div class="flex gap-4 text-[#6B7280]">
+<button class="hover:text-[#C9963A] transition-colors"><span class="material-symbols-outlined">notifications</span></button>
+<button class="hover:text-[#C9963A] transition-colors"><span class="material-symbols-outlined">account_circle</span></button>
+</div>
+</div>
+</header>
+<!-- Contextual Toolbar -->
+<div class="px-12 py-8 flex items-center justify-between">
+<div class="flex items-baseline gap-4">
+<h2 class="text-3xl font-['Manrope'] font-extrabold tracking-tight text-[#E8E3DC]">Properties</h2>
+<span class="text-[#9899A8] text-sm font-medium tracking-wide">234 total listings</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-[#1C1D27] p-1 rounded-lg">
+<button class="p-2 text-[#C9963A] bg-[#0D0E12]/50 rounded shadow-sm"><span class="material-symbols-outlined text-[18px]">grid_view</span></button>
+<button class="p-2 text-[#6B7280] hover:text-[#E8E3DC]"><span class="material-symbols-outlined text-[18px]">format_list_bulleted</span></button>
+</div>
+<div class="relative">
+<select class="bg-[#1C1D27] text-[#E8E3DC] border-none rounded-lg text-xs py-2.5 px-4 pr-10 focus:ring-1 focus:ring-[#C9963A] appearance-none">
+<option>Recently Added</option>
+<option>Price: High to Low</option>
+<option>Price: Low to High</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#6B7280] pointer-events-none text-sm">expand_more</span>
+</div>
+<button class="flex items-center gap-2 border border-[#C9963A] text-[#C9963A] px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest hover:bg-[#C9963A]/5 transition-all">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                    Nueva propiedad
+                </button>
+</div>
+</div>
+<!-- Property Grid -->
+<div class="px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+<!-- Property Card 1 -->
+<div class="glass-card rounded-[12px] overflow-hidden group flex flex-col h-full ambient-glow">
+<div class="relative h-[52%] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Modern architectural villa with sharp lines, floor-to-ceiling glass windows at sunset, reflecting warm golden light on a dark facade" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDITfmLTQ-b-XuORapt9a53pMDU_OQ_r3-xTY0L0BiNm2K92hK6WsW6fgKJVCm-DYN1DWlEynbZd4U_B1RsZ0tkqSgJl39IrC-kw3sFGm2YtOwcLg-5hTgeVkCwy_VjEtXpHCNknigEGsDyWkrriAOl9m3HODwjsCWg_1d0_csZK9i-CD9bdrGIrNUbxrles6XCuF5I6yvMn4Z8r030bARZ-sg0D0_6oFL7E6vrQNkr4TrhRZdADpPHp8fgo1XNxMzkxxTYXJlbyS8"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-[#C9963A] text-[#0D0E12] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">COL</span>
+<span class="bg-[#0D0E12]/80 backdrop-blur text-[#E8E3DC] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">Green Valley</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-2xl font-bold font-['Manrope'] text-[#E8E3DC] tracking-tight">USD 1,240,000</h3>
+<span class="bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Disponible</span>
+</div>
+<p class="text-[#9899A8] text-sm font-medium mb-4">Ref: #AE882 • Luxury Penthouse</p>
+</div>
+<div class="flex items-center justify-between border-t border-[#2a2a2a] pt-4">
+<div class="flex gap-4 text-[#E8E3DC]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bed</span>
+<span class="text-xs font-['Manrope'] font-bold">4</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bathtub</span>
+<span class="text-xs font-['Manrope'] font-bold">3</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">square_foot</span>
+<span class="text-xs font-['Manrope'] font-bold">340m²</span>
+</div>
+</div>
+<button class="text-[#C9963A] hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Property Card 2 -->
+<div class="glass-card rounded-[12px] overflow-hidden group flex flex-col h-full ambient-glow">
+<div class="relative h-[52%] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Elegant contemporary kitchen with dark wood cabinetry and black marble island, lit by subtle recessed architectural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuARHruP68-MVIiDdAq7qYy2vIPPzdy4HavXX2jDwa-X2bIBWE0yZwqKZ1U64oURP4pDhU976H6hSBrJHNdZ1onP1zNR4_fSJjFUWwbId4eWoF60cj6zFd5oWfd-ZwzS5SiFmBpKuOl8Jte0KpPgVuhfrMqtnHj9f1EMQYp3frWu65Lh3_NnIMlfHE1iPn_etORpxbx6ESFVYqWAzjuU06qLZoH_Ruh_X6_E2gFvhx0rcn_5DZcdXsDombdTVa2ABx2KCbnj2SuiAhQ"/>
+<div class="absolute top-4 left-4">
+<span class="bg-[#C9963A] text-[#0D0E12] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">BCR</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-2xl font-bold font-['Manrope'] text-[#E8E3DC] tracking-tight">USD 890,000</h3>
+<span class="bg-[#F59E0B]/10 text-[#F59E0B] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Reservado</span>
+</div>
+<p class="text-[#9899A8] text-sm font-medium mb-4">Ref: #AE104 • Modern Flat</p>
+</div>
+<div class="flex items-center justify-between border-t border-[#2a2a2a] pt-4">
+<div class="flex gap-4 text-[#E8E3DC]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bed</span>
+<span class="text-xs font-['Manrope'] font-bold">2</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bathtub</span>
+<span class="text-xs font-['Manrope'] font-bold">2</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">square_foot</span>
+<span class="text-xs font-['Manrope'] font-bold">185m²</span>
+</div>
+</div>
+<button class="text-[#C9963A] hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Property Card 3 -->
+<div class="glass-card rounded-[12px] overflow-hidden group flex flex-col h-full ambient-glow">
+<div class="relative h-[52%] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Luxury infinity pool at dusk overlooking a dark valley, illuminated by submerged warm lights within a dark stone terrace" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj2Ce52xz_pZjIm76bJOA2bbIByFAgbMZ40bTUAm4uV7L3YU49XSOSCBwNdWLAyEK_f4dWvcDYz_IWCGZbYuIeYQuJvHA7NajlsFGgp3MBaoXj9ZpVSlEPy98SEcerR3UAj32SjH9TjqARx-ts_w6xoUGp2wiGQnRtIiBjRFDyEeaFQQydkcKD0yqDHv8nZAmeFO0XnZenrO0-FqnOfzSb87jztUdt_0vPoPsjwVqA-16zQnqR5gGleJnnCx_y3m4ho9w2J-ii6yU"/>
+<div class="absolute top-4 left-4 flex gap-2">
+<span class="bg-[#C9963A] text-[#0D0E12] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">COL</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-2xl font-bold font-['Manrope'] text-[#E8E3DC] tracking-tight">USD 2,150,000</h3>
+<span class="bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Disponible</span>
+</div>
+<p class="text-[#9899A8] text-sm font-medium mb-4">Ref: #AE921 • Hillside Estate</p>
+</div>
+<div class="flex items-center justify-between border-t border-[#2a2a2a] pt-4">
+<div class="flex gap-4 text-[#E8E3DC]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bed</span>
+<span class="text-xs font-['Manrope'] font-bold">6</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bathtub</span>
+<span class="text-xs font-['Manrope'] font-bold">5</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">square_foot</span>
+<span class="text-xs font-['Manrope'] font-bold">720m²</span>
+</div>
+</div>
+<button class="text-[#C9963A] hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Property Card 4 -->
+<div class="glass-card rounded-[12px] overflow-hidden group flex flex-col h-full ambient-glow">
+<div class="relative h-[52%] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Modern minimalist home entrance with black slate walls and a singular bonsai tree under a spotlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACqxEwMIPuCvpfx2ig0XrQ949FImqLV2S5vSVf_XVQhHA3L4KWSNogllTxx9v2EsfPbIDwl0qMoLh3ZMfzXXcrbnX7uah0A51F4ZsxTWcZ-kyMqi_thCQDwqVjnAn2KpbkFBXp0LO_YwnWwGV02j0nvGfB-IaP73i8uZdXFKkeTKYwAPrNhwJUiY2c-cEmS5MMNEQlr1lcUDGPZhatng4oy7Ro_oeYazSwSs_0o7E_LcDj02JWXIxnd7Iyid584lx3bkrSzOb5peQ"/>
+<div class="absolute top-4 left-4">
+<span class="bg-[#0D0E12]/80 backdrop-blur text-[#E8E3DC] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">Green Valley</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-2xl font-bold font-['Manrope'] text-[#E8E3DC] tracking-tight">USD 540,000</h3>
+<span class="bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Disponible</span>
+</div>
+<p class="text-[#9899A8] text-sm font-medium mb-4">Ref: #AE339 • Urban Studio</p>
+</div>
+<div class="flex items-center justify-between border-t border-[#2a2a2a] pt-4">
+<div class="flex gap-4 text-[#E8E3DC]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bed</span>
+<span class="text-xs font-['Manrope'] font-bold">1</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bathtub</span>
+<span class="text-xs font-['Manrope'] font-bold">1</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">square_foot</span>
+<span class="text-xs font-['Manrope'] font-bold">95m²</span>
+</div>
+</div>
+<button class="text-[#C9963A] hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Property Card 5 -->
+<div class="glass-card rounded-[12px] overflow-hidden group flex flex-col h-full ambient-glow">
+<div class="relative h-[52%] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Grand living room with double height ceiling, massive dark-framed windows viewing a night cityscape, luxury furniture in grey tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbxFc4-AyFZHl4RmsYNtLI5krRDojc-zofRek1ZiKBQmYo47H-UzdUr3v1kUK35osCUwCt12bRQTNJ5Ei9-QGNMHsHW-tqyn_6uhVv1qmR4H__Dq67ui5LUgQg1y1NZjw7A8rxf8znQXAHLIcNI0mM8MPjFacczu6ZoSzPjKu1bdEPx02ivVc9yY0Ls6EvdqdWlQjEn49dm16IsE_FtLEkb1Xu-SeOTe73VV0uTKqDpc8JYM_LkP60kO0M-gweYuQ7KnG-awJTdgg"/>
+<div class="absolute top-4 left-4">
+<span class="bg-[#C9963A] text-[#0D0E12] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">BCR</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-2xl font-bold font-['Manrope'] text-[#E8E3DC] tracking-tight">USD 3,450,000</h3>
+<span class="bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Disponible</span>
+</div>
+<p class="text-[#9899A8] text-sm font-medium mb-4">Ref: #AE002 • Presidential Suite</p>
+</div>
+<div class="flex items-center justify-between border-t border-[#2a2a2a] pt-4">
+<div class="flex gap-4 text-[#E8E3DC]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bed</span>
+<span class="text-xs font-['Manrope'] font-bold">5</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bathtub</span>
+<span class="text-xs font-['Manrope'] font-bold">6</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">square_foot</span>
+<span class="text-xs font-['Manrope'] font-bold">850m²</span>
+</div>
+</div>
+<button class="text-[#C9963A] hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Property Card 6 -->
+<div class="glass-card rounded-[12px] overflow-hidden group flex flex-col h-full ambient-glow">
+<div class="relative h-[52%] overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="Exterior of a dark concrete modern home at night with strategic warm uplighting hitting textured walls" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj8a7A_RskkAMwRlblUP-M9JotufkvMbfRkAj42hsSwjefbV6_27nYqffiKRCrQadWwky2wKQ-WJtbvte2yaxF-HqJDfAOQX9qQ_2z40xuDyH8aqTRhUc5jfuq8sVxMP7cma9Fu7e6qPkr4sLWLAg7eHJdjt1fnuWa_SjwBBy1pW1kuk97dUlUW6_TFrB5ZBlwbIPGUaCF_PGXV8pw2sPfuWFOOSFOtOgjcxUfMuiyNzVaA1WazotS7Ut2uymwmx7mgRAvDzDEFPc"/>
+<div class="absolute top-4 left-4">
+<span class="bg-[#C9963A] text-[#0D0E12] px-3 py-1 rounded text-[10px] font-bold tracking-widest uppercase">COL</span>
+</div>
+</div>
+<div class="p-6 flex flex-col flex-1 justify-between">
+<div>
+<div class="flex justify-between items-start mb-2">
+<h3 class="text-2xl font-bold font-['Manrope'] text-[#E8E3DC] tracking-tight">USD 1,680,000</h3>
+<span class="bg-[#F59E0B]/10 text-[#F59E0B] px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">Reservado</span>
+</div>
+<p class="text-[#9899A8] text-sm font-medium mb-4">Ref: #AE512 • Brutalist Mansion</p>
+</div>
+<div class="flex items-center justify-between border-t border-[#2a2a2a] pt-4">
+<div class="flex gap-4 text-[#E8E3DC]">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bed</span>
+<span class="text-xs font-['Manrope'] font-bold">4</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">bathtub</span>
+<span class="text-xs font-['Manrope'] font-bold">4</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-sm text-[#C9963A]">square_foot</span>
+<span class="text-xs font-['Manrope'] font-bold">420m²</span>
+</div>
+</div>
+<button class="text-[#C9963A] hover:translate-x-1 transition-transform">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -153,7 +153,7 @@ export default function LoginPage() {
                   outline: "none",
                 }}
                 onFocus={(e) => {
-                  e.target.style.borderColor = "#e11d48";
+                  e.target.style.borderColor = "var(--primary)";
                   e.target.style.background = "var(--background)";
                 }}
                 onBlur={(e) => {
@@ -178,7 +178,7 @@ export default function LoginPage() {
                 <a
                   href="#"
                   className="text-[11px] font-semibold transition-opacity hover:opacity-70"
-                  style={{ color: "#e11d48" }}
+                  style={{ color: "var(--primary)" }}
                 >
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -200,7 +200,7 @@ export default function LoginPage() {
                     outline: "none",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = "#e11d48";
+                    e.target.style.borderColor = "var(--primary)";
                     e.target.style.background = "var(--background)";
                   }}
                   onBlur={(e) => {
@@ -232,9 +232,10 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full h-11 text-white font-bold text-sm rounded-md transition-all duration-200 hover:brightness-95 active:scale-[0.98] disabled:opacity-60 cursor-pointer mt-1"
               style={{
-                background: "#e11d48",
+                background: "var(--primary)",
+                color: "var(--primary-foreground)",
                 fontFamily: "var(--font-manrope), Manrope, sans-serif",
-                boxShadow: "0 4px 16px rgba(225,29,72,0.28)",
+                boxShadow: "0 4px 16px color-mix(in srgb, var(--primary) 28%, transparent)",
               }}
             >
               {loading ? "Iniciando sesión..." : "Iniciar sesión"}

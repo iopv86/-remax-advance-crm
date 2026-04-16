@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-container": "#2f3643",
+                        "on-primary-fixed-variant": "#604100",
+                        "surface-container-highest": "#353534",
+                        "on-surface-variant": "#d3c4b1",
+                        "surface-variant": "#353534",
+                        "secondary-fixed-dim": "#cac6bf",
+                        "on-primary-container": "#4a3100",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed-variant": "#404754",
+                        "on-primary-fixed": "#281900",
+                        "surface-container-low": "#1c1b1b",
+                        "primary-fixed": "#ffdeac",
+                        "inverse-on-surface": "#313030",
+                        "surface-tint": "#f5bd5d",
+                        "outline": "#9c8f7d",
+                        "error": "#ffb4ab",
+                        "tertiary": "#c0c7d6",
+                        "primary-fixed-dim": "#f5bd5d",
+                        "secondary": "#cac6bf",
+                        "on-secondary": "#32302c",
+                        "inverse-primary": "#7e5700",
+                        "surface-container": "#201f1f",
+                        "surface-dim": "#131313",
+                        "inverse-surface": "#e5e2e1",
+                        "surface-bright": "#3a3939",
+                        "on-secondary-fixed-variant": "#494742",
+                        "surface": "#131313",
+                        "on-primary": "#432c00",
+                        "on-tertiary": "#2a313d",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary-container": "#494742",
+                        "surface-container-lowest": "#0e0e0e",
+                        "background": "#131313",
+                        "on-error": "#690005",
+                        "on-secondary-fixed": "#1d1b17",
+                        "error-container": "#93000a",
+                        "on-secondary-container": "#b9b5ae",
+                        "tertiary-fixed": "#dce2f3",
+                        "on-background": "#e5e2e1",
+                        "secondary-fixed": "#e7e2db",
+                        "primary": "#f5bd5d",
+                        "outline-variant": "#4f4537",
+                        "tertiary-fixed-dim": "#c0c7d6",
+                        "tertiary-container": "#989fae",
+                        "primary-container": "#c9963a",
+                        "on-tertiary-fixed": "#151c27"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #0E0E0E; }
+        ::-webkit-scrollbar-thumb { background: #353534; border-radius: 10px; }
+        .glass-card {
+            background: rgba(20, 21, 28, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar Implementation -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-8 h-16 bg-[#0E0E0E]/80 backdrop-blur-xl">
+<div class="text-2xl font-bold tracking-tight text-[#C9963A]">AVA CRM</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#6B7280] hover:text-[#E8E3DC] font-label text-[12px] uppercase tracking-wider" href="#">Dashboard</a>
+<a class="text-[#6B7280] hover:text-[#E8E3DC] font-label text-[12px] uppercase tracking-wider" href="#">Analytics</a>
+<a class="text-[#6B7280] hover:text-[#E8E3DC] font-label text-[12px] uppercase tracking-wider" href="#">Team</a>
+<a class="text-[#C9963A] border-b-2 border-[#C9963A] pb-1 font-label text-[12px] uppercase tracking-wider" href="#">Inbox</a>
+</nav>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#6B7280] hover:text-[#E8E3DC] cursor-pointer">help_outline</span>
+<span class="material-symbols-outlined text-[#6B7280] hover:text-[#E8E3DC] cursor-pointer">settings</span>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed px-5 py-2 rounded-lg font-semibold text-sm transition-all hover:shadow-[0_0_20px_rgba(245,189,93,0.15)] active:scale-[0.98]">
+                New Broadcast
+            </button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="CRM Admin" class="w-full h-full object-cover" data-alt="Professional real estate agent headshot with soft studio lighting and dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4Q7-sXNbeNqh6AGQhzXRM_qX3m1UwnUy4cxe-zIEU3gUdCmkkT40AUJ8VjZIEC0mNelJYGyMcQjEioGIGygD5fxTRMs9hkg_hYP06eho2LI77Y8EuwehJ0p4B8VatKGSkaFfRhpUKltpDPNT-5s7vevNZoF4UcaGY8wty5s3gwMGuTGClLNtm8lt91E2OUQYKPypnTR7MEBiZE5pyn_3-3hmUsLeQeZSK_GP5PQOif5Ew1NFpVwjJVuZ6UQ7Czi_oDa9sqm0wcNc"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar Implementation -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-64 z-40 bg-[#0E0E0E] flex flex-col border-r border-[#4f4537]/20">
+<div class="p-6">
+<div class="flex items-center gap-3 mb-1">
+<div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+<span class="font-headline text-on-surface font-bold">Ava Active</span>
+</div>
+<span class="text-[10px] uppercase tracking-[0.1em] text-on-surface-variant">High Intent Leads Only</span>
+</div>
+<nav class="flex-1 mt-4">
+<div class="flex items-center gap-4 bg-gradient-to-r from-[#C9963A]/10 to-transparent text-[#C9963A] border-r-4 border-[#C9963A] py-3 px-6">
+<span class="material-symbols-outlined">inbox</span>
+<span class="font-label text-[12px] uppercase tracking-wider font-semibold">Inbox</span>
+</div>
+<div class="flex items-center gap-4 text-[#6B7280] py-3 px-6 hover:text-[#E8E3DC] transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary">person_search</span>
+<span class="font-label text-[12px] uppercase tracking-wider">Leads</span>
+</div>
+<div class="flex items-center gap-4 text-[#6B7280] py-3 px-6 hover:text-[#E8E3DC] transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary">smart_toy</span>
+<span class="font-label text-[12px] uppercase tracking-wider">Automation</span>
+</div>
+<div class="flex items-center gap-4 text-[#6B7280] py-3 px-6 hover:text-[#E8E3DC] transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary">bar_chart</span>
+<span class="font-label text-[12px] uppercase tracking-wider">Reports</span>
+</div>
+<div class="flex items-center gap-4 text-[#6B7280] py-3 px-6 hover:text-[#E8E3DC] transition-all group">
+<span class="material-symbols-outlined group-hover:text-primary">inventory_2</span>
+<span class="font-label text-[12px] uppercase tracking-wider">Archive</span>
+</div>
+</nav>
+<div class="p-6 mt-auto">
+<div class="bg-surface-container rounded-xl p-4 mb-6 border border-outline-variant/10">
+<p class="text-xs text-on-surface-variant mb-3">Maximize your outreach with premium tools.</p>
+<button class="w-full py-2 text-xs font-bold uppercase tracking-widest text-primary border border-primary/30 rounded hover:bg-primary/5 transition-colors">
+                    Upgrade Plan
+                </button>
+</div>
+<div class="flex items-center gap-4 text-[#6B7280] py-3 px-2 hover:text-error transition-all cursor-pointer">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label text-[12px] uppercase tracking-wider">Logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="ml-64 mt-16 flex h-[calc(100vh-64px)] overflow-hidden">
+<!-- Left Column: Conversations (280px) -->
+<section class="w-[280px] bg-[#14151C] border-r border-outline-variant/10 flex flex-col">
+<div class="p-5">
+<h1 class="font-headline text-[18px] text-white font-bold mb-4">Conversaciones</h1>
+<div class="relative mb-6">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="w-full bg-surface-container-lowest border-none rounded-lg pl-10 py-2 text-xs focus:ring-1 focus:ring-primary text-on-surface" placeholder="Buscar chats..." type="text"/>
+</div>
+<div class="flex gap-4 overflow-x-auto pb-2 scrollbar-hide border-b border-outline-variant/5">
+<button class="text-primary font-semibold text-xs whitespace-nowrap border-b-2 border-primary pb-2">Todos</button>
+<button class="text-on-surface-variant font-medium text-xs whitespace-nowrap pb-2 hover:text-on-surface">Ava activa</button>
+<button class="text-on-surface-variant font-medium text-xs whitespace-nowrap pb-2 hover:text-on-surface">Tomado</button>
+<button class="text-on-surface-variant font-medium text-xs whitespace-nowrap pb-2 hover:text-on-surface">Sin respuesta</button>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto">
+<!-- Conversation Row (Active) -->
+<div class="h-[68px] flex items-center px-4 bg-[#1C1D27] cursor-pointer border-l-2 border-primary">
+<div class="w-9 h-9 rounded-full overflow-hidden mr-3 flex-shrink-0 relative">
+<img alt="Carlos Mejía" class="w-full h-full object-cover" data-alt="Portrait of a smiling middle-aged man in business casual attire with soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz88GqhGnRy0Klm9LkFOIiXVZ3gVB5ZUjS2z2l0ScdPftd3J_KHzpkYirOyFqkbNNext0K9Osx0xDlgOVNNhaOy4dfUt6Ph9ZKWBd1jkkbmXL5Pw1EFv6slLvtiJew_UvsaXRk7ZX-2J9SlkgNVhKRJZk8VzBWiRpU2RGUlItY1UbKgM8oReQlaTh_HJd_Z0Y0uqshn_i3bWiZ13H8lBbIEl9y6ABrXea0fegNp097OmfzQXeOaQmT4nhiMDKfKtKjtdgTxhkCaC0"/>
+<div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#1C1D27] rounded-full"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h3 class="text-sm font-medium text-white truncate">Carlos Mejía</h3>
+<span class="text-[11px] text-[#545567]">14:20</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-[12px] text-[#9899A8] truncate pr-2">Hola, me interesa la propiedad...</p>
+<span class="bg-[#C9963A] text-[#281900] text-[10px] font-bold px-1.5 py-0.5 rounded-full">2</span>
+</div>
+</div>
+</div>
+<!-- Conversation Row -->
+<div class="h-[68px] flex items-center px-4 hover:bg-[#1C1D27]/50 cursor-pointer transition-colors">
+<div class="w-9 h-9 rounded-full overflow-hidden mr-3 flex-shrink-0">
+<img alt="Lucía Fernández" class="w-full h-full object-cover" data-alt="Modern professional woman profile photo with minimal background and professional lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsv5R4LJuAB_CYqaYPa9ptTOaZm44IFhdeuEdTjDQCaIlWN34fiDF4ETWeZPcYJQu5uXYRCjSmUYU0s4F5dH2s6uIsAm1gRKYsI97w4C9-zVaY-IR1Ft7Vbad9hcWSGyIP5ERMoURxyxDSBuV5uMK6u8ZXaLJ4kDUWnTFfNFBlr25eTtCpemk6Ud4W04AmI471d3ENBh_O3kzKWtSxhB3r-LQupZQ9xq2PPjnwxat2VbHD4ydU3iOI2l4vUM7dP_hRHEALW9rEUJA"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h3 class="text-sm font-medium text-white truncate">Lucía Fernández</h3>
+<span class="text-[11px] text-[#545567]">12:45</span>
+</div>
+<div class="flex justify-between items-center">
+<p class="text-[12px] text-[#9899A8] truncate pr-2 leading-tight">¿Cuándo podemos agendar la visita?</p>
+<span class="bg-[#22242F] text-[#C9963A] text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-tighter">Ava</span>
+</div>
+</div>
+</div>
+<!-- Repeating Rows for visual depth -->
+<div class="h-[68px] flex items-center px-4 hover:bg-[#1C1D27]/50 cursor-pointer transition-colors opacity-80">
+<div class="w-9 h-9 rounded-full overflow-hidden mr-3 flex-shrink-0">
+<img alt="Roberto Ruiz" class="w-full h-full object-cover" data-alt="Young male professional portrait in studio lighting with a neutral gray background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy2L6rKcOQOBYHVtYkgTem8R_fYLPJOTCrwzvAAd-K6AMmOOutKReI44TL0jILMKK82MjBFxTsvx1-aC7kc6T8p1RHt8znNsIeygo-1Wn2H5OlBzZ_6vjaOKUSkQnWhQDOG69bakD8lPTM3i9QtqgBYZbaOtTga75-EpbAb__jbZXDA5IehXCdYmPnnHPdN5zWs8-jfPxFO0aKYcu7eJyxewRS49rCwRHBStM-8En2bY7VWY7OWF0pyqa7H0I2ZqmGCzkWmAK5m08"/>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline">
+<h3 class="text-sm font-medium text-white truncate">Roberto Ruiz</h3>
+<span class="text-[11px] text-[#545567]">Ayer</span>
+</div>
+<p class="text-[12px] text-[#9899A8] truncate">Gracias por la información enviada.</p>
+</div>
+</div>
+<!-- ... additional rows ... -->
+</div>
+</section>
+<!-- Center Column: Chat Transcript (Flex) -->
+<section class="flex-1 bg-[#0D0E12] flex flex-col relative">
+<!-- Sticky Header -->
+<div class="h-16 flex items-center justify-between px-8 bg-[#0D0E12]/90 backdrop-blur-md border-b border-outline-variant/10 z-10">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden">
+<img alt="Carlos Mejía" class="w-full h-full object-cover" data-alt="Close-up of a client portrait for a messaging interface with high detail and soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBN30b1-oXJgbZ7Onk-hGJFsrmT2irC6cxcvSENM54VcLyEA5zNCly3v0nIOWcWjCHUp_8FlQV46mYhk6no0TsFEnv00Gut_ANU8Jc3g1ucEsLXlL1FfrAvmvdXdqLL6SGHHuMwWvZLgpqfXZ4fo0-g4pEJpixLOCzWmxRfKxzbXXMNLngpzRXfrouMn_fv9W5MkWOjOCzDZGXM85sANIBX9LFy56O9AvTtoP5fx78AdUsvvJjwGdcgAZwzUs7lDHXzF_CtCf-1W8"/>
+</div>
+<div>
+<h2 class="font-headline font-semibold text-white">Carlos Mejía</h2>
+<div class="flex items-center gap-2">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+<span class="text-[11px] text-[#9899A8]">En línea — WhatsApp</span>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-[#281900] px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest hover:shadow-[0_0_15px_rgba(201,150,58,0.3)] transition-all">
+                        Tomar conversación
+                    </button>
+<span class="material-symbols-outlined text-green-500 cursor-pointer">chat</span>
+</div>
+</div>
+<!-- Messages Area -->
+<div class="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
+<!-- Day Separator -->
+<div class="flex items-center gap-4 py-4">
+<div class="flex-1 h-[1px] bg-outline-variant/10"></div>
+<span class="text-[10px] uppercase tracking-[0.2em] text-[#545567] font-bold">Hoy</span>
+<div class="flex-1 h-[1px] bg-outline-variant/10"></div>
+</div>
+<!-- Lead Message (Right) -->
+<div class="flex flex-col items-end gap-1 max-w-[80%] self-end">
+<div class="bg-[#22242F] text-on-surface px-4 py-3 rounded-2xl rounded-tr-none text-sm leading-relaxed border border-outline-variant/5">
+                        Hola, vi el anuncio en Meta Ads. Me interesa el apartamento de 2 habitaciones en el sector norte. ¿Podrías darme el precio?
+                    </div>
+<span class="text-[10px] text-[#545567] mr-1">14:15</span>
+</div>
+<!-- Ava Message (Left) -->
+<div class="flex flex-col items-start gap-1 max-w-[80%]">
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary mb-1 ml-1">Ava AI</span>
+<div class="bg-[#1C1D27] text-on-surface px-4 py-3 rounded-2xl rounded-tl-none text-sm leading-relaxed border border-primary/10 shadow-[0_0_15px_rgba(201,150,58,0.04)]">
+                        ¡Hola Carlos! Qué gusto saludarte. Ese apartamento es una de nuestras mejores opciones actuales. El precio base es de <span class="font-headline font-bold text-primary">USD 150,000</span>. ¿Te gustaría recibir el brochure completo por aquí o prefieres agendar una llamada?
+                    </div>
+<span class="text-[10px] text-[#545567] ml-1">14:16</span>
+</div>
+<!-- Lead Message (Right) -->
+<div class="flex flex-col items-end gap-1 max-w-[80%] self-end">
+<div class="bg-[#22242F] text-on-surface px-4 py-3 rounded-2xl rounded-tr-none text-sm leading-relaxed border border-outline-variant/5">
+                        Envíame el brochure por favor. También quería saber sobre las opciones de financiamiento.
+                    </div>
+<span class="text-[10px] text-[#545567] mr-1">14:20</span>
+</div>
+</div>
+<!-- Bottom Input (Locked) -->
+<div class="p-6 bg-[#0D0E12] border-t border-outline-variant/10">
+<div class="flex items-center gap-4 bg-surface-container-lowest/50 border border-outline-variant/20 rounded-xl px-6 py-4 cursor-not-allowed group transition-all hover:bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[#545567] group-hover:text-primary transition-colors">lock</span>
+<p class="text-[#545567] text-sm italic flex-1">Ava está activa — toma la conversación para responder manualmente</p>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-[#545567] cursor-not-allowed">attach_file</span>
+<span class="material-symbols-outlined text-[#545567] cursor-not-allowed">mood</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Column: Detail (320px) -->
+<section class="w-[320px] bg-[#14151C] border-l border-outline-variant/10 overflow-y-auto flex flex-col">
+<div class="p-6">
+<!-- Profile Glass Card -->
+<div class="glass-card rounded-2xl p-6 border border-outline-variant/10 mb-8 flex flex-col items-center text-center">
+<div class="w-20 h-20 rounded-2xl overflow-hidden mb-4 border-2 border-primary/20 p-1">
+<img alt="Carlos Profile" class="w-full h-full object-cover rounded-xl" data-alt="Detailed close-up of a client profile image in a luxury CRM context with warm tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVnH6nRlkg4gEceGat0LMqFQLU_A66WNN6up03Z2HL7x0zufxeSoSiDKUZqBdCrf1X5XjJrYgwtv5woRql_5lYOcbrp-yqpS52rBb_1rd6ckRZCNq3WV2mPKj6evHuzGkaJ20tfBiW7ramQgK_-ZF44R3qouJLtiocev_m3-Ex_IYUxzayYhWBJ_QSX1_bIuQ_7TvYyciu5fpGBc9nb0oPlJh6IyZmzRryb62BUS1G4oTCnAeWmOQhal6ub7-7r9HN1Ard18bP6MQ"/>
+</div>
+<h3 class="font-headline text-lg font-bold text-white mb-1">Carlos Mejía</h3>
+<p class="text-xs text-[#9899A8] mb-4">+57 312 456 7890</p>
+<div class="flex flex-wrap justify-center gap-2 mb-6">
+<span class="bg-[#003B5C]/40 text-[#5DADE2] text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-[#5DADE2]/20">Meta Ads</span>
+<div class="bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-primary/20 flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+                            Score: 92
+                        </div>
+</div>
+<div class="w-full h-[1px] bg-outline-variant/10 mb-6"></div>
+<div class="w-full space-y-4">
+<div class="flex justify-between text-[11px] uppercase tracking-widest font-bold text-[#545567]">
+<span>Intereses</span>
+</div>
+<div class="flex flex-wrap gap-2">
+<span class="bg-[#22242F] text-[#9899A8] text-[10px] px-2 py-1 rounded">COL</span>
+<span class="bg-[#22242F] text-[#9899A8] text-[10px] px-2 py-1 rounded">2 hab</span>
+<span class="bg-[#22242F] text-[#9899A8] text-[10px] px-2 py-1 rounded">USD 150k</span>
+</div>
+</div>
+</div>
+<!-- Assigned Agent -->
+<div class="mb-8">
+<h4 class="text-[10px] uppercase tracking-[0.2em] font-bold text-[#545567] mb-4">Agente Asignado</h4>
+<div class="flex items-center gap-3 bg-[#1C1D27] p-3 rounded-xl border border-outline-variant/5">
+<div class="w-8 h-8 rounded-full overflow-hidden">
+<img alt="Agent" class="w-full h-full object-cover" data-alt="Small avatar of a real estate professional for an assignment panel" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD1ByN5oS2ibAm_xDcqx_qI_qT4Uczli11mGvwIB3u-JBG-NcSDCUZipGDpZahgz4nQGKzkt4F41r-QTggEjbNIArjJ4KCahJUquDfq9q90KrIu_QLI-tDBWy5CoifospFOiSlj9dSf-tG0x0-ywDnHLvf_RwWkNYD9ESIaxBvkdIBX7MjZbFFVTZq0BZJmIelgQ7d-zZYKXL2Vokto6Q215HEw29Xh-ln2cyu6piU5NIFbeN96RsipOJVhW8SnxsFFQBMgohOf-3M"/>
+</div>
+<div>
+<p class="text-xs font-semibold text-on-surface">Admin User</p>
+<p class="text-[10px] text-on-surface-variant">Líder Comercial</p>
+</div>
+</div>
+</div>
+<!-- Timeline -->
+<div>
+<h4 class="text-[10px] uppercase tracking-[0.2em] font-bold text-[#545567] mb-6">Actividad Reciente</h4>
+<div class="space-y-6 relative ml-2">
+<div class="absolute left-[3px] top-1 bottom-1 w-[1px] bg-outline-variant/20"></div>
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-[7px] h-[7px] rounded-full bg-primary shadow-[0_0_8px_rgba(201,150,58,0.4)]"></div>
+<p class="text-xs text-on-surface font-medium">Chat iniciado vía WhatsApp</p>
+<p class="text-[10px] text-[#545567]">Hoy, 14:15</p>
+</div>
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-[7px] h-[7px] rounded-full bg-outline-variant"></div>
+<p class="text-xs text-on-surface font-medium">Ava calificó el lead (Hot)</p>
+<p class="text-[10px] text-[#545567]">Hoy, 14:17</p>
+</div>
+<div class="relative pl-6">
+<div class="absolute left-0 top-1 w-[7px] h-[7px] rounded-full bg-outline-variant"></div>
+<p class="text-xs text-on-surface font-medium">Registro desde Meta Ads</p>
+<p class="text-[10px] text-[#545567]">Hoy, 14:10</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

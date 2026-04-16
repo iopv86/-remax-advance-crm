@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0E0E0E;
+        }
+        .font-headline {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#131313",
+                        "outline": "#9c8f7d",
+                        "inverse-on-surface": "#313030",
+                        "on-primary": "#432c00",
+                        "secondary-fixed-dim": "#cac6bf",
+                        "tertiary-container": "#989fae",
+                        "surface-dim": "#131313",
+                        "primary-container": "#c9963a",
+                        "on-surface": "#e5e2e1",
+                        "on-background": "#e5e2e1",
+                        "tertiary-fixed-dim": "#c0c7d6",
+                        "on-secondary": "#32302c",
+                        "on-secondary-fixed": "#1d1b17",
+                        "surface-container-high": "#2a2a2a",
+                        "secondary": "#cac6bf",
+                        "on-secondary-container": "#b9b5ae",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#d3c4b1",
+                        "on-tertiary-fixed": "#151c27",
+                        "secondary-container": "#494742",
+                        "on-tertiary-container": "#2f3643",
+                        "surface-variant": "#353534",
+                        "surface-container": "#201f1f",
+                        "primary": "#f5bd5d",
+                        "on-error-container": "#ffdad6",
+                        "tertiary": "#c0c7d6",
+                        "primary-fixed": "#ffdeac",
+                        "error-container": "#93000a",
+                        "error": "#ffb4ab",
+                        "on-tertiary": "#2a313d",
+                        "on-primary-fixed": "#281900",
+                        "surface-tint": "#f5bd5d",
+                        "on-tertiary-fixed-variant": "#404754",
+                        "surface": "#131313",
+                        "secondary-fixed": "#e7e2db",
+                        "on-primary-fixed-variant": "#604100",
+                        "on-secondary-fixed-variant": "#494742",
+                        "inverse-primary": "#7e5700",
+                        "primary-fixed-dim": "#f5bd5d",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-surface": "#e5e2e1",
+                        "tertiary-fixed": "#dce2f3",
+                        "outline-variant": "#4f4537",
+                        "surface-container-highest": "#353534",
+                        "surface-container-low": "#1c1b1b",
+                        "surface-bright": "#3a3939",
+                        "on-primary-container": "#4a3100"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="text-on-surface selection:bg-primary/30">
+<!-- SideNavBar (Shared Component Blueprint) -->
+<aside class="fixed left-0 top-0 h-full w-20 hover:w-64 transition-all duration-500 z-50 bg-[#0E0E0E] border-r border-[#4f4537]/10 shadow-[10px_0_30px_rgba(0,0,0,0.5)] flex flex-col h-full py-6 items-center group overflow-hidden">
+<div class="mb-12 flex items-center px-6 w-full">
+<div class="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded bg-primary-container/10">
+<span class="font-['Manrope'] font-black text-2xl text-[#C9963A]">AE</span>
+</div>
+<div class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<p class="font-['Manrope'] font-black text-lg text-[#C9963A] whitespace-nowrap">AE Estate</p>
+<p class="text-[10px] uppercase tracking-widest text-on-surface-variant/60">Luxury CRM</p>
+</div>
+</div>
+<nav class="flex-1 w-full space-y-2">
+<!-- Dashboard -->
+<a class="flex items-center h-12 w-full px-6 text-[#6B7280] opacity-80 hover:opacity-100 hover:bg-[#131313] hover:text-[#E8E3DC] transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-['Inter'] text-sm tracking-wide whitespace-nowrap">Dashboard</span>
+</a>
+<!-- KPI Agentes (ACTIVE) -->
+<a class="flex items-center h-12 w-full px-6 bg-[#201f1f] text-[#C9963A] shadow-[inset_4px_0_0_0_#C9963A] transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-['Inter'] text-sm tracking-wide whitespace-nowrap font-semibold">KPI Agentes</span>
+</a>
+<!-- Inventory -->
+<a class="flex items-center h-12 w-full px-6 text-[#6B7280] opacity-80 hover:opacity-100 hover:bg-[#131313] hover:text-[#E8E3DC] transition-all" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-['Inter'] text-sm tracking-wide whitespace-nowrap">Inventory</span>
+</a>
+<!-- Clients -->
+<a class="flex items-center h-12 w-full px-6 text-[#6B7280] opacity-80 hover:opacity-100 hover:bg-[#131313] hover:text-[#E8E3DC] transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-['Inter'] text-sm tracking-wide whitespace-nowrap">Clients</span>
+</a>
+<!-- Settings -->
+<a class="flex items-center h-12 w-full px-6 text-[#6B7280] opacity-80 hover:opacity-100 hover:bg-[#131313] hover:text-[#E8E3DC] transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300 font-['Inter'] text-sm tracking-wide whitespace-nowrap">Settings</span>
+</a>
+</nav>
+</aside>
+<main class="ml-20 p-8 space-y-8">
+<!-- Header -->
+<header class="flex items-center justify-between">
+<div>
+<h1 class="text-[28px] font-headline font-bold text-white tracking-tight">Rendimiento de Agentes</h1>
+<p class="text-sm text-on-surface-variant">Analíticas de performance y conversión en tiempo real</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="bg-surface-container-highest/20 p-1 rounded-lg flex items-center">
+<button class="px-4 py-1.5 text-xs font-medium text-on-surface-variant hover:text-white transition-colors">Semanal</button>
+<button class="px-4 py-1.5 text-xs font-medium bg-primary-container text-on-primary-container rounded-md shadow-lg shadow-primary-container/20">Mensual</button>
+<button class="px-4 py-1.5 text-xs font-medium text-on-surface-variant hover:text-white transition-colors">Trimestral</button>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 border border-outline-variant/30 rounded-lg text-xs font-medium text-[#9899A8] hover:bg-surface-container-highest transition-colors group">
+<span class="material-symbols-outlined text-sm">download</span>
+                    Exportar
+                </button>
+</div>
+</header>
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+<!-- Card 1 -->
+<div class="bg-[#1C1D27]/80 backdrop-blur-xl border border-primary-container/15 rounded-xl p-6 relative overflow-hidden group">
+<div class="flex flex-col gap-1">
+<span class="text-[#9899A8] text-xs font-medium tracking-wide uppercase">Tiempo Resp.</span>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-semibold text-white">8.4 min</span>
+<div class="flex items-center text-xs text-green-500 font-medium">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            12%
+                        </div>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-7xl">timer</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-[#1C1D27]/80 backdrop-blur-xl border border-primary-container/15 rounded-xl p-6 relative overflow-hidden group">
+<div class="flex flex-col gap-1">
+<span class="text-[#9899A8] text-xs font-medium tracking-wide uppercase">Tasa Conversión</span>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-semibold text-white">32%</span>
+<div class="flex items-center text-xs text-green-500 font-medium">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            4.2%
+                        </div>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-7xl">ads_click</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-[#1C1D27]/80 backdrop-blur-xl border border-primary-container/15 rounded-xl p-6 relative overflow-hidden group">
+<div class="flex flex-col gap-1">
+<span class="text-[#9899A8] text-xs font-medium tracking-wide uppercase">Deals Estancados</span>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-semibold text-white">5 Deals</span>
+<div class="flex items-center text-xs text-red-500 font-medium">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            2
+                        </div>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-7xl">warning</span>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-[#1C1D27]/80 backdrop-blur-xl border border-primary-container/15 rounded-xl p-6 relative overflow-hidden group">
+<div class="flex flex-col gap-1">
+<span class="text-[#9899A8] text-xs font-medium tracking-wide uppercase">Pipeline Total</span>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-headline font-semibold text-white">RD$ 84.5M</span>
+<div class="flex items-center text-xs text-green-500 font-medium">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+                            18%
+                        </div>
+</div>
+</div>
+<div class="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+<span class="material-symbols-outlined text-7xl">account_balance_wallet</span>
+</div>
+</div>
+</div>
+<!-- Agent Data Table -->
+<section class="bg-[#14151C] rounded-xl overflow-hidden shadow-2xl">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50">
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567]">Agente</th>
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567]">
+<div class="flex items-center gap-1 cursor-pointer hover:text-white transition-colors">
+                                    Leads
+                                    <span class="material-symbols-outlined text-[14px]">unfold_more</span>
+</div>
+</th>
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567]">Resp.</th>
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567]">Conversión</th>
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567] text-right">Pipeline</th>
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567]">Estado</th>
+<th class="px-6 py-4 font-headline font-semibold text-[11px] uppercase tracking-widest text-[#545567]">Actividad 7D</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Top Agent -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors border-l-[3px] border-primary-container">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img class="w-7 h-7 rounded-full object-cover" data-alt="professional portrait of a high-end real estate agent in a tailored navy suit with a clean background and warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV19VbnAjfK_fVsj8ZPb2WahPgiWMJRZHZqOQ9t5uaqM0rozZ3EpBffaPCvi2smTP-KIc1yfPyFxGMhnypbiZI7IisfpCUVjc-WSGLZUMp8lpa0ofUZPm9bQ0xmESAvZtZzvSqMU1h1QqJQZ4L9cGTyDEwlZp3lhKnSSjL75gZUPoKjUXIWRxng6LYCNTZ_NxGdykfTWEmhawSVfIu_VNQe5igKsw14Kk_H1uqyCcq8T4f8RJWgGjPrUgM6vPp8rpdjU5ry4l8vEs"/>
+<span class="font-medium text-sm text-white">Alejandro Vance</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">142</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20">&lt;1h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[45%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">45%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 22.4M</td>
+<td class="px-6 py-4 text-center">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold">0</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30">
+<path d="M0,25 Q15,5 30,20 T60,10 T100,15" fill="none" stroke="#C9963A" stroke-width="2"></path>
+</svg>
+</td>
+</tr>
+<!-- Agent 2 -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img class="w-7 h-7 rounded-full object-cover" data-alt="sophisticated female real estate professional in modern minimalist office setting with soft natural window light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlMihd9Dw_7ZiUwhwHMRB0t-Vjx2ZcLzhkU_b9JjIXK24CQYFRR2G3dGLK0hcfouAcU2ootoeau1wVsrRnF6Qr-ZwT0fy00QGot3xX9Nr10T7DfST6SjNKgqqriqyJsYXwTaZociZ-NY399jvqKQrYFpp-FqT1OlVcjNqSgTwY3rBgtGXbPlxjtQ78S770ePUc4fVqyaxz2AVSkS__H09d-8gEhr0e566EyB_TrOZ0CQ1kh5qiL8yCUIcQ2pDf66F51Qu_3LJRGII"/>
+<span class="font-medium text-sm text-white">Isabella Moore</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">98</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">2h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[38%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">38%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 18.2M</td>
+<td class="px-6 py-4">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">2</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30">
+<path d="M0,15 Q25,25 50,5 T100,20" fill="none" stroke="#C9963A" stroke-width="2"></path>
+</svg>
+</td>
+</tr>
+<!-- Agent 3 -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img class="w-7 h-7 rounded-full object-cover" data-alt="executive real estate broker profile photo with professional attire and professional studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbpY1RSnmUt0J9YMojTwopghEOeE8or7w77-F_To34SwI2YPeufa-2GccPzHFROWZ3w1R5XUwsWaARN9qP2UD9-K35KM1WTcTkyrR3IUppBhMD8VlCz1NKQnVCilG9a2Tkm3geUiWvtvOSWkZrhjra-trvDrtyoeRrPv2c8dkoeBnyHyG1Nf9S_Ql6PwVkO9zSywk1yT_8Dus62L92lX5TWYrsnG8exz0VRGikNMd7HVwuX70q2dr_3cRHEr8oRTah3yF3aSyTRMk"/>
+<span class="font-medium text-sm text-white">Mateo Silva</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">115</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20">&lt;1h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[29%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">29%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 12.8M</td>
+<td class="px-6 py-4">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">1</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30">
+<path d="M0,10 L20,25 L40,10 L60,20 L80,5 L100,15" fill="none" stroke="#C9963A" stroke-width="2"></path>
+</svg>
+</td>
+</tr>
+<!-- More Agent placeholders (4 more for 7 total) -->
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] text-on-surface-variant">LV</div>
+<span class="font-medium text-sm text-white">Lucia Vega</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">76</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-red-500/10 text-red-500 border border-red-500/20">5h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[15%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">15%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 9.1M</td>
+<td class="px-6 py-4">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">2</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30"><path d="M0,25 L50,15 L100,20" fill="none" stroke="#C9963A" stroke-width="2"></path></svg>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] text-on-surface-variant">RP</div>
+<span class="font-medium text-sm text-white">Ricardo Pena</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">62</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">2h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[22%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">22%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 7.5M</td>
+<td class="px-6 py-4">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">0</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30"><path d="M0,5 L50,10 L100,5" fill="none" stroke="#C9963A" stroke-width="2"></path></svg>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] text-on-surface-variant">EC</div>
+<span class="font-medium text-sm text-white">Elena Cruz</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">54</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20">&lt;1h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[41%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">41%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 8.9M</td>
+<td class="px-6 py-4">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">0</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30"><path d="M0,25 L25,5 L50,25 L75,5 L100,25" fill="none" stroke="#C9963A" stroke-width="2"></path></svg>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-highest/20 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] text-on-surface-variant">SG</div>
+<span class="font-medium text-sm text-white">Sofia Gomez</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface">42</td>
+<td class="px-6 py-4">
+<span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-green-500/10 text-green-500 border border-green-500/20">&lt;1h</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="flex-1 h-1.5 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[25%]"></div>
+</div>
+<span class="text-xs text-on-surface-variant font-medium">25%</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-headline font-semibold text-sm text-white">RD$ 5.5M</td>
+<td class="px-6 py-4">
+<span class="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">0</span>
+</td>
+<td class="px-6 py-4">
+<svg class="w-24 h-8" viewbox="0 0 100 30"><path d="M0,15 L100,15" fill="none" stroke="#C9963A" stroke-width="2"></path></svg>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+<!-- Pipeline Value by Agent (Horizontal Bar) -->
+<div class="bg-[#1C1D27]/80 backdrop-blur-xl border border-outline-variant/10 rounded-xl p-8 space-y-6">
+<h3 class="font-headline font-bold text-lg text-white">Valor de Pipeline por Agente</h3>
+<div class="space-y-4">
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-on-surface-variant uppercase tracking-wider">
+<span>A. Vance</span>
+<span>RD$ 22.4M</span>
+</div>
+<div class="h-4 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[100%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-on-surface-variant uppercase tracking-wider">
+<span>I. Moore</span>
+<span>RD$ 18.2M</span>
+</div>
+<div class="h-4 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[82%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-on-surface-variant uppercase tracking-wider">
+<span>M. Silva</span>
+<span>RD$ 12.8M</span>
+</div>
+<div class="h-4 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[57%]"></div>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between text-xs text-on-surface-variant uppercase tracking-wider">
+<span>L. Vega</span>
+<span>RD$ 9.1M</span>
+</div>
+<div class="h-4 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[41%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Scatter Plot (Response vs Conversion) -->
+<div class="bg-[#1C1D27]/80 backdrop-blur-xl border border-outline-variant/10 rounded-xl p-8 space-y-6 relative overflow-hidden">
+<h3 class="font-headline font-bold text-lg text-white">Tiempo de Respuesta vs Conversión</h3>
+<div class="relative h-[250px] border-l border-b border-outline-variant/30 ml-6 mb-6">
+<!-- Scatter dots -->
+<div class="absolute bottom-[80%] left-[20%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<div class="absolute bottom-[65%] left-[35%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<div class="absolute bottom-[40%] left-[60%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<div class="absolute bottom-[20%] left-[85%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<div class="absolute bottom-[55%] left-[45%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<div class="absolute bottom-[75%] left-[25%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<div class="absolute bottom-[30%] left-[70%] w-3 h-3 bg-primary rounded-full shadow-[0_0_15px_rgba(245,189,93,0.5)]"></div>
+<!-- Labels -->
+<span class="absolute -left-12 top-1/2 -rotate-90 text-[10px] text-[#545567] uppercase tracking-widest font-bold">Conversión (%)</span>
+<span class="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-[#545567] uppercase tracking-widest font-bold">Tiempo de Respuesta (min)</span>
+</div>
+<p class="text-[11px] text-on-surface-variant italic leading-tight text-center">La correlación indica que tiempos menores a 5 min incrementan la conversión en un 22%.</p>
+</div>
+</div>
+</main>
+</body></html>

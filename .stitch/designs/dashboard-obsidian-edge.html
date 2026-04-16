@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Advance Estate CRM | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "background": "#131313",
+                        "outline": "#9c8f7d",
+                        "on-secondary-container": "#b9b5ae",
+                        "surface-container": "#201f1f",
+                        "on-error": "#690005",
+                        "surface": "#131313",
+                        "on-tertiary-container": "#2f3643",
+                        "error-container": "#93000a",
+                        "on-background": "#e5e2e1",
+                        "surface-tint": "#f5bd5d",
+                        "on-primary": "#432c00",
+                        "on-primary-fixed-variant": "#604100",
+                        "on-tertiary": "#2a313d",
+                        "surface-variant": "#353534",
+                        "secondary-fixed-dim": "#cac6bf",
+                        "tertiary-fixed-dim": "#c0c7d6",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#3a3939",
+                        "secondary": "#cac6bf",
+                        "secondary-fixed": "#e7e2db",
+                        "tertiary": "#c0c7d6",
+                        "on-surface": "#e5e2e1",
+                        "inverse-primary": "#7e5700",
+                        "on-secondary-fixed": "#1d1b17",
+                        "surface-container-low": "#1c1b1b",
+                        "outline-variant": "#4f4537",
+                        "on-surface-variant": "#d3c4b1",
+                        "tertiary-container": "#989fae",
+                        "surface-container-highest": "#353534",
+                        "inverse-surface": "#e5e2e1",
+                        "secondary-container": "#494742",
+                        "surface-dim": "#131313",
+                        "surface-container-high": "#2a2a2a",
+                        "on-secondary-fixed-variant": "#494742",
+                        "primary-container": "#c9963a",
+                        "error": "#ffb4ab",
+                        "primary-fixed": "#ffdeac",
+                        "on-primary-container": "#4a3100",
+                        "on-tertiary-fixed": "#151c27",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-on-surface": "#313030",
+                        "tertiary-fixed": "#dce2f3",
+                        "on-secondary": "#32302c",
+                        "primary": "#f5bd5d",
+                        "primary-fixed-dim": "#f5bd5d",
+                        "on-tertiary-fixed-variant": "#404754",
+                        "on-primary-fixed": "#281900"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0e0e0e;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .gold-glow {
+            box-shadow: 0 0 40px rgba(245, 189, 93, 0.04);
+        }
+    </style>
+</head>
+<body class="flex min-h-screen">
+<!-- SideNavBar (Execution from JSON) -->
+<aside class="h-screen w-64 fixed left-0 top-0 bg-stone-950/80 backdrop-blur-xl flex flex-col py-8 px-4 z-50 transition-all duration-300">
+<div class="mb-10 px-2">
+<h1 class="text-2xl font-bold tracking-tighter bg-gradient-to-br from-amber-200 to-amber-600 bg-clip-text text-transparent font-['Manrope']">Advance Estate</h1>
+<p class="text-[10px] uppercase tracking-widest text-stone-500 mt-1">Luxury Real Estate CRM</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Dashboard (Active) -->
+<a class="flex items-center gap-3 px-4 py-3 text-amber-400 bg-stone-900/50 font-bold border-r-2 border-amber-600 scale-[0.98] active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined text-amber-500" data-icon="dashboard">dashboard</span>
+<span class="font-['Manrope'] tracking-tight">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-['Manrope'] tracking-tight">Contactos</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="monetization_on">monetization_on</span>
+<span class="font-['Manrope'] tracking-tight">Oportunidades</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="apartment">apartment</span>
+<span class="font-['Manrope'] tracking-tight">Propiedades</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="trending_up">trending_up</span>
+<span class="font-['Manrope'] tracking-tight">KPI Agentes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-['Manrope'] tracking-tight">Conversaciones</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-['Manrope'] tracking-tight">Ava IA</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-500 hover:text-gray-200 hover:bg-stone-900/30 transition-all duration-300 mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Manrope'] tracking-tight">Configuración</span>
+</a>
+</nav>
+<div class="mt-8 pt-8 border-t border-white/5 px-2">
+<div class="flex items-center gap-3">
+<img alt="User profile" class="w-10 h-10 rounded-full object-cover border border-amber-600/30" data-alt="professional portrait of a confident male real estate executive in a dark tailored suit against a blurred architectural background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCHi2_V53eIdICLLfYawjGdgWLG4wkhiwiKhUSLu_A9lasxzA8KnHnI8hyZcuTyZdqGiKCj9KgtfGF2Ih6alcriCn9uvm_2Xwcfx0z3m55Bd6UB1v4vBS6fgOz0Jbz-0KTEGSqiaz-qRRGwf0cw_1DoIYaZXFLOqTC3MJ0WGXkWqHOgN6Wxpf330kBJPLzwUQezjJ0kAHjVMg7E2IIhyrqr-Eu1F_WUhMyEW7IwCKIsUCxZmlChyuStoay-E-Je6djKqvSVlxDSyvM"/>
+<div>
+<p class="text-sm font-bold text-on-surface">Ivan García</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-wider">Director Principal</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen bg-surface-container-lowest">
+<!-- TopAppBar (Execution from JSON) -->
+<header class="fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-stone-950/80 backdrop-blur-xl flex items-center justify-between px-8 z-40 border-b border-white/5">
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-stone-500 text-sm">search</span>
+<input class="bg-stone-900/50 border-none rounded-full pl-10 pr-4 py-1.5 text-xs w-80 focus:ring-1 focus:ring-amber-600/50 text-stone-300 placeholder:text-stone-600" placeholder="Buscar propiedades, clientes o transacciones..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex flex-col items-right text-right">
+<p class="text-sm font-semibold text-on-surface">Buenos días, Ivan</p>
+<p class="text-[10px] text-stone-500 uppercase tracking-tighter">Lunes, 24 de Mayo 2024</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-stone-400 hover:bg-white/5 transition-all rounded-full">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-stone-400 hover:bg-white/5 transition-all rounded-full">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</button>
+<div class="h-8 w-px bg-white/10"></div>
+<img alt="Agent Avatar" class="w-9 h-9 rounded-full border border-stone-800" data-alt="high-end close-up of a professional male agent, warm subtle lighting, corporate luxury style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABvaVPvsvKNUIoKd9_sprrwmVkfVYtv3XQaf246ZrCbXm_i7SGXIS3Edxr6FAfMTiNJdDVEO-UyJa_M-lWdReLjZGmZEr4gLxYldMZ5nN6cmBLwItXoh0hi-gI0VfMWGXPlxg8kgAEyxkOytj4EjAcGpcrVa7Qs9X7Z-XT5bYCKu_6DHV-fhxIdvT8ESo2WnHUaQ1jrgM5ntHSAprcAcVLB1qd3gQDOU_5RO-Dx6cnUs0n-lrpxDlk6l4zXJp1odDvtYbJOEZ4TQw"/>
+</div>
+</div>
+</header>
+<!-- Scrollable Canvas -->
+<section class="mt-16 p-8 space-y-8 overflow-y-auto">
+<!-- KPI Row -->
+<div class="grid grid-cols-4 gap-6">
+<!-- Comisiones -->
+<div class="bg-surface-container-high rounded-xl p-6 gold-glow transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant">Comisiones del mes</span>
+<span class="material-symbols-outlined text-primary text-sm">payments</span>
+</div>
+<div class="flex flex-col">
+<span class="text-4xl font-[800] font-headline text-primary-container tracking-tighter">$124,500</span>
+<div class="flex items-center gap-1 mt-2 text-[11px] text-emerald-500">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+<span>+12.4% vs mes anterior</span>
+</div>
+</div>
+</div>
+<!-- Deals Activos -->
+<div class="bg-surface-container-high rounded-xl p-6 gold-glow transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant">Deals Activos</span>
+<span class="material-symbols-outlined text-primary text-sm">handshake</span>
+</div>
+<div class="flex flex-col">
+<span class="text-4xl font-[800] font-headline text-primary-container tracking-tighter">18</span>
+<div class="flex items-center gap-1 mt-2 text-[11px] text-on-surface-variant">
+<span>Valor estimado: $4.2M</span>
+</div>
+</div>
+</div>
+<!-- Propiedades -->
+<div class="bg-surface-container-high rounded-xl p-6 gold-glow transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant">Propiedades Activas</span>
+<span class="material-symbols-outlined text-primary text-sm">domain</span>
+</div>
+<div class="flex flex-col">
+<span class="text-4xl font-[800] font-headline text-primary-container tracking-tighter">43</span>
+<div class="flex items-center gap-1 mt-2 text-[11px] text-emerald-500">
+<span class="material-symbols-outlined text-xs">add</span>
+<span>4 nuevas esta semana</span>
+</div>
+</div>
+</div>
+<!-- Tasa de Conversión -->
+<div class="bg-surface-container-high rounded-xl p-6 gold-glow transition-all hover:translate-y-[-2px]">
+<div class="flex justify-between items-start mb-4">
+<span class="text-[10px] font-bold uppercase tracking-[0.1em] text-on-surface-variant">Tasa de Conversión</span>
+<span class="material-symbols-outlined text-primary text-sm">analytics</span>
+</div>
+<div class="flex flex-col">
+<span class="text-4xl font-[800] font-headline text-primary-container tracking-tighter">31%</span>
+<div class="w-full bg-stone-800 h-1.5 rounded-full mt-4 overflow-hidden">
+<div class="h-full bg-primary-container" style="width: 31%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-3 gap-8 items-start">
+<!-- Pipeline Funnel (2/3) -->
+<div class="col-span-2 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold font-headline tracking-tight text-on-surface">Pipeline de Ventas</h2>
+<button class="text-[10px] uppercase font-bold text-primary tracking-widest hover:underline transition-all">Ver todos los deals</button>
+</div>
+<div class="bg-surface-container rounded-xl p-8 relative overflow-hidden">
+<!-- Horizontal Funnel Design -->
+<div class="flex justify-between gap-2 relative">
+<!-- Nuevo Lead -->
+<div class="flex-1 group">
+<div class="bg-stone-900/40 p-4 rounded-lg border-l-4 border-primary transition-all group-hover:bg-stone-800/60">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Nuevo Lead</p>
+<p class="text-2xl font-headline font-bold text-on-surface">14</p>
+</div>
+<div class="mt-3 h-1.5 w-full bg-stone-900 rounded-full">
+<div class="h-full bg-gradient-to-r from-amber-600/20 to-amber-600 w-full rounded-full"></div>
+</div>
+</div>
+<!-- Contactado -->
+<div class="flex-1 group">
+<div class="bg-stone-900/40 p-4 rounded-lg border-l-4 border-primary/70 transition-all group-hover:bg-stone-800/60">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Contactado</p>
+<p class="text-2xl font-headline font-bold text-on-surface">8</p>
+</div>
+<div class="mt-3 h-1.5 w-full bg-stone-900 rounded-full">
+<div class="h-full bg-gradient-to-r from-amber-600 to-amber-500 w-full rounded-full"></div>
+</div>
+</div>
+<!-- Propuesta -->
+<div class="flex-1 group">
+<div class="bg-stone-900/40 p-4 rounded-lg border-l-4 border-primary/50 transition-all group-hover:bg-stone-800/60">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Propuesta</p>
+<p class="text-2xl font-headline font-bold text-on-surface">5</p>
+</div>
+<div class="mt-3 h-1.5 w-full bg-stone-900 rounded-full">
+<div class="h-full bg-gradient-to-r from-amber-500 to-amber-400 w-full rounded-full"></div>
+</div>
+</div>
+<!-- Negociación -->
+<div class="flex-1 group">
+<div class="bg-stone-900/40 p-4 rounded-lg border-l-4 border-primary/30 transition-all group-hover:bg-stone-800/60">
+<p class="text-[10px] font-bold text-on-surface-variant uppercase mb-1">Negociación</p>
+<p class="text-2xl font-headline font-bold text-on-surface">3</p>
+</div>
+<div class="mt-3 h-1.5 w-full bg-stone-900 rounded-full">
+<div class="h-full bg-gradient-to-r from-amber-400 to-amber-300 w-full rounded-full"></div>
+</div>
+</div>
+<!-- Cerrado -->
+<div class="flex-1 group">
+<div class="bg-amber-600/10 p-4 rounded-lg border-l-4 border-amber-600 transition-all group-hover:bg-amber-600/20">
+<p class="text-[10px] font-bold text-amber-600 uppercase mb-1">Cerrado</p>
+<p class="text-2xl font-headline font-bold text-on-surface">12</p>
+</div>
+<div class="mt-3 h-1.5 w-full bg-stone-900 rounded-full">
+<div class="h-full bg-amber-600 w-full rounded-full shadow-[0_0_10px_rgba(217,119,6,0.5)]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row: Recent Activity -->
+<div class="space-y-4">
+<h2 class="text-lg font-bold font-headline tracking-tight text-on-surface pt-4">Actividad Reciente</h2>
+<div class="bg-surface-container rounded-xl overflow-hidden">
+<table class="w-full text-left">
+<thead class="bg-stone-900/50">
+<tr>
+<th class="px-6 py-3 text-[10px] uppercase font-bold text-on-surface-variant">Timestamp</th>
+<th class="px-6 py-3 text-[10px] uppercase font-bold text-on-surface-variant">Agente / Cliente</th>
+<th class="px-6 py-3 text-[10px] uppercase font-bold text-on-surface-variant">Propiedad</th>
+<th class="px-6 py-3 text-[10px] uppercase font-bold text-on-surface-variant text-right">Estado</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-all cursor-default">
+<td class="px-6 py-4 text-xs font-headline text-stone-400">14:23</td>
+<td class="px-6 py-4">
+<p class="text-sm font-semibold">Carlos Mendez</p>
+<p class="text-[10px] text-stone-500">con Elena Rosas</p>
+</td>
+<td class="px-6 py-4 text-xs font-medium">Villa Magna - Penthouse 402</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-900/30 text-emerald-400 border border-emerald-900/50">Cerrado</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-all cursor-default">
+<td class="px-6 py-4 text-xs font-headline text-stone-400">12:05</td>
+<td class="px-6 py-4">
+<p class="text-sm font-semibold">Sofia Ricci</p>
+<p class="text-[10px] text-stone-500">con Marcus Valadez</p>
+</td>
+<td class="px-6 py-4 text-xs font-medium">Residencial Bosques Lote 12</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-900/30 text-amber-500 border border-amber-900/50">Seguimiento</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-all cursor-default">
+<td class="px-6 py-4 text-xs font-headline text-stone-400">10:48</td>
+<td class="px-6 py-4">
+<p class="text-sm font-semibold">Ana Beltrán</p>
+<p class="text-[10px] text-stone-500">con Constructora Ortiz</p>
+</td>
+<td class="px-6 py-4 text-xs font-medium">Terreno Industrial Querétaro</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-900/30 text-rose-500 border border-rose-900/50">Estancado</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-all cursor-default">
+<td class="px-6 py-4 text-xs font-headline text-stone-400">09:15</td>
+<td class="px-6 py-4">
+<p class="text-sm font-semibold">Ricardo Vega</p>
+<p class="text-[10px] text-stone-500">con Familia Smith</p>
+</td>
+<td class="px-6 py-4 text-xs font-medium">Hacienda Santa Fe - Casa 22</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-900/30 text-emerald-400 border border-emerald-900/50">Cerrado</span>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-all cursor-default">
+<td class="px-6 py-4 text-xs font-headline text-stone-400">08:30</td>
+<td class="px-6 py-4">
+<p class="text-sm font-semibold">Ivan García</p>
+<p class="text-[10px] text-stone-500">con Inversiones Capital</p>
+</td>
+<td class="px-6 py-4 text-xs font-medium">Torre Onyx - Oficinas Floor 10</td>
+<td class="px-6 py-4 text-right">
+<span class="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-900/30 text-amber-500 border border-amber-900/50">Seguimiento</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Top Agents (1/3) -->
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="text-lg font-bold font-headline tracking-tight text-on-surface">Top Agentes</h2>
+<span class="material-symbols-outlined text-stone-600">more_vert</span>
+</div>
+<div class="bg-surface-container rounded-xl p-6 space-y-6">
+<!-- Agent 1 -->
+<div class="flex items-center gap-4 group">
+<div class="text-2xl">🥇</div>
+<img alt="Sofia Ricci Avatar" class="w-12 h-12 rounded-xl object-cover ring-2 ring-primary-container/20 group-hover:ring-primary-container transition-all" data-alt="headshot of elegant professional woman, confident smile, corporate real estate agent aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTJdxfySUtj_EHGpKfWE5yEk4sHknIXeuGa-5lDtf_CHe4FpsOGYnyYkmL9sLBy_yDMRjx6pf7uc-TtQC6B9gUGc_MekxXcoFeuTXlai2nnl6BIusPHGtj-vp5eu0Qz7PRrReeFz15Rqfa0219lc4fylgPkyu2f7LaFoEWviK3l9nX3es9ZuiWdsn4-N6F8pOb0xVi7I7PAVGQi7xONWQWaDrykHvy_S2w-sMM2iilGVZfRyNWozw95Ng_L6Qngw5ZblNTS_S_GrM"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Sofia Ricci</p>
+<p class="text-xs text-primary font-headline font-bold">$42,800</p>
+<div class="w-full bg-stone-900 h-1 rounded-full mt-2">
+<div class="h-full bg-primary-container" style="width: 95%"></div>
+</div>
+</div>
+</div>
+<!-- Agent 2 -->
+<div class="flex items-center gap-4 group">
+<div class="text-2xl">🥈</div>
+<img alt="Carlos Mendez Avatar" class="w-12 h-12 rounded-xl object-cover ring-2 ring-transparent group-hover:ring-stone-700 transition-all" data-alt="portrait of a sharp dressed professional male in a modern office, cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjLbvhrInytnMh2HWz5MCblSw8Vdant4CJrHapJjCvzpYOkZdkJpgVwNQwSHSziyMd2EzoxlgpJDXeoC9sMWASwEyftP6WME0L5iL7lnGkVotxWN1KYV6KBvTF8G91U7k1Wg-OnGGy-3tUscso3G8dA7hJlnnvZXsx1Axz4wJGfMq47rPf4pO51oF_ez09Ytfed8ilGLNuP0vyxgYDEJmiaTeD_zC3UuT8O7lSTs_1WlwU5CGttIjYQ06XyeR3CFCfkNKuIZNG1ZU"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Carlos Mendez</p>
+<p class="text-xs text-primary font-headline font-bold">$38,150</p>
+<div class="w-full bg-stone-900 h-1 rounded-full mt-2">
+<div class="h-full bg-primary-container/80" style="width: 82%"></div>
+</div>
+</div>
+</div>
+<!-- Agent 3 -->
+<div class="flex items-center gap-4 group">
+<div class="text-2xl">🥉</div>
+<img alt="Ana Beltrán Avatar" class="w-12 h-12 rounded-xl object-cover ring-2 ring-transparent group-hover:ring-stone-700 transition-all" data-alt="close up of sophisticated woman professional looking focused and intelligent, high end studio photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbT1mtXvpvUEAxTjYi2w7W_lOOjDWb5vH3OhkqvaUX7nyXJk_yzphcSTPnLXzqKNXFCk76x9ygpv_n502v8n3M5nS1oUj-4xIgYrVKIIYkq9FrtOJdC1Gc8T0vi1IIiYzJ4Z9aKmCfYMhfqrxEFV9MIaS3IxuTUKLtQ6HrcGmC9gIzZFnoeGaoh9FmpKokv7e9XIokwHlAL8iPrwMIwMFmlnhEBvgw2ADnlXyXali9xjfsBjAq-QQmJk4jIZqPrfQ4EvADFNw58VM"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate">Ana Beltrán</p>
+<p class="text-xs text-primary font-headline font-bold">$29,400</p>
+<div class="w-full bg-stone-900 h-1 rounded-full mt-2">
+<div class="h-full bg-primary-container/60" style="width: 65%"></div>
+</div>
+</div>
+</div>
+<!-- Agent 4 -->
+<div class="flex items-center gap-4 group opacity-70 hover:opacity-100 transition-opacity">
+<div class="text-2xl text-[10px] w-6 text-center font-bold font-headline text-stone-600">4</div>
+<img alt="Ricardo Vega Avatar" class="w-12 h-12 rounded-xl object-cover border border-stone-800" data-alt="modern businessman profile, soft background lighting, executive vibe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7akZmZjZr4-5ph9chCZxXlmu0t3R1Phxbn2VQzWWHg5VkR4gmltaCyYU-8ZtyuEyDrutsJPgGnaVf82eJZ8USajs3B4yTTKqfrtpvb108p2Yaf4SG7mamiL2EYaFCBrv01mss_as8eQxc7Le5xAEVJKnehPESdtIvy4I5QhUyK9B7byFMoPTgy3UZboal_Uua8t1V6tR0Oh07wjOjxs32vYrtUZk-INYBD9Veijoe8fAceBOtacSOiqIlJaPNAH0mXcOh596PQ7A"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold truncate text-on-surface-variant">Ricardo Vega</p>
+<p class="text-xs text-primary/70 font-headline font-bold">$12,200</p>
+<div class="w-full bg-stone-900 h-1 rounded-full mt-2">
+<div class="h-full bg-primary-container/40" style="width: 32%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Marketplace Snapshot -->
+<div class="bg-gradient-to-br from-stone-900 to-black rounded-xl p-6 relative overflow-hidden group">
+<div class="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
+<span class="material-symbols-outlined text-[160px] text-primary" style="font-variation-settings: 'FILL' 1;">insights</span>
+</div>
+<p class="text-[10px] font-bold uppercase text-primary mb-2">Market Insight</p>
+<h3 class="text-sm font-bold mb-4">Tendencia Inmobiliaria Luxury</h3>
+<p class="text-xs text-stone-400 leading-relaxed">Las propiedades frente al mar han visto un incremento del 8.2% en plusvalía trimestral.</p>
+<button class="mt-4 px-4 py-2 bg-primary text-on-primary text-[10px] font-bold uppercase rounded-lg hover:shadow-[0_0_12px_rgba(245,189,93,0.3)] transition-all">Generar Reporte IA</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Floating Action Button (Shell Suppression Context Check: Only on Home/Dashboard) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-primary to-primary-container text-on-primary-fixed rounded-full shadow-[0_10px_30px_rgba(201,150,58,0.3)] flex items-center justify-center group hover:scale-110 transition-all z-[60]">
+<span class="material-symbols-outlined text-2xl group-hover:rotate-90 transition-transform">add</span>
+</button>
+</body></html>

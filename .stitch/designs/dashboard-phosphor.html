@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ADVANCE ESTATE // COMMAND CENTER</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@700&amp;family=Space+Grotesk:wght@300;400;500;600&amp;family=Inter:wght@400;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#f8a010",
+                        "on-background": "#f1f4fa",
+                        "on-secondary": "#003047",
+                        "tertiary-fixed-dim": "#e79400",
+                        "tertiary-dim": "#e79400",
+                        "error-container": "#9f0519",
+                        "surface": "#0a0f13",
+                        "inverse-primary": "#006e37",
+                        "tertiary": "#ffb148",
+                        "surface-container-highest": "#21262c",
+                        "on-primary-fixed-variant": "#006632",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-primary-container": "#005b2c",
+                        "on-surface-variant": "#a8abb1",
+                        "outline": "#72767b",
+                        "error-dim": "#d7383b",
+                        "surface-tint": "#a4ffb9",
+                        "primary-dim": "#00ed7e",
+                        "on-secondary-container": "#f3f8ff",
+                        "on-surface": "#f1f4fa",
+                        "on-primary": "#006532",
+                        "secondary-dim": "#17a8ec",
+                        "on-primary-fixed": "#004621",
+                        "on-tertiary-fixed-variant": "#563400",
+                        "on-tertiary-container": "#4a2c00",
+                        "inverse-surface": "#f7f9ff",
+                        "on-error": "#490006",
+                        "outline-variant": "#44484d",
+                        "secondary": "#34b5fa",
+                        "surface-container-high": "#1b2026",
+                        "surface-dim": "#0a0f13",
+                        "on-error-container": "#ffa8a3",
+                        "tertiary-fixed": "#f8a010",
+                        "primary": "#a4ffb9",
+                        "on-tertiary": "#573500",
+                        "background": "#0a0f13",
+                        "error": "#ff716c",
+                        "inverse-on-surface": "#51555a",
+                        "surface-variant": "#21262c",
+                        "surface-bright": "#262d33",
+                        "surface-container-low": "#0f1418",
+                        "on-secondary-fixed": "#003853",
+                        "secondary-container": "#006591",
+                        "surface-container-lowest": "#000000",
+                        "on-secondary-fixed-variant": "#00567c",
+                        "primary-container": "#00fd87",
+                        "primary-fixed": "#00fd87",
+                        "secondary-fixed": "#a4d8ff",
+                        "primary-fixed-dim": "#00ed7e",
+                        "surface-container": "#151a1f",
+                        "secondary-fixed-dim": "#81ccff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "4px",
+                        "lg": "4px",
+                        "xl": "4px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope"],
+                        "body": ["Space Grotesk"],
+                        "label": ["Inter"],
+                        "mono": ["JetBrains Mono"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #0a0f13;
+            background-image: radial-gradient(#0e1520 1px, transparent 1px);
+            background-size: 24px 24px;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #a8abb1;
+        }
+        .phosphor-glow {
+            text-shadow: 0 0 8px rgba(164, 255, 185, 0.4);
+        }
+        .phosphor-glow-box {
+            box-shadow: 0 0 12px rgba(164, 255, 185, 0.15);
+        }
+        .scanline-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .funnel-level {
+            clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+<div class="scanline-overlay"></div>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 bg-[#060a0e] text-[#a4ffb9] font-mono uppercase tracking-tighter text-[0.75rem] h-screen w-64 border-r border-[#0e1520] z-50">
+<div class="px-6 mb-8">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-emerald-950/40 border border-[#a4ffb9] flex items-center justify-center relative">
+<span class="text-[#a4ffb9] font-bold text-xl tracking-widest">AE</span>
+<div class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full animate-pulse shadow-[0_0_8px_#a4ffb9]"></div>
+</div>
+<div>
+<div class="text-[#a4ffb9] font-bold text-xl tracking-widest">PHOSPHOR</div>
+<div class="text-[0.6rem] opacity-50">V2.0.4</div>
+</div>
+</div>
+<div class="mt-4 px-2 py-1 bg-emerald-950/20 border border-emerald-900/30 text-[0.6rem] text-center tracking-[0.2em]">
+                SYSTEM ONLINE
+            </div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="px-6 py-3 flex items-center gap-4 text-[#a4ffb9] border-l-2 border-[#a4ffb9] bg-emerald-950/20 shadow-[0_0_12px_rgba(164,255,185,0.2)] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="grid_view">grid_view</span>
+<span>DASHBOARD</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-4 text-[#a8abb1] hover:text-[#a4ffb9] hover:bg-[#0e1520] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="real_estate_agent">real_estate_agent</span>
+<span>INVENTORY</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-4 text-[#a8abb1] hover:text-[#a4ffb9] hover:bg-[#0e1520] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span>TRANSACTIONS</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-4 text-[#a8abb1] hover:text-[#a4ffb9] hover:bg-[#0e1520] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="groups">groups</span>
+<span>CLIENTS</span>
+</a>
+<a class="px-6 py-3 flex items-center gap-4 text-[#a8abb1] hover:text-[#a4ffb9] hover:bg-[#0e1520] transition-all duration-150" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+<span>SETTINGS</span>
+</a>
+</nav>
+<div class="px-6 mt-auto pt-6 border-t border-[#0e1520] flex flex-col gap-2 opacity-60">
+<button class="flex items-center gap-4 hover:text-[#a4ffb9] transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="restart_alt">restart_alt</span>
+<span>REBOOT</span>
+</button>
+<button class="flex items-center gap-4 hover:text-[#a4ffb9] transition-colors">
+<span class="material-symbols-outlined text-[18px]" data-icon="logout">logout</span>
+<span>LOGOUT</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex flex-col h-screen overflow-hidden">
+<!-- TopNavBar -->
+<header class="bg-[#0a0f13] border-b border-[#0e1520] h-16 flex justify-between items-center px-8 z-40 sticky top-0">
+<div class="flex items-center gap-6">
+<h1 class="text-[#a4ffb9] font-mono text-sm font-black tracking-tighter phosphor-glow">ADVANCE ESTATE // COMMAND CENTER</h1>
+<div class="h-4 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-4 text-[#a8abb1] font-mono text-xs">
+<span class="text-[#a4ffb9]">LIVE_FEED</span>
+<span class="hover:text-white cursor-crosshair">NETWORK_STATUS</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="font-mono text-xs text-[#a4ffb9] tracking-widest" id="live-timestamp">
+                    UTC-05 [14:23:08:42]
+                </div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-[#a8abb1] hover:text-white cursor-crosshair" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined text-[#a8abb1] hover:text-white cursor-crosshair" data-icon="terminal">terminal</span>
+<button class="bg-emerald-950/40 border border-[#a4ffb9] text-[#a4ffb9] px-4 py-1 text-xs font-mono tracking-widest hover:bg-emerald-900 transition-colors">
+                        SCAN_SYSTEM
+                    </button>
+<div class="w-8 h-8 bg-surface-container-highest border border-outline-variant flex items-center justify-center">
+<img alt="OPERATOR_01" class="w-full h-full object-cover grayscale opacity-70" data-alt="gritty black and white profile portrait of a tech professional wearing tactical headset with green lighting accents" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2NdMZE1Cxfeu1ZbEDzSXuPoAjCRzww1dBES9PxGcOcohVKxBV_w1epUFFuFMapsgkWd6ktLMIbF_s3z4-w4OHkxeWQ9kZ8Jf9zZX9XpbvKgLEwdjdcQL0bk2UNpeFo7dRwOIPaxH4eTYmyl-W7Aw5H6rgBs1gD49RKRXJV7hKGJX4Fkqrri6fEo50jvdU7b5kPieMODTLb0tOf9TJE0eM-PCJOiNdTLsKClGtU8OjpDaUPK6r9yUjHjYbancjsQIFlOnURHuUg7k"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Workspace -->
+<div class="flex-1 p-6 grid grid-cols-12 grid-rows-[auto_1fr_auto] gap-6 overflow-hidden">
+<!-- KPI Strip -->
+<div class="col-span-12 grid grid-cols-5 gap-4">
+<!-- KPI Card 1 -->
+<div class="bg-surface-container-low border border-[#0e1520] p-4 flex flex-col gap-1 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<span class="text-[0.6rem] font-mono text-on-surface-variant uppercase tracking-widest">Comisiones</span>
+<div class="flex items-baseline justify-between">
+<span class="font-mono text-xl text-primary font-bold phosphor-glow">$124,500</span>
+<span class="text-[0.6rem] font-mono text-primary">+14.2%</span>
+</div>
+<div class="w-full h-1 bg-emerald-950/30 mt-2">
+<div class="h-full bg-primary shadow-[0_0_8px_#a4ffb9]" style="width: 72%"></div>
+</div>
+</div>
+<!-- KPI Card 2 -->
+<div class="bg-surface-container-low border border-[#0e1520] p-4 flex flex-col gap-1 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<span class="text-[0.6rem] font-mono text-on-surface-variant uppercase tracking-widest">Deals Activos</span>
+<div class="flex items-baseline justify-between">
+<span class="font-mono text-xl text-secondary font-bold">18</span>
+<span class="text-[0.6rem] font-mono text-secondary">LIVE</span>
+</div>
+<div class="w-full h-1 bg-sky-950/30 mt-2">
+<div class="h-full bg-secondary" style="width: 45%"></div>
+</div>
+</div>
+<!-- KPI Card 3 -->
+<div class="bg-surface-container-low border border-[#0e1520] p-4 flex flex-col gap-1 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary"></div>
+<span class="text-[0.6rem] font-mono text-on-surface-variant uppercase tracking-widest">Pipeline</span>
+<div class="flex items-baseline justify-between">
+<span class="font-mono text-xl text-secondary font-bold">$2.8M</span>
+<span class="text-[0.6rem] font-mono text-on-surface-variant">VOL</span>
+</div>
+<div class="w-full h-1 bg-sky-950/30 mt-2">
+<div class="h-full bg-secondary" style="width: 88%"></div>
+</div>
+</div>
+<!-- KPI Card 4 -->
+<div class="bg-surface-container-low border border-[#0e1520] p-4 flex flex-col gap-1 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary"></div>
+<span class="text-[0.6rem] font-mono text-on-surface-variant uppercase tracking-widest">Tasa Conv.</span>
+<div class="flex items-baseline justify-between">
+<span class="font-mono text-xl text-tertiary font-bold">31%</span>
+<span class="text-[0.6rem] font-mono text-tertiary-dim">STABLE</span>
+</div>
+<div class="w-full h-1 bg-amber-950/30 mt-2">
+<div class="h-full bg-tertiary" style="width: 31%"></div>
+</div>
+</div>
+<!-- KPI Card 5 -->
+<div class="bg-surface-container-low border border-[#0e1520] p-4 flex flex-col gap-1 relative overflow-hidden">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary"></div>
+<span class="text-[0.6rem] font-mono text-on-surface-variant uppercase tracking-widest">Tiempo Resp.</span>
+<div class="flex items-baseline justify-between">
+<span class="font-mono text-xl text-primary font-bold">8m</span>
+<span class="text-[0.6rem] font-mono text-primary-dim">OPTIMAL</span>
+</div>
+<div class="w-full h-1 bg-emerald-950/30 mt-2">
+<div class="h-full bg-primary" style="width: 15%"></div>
+</div>
+</div>
+</div>
+<!-- Main Panel: Funnel Visualization -->
+<div class="col-span-8 bg-surface-container-low border border-[#0e1520] p-6 relative flex flex-col overflow-hidden">
+<div class="flex justify-between items-center mb-6">
+<div class="flex flex-col">
+<h2 class="text-[#a4ffb9] font-headline text-lg font-bold">PIPELINE_DENSITY</h2>
+<span class="text-[0.6rem] font-mono opacity-50 uppercase tracking-[0.3em]">Sector Alpha Analysis</span>
+</div>
+<div class="flex gap-2">
+<div class="px-3 py-1 bg-emerald-950/20 border border-primary/20 text-[0.6rem] font-mono text-primary">REAL_TIME</div>
+<div class="px-3 py-1 bg-[#0a0f13] border border-outline-variant text-[0.6rem] font-mono text-on-surface-variant">REF: 294-X</div>
+</div>
+</div>
+<!-- Funnel SVG with CSS fill effects -->
+<div class="flex-1 flex flex-col justify-center items-center py-4 relative">
+<div class="w-full max-w-xl flex flex-col gap-1">
+<!-- Step 1 -->
+<div class="relative group">
+<div class="h-16 bg-surface-container border-x border-t border-outline-variant/30 flex items-center justify-between px-12 clip-path-funnel" style="clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);">
+<div class="absolute inset-0 bg-emerald-950/10 pointer-events-none"></div>
+<span class="font-mono text-xs text-primary z-10">QUALIFIED_LEADS</span>
+<div class="flex items-center gap-4 z-10">
+<span class="font-mono text-xl text-primary font-bold">428</span>
+<span class="text-[0.6rem] font-mono opacity-40">$4.1M</span>
+</div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative">
+<div class="h-16 bg-surface-container border-x border-outline-variant/30 flex items-center justify-between px-16" style="clip-path: polygon(10% 0%, 90% 0%, 80% 100%, 20% 100%);">
+<div class="absolute inset-0 bg-sky-950/20 pointer-events-none" style="width: 65%"></div>
+<span class="font-mono text-xs text-secondary z-10">SITE_VISITS</span>
+<div class="flex items-center gap-4 z-10">
+<span class="font-mono text-xl text-secondary font-bold">114</span>
+<span class="text-[0.6rem] font-mono opacity-40">$1.8M</span>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative">
+<div class="h-16 bg-surface-container border-x border-outline-variant/30 flex items-center justify-between px-20" style="clip-path: polygon(20% 0%, 80% 0%, 70% 100%, 30% 100%);">
+<div class="absolute inset-0 bg-sky-900/10 pointer-events-none" style="width: 40%"></div>
+<span class="font-mono text-xs text-secondary z-10">PROPOSALS</span>
+<div class="flex items-center gap-4 z-10">
+<span class="font-mono text-xl text-secondary font-bold">56</span>
+<span class="text-[0.6rem] font-mono opacity-40">$1.1M</span>
+</div>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="relative">
+<div class="h-16 bg-emerald-950/40 border border-primary/40 flex items-center justify-between px-24" style="clip-path: polygon(30% 0%, 70% 0%, 65% 100%, 35% 100%);">
+<span class="font-mono text-xs text-primary z-10 phosphor-glow">CLOSING</span>
+<div class="flex items-center gap-4 z-10">
+<span class="font-mono text-xl text-primary font-bold phosphor-glow">18</span>
+<span class="text-[0.6rem] font-mono opacity-40">$640K</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative technical lines -->
+<div class="absolute inset-0 pointer-events-none opacity-20 border border-primary/20 m-4 rounded-[4px]">
+<div class="absolute top-0 left-0 w-4 h-4 border-t border-l border-primary"></div>
+<div class="absolute top-0 right-0 w-4 h-4 border-t border-r border-primary"></div>
+<div class="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-primary"></div>
+<div class="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-primary"></div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Agent Leaderboard -->
+<div class="col-span-4 bg-surface-container-low border border-[#0e1520] p-6 flex flex-col overflow-hidden">
+<div class="flex flex-col mb-6">
+<h2 class="text-[#a4ffb9] font-headline text-lg font-bold">OPERATOR_STATS</h2>
+<span class="text-[0.6rem] font-mono opacity-50 uppercase tracking-[0.3em]">High Performers</span>
+</div>
+<div class="flex flex-col gap-3 overflow-y-auto pr-2">
+<!-- Rank 1 -->
+<div class="bg-surface-container border border-outline-variant/20 p-3 flex items-center gap-4 group hover:border-primary/50 transition-colors">
+<div class="font-mono text-primary font-bold text-lg">01</div>
+<div class="w-10 h-10 border border-outline-variant">
+<img alt="Agent" class="grayscale opacity-60 group-hover:opacity-100 transition-opacity" data-alt="close up passport style portrait of male real estate agent with sharp jawline in tech environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMuuIxDSLP3Lwl2YrDcVq9e7lcbzAYbGkmOvqoBM7yYzaBzquJ0KrHa-FwqhHekUodCTTXsT6HLEJL2ymN8aLvr6aQqwgRYWSLov2Pi-ClrcgR6nsaksz0j9YJB4eku0K2vudyjc1k-DiWrqcQMu0mEPn2p5JLd-MW_nCWXrXTXPLglC-woi_GtmAft2jgVZYLz4o2jt_E1rwMQ3IR35t-A-ig2ak2SbCbh7Xsdm5DFW8HsWggWKA83xnSh4_QBihAgSUQX6Ho0Q0"/>
+</div>
+<div class="flex-1">
+<div class="font-mono text-xs text-on-surface uppercase tracking-tighter">MARCUS_VANCE</div>
+<div class="text-[0.6rem] text-on-surface-variant font-mono">12 DEALS // $840K</div>
+</div>
+<div class="text-right">
+<div class="text-primary font-mono text-xs">+2.4%</div>
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+<!-- Rank 2 -->
+<div class="bg-surface-container border border-outline-variant/20 p-3 flex items-center gap-4 group hover:border-primary/50 transition-colors">
+<div class="font-mono text-primary font-bold text-lg opacity-70">02</div>
+<div class="w-10 h-10 border border-outline-variant">
+<img alt="Agent" class="grayscale opacity-60 group-hover:opacity-100 transition-opacity" data-alt="close up passport style portrait of female operator looking focused with soft cool ambient lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZInhNc9UAOwg0n9PEDY1CA9xHMaa4KZxRWmshDMnYHRkv1htN9RI05cyyhF3i8bFMkqZ6KjgnGnjAIo3Ev358fsSoX_KPT4g1KuA6rR2PEoYScqay3GxrCHbDH7PEhjKIVe1ZeROtkKs372EF9swpvZu9xucE3fNB3ULmi8h1VJKH5p9eYOJ0LhTu32iVVExCimtLuAQWhr0kPVt5URUgXc54Ite-_yJ5Hr9p2-KzkWrfspE4aPGTOnXrXRCeb03mmz41oKNBApA"/>
+</div>
+<div class="flex-1">
+<div class="font-mono text-xs text-on-surface uppercase tracking-tighter">ELARA_KIM</div>
+<div class="text-[0.6rem] text-on-surface-variant font-mono">09 DEALS // $710K</div>
+</div>
+<div class="text-right">
+<div class="text-secondary font-mono text-xs">-0.8%</div>
+<span class="material-symbols-outlined text-secondary text-[16px]" data-icon="trending_flat">trending_flat</span>
+</div>
+</div>
+<!-- Rank 3 -->
+<div class="bg-surface-container border border-outline-variant/20 p-3 flex items-center gap-4 group hover:border-primary/50 transition-colors">
+<div class="font-mono text-primary font-bold text-lg opacity-40">03</div>
+<div class="w-10 h-10 border border-outline-variant">
+<img alt="Agent" class="grayscale opacity-60 group-hover:opacity-100 transition-opacity" data-alt="professional male profile avatar in moody low key lighting tech dashboard aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoZyQH6qs02FUAz4bbg2HZ7ObOPjiRGZXthdPlVC6i799MxcC6d8w9UYxWZYzWEjTlw1cLllbEgwKmUAqYIt94Y9YzZ_PzSQ52wlBGsRWFUc_4FgTGABaKuyluSw50_uEG8CSFjfhICMNyEPyWR3mqCEdmdDApv9gEoxS10SKzkTBE4WDQd4NgTI8CMSGWBlF8_Wlot61JNsmLGM0bF1TbuBYX3V9fc8tP9MMM4tuFJimZusmqt3ZdKAcVdH0ZUIWWspxSLfImbMM"/>
+</div>
+<div class="flex-1">
+<div class="font-mono text-xs text-on-surface uppercase tracking-tighter">DAELON_SHAW</div>
+<div class="text-[0.6rem] text-on-surface-variant font-mono">08 DEALS // $620K</div>
+</div>
+<div class="text-right">
+<div class="text-primary font-mono text-xs">+1.2%</div>
+<span class="material-symbols-outlined text-primary text-[16px]" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+<!-- Latest Entry with Cursor -->
+<div class="bg-emerald-950/10 border border-primary/20 p-3 flex items-center gap-4 relative">
+<div class="absolute left-0 top-0 w-full h-full border-2 border-primary/5 pointer-events-none"></div>
+<div class="font-mono text-primary font-bold text-lg phosphor-glow">04</div>
+<div class="w-10 h-10 border border-primary/40 bg-emerald-900/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+</div>
+<div class="flex-1">
+<div class="font-mono text-xs text-primary uppercase tracking-tighter phosphor-glow">SYSTEM_SYNC<span class="inline-block w-2 h-4 bg-primary ml-1 cursor-blink"></span></div>
+<div class="text-[0.6rem] text-primary/60 font-mono">CALCULATING_TRAJECTORY...</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Panel: Console Log -->
+<div class="col-span-12 bg-surface-container-low border border-[#0e1520] h-32 flex flex-col font-mono text-[0.7rem]">
+<div class="bg-surface-container-high px-4 py-1 flex items-center justify-between border-b border-[#0e1520]">
+<span class="text-on-surface-variant uppercase tracking-widest text-[0.6rem]">SYSTEM_CONSOLE_OUTPUT // ACTIVITY_LOG</span>
+<div class="flex gap-4">
+<span class="text-primary">AUTO_REFRESH: ON</span>
+<span class="text-on-surface-variant">LOGS: 2,841 KB</span>
+</div>
+</div>
+<div class="flex-1 p-3 overflow-y-auto space-y-1 bg-surface-container-lowest">
+<div class="flex gap-4">
+<span class="text-primary opacity-60">[14:22:01]</span>
+<span class="text-on-surface-variant">INITIALIZING TRANSACTION SCAN: <span class="text-primary">[DEAL_ID_9011]</span></span>
+<span class="text-[#34b5fa] ml-auto">STATUS: VERIFIED</span>
+</div>
+<div class="flex gap-4">
+<span class="text-primary opacity-60">[14:22:15]</span>
+<span class="text-on-surface-variant">LEAD GENERATION SEQUENCE COMPLETE. SOURCE: 127.0.0.1</span>
+<span class="text-[#34b5fa] ml-auto">DATA: SECURED</span>
+</div>
+<div class="flex gap-4">
+<span class="text-primary opacity-60">[14:22:34]</span>
+<span class="text-on-surface-variant">MODIFICATION DETECTED ON <span class="text-primary">[DEAL_ID_8820]</span> BY OPERATOR_03</span>
+<span class="text-tertiary ml-auto">WARN: ASSET_LOCKED</span>
+</div>
+<div class="flex gap-4">
+<span class="text-primary opacity-60">[14:23:02]</span>
+<span class="text-on-surface-variant">PIPELINE FORECAST RE-CALCULATION TRIGGERED. NEW_EPS: +0.02%</span>
+<span class="text-primary ml-auto">SYST: OK</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Data Stream -->
+<footer class="bg-surface-container-lowest h-6 border-t border-[#0e1520] flex items-center px-6 overflow-hidden">
+<div class="flex gap-8 animate-marquee whitespace-nowrap text-[0.6rem] font-mono text-on-surface-variant/40">
+<span>COORD_X: 40.7128° N // COORD_Y: 74.0060° W</span>
+<span>SYSTEM_VOLTAGE: 220V // TEMP: 42°C</span>
+<span>NETWORK_LATENCY: 12ms // UPTIME: 99.98%</span>
+<span>DATA_STREAM_01: ACTIVE // BUFFER: 14%</span>
+<span>ENCRYPTION_LEVEL: AES-256-GCM</span>
+<span>SESSION_TOKEN: 8x82-P9L0-K332</span>
+<span>SYNC_PULSE: STABLE</span>
+<span>COORD_X: 40.7128° N // COORD_Y: 74.0060° W</span>
+<span>SYSTEM_VOLTAGE: 220V // TEMP: 42°C</span>
+</div>
+</footer>
+</main>
+<style>
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 30s linear infinite;
+        }
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0f13;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #21262c;
+            border-radius: 0;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a4ffb9;
+        }
+    </style>
+</body></html>

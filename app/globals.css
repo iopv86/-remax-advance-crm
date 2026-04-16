@@ -100,6 +100,7 @@
   --sidebar-accent-foreground: #f9fafb;
   --sidebar-border: rgba(255, 255, 255, 0.06);
   --sidebar-ring: #e11d48;
+  --sidebar-accent-border: rgba(225, 29, 72, 0.2);
 
   /* Brand accent — Rose/Red (CTAs, primary actions) */
   --red: #e11d48;
@@ -124,55 +125,56 @@
 }
 
 /* ═══════════════════════════════════════
-   DARK MODE — Obsidian palette
-   #0D0D0D bg + gold #C9A84C accent
+   DARK MODE — Obsidian Edge
+   #0D0E14 bg + Estate Gold #C9963A accent
 ═══════════════════════════════════════ */
 .dark {
-  /* Page bg — Obsidian black */
-  --background: #0D0D0D;
-  --foreground: #e8e3dc;
+  /* Page bg — deep charcoal-navy */
+  --background: #0D0E14;
+  --foreground: #F5F0E8;
 
-  /* Cards — very dark with subtle warmth */
-  --card: #161614;
-  --card-foreground: #e8e3dc;
-  --popover: #161614;
-  --popover-foreground: #e8e3dc;
+  /* Cards — solid dark base (glassmorphism via .card-base/.card-glass classes) */
+  --card: #131520;
+  --card-foreground: #F5F0E8;
+  --popover: #161820;
+  --popover-foreground: #F5F0E8;
 
-  /* Primary — rose-red stays */
-  --primary: #f43f5e;
-  --primary-foreground: #ffffff;
+  /* Primary — Estate Gold */
+  --primary: #C9963A;
+  --primary-foreground: #0D0E14;
 
-  --secondary: #1c1c1a;
-  --secondary-foreground: #c5bfb5;
-  --muted: #1c1c1a;
-  --muted-foreground: #7a7368;
-  --accent: #1c1c1a;
-  --accent-foreground: #e8e3dc;
-  --destructive: #f43f5e;
-  --border: rgba(255, 255, 255, 0.07);
-  --input: #1c1c1a;
-  --ring: rgba(201, 168, 76, 0.3);
+  --secondary: #1A1A2E;
+  --secondary-foreground: #B8B0A4;
+  --muted: #1A1A2E;
+  --muted-foreground: #8B8178;
+  --accent: rgba(201, 150, 58, 0.08);
+  --accent-foreground: #C9963A;
+  --destructive: #ef4444;
+  --border: rgba(201, 150, 58, 0.15);
+  --input: #1A1A2E;
+  --ring: rgba(201, 150, 58, 0.3);
 
-  /* Sidebar — same dark as light mode (unified sidebar) */
-  --sidebar: #111827;
-  --sidebar-foreground: #f9fafb;
-  --sidebar-primary: #e11d48;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(225, 29, 72, 0.1);
-  --sidebar-accent-foreground: #f9fafb;
-  --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #e11d48;
+  /* Sidebar — unified dark (Obsidian Edge) */
+  --sidebar: #0D0E14;
+  --sidebar-foreground: #F5F0E8;
+  --sidebar-primary: #C9963A;
+  --sidebar-primary-foreground: #0D0E14;
+  --sidebar-accent: rgba(201, 150, 58, 0.1);
+  --sidebar-accent-foreground: #C9963A;
+  --sidebar-border: rgba(201, 150, 58, 0.08);
+  --sidebar-ring: #C9963A;
+  --sidebar-accent-border: rgba(201, 150, 58, 0.25);
 
-  /* Gold accent for dark mode (Obsidian theme) */
-  --amber: #C9A84C;
-  --amber-muted: rgba(201, 168, 76, 0.1);
-  --gold: #C9A84C;
-  --gold-light: #E0C070;
-  --gold-muted: rgba(201, 168, 76, 0.1);
+  /* Estate Gold (primary accent) */
+  --amber: #C9963A;
+  --amber-muted: rgba(201, 150, 58, 0.1);
+  --gold: #C9963A;
+  --gold-light: #E8B84B;
+  --gold-muted: rgba(201, 150, 58, 0.1);
 
   /* Brand accents */
-  --red: #f43f5e;
-  --red-muted: rgba(244, 63, 94, 0.1);
+  --red: #ef4444;
+  --red-muted: rgba(239, 68, 68, 0.1);
   --blue: #3b82f6;
   --blue-muted: rgba(59, 130, 246, 0.1);
   --emerald: #10b981;
@@ -183,42 +185,48 @@
   --teal-muted: rgba(20, 184, 166, 0.1);
 }
 
-/* Dark mode component overrides */
+/* Dark mode component overrides — Obsidian Edge */
 .dark .card-base,
 .dark .card-glow {
-  background: var(--card);
-  border-color: rgba(51, 65, 85, 0.7);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(201, 150, 58, 0.15);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
 .dark .card-glow:hover {
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  border-color: rgba(201, 150, 58, 0.3);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(201, 150, 58, 0.06);
 }
 
 .dark .card-glass {
-  background: rgba(15, 23, 42, 0.85);
-  border-color: rgba(51, 65, 85, 0.6);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(201, 150, 58, 0.15);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
 }
 
 .dark .page-header {
-  background: rgba(10, 15, 30, 0.85);
-  border-bottom-color: rgba(51, 65, 85, 0.6);
+  background: rgba(13, 14, 20, 0.85);
+  border-bottom-color: rgba(201, 150, 58, 0.1);
 }
 
 .dark .page-bg {
-  background: radial-gradient(circle at top left, rgba(201, 168, 76, 0.06), transparent 28%),
-    linear-gradient(180deg, #0D0D0D 0%, #111110 45%, #0D0D0D 100%);
+  background:
+    radial-gradient(circle at 20% 0%, rgba(201, 150, 58, 0.06) 0%, transparent 40%),
+    radial-gradient(circle at 80% 100%, rgba(26, 26, 46, 0.4) 0%, transparent 50%),
+    linear-gradient(180deg, #0D0E14 0%, #0F1018 50%, #0D0E14 100%);
 }
 
 .dark .nav-item-active {
-  background: linear-gradient(to right, rgba(244, 63, 94, 0.1), rgba(15, 23, 42, 0.6));
-  outline-color: rgba(244, 63, 94, 0.25);
+  background: rgba(201, 150, 58, 0.1);
+  outline-color: rgba(201, 150, 58, 0.25);
+  color: #C9963A !important;
 }
 
+.dark .nav-item-active .nav-icon { color: #C9963A !important; }
+
 .dark .kanban-col {
-  background: rgba(15, 23, 42, 0.6);
-  border-color: rgba(51, 65, 85, 0.7);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(201, 150, 58, 0.12);
 }
 
 .dark .table-row-hover:hover {
