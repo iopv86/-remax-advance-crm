@@ -1,50 +1,97 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { TasksClient } from "./tasks-client";
 import type { Task } from "@/lib/types";
-import { CheckSquare } from "lucide-react";
-import { TasksTable } from "./tasks-table";
+import { startOfDay, isAfter, parseISO, isToday } from "date-fns";
 
-export default async function TasksPage() {
+export default async function TasksPage({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    q?: string;
+    priority?: string;
+    status?: string;
+    view?: string;
+    month?: string;
+  }>;
+}) {
+  const params = await searchParams;
   const supabase = await createClient();
 
-  const { data: tasks } = await supabase
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  // Fetch tasks
+  let query = supabase
     .from("tasks")
     .select(
-      "id, title, description, due_date, priority, status, created_at, contact:contacts(first_name, last_name)"
+      "id, agent_id, contact_id, deal_id, title, description, due_date, priority, status, is_automated, completed_at, created_at, updated_at, contact:contacts(first_name, last_name)"
     )
-    .not("status", "in", '("completed","cancelled")')
     .order("due_date", { ascending: true, nullsFirst: false })
-    .limit(100);
+    .order("created_at", { ascending: false })
+    .limit(300);
+
+  if (params.q) query = (query as typeof query).ilike("title", `%${params.q}%`);
+  if (params.priority) query = (query as typeof query).eq("priority", params.priority);
+  if (params.status) query = (query as typeof query).eq("status", params.status);
+
+  const [{ data: rawTasks }, { data: rawContacts }] = await Promise.all([
+    query,
+    supabase
+      .from("contacts")
+      .select("id, first_name, last_name")
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
+
+  const tasks = (rawTasks ?? []) as unknown as Task[];
+  const contacts = (rawContacts ?? []) as { id: string; first_name: string | null; last_name: string | null }[];
+
+  // Compute stats
+  const now = startOfDay(new Date());
+  const pending = tasks.filter((t) => t.status === "pending").length;
+  const overdue = tasks.filter(
+    (t) => t.status !== "completed" && t.status !== "cancelled" && t.due_date && !isAfter(parseISO(t.due_date), now) && !isToday(parseISO(t.due_date))
+  ).length;
+  const completedToday = tasks.filter(
+    (t) => t.status === "completed" && t.completed_at && isToday(new Date(t.completed_at))
+  ).length;
+  const urgent = tasks.filter((t) => t.priority === "urgent" && t.status !== "completed").length;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
+      {/* Header */}
       <div className="page-header animate-fade-up">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-1">
-              Actividades
-            </p>
-            <h1
-              style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 30,
-                letterSpacing: "-0.02em",
-                color: "var(--foreground)",
-                lineHeight: 1.1,
-              }}
-            >
-              Tareas
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-amber-100 bg-white/80 px-3 py-1.5 text-xs font-medium text-amber-700 shadow-sm backdrop-blur">
-            <CheckSquare className="h-3.5 w-3.5" />
-            {tasks?.length ?? 0} pendientes
-          </div>
+        <div>
+          <h1
+            style={{
+              fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
+              fontWeight: 700,
+              fontSize: 22,
+              letterSpacing: "-0.02em",
+              color: "var(--foreground)",
+            }}
+          >
+            Tareas
+          </h1>
+          <p className="text-sm mt-0.5" style={{ color: "var(--muted-foreground)" }}>
+            Gestiona tus seguimientos y pendientes
+          </p>
         </div>
       </div>
 
-      <div className="p-7 animate-fade-up-1">
-        <TasksTable tasks={(tasks as unknown as Task[]) ?? []} />
+      {/* Client */}
+      <div className="flex-1 p-6 animate-fade-up-1">
+        <TasksClient
+          tasks={tasks}
+          contacts={contacts}
+          stats={{ pending, overdue, completedToday, urgent }}
+          initialView={params.view === "calendar" ? "calendar" : "list"}
+          initialPriority={params.priority}
+          initialStatus={params.status}
+          initialSearch={params.q}
+          initialMonth={params.month}
+        />
       </div>
     </div>
   );

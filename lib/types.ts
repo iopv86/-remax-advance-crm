@@ -101,6 +101,10 @@ export interface Task {
   due_date?: string;
   priority: "low" | "medium" | "high" | "urgent";
   status: "pending" | "in_progress" | "completed" | "cancelled";
+  is_automated: boolean;
+  completed_at?: string | null;
+  completed_by?: string | null;
+  updated_at?: string;
   created_at: string;
   contact?: Contact;
 }
@@ -188,4 +192,28 @@ export const CLASSIFICATION_LABELS: Record<LeadClassification, string> = {
   warm: "🟠 WARM",
   cold: "❄️ COLD",
   unqualified: "UNQUALIFIED",
+};
+
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+export type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+
+export const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  low: "Baja",
+  medium: "Media",
+  high: "Alta",
+  urgent: "Urgente",
+};
+
+export const PRIORITY_COLORS: Record<TaskPriority, { bg: string; text: string; dot: string }> = {
+  urgent: { bg: "rgba(239,68,68,0.08)",   text: "#ef4444", dot: "#ef4444" },
+  high:   { bg: "rgba(201,150,58,0.08)",  text: "#C9963A", dot: "#C9963A" },
+  medium: { bg: "rgba(59,130,246,0.08)",  text: "#3b82f6", dot: "#3b82f6" },
+  low:    { bg: "rgba(100,116,139,0.08)", text: "#64748b", dot: "#94a3b8" },
+};
+
+export const STATUS_LABELS: Record<TaskStatus, string> = {
+  pending: "Pendiente",
+  in_progress: "En progreso",
+  completed: "Completada",
+  cancelled: "Cancelada",
 };
