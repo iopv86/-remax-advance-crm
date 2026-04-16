@@ -67,19 +67,40 @@ export function Logo({
   const nameSize = size === "sm" ? "13px" : size === "md" ? "16px" : "20px";
   const subSize = size === "sm" ? "9px" : "10px";
 
-  /* ── Login lockup — professional logotipo centered ──────────────── */
+  /* ── Login lockup — inline monogram + wordmark (transparent bg) ─── */
   if (variant === "login") {
     return (
-      <div className={cn("flex flex-col items-center gap-2 select-none", className)}>
-        <Image
-          src="/logos/logotipo.svg"
-          alt="Advance Estate"
-          width={280}
-          height={280}
-          priority
-          style={{ width: 280, height: "auto" }}
-          unoptimized
-        />
+      <div className={cn("flex flex-col items-center gap-3 select-none", className)}>
+        <AEMonogram size={88} />
+        <div className="flex flex-col items-center gap-1">
+          <span
+            style={{
+              fontFamily: "var(--font-cinzel), Cinzel, Georgia, serif",
+              fontWeight: 700,
+              fontSize: "18px",
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              background: "linear-gradient(135deg, #F5E6C8 0%, #C9963A 60%, #A67828 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Advance Estate
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--font-inter), Inter, sans-serif",
+              fontWeight: 400,
+              fontSize: "9px",
+              letterSpacing: "0.28em",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.35)",
+            }}
+          >
+            Luxury Real Estate
+          </span>
+        </div>
       </div>
     );
   }

@@ -55,21 +55,19 @@ export default function LoginPage() {
             zIndex: 20,
           }}
         />
-        {/* Background — luxury villa atmosphere (gradient stand-in) */}
-        <div
-          className="absolute inset-0"
+        {/* Villa photo — desaturated dark luxury */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuD455e6muSbNklSgcAIqCp8pFjXLVH41Zu3Tm4yiZCZjRh_IokCM24GcQNlJeFhImg4GnVFzAdzZWpWW9Qq1cfb77kg6UnBklsLRInkk6JUzZwpM3YVdszMB43I2aQftlV9Cb7TIwQyR3mI32_m7gxdOc1j0MM2xwMYzKqgZSMrGMAiNrQIrnEOnWHa3Q6b2jehDGa_MXjaHVMtRPk7t8o5-5gQPMzj2m4jj1Ffq5V4QfNyGIqO-L4JzX18i2UDB5WEfaExzNOrBns"
+          alt=""
+          aria-hidden="true"
           style={{
-            background:
-              "linear-gradient(160deg, #0c0b09 0%, #1a1410 35%, #0f0e0c 65%, #080808 100%)",
-          }}
-        />
-        {/* Subtle texture grain */}
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E\")",
-            zIndex: 5,
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "grayscale(1) brightness(0.5)",
           }}
         />
         {/* Logo — top left */}
