@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Pencil, Trash2, GripVertical } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { DealSheet } from "@/components/deal-sheet";
 import { STAGE_LABELS } from "@/lib/types";
@@ -22,6 +21,8 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/core";
 
+// ── Types ─────────────────────────────────────────────────────────────────────
+
 interface ContactOption {
   id: string;
   first_name: string | null;
@@ -31,6 +32,8 @@ interface ContactOption {
 interface Props {
   deals: Deal[];
 }
+
+// ── Stage config ──────────────────────────────────────────────────────────────
 
 const STAGE_ORDER: DealStage[] = [
   "lead_captured",
@@ -48,7 +51,6 @@ const STAGE_ORDER: DealStage[] = [
   "closed_lost",
 ];
 
-// Simplified display names for Stitch-style headers
 const STAGE_SHORT: Record<DealStage, string> = {
   lead_captured: "NUEVO LEAD",
   qualified: "CALIFICADO",
@@ -61,11 +63,28 @@ const STAGE_SHORT: Record<DealStage, string> = {
   financiamiento: "FINANCIAMIENTO",
   contract: "CONTRATO",
   due_diligence: "DUE DILIGENCE",
-  closed_won: "CERRADO ✓",
+  closed_won: "CERRADO GANADO",
   closed_lost: "PERDIDO",
 };
 
-// ── Draggable deal card ───────────────────────────────────────────────────────
+// Dot color per stage
+const STAGE_DOT: Record<DealStage, string> = {
+  lead_captured: "#3b82f6",
+  qualified: "#f59e0b",
+  contacted: "#8b5cf6",
+  showing_scheduled: "#6366f1",
+  showing_done: "#0ea5e9",
+  offer_made: "#ec4899",
+  negotiation: "#f97316",
+  promesa_de_venta: "#14b8a6",
+  financiamiento: "#84cc16",
+  contract: "#a78bfa",
+  due_diligence: "#fb923c",
+  closed_won: "#10b981",
+  closed_lost: "#6b7280",
+};
+
+// ── Deal card ─────────────────────────────────────────────────────────────────
 
 interface DealCardProps {
   deal: Deal;
@@ -91,89 +110,220 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
     lead_classification?: string;
     phone?: string;
   } | null;
+
   const contactId = typeof deal.contact_id === "string" ? deal.contact_id : null;
-  const contactName = [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Sin nombre";
+  const contactName =
+    [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Sin nombre";
   const contactInitials =
     [contact?.first_name?.[0], contact?.last_name?.[0]]
       .filter(Boolean)
       .join("")
       .toUpperCase() || "?";
 
+  const isWon = deal.stage === "closed_won";
+
   return (
     <div
       ref={setNodeRef}
       style={{
         ...style,
-        background: "white",
-        border: "1px solid #e5e7eb",
-        borderRadius: 8,
-        padding: 12,
-        boxShadow: "0 1px 3px rgba(28,25,23,0.08)",
+        background: "rgba(255,255,255,0.04)",
+        backdropFilter: "blur(10px)",
+        border: "1px solid rgba(201,150,58,0.15)",
+        borderRadius: "0.25rem",
+        padding: "20px",
         cursor: dragging || isDragging ? "grabbing" : "grab",
         opacity: dragging || isDragging ? 0.5 : 1,
-        transition: "border-color 0.15s, box-shadow 0.15s",
+        transition: "border-color 0.2s, box-shadow 0.2s",
+        position: "relative",
       }}
-      className="group hover:border-rose-300 hover:shadow-md"
+      className={`group ${isWon ? "opacity-70 grayscale hover:grayscale-0 hover:opacity-100" : ""}`}
+      onMouseEnter={(e) => {
+        if (!dragging && !isDragging) {
+          const el = e.currentTarget as HTMLDivElement;
+          el.style.borderColor = "rgba(201,150,58,0.4)";
+          el.style.boxShadow = "inset 0 0 10px rgba(245,189,93,0.05)";
+        }
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLDivElement;
+        el.style.borderColor = "rgba(201,150,58,0.15)";
+        el.style.boxShadow = "none";
+      }}
     >
-      {/* Drag handle + info */}
-      <div {...listeners} {...attributes} className="flex justify-between items-start mb-2">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
+      {/* Drag handle area */}
+      <div {...listeners} {...attributes} className="absolute inset-0 rounded" style={{ cursor: "grab" }} />
+
+      {/* Card content (above drag layer) */}
+      <div className="relative" style={{ pointerEvents: "none" }}>
+        {/* Header row: classification badge + age */}
+        <div className="flex justify-between items-start mb-4">
+          <span
+            style={{
+              background: "rgba(59,130,246,0.1)",
+              color: "#93c5fd",
+              fontSize: "10px",
+              padding: "2px 6px",
+              borderRadius: "0.125rem",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {contact?.lead_classification ?? "Lead"}
+          </span>
+          {isWon && (
+            <span
+              style={{
+                fontSize: "10px",
+                color: "#34d399",
+                fontWeight: 700,
+                display: "flex",
+                alignItems: "center",
+                gap: 3,
+              }}
+            >
+              ✓ Ganado
+            </span>
+          )}
+        </div>
+
+        {/* Property / deal name — contact name as headline */}
+        <h4
+          style={{
+            color: "#e3e1ea",
+            fontFamily: "Manrope, var(--font-manrope), sans-serif",
+            fontWeight: 700,
+            fontSize: "15px",
+            marginBottom: 2,
+            lineHeight: 1.3,
+          }}
+        >
+          {contactName}
+        </h4>
+
+        {/* Notes snippet if available */}
+        {deal.notes && (
+          <p
+            style={{
+              color: "#9899A8",
+              fontSize: "12px",
+              marginBottom: 16,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {deal.notes}
+          </p>
+        )}
+
+        {/* Bottom row: avatar / initials + value */}
+        <div className="flex justify-between items-center" style={{ marginTop: deal.notes ? 0 : 16 }}>
+          {/* Avatar initials */}
           <div
-            className="w-8 h-8 rounded-md shrink-0 flex items-center justify-center text-xs font-bold"
-            style={{ background: "#fee2e2", color: "#dc2626" }}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: "#292a30",
+              border: "1px solid rgba(245,189,93,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 10,
+              fontWeight: 700,
+              color: "#f5bd5d",
+            }}
           >
             {contactInitials}
           </div>
+
+          {/* Value */}
+          {deal.deal_value != null && (
+            <span
+              style={{
+                fontFamily: "Manrope, var(--font-manrope), sans-serif",
+                fontWeight: 700,
+                fontSize: "14px",
+                color: isWon ? "#34d399" : "#f5bd5d",
+              }}
+            >
+              {deal.currency ?? "RD$"} {deal.deal_value.toLocaleString()}
+            </span>
+          )}
         </div>
-        <GripVertical className="w-4 h-4 shrink-0 text-stone-300 group-hover:text-stone-400" />
       </div>
 
-      {/* Contact name */}
-      {contactId ? (
+      {/* Edit / delete actions — re-enable pointer events */}
+      <div
+        className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ pointerEvents: "auto" }}
+      >
+        <button
+          onClick={(e) => onEdit(deal, e)}
+          title="Editar"
+          style={{
+            padding: "3px 6px",
+            borderRadius: "0.125rem",
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(201,150,58,0.2)",
+            color: "#9899A8",
+            fontSize: 11,
+            cursor: "pointer",
+            transition: "color 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = "#f5bd5d";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(245,189,93,0.5)";
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = "#9899A8";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(201,150,58,0.2)";
+          }}
+        >
+          Editar
+        </button>
+        <button
+          onClick={(e) => onDelete(deal, e)}
+          title="Eliminar"
+          disabled={deletingId === deal.id}
+          style={{
+            padding: "3px 6px",
+            borderRadius: "0.125rem",
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(201,150,58,0.2)",
+            color: "#9899A8",
+            fontSize: 11,
+            cursor: "pointer",
+            opacity: deletingId === deal.id ? 0.4 : 1,
+            transition: "color 0.15s, border-color 0.15s",
+          }}
+          onMouseEnter={(e) => {
+            if (deletingId !== deal.id) {
+              (e.currentTarget as HTMLButtonElement).style.color = "#f87171";
+              (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(248,113,113,0.4)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = "#9899A8";
+            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(201,150,58,0.2)";
+          }}
+        >
+          {deletingId === deal.id ? "..." : "Borrar"}
+        </button>
+      </div>
+
+      {/* Contact link — pointer events enabled */}
+      {contactId && (
         <Link
           href={`/dashboard/contacts/${contactId}`}
           onClick={(e) => e.stopPropagation()}
-          className="block text-sm font-semibold text-stone-900 leading-tight mb-1 hover:text-rose-600 transition-colors"
-        >
-          {contactName}
-        </Link>
-      ) : (
-        <p className="text-sm font-semibold text-stone-900 leading-tight mb-1">{contactName}</p>
-      )}
-
-      {/* Deal value */}
-      {deal.deal_value != null && (
-        <div
-          className="flex justify-between items-end pt-3 mt-2"
-          style={{ borderTop: "1px solid #f5f5f4" }}
-        >
-          <span
-            className="font-bold text-sm"
-            style={{
-              fontFamily: "var(--font-manrope), Manrope, sans-serif",
-              color: "#1C1917",
-            }}
-          >
-            {deal.currency ?? "RD$"} {deal.deal_value.toLocaleString()}
-          </span>
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button
-              onClick={(e) => onEdit(deal, e)}
-              title="Editar"
-              className="p-1 rounded hover:bg-stone-100 text-slate-400 hover:text-slate-700 transition-colors"
-            >
-              <Pencil className="w-3 h-3" />
-            </button>
-            <button
-              onClick={(e) => onDelete(deal, e)}
-              title="Eliminar"
-              disabled={deletingId === deal.id}
-              className="p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors disabled:opacity-40"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
-          </div>
-        </div>
+          className="absolute inset-0"
+          style={{ pointerEvents: "none" }}
+          tabIndex={-1}
+          aria-hidden
+        />
       )}
     </div>
   );
@@ -194,8 +344,16 @@ function DroppableColumn({
   return (
     <div
       ref={setNodeRef}
-      className="flex flex-col gap-3 p-2 rounded-b-lg transition-colors min-h-[80px]"
-      style={isOver ? { background: "rgba(225,29,72,0.04)", outline: "2px dashed rgba(225,29,72,0.3)" } : {}}
+      className="flex flex-col gap-4 transition-all min-h-[80px]"
+      style={
+        isOver
+          ? {
+              outline: "2px dashed rgba(245,189,93,0.4)",
+              borderRadius: "0.25rem",
+              background: "rgba(245,189,93,0.03)",
+            }
+          : {}
+      }
     >
       {children}
     </div>
@@ -246,7 +404,8 @@ export function PipelineClient({ deals: initial }: Props) {
     e.stopPropagation();
     e.preventDefault();
     const contact = deal.contact as { first_name?: string; last_name?: string } | null;
-    const name = [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "este deal";
+    const name =
+      [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "este deal";
     if (!confirm(`¿Eliminar oportunidad de ${name}? Esta acción no se puede deshacer.`)) return;
     setDeletingId(deal.id);
     const supabase = createClient();
@@ -322,52 +481,117 @@ export function PipelineClient({ deals: initial }: Props) {
 
   return (
     <>
+      <style>{`
+        .kanban-scroll::-webkit-scrollbar { height: 4px; }
+        .kanban-scroll::-webkit-scrollbar-track { background: #0d0e14; }
+        .kanban-scroll::-webkit-scrollbar-thumb { background: #34343b; border-radius: 10px; }
+      `}</style>
+
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
       >
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-5 min-w-max items-start">
+        {/* Kanban scroll container */}
+        <div
+          className="kanban-scroll"
+          style={{
+            overflowX: "auto",
+            paddingBottom: 24,
+            scrollBehavior: "smooth",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: 24,
+              minWidth: "max-content",
+              alignItems: "flex-start",
+            }}
+          >
             {STAGE_ORDER.map((stage) => {
               const stageDeals = grouped[stage];
               const stageValue = stageDeals.reduce((sum, d) => sum + (d.deal_value ?? 0), 0);
+              const dotColor = STAGE_DOT[stage];
 
               return (
                 <div
                   key={stage}
-                  style={{ minWidth: 280, width: 280 }}
-                  className="flex flex-col gap-3"
+                  style={{ minWidth: 320, width: 320, display: "flex", flexDirection: "column", gap: 0 }}
                 >
                   {/* Column header */}
-                  <div className="flex items-center justify-between px-1">
+                  <div
+                    className="flex items-center justify-between"
+                    style={{ marginBottom: 16, paddingLeft: 4, paddingRight: 4 }}
+                  >
                     <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-xs text-stone-500 tracking-wider uppercase">
+                      {/* Stage dot */}
+                      <div
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: "50%",
+                          background: dotColor,
+                          flexShrink: 0,
+                        }}
+                      />
+                      <h3
+                        style={{
+                          fontFamily: "Manrope, var(--font-manrope), sans-serif",
+                          fontWeight: 700,
+                          fontSize: 11,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.12em",
+                          color: "#e3e1ea",
+                        }}
+                      >
                         {STAGE_SHORT[stage]}
                       </h3>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {stageValue > 0 && (
+                        <span
+                          style={{
+                            fontSize: 11,
+                            fontWeight: 700,
+                            color: "#9899A8",
+                            fontFamily: "Manrope, var(--font-manrope), sans-serif",
+                          }}
+                        >
+                          RD$ {(stageValue / 1_000_000).toFixed(1)}M
+                        </span>
+                      )}
                       <span
-                        className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                        style={{ background: "#e5e7eb", color: "#6b7280" }}
+                        style={{
+                          background: "#292a30",
+                          color: "#9899A8",
+                          fontSize: 10,
+                          padding: "2px 7px",
+                          borderRadius: "999px",
+                          fontWeight: 700,
+                        }}
                       >
                         {stageDeals.length}
                       </span>
                     </div>
-                    {stageValue > 0 && (
-                      <span className="text-[11px] font-bold text-stone-400">
-                        RD$ {(stageValue / 1_000_000).toFixed(1)}M
-                      </span>
-                    )}
                   </div>
 
+                  {/* Droppable cards area */}
                   <DroppableColumn stage={stage} isOver={overStage === stage}>
                     {stageDeals.length === 0 && (
                       <div
-                        className="flex items-center justify-center py-6 rounded-lg"
                         style={{
-                          border: "2px dashed #e5e7eb",
-                          color: "#94a3b8",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          minHeight: 80,
+                          border: "2px dashed rgba(201,150,58,0.12)",
+                          borderRadius: "0.25rem",
+                          color: "#9899A8",
                           fontSize: 12,
+                          fontFamily: "Inter, sans-serif",
                         }}
                       >
                         {overStage === stage ? "Soltar aquí" : "Vacío"}
@@ -391,29 +615,83 @@ export function PipelineClient({ deals: initial }: Props) {
 
         {/* Drag overlay */}
         <DragOverlay>
-          {activeDeal && (() => {
-            const contact = activeDeal.contact as { first_name?: string; last_name?: string } | null;
-            const name = [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Sin nombre";
-            return (
-              <div
-                className="opacity-95 shadow-xl rotate-1 cursor-grabbing"
-                style={{
-                  background: "white",
-                  border: "1px solid #e5e7eb",
-                  borderRadius: 8,
-                  padding: 12,
-                  width: 280,
-                }}
-              >
-                <p className="text-sm font-semibold text-stone-900">{name}</p>
-                {activeDeal.deal_value != null && (
-                  <p className="text-sm font-bold mt-1" style={{ color: "#1C1917" }}>
-                    {activeDeal.currency ?? "RD$"} {activeDeal.deal_value.toLocaleString()}
-                  </p>
-                )}
-              </div>
-            );
-          })()}
+          {activeDeal &&
+            (() => {
+              const contact = activeDeal.contact as {
+                first_name?: string;
+                last_name?: string;
+              } | null;
+              const name =
+                [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") ||
+                "Sin nombre";
+              const initials =
+                [contact?.first_name?.[0], contact?.last_name?.[0]]
+                  .filter(Boolean)
+                  .join("")
+                  .toUpperCase() || "?";
+
+              return (
+                <div
+                  style={{
+                    background: "rgba(18,19,25,0.95)",
+                    border: "1px solid rgba(201,150,58,0.5)",
+                    boxShadow: "0 20px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(245,189,93,0.08)",
+                    borderRadius: "0.25rem",
+                    padding: 20,
+                    width: 320,
+                    cursor: "grabbing",
+                    transform: "rotate(1deg)",
+                  }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background: "#292a30",
+                        border: "1px solid rgba(245,189,93,0.3)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: "#f5bd5d",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {initials}
+                    </div>
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "Manrope, sans-serif",
+                          fontWeight: 700,
+                          fontSize: 14,
+                          color: "#e3e1ea",
+                        }}
+                      >
+                        {name}
+                      </p>
+                      {activeDeal.deal_value != null && (
+                        <p
+                          style={{
+                            fontFamily: "Manrope, sans-serif",
+                            fontWeight: 700,
+                            fontSize: 13,
+                            color: "#f5bd5d",
+                            marginTop: 2,
+                          }}
+                        >
+                          {activeDeal.currency ?? "RD$"}{" "}
+                          {activeDeal.deal_value.toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
         </DragOverlay>
       </DndContext>
 

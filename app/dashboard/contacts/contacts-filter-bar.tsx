@@ -1,8 +1,20 @@
 "use client";
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { Search, SlidersHorizontal, Download } from "lucide-react";
 import { useCallback, useRef } from "react";
+
+// ── Design tokens (Obsidian Edge) ─────────────────────────────────────────────
+const T = {
+  surfaceContainerLow: "#1c1b1b",
+  surfaceContainerHigh: "#2a2a2a",
+  surfaceContainerHighest: "#353534",
+  outlineVariantFaint: "rgba(79,69,55,0.30)",
+  onSurface: "#e5e2e1",
+  onSurfaceVariant: "#d3c4b1",
+  primary: "#f5bd5d",
+  primaryContainer: "#c9963a",
+  onPrimaryFixed: "#281900",
+} as const;
 
 interface Props {
   currentClassification?: string;
@@ -10,14 +22,18 @@ interface Props {
   totalCount: number;
 }
 
-const PILLS = [
+const PILLS: { label: string; value: string }[] = [
   { label: "Todos", value: "" },
   { label: "Leads Calientes", value: "hot" },
   { label: "Warm Leads", value: "warm" },
   { label: "Leads Fríos", value: "cold" },
 ];
 
-export function ContactsFilterBar({ currentClassification, currentSearch, totalCount }: Props) {
+export function ContactsFilterBar({
+  currentClassification,
+  currentSearch,
+  totalCount,
+}: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -49,73 +65,149 @@ export function ContactsFilterBar({ currentClassification, currentSearch, totalC
   }
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4">
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        marginBottom: 32,
+        overflowX: "auto",
+        paddingBottom: 4,
+      }}
+    >
       {/* Filter pills */}
-      <div
-        className="flex items-center gap-2 p-1.5 rounded-full px-4"
-        style={{ background: "var(--muted)" }}
-      >
-        {PILLS.map((pill) => {
-          const active = (currentClassification ?? "") === pill.value;
-          return (
-            <button
-              key={pill.value}
-              onClick={() => setClassification(pill.value)}
-              className="px-4 py-1.5 text-xs font-semibold rounded-full transition-all"
-              style={
-                active
-                  ? { background: "var(--primary)", color: "var(--primary-foreground)" }
-                  : { color: "#64748b" }
-              }
-            >
-              {pill.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Right: search + sort + export */}
-      <div className="flex items-center gap-3">
-        {/* Search input */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Buscar..."
-            defaultValue={currentSearch ?? ""}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="pl-9 pr-4 py-1.5 text-sm rounded-lg border-none transition-all"
+      {PILLS.map((pill) => {
+        const active = (currentClassification ?? "") === pill.value;
+        return (
+          <button
+            key={pill.value}
+            onClick={() => setClassification(pill.value)}
             style={{
-              background: "white",
-              color: "#1C1917",
-              outline: "none",
-              border: "1px solid transparent",
-              width: 200,
+              padding: "6px 16px",
+              borderRadius: 9999,
+              border: "none",
+              cursor: "pointer",
+              fontSize: 12,
+              fontWeight: 700,
+              textTransform: "uppercase" as const,
+              letterSpacing: "0.08em",
+              whiteSpace: "nowrap" as const,
+              transition: "background 150ms ease, color 150ms ease",
+              background: active ? T.primaryContainer : T.surfaceContainerHigh,
+              color: active ? T.onPrimaryFixed : T.onSurfaceVariant,
             }}
-            onFocus={(e) => (e.target.style.borderColor = "var(--primary)")}
-            onBlur={(e) => (e.target.style.borderColor = "transparent")}
-          />
-        </div>
+          >
+            {pill.label}
+          </button>
+        );
+      })}
 
-        <button
-          className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg transition-all hover:border-slate-200"
+      {/* Divider */}
+      <div
+        style={{
+          width: 1,
+          height: 16,
+          background: T.outlineVariantFaint,
+          margin: "0 8px",
+          flexShrink: 0,
+        }}
+      />
+
+      {/* More filters */}
+      <button
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
+          padding: "6px 16px",
+          borderRadius: 9999,
+          border: "none",
+          cursor: "pointer",
+          fontSize: 12,
+          fontWeight: 700,
+          textTransform: "uppercase" as const,
+          letterSpacing: "0.08em",
+          background: T.surfaceContainerHigh,
+          color: T.onSurfaceVariant,
+          whiteSpace: "nowrap" as const,
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <line x1="8" y1="6" x2="21" y2="6" />
+          <line x1="8" y1="12" x2="21" y2="12" />
+          <line x1="8" y1="18" x2="21" y2="18" />
+          <line x1="3" y1="6" x2="3.01" y2="6" />
+          <line x1="3" y1="12" x2="3.01" y2="12" />
+          <line x1="3" y1="18" x2="3.01" y2="18" />
+        </svg>
+        Más filtros
+      </button>
+
+      {/* Push search to far right */}
+      <div style={{ flex: 1 }} />
+
+      {/* Search input */}
+      <div style={{ position: "relative", flexShrink: 0 }}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           style={{
-            color: "#475569",
-            background: "white",
-            border: "1px solid transparent",
+            position: "absolute",
+            left: 12,
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: T.onSurfaceVariant,
+            pointerEvents: "none",
           }}
         >
-          <SlidersHorizontal className="w-4 h-4" />
-          Última actividad
-        </button>
-
-        <button
-          className="flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-lg transition-all"
-          style={{ color: "#94a3b8" }}
-        >
-          <Download className="w-4 h-4" />
-          Exportar
-        </button>
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar contactos..."
+          defaultValue={currentSearch ?? ""}
+          onChange={(e) => handleSearchChange(e.target.value)}
+          style={{
+            width: 240,
+            background: T.surfaceContainerLow,
+            border: `1px solid rgba(79,69,55,0.20)`,
+            borderRadius: 8,
+            paddingLeft: 40,
+            paddingRight: 16,
+            paddingTop: 8,
+            paddingBottom: 8,
+            fontSize: 14,
+            color: T.onSurface,
+            outline: "none",
+            transition: "border-color 150ms ease, box-shadow 150ms ease",
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = T.primary;
+            e.target.style.boxShadow = `0 0 0 1px ${T.primary}`;
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = "rgba(79,69,55,0.20)";
+            e.target.style.boxShadow = "none";
+          }}
+        />
       </div>
     </div>
   );

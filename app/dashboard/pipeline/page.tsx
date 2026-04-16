@@ -19,87 +19,170 @@ export default async function PipelinePage() {
     .filter((d) => d.stage !== "closed_lost")
     .reduce((sum, d) => sum + (d.deal_value ?? 0), 0);
 
+  // Summary counts
+  const qualified = typedDeals.filter((d) => d.stage === "qualified").length;
+  const proposed = typedDeals.filter((d) =>
+    ["offer_made", "promesa_de_venta"].includes(d.stage)
+  ).length;
+  const negotiating = typedDeals.filter((d) => d.stage === "negotiation").length;
+  const closedWon = typedDeals.filter((d) => d.stage === "closed_won").length;
+
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        background: "#121319",
+      }}
+    >
       {/* Page Header */}
-      <div className="px-8 py-6 shrink-0 bg-background">
-        <div className="flex justify-between items-end mb-6">
+      <div
+        style={{
+          padding: "32px 48px 0",
+          flexShrink: 0,
+          background: "#121319",
+        }}
+      >
+        {/* Breadcrumb + title row */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginBottom: 40,
+          }}
+        >
           <div>
-            <h2
-              className="font-extrabold tracking-tight"
+            <nav
               style={{
-                fontFamily: "var(--font-manrope), Manrope, sans-serif",
-                fontSize: 24,
-                color: "#1C1917",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                color: "#9899A8",
+                fontSize: 11,
+                marginBottom: 8,
+                textTransform: "uppercase",
+                letterSpacing: "0.2em",
+              }}
+            >
+              <span>Dashboard</span>
+              <span style={{ fontSize: 10 }}>›</span>
+              <span style={{ color: "#f5bd5d" }}>Pipeline</span>
+            </nav>
+            <h1
+              style={{
+                fontFamily: "Manrope, var(--font-manrope), sans-serif",
+                fontWeight: 800,
+                fontSize: 36,
+                color: "#e3e1ea",
+                letterSpacing: "-0.02em",
+                lineHeight: 1,
               }}
             >
               Pipeline de Ventas
-            </h2>
-            {totalPipeline > 0 && (
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-stone-500 text-sm">Valor Total en Pipeline:</span>
-                <span
-                  className="font-bold text-lg"
-                  style={{
-                    fontFamily: "var(--font-manrope), Manrope, sans-serif",
-                    color: "#1C1917",
-                  }}
-                >
-                  RD$ {(totalPipeline / 1_000_000).toFixed(1)}M
-                </span>
-              </div>
-            )}
+            </h1>
           </div>
-          <NewDealButton />
+
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+            <span
+              style={{
+                color: "#9899A8",
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: "0.2em",
+              }}
+            >
+              Volumen Total del Pipeline
+            </span>
+            <div
+              style={{
+                fontFamily: "Manrope, var(--font-manrope), sans-serif",
+                fontWeight: 700,
+                fontSize: 28,
+                color: "#f5bd5d",
+              }}
+            >
+              RD$ {totalPipeline.toLocaleString()}
+            </div>
+          </div>
         </div>
 
-        {/* Filter row */}
+        {/* Summary metric pills */}
         <div
-          className="flex items-center justify-between pt-5"
-          style={{ borderTop: "1px solid #E7E5E0" }}
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 16,
+            marginBottom: 40,
+          }}
         >
-          <div className="flex items-center gap-3">
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-colors hover:border-stone-400"
-              style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-            >
-              <span className="text-sm font-medium text-stone-600">Todos los Agentes</span>
-              <svg className="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </div>
-            <div
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer transition-colors hover:border-stone-400"
-              style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-            >
-              <span className="text-sm font-medium text-stone-600">Este Mes</span>
-              <svg className="w-4 h-4 text-stone-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </div>
-          </div>
+          <MetricPill label="En Calificación" value={qualified} accentColor="#f5bd5d" />
+          <MetricPill label="En Propuesta" value={proposed} accentColor="#f59e0b" />
+          <MetricPill label="En Negociación" value={negotiating} accentColor="#f97316" />
+          <MetricPill label="Cerrado Ganado" value={closedWon} accentColor="#10b981" />
 
-          <div
-            className="p-1 rounded-lg flex"
-            style={{ background: "var(--border)" }}
-          >
-            <button
-              className="px-4 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2"
-              style={{ background: "white", color: "#1C1917", boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
-            >
-              Kanban
-            </button>
-            <button className="px-4 py-1.5 rounded-md text-sm font-medium text-stone-500 flex items-center gap-2 hover:text-stone-700 transition-colors">
-              Lista
-            </button>
+          <div style={{ marginLeft: "auto" }}>
+            <NewDealButton />
           </div>
         </div>
       </div>
 
       {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto px-8 pb-8">
+      <div
+        style={{
+          flex: 1,
+          overflowX: "auto",
+          padding: "0 48px 48px",
+        }}
+      >
         <PipelineClient deals={typedDeals} />
       </div>
+    </div>
+  );
+}
+
+function MetricPill({
+  label,
+  value,
+  accentColor,
+}: {
+  label: string;
+  value: number;
+  accentColor: string;
+}) {
+  return (
+    <div
+      style={{
+        background: "#1a1b22",
+        borderLeft: `4px solid ${accentColor}40`,
+        padding: "10px 24px",
+        display: "flex",
+        alignItems: "center",
+        gap: 16,
+      }}
+    >
+      <span
+        style={{
+          color: "#9899A8",
+          fontSize: 11,
+          fontWeight: 600,
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+        }}
+      >
+        {label}
+      </span>
+      <span
+        style={{
+          fontFamily: "Manrope, var(--font-manrope), sans-serif",
+          fontWeight: 700,
+          fontSize: 20,
+          color: "#e3e1ea",
+        }}
+      >
+        {value}
+      </span>
     </div>
   );
 }
