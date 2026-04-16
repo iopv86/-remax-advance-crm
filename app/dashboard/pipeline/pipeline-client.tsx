@@ -40,7 +40,10 @@ const STAGE_ORDER: DealStage[] = [
   "showing_done",
   "offer_made",
   "negotiation",
+  "promesa_de_venta",
+  "financiamiento",
   "contract",
+  "due_diligence",
   "closed_won",
   "closed_lost",
 ];
@@ -54,7 +57,10 @@ const STAGE_SHORT: Record<DealStage, string> = {
   showing_done: "VISITA HECHA",
   offer_made: "OFERTA",
   negotiation: "NEGOCIACIÓN",
+  promesa_de_venta: "PROMESA",
+  financiamiento: "FINANCIAMIENTO",
   contract: "CONTRATO",
+  due_diligence: "DUE DILIGENCE",
   closed_won: "CERRADO ✓",
   closed_lost: "PERDIDO",
 };

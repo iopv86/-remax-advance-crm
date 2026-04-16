@@ -1,7 +1,7 @@
 export type LeadClassification = "hot" | "warm" | "cold" | "unqualified";
 export type LeadStatus = "new" | "contacted" | "qualified" | "unqualified" | "nurturing" | "archived";
 export type LeadSource = "ctwa_ad" | "lead_form" | "referral" | "walk_in" | "website" | "social_media" | "other";
-export type DealStage = "lead_captured" | "qualified" | "contacted" | "showing_scheduled" | "showing_done" | "offer_made" | "negotiation" | "contract" | "closed_won" | "closed_lost";
+export type DealStage = "lead_captured" | "qualified" | "contacted" | "showing_scheduled" | "showing_done" | "offer_made" | "negotiation" | "promesa_de_venta" | "financiamiento" | "contract" | "due_diligence" | "closed_won" | "closed_lost";
 export type PropertyType = "apartment" | "penthouse" | "villa" | "house" | "land" | "commercial" | "apart_hotel" | "farm";
 export type CurrencyType = "USD" | "DOP";
 export type AgentRole = "admin" | "manager" | "agent";
@@ -113,7 +113,10 @@ export const STAGE_LABELS: Record<DealStage, string> = {
   showing_done: "Visita realizada",
   offer_made: "Oferta presentada",
   negotiation: "En negociación",
+  promesa_de_venta: "Promesa de venta",
+  financiamiento: "Financiamiento",
   contract: "Contrato firmado",
+  due_diligence: "Due diligence",
   closed_won: "Cerrado/Ganado",
   closed_lost: "Cerrado/Perdido",
 };

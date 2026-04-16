@@ -42,7 +42,10 @@ const STAGE_ACCENT: Record<DealStage, string> = {
   showing_done: "#d97706",
   offer_made: "#C9963A",
   negotiation: "#C9963A",
+  promesa_de_venta: "#C9963A",
+  financiamiento: "#7c3aed",
   contract: "#7c3aed",
+  due_diligence: "#0d9488",
   closed_won: "#10b981",
   closed_lost: "#94a3b8",
 };

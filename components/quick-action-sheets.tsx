@@ -226,9 +226,13 @@ function NewDealForm({
             <SelectItem value="qualified">Calificado</SelectItem>
             <SelectItem value="contacted">Contactado</SelectItem>
             <SelectItem value="showing_scheduled">Visita agendada</SelectItem>
+            <SelectItem value="showing_done">Visita realizada</SelectItem>
             <SelectItem value="offer_made">Oferta presentada</SelectItem>
             <SelectItem value="negotiation">En negociación</SelectItem>
+            <SelectItem value="promesa_de_venta">Promesa de venta</SelectItem>
+            <SelectItem value="financiamiento">Financiamiento</SelectItem>
             <SelectItem value="contract">Contrato firmado</SelectItem>
+            <SelectItem value="due_diligence">Due diligence</SelectItem>
             <SelectItem value="closed_won">Cerrado/Ganado</SelectItem>
             <SelectItem value="closed_lost">Cerrado/Perdido</SelectItem>
           </SelectContent>
