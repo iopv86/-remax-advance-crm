@@ -64,7 +64,7 @@ export function ContactsFilterBar({ currentClassification, currentSearch, totalC
               className="px-4 py-1.5 text-xs font-semibold rounded-full transition-all"
               style={
                 active
-                  ? { background: "#b80035", color: "white" }
+                  ? { background: "var(--primary)", color: "var(--primary-foreground)" }
                   : { color: "#64748b" }
               }
             >
@@ -92,7 +92,7 @@ export function ContactsFilterBar({ currentClassification, currentSearch, totalC
               border: "1px solid transparent",
               width: 200,
             }}
-            onFocus={(e) => (e.target.style.borderColor = "#e11d48")}
+            onFocus={(e) => (e.target.style.borderColor = "var(--primary)")}
             onBlur={(e) => (e.target.style.borderColor = "transparent")}
           />
         </div>

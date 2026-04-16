@@ -93,11 +93,11 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
                 active
-                  ? "text-white border-[#e11d48] bg-[rgba(225,29,72,0.08)] dark:border-[#C9963A] dark:bg-[rgba(201,150,58,0.1)] dark:text-[#C9963A]"
+                  ? "text-[#C9963A] border-[#C9963A] bg-[rgba(201,150,58,0.08)]"
                   : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
               )}
             >
-              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#e11d48] dark:text-[#C9963A]" : "text-gray-500")} />
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#C9963A]" : "text-gray-500")} />
               <span>{label}</span>
             </Link>
           );

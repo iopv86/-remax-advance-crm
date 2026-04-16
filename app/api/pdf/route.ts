@@ -18,7 +18,7 @@ const DEFAULT_CONFIG: AgencyConfig = {
   agency_name: "Advance Estate",
   agency_tagline: "República Dominicana",
   agency_logo_url: "",
-  agency_primary_color: "#e11d48",
+  agency_primary_color: "#C9963A",
 };
 
 async function getAgencyConfig(): Promise<AgencyConfig> {

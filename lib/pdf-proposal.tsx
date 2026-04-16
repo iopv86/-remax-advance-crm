@@ -262,7 +262,7 @@ interface ProposalDocProps {
 }
 
 export function ProposalDocument({ properties, agent, config }: ProposalDocProps) {
-  const S = makeStyles(config.agency_primary_color || "#e11d48");
+  const S = makeStyles(config.agency_primary_color || "#C9963A");
 
   return (
     <Document

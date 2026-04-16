@@ -184,9 +184,9 @@ export default function DashboardPage() {
           <button
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all hover:brightness-95 active:scale-95 cursor-pointer"
             style={{
-              background: "#e11d48",
-              color: "#ffffff",
-              boxShadow: "0 2px 8px rgba(225,29,72,0.25)",
+              background: "var(--primary)",
+              color: "var(--primary-foreground)",
+              boxShadow: "0 2px 8px rgba(201,150,58,0.3)",
             }}
             onClick={() => window.location.href = "/dashboard/pipeline"}
           >

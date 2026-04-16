@@ -259,7 +259,7 @@ export function ContactsTable({ contacts: initial }: Props) {
                           onClick={(e) => e.stopPropagation()}
                           title="WhatsApp"
                           className="p-1.5 rounded hover:bg-stone-100 transition-colors"
-                          style={{ color: "#e11d48" }}
+                          style={{ color: "#25D366" }}
                         >
                           <MessageCircle className="w-4 h-4" />
                         </a>

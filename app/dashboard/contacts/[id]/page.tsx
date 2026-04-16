@@ -40,8 +40,8 @@ const STAGE_ACCENT: Record<DealStage, string> = {
   contacted: "#2563eb",
   showing_scheduled: "#d97706",
   showing_done: "#d97706",
-  offer_made: "#e11d48",
-  negotiation: "#e11d48",
+  offer_made: "#C9963A",
+  negotiation: "#C9963A",
   contract: "#7c3aed",
   closed_won: "#10b981",
   closed_lost: "#94a3b8",
@@ -162,7 +162,7 @@ export default async function ContactDetailPage({
                   className="pb-4 text-sm font-medium transition-colors"
                   style={
                     isActive
-                      ? { color: "#e11d48", borderBottom: "2px solid #e11d48" }
+                      ? { color: "var(--primary)", borderBottom: "2px solid var(--primary)" }
                       : { color: "#6b7280" }
                   }
                 >
@@ -181,8 +181,8 @@ export default async function ContactDetailPage({
             Exportar
           </button>
           <button
-            className="px-4 py-1.5 rounded-lg text-sm font-semibold text-white transition-all hover:brightness-95"
-            style={{ background: "#e11d48" }}
+            className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all hover:brightness-95"
+            style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
           >
             Editar
           </button>
@@ -206,8 +206,8 @@ export default async function ContactDetailPage({
               <div
                 className="w-24 h-24 rounded-3xl flex items-center justify-center text-3xl font-extrabold mb-4 border"
                 style={{
-                  background: "var(--red-muted)",
-                  color: "#e11d48",
+                  background: "rgba(201, 150, 58, 0.1)",
+                  color: "var(--primary)",
                   border: "1px solid var(--border)",
                   fontFamily: "var(--font-manrope), Manrope, sans-serif",
                 }}
@@ -291,7 +291,7 @@ export default async function ContactDetailPage({
                     <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: "#94a3b8" }}>
                       Pipeline Stage
                     </p>
-                    <span className="text-sm font-bold" style={{ color: "#e11d48" }}>
+                    <span className="text-sm font-bold" style={{ color: "var(--primary)" }}>
                       {STAGE_LABELS[topDeal.stage]}
                     </span>
                   </div>
@@ -437,9 +437,9 @@ export default async function ContactDetailPage({
                   <div className="flex gap-3">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-                      style={{ background: "var(--red-muted)" }}
+                      style={{ background: "rgba(201, 150, 58, 0.1)" }}
                     >
-                      <svg className="w-3.5 h-3.5 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <svg className="w-3.5 h-3.5 text-[#C9963A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
                       </svg>
                     </div>

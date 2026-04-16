@@ -104,7 +104,7 @@ export function buildProposalHtml(
   <p style="color:rgba(255,255,255,0.4);font-size:16px;margin-bottom:60px;">Propuesta Inmobiliaria</p>
 
   <!-- Divider -->
-  <div style="width:60px;height:3px;background:linear-gradient(90deg,#e11d48,#f97316);border-radius:99px;margin-bottom:60px;"></div>
+  <div style="width:60px;height:3px;background:linear-gradient(90deg,#C9963A,#E8B84B);border-radius:99px;margin-bottom:60px;"></div>
 
   <!-- Properties summary -->
   <div style="text-align:center;margin-bottom:60px;">

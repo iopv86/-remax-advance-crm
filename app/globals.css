@@ -75,32 +75,32 @@
   --popover: #ffffff;
   --popover-foreground: #0f172a;
 
-  /* Primary — rose/red for CTAs */
-  --primary: #e11d48;
-  --primary-foreground: #ffffff;
+  /* Primary — Estate Gold (brand signature color) */
+  --primary: #C9963A;
+  --primary-foreground: #0D0E14;
 
   --secondary: #f1f5f9;
   --secondary-foreground: #1e293b;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
+  --accent: rgba(201, 150, 58, 0.08);
+  --accent-foreground: #C9963A;
   --destructive: #e11d48;
   --border: rgba(203, 213, 225, 0.8);
   --input: #f1f5f9;
-  --ring: rgba(225, 29, 72, 0.25);
+  --ring: rgba(201, 150, 58, 0.3);
   --radius: 1rem;
 
   /* Sidebar — dark #111827 (Attio Broker) */
   --sidebar: #111827;
   --sidebar-foreground: #f9fafb;
-  --sidebar-primary: #e11d48;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: rgba(225, 29, 72, 0.1);
-  --sidebar-accent-foreground: #f9fafb;
+  --sidebar-primary: #C9963A;
+  --sidebar-primary-foreground: #0D0E14;
+  --sidebar-accent: rgba(201, 150, 58, 0.1);
+  --sidebar-accent-foreground: #C9963A;
   --sidebar-border: rgba(255, 255, 255, 0.06);
-  --sidebar-ring: #e11d48;
-  --sidebar-accent-border: rgba(225, 29, 72, 0.2);
+  --sidebar-ring: #C9963A;
+  --sidebar-accent-border: rgba(201, 150, 58, 0.2);
 
   /* Brand accent — Rose/Red (CTAs, primary actions) */
   --red: #e11d48;
@@ -315,14 +315,14 @@
    SIDEBAR NAV
 ═══════════════════════════════════════ */
 .nav-item-active {
-  background: linear-gradient(to right, #fff1f2, #ffffff);
-  color: #0f172a !important;
+  background: linear-gradient(to right, rgba(201, 150, 58, 0.1), rgba(201, 150, 58, 0.04));
+  color: #C9963A !important;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
-  outline: 1px solid #fecdd3;
+  outline: 1px solid rgba(201, 150, 58, 0.25);
   border-radius: 16px;
 }
 
-.nav-item-active .nav-icon { color: #e11d48 !important; }
+.nav-item-active .nav-icon { color: #C9963A !important; }
 
 .sidebar-nav-hover:hover {
   background: rgba(15, 23, 42, 0.04);
