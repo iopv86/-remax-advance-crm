@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Eye, EyeOff } from "lucide-react";
-import Image from "next/image";
+import { Logo } from "@/components/logo";
 
 
 export default function LoginPage() {
@@ -60,16 +60,9 @@ export default function LoginPage() {
           className="absolute inset-0 hidden dark:block"
           style={{ background: "#080808", borderRight: "1px solid #1A1A18" }}
         />
-        {/* Strip content — logo only, centered */}
+        {/* Strip content — logo lockup, centered */}
         <div className="relative z-10 flex h-full items-center justify-center px-6">
-          <Image
-            src="/ae-logo-final.svg"
-            alt="Advance Estate"
-            width={260}
-            height={260}
-            className="object-contain w-full max-w-[260px]"
-            priority
-          />
+          <Logo variant="login" />
         </div>
       </section>
 
@@ -96,14 +89,8 @@ export default function LoginPage() {
         <div className="w-full max-w-[340px] flex flex-col">
 
           {/* Mobile logo (hidden on desktop) */}
-          <div className="mb-8 flex items-center gap-3 md:hidden">
-            <Image
-              src="/ae-logo-final.svg"
-              alt="Advance Estate"
-              width={48}
-              height={48}
-              className="object-contain"
-            />
+          <div className="mb-8 md:hidden">
+            <Logo size="sm" />
           </div>
 
           {/* Heading */}

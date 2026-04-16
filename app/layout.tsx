@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { Inter, Manrope, JetBrains_Mono } from "next/font/google";
+import { Cinzel, Inter, Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+
+const cinzel = Cinzel({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-cinzel",
+  display: "swap",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -33,7 +40,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="h-full" suppressHydrationWarning>
-      <body className={`${inter.variable} ${manrope.variable} ${mono.variable} h-full`}>
+      <body className={`${cinzel.variable} ${inter.variable} ${manrope.variable} ${mono.variable} h-full`}>
         <ThemeProvider>
           {children}
           <Toaster richColors position="top-right" />

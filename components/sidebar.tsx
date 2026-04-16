@@ -57,7 +57,7 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
-        <Logo size="sm" className="text-white" />
+        <Logo size="sm" iconOnly className="text-white" />
       </div>
 
       {/* Ava status pill */}
