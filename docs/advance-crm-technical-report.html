@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Advance Estate CRM — Technical Report v1.9</title>
+<title>Advance Estate CRM — Technical Report v2.0</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -264,11 +264,11 @@
     <div class="cover-meta">
       <div class="cover-meta-item">
         <div class="cover-meta-label">Versión</div>
-        <div class="cover-meta-value">v1.9</div>
+        <div class="cover-meta-value">v2.0</div>
       </div>
       <div class="cover-meta-item">
         <div class="cover-meta-label">Fecha</div>
-        <div class="cover-meta-value">14 Abril 2026</div>
+        <div class="cover-meta-value">16 Abril 2026</div>
       </div>
       <div class="cover-meta-item">
         <div class="cover-meta-label">Estado</div>
@@ -281,7 +281,7 @@
     </div>
   </div>
   <div class="cover-footer">
-    <span class="cover-version">v1.9 — April 2026</span>
+    <span class="cover-version">v2.0 — April 2026</span>
     <span class="cover-confidential">Confidencial — Advance Estate / RE/MAX Advance RD</span>
   </div>
 </div>
@@ -295,13 +295,13 @@
   <div class="card-grid-3">
     <div class="stat-box">
       <div class="stat-label">Features activas</div>
-      <div class="stat-value red">18</div>
+      <div class="stat-value red">20</div>
       <div class="stat-sub">módulos en producción</div>
     </div>
     <div class="stat-box">
       <div class="stat-label">Design System</div>
-      <div class="stat-value">v3</div>
-      <div class="stat-sub">Attio Broker + Obsidian (Stitch)</div>
+      <div class="stat-value">v4</div>
+      <div class="stat-sub">Obsidian Edge — Dark Locked</div>
     </div>
     <div class="stat-box">
       <div class="stat-label">AI Stack</div>
@@ -329,7 +329,7 @@
   </div>
 
   <div class="page-footer">
-    <span>Advance Estate CRM — Technical Report v1.9</span>
+    <span>Advance Estate CRM — Technical Report v2.0</span>
     <span>Página 1</span>
   </div>
 </div>
@@ -382,7 +382,7 @@
   </div>
 
   <div class="page-footer">
-    <span>Advance Estate CRM — Technical Report v1.9</span>
+    <span>Advance Estate CRM — Technical Report v2.0</span>
     <span>Página 2</span>
   </div>
 </div>
@@ -391,14 +391,31 @@
 <div class="page">
   <div class="section-eyebrow">03 — Features</div>
   <h2>Módulos implementados</h2>
-  <p class="section-lead">18 módulos en producción resultado de 9 sesiones de desarrollo (v1.0 → v1.9).</p>
+  <p class="section-lead">20 módulos en producción resultado de 10 sesiones de desarrollo (v1.0 → v2.0).</p>
 
   <ul class="feature-list">
     <li>
-      <div class="feat-num">18</div>
-      <div><div class="feat-name">Rebuild completo UI — Diseños Stitch aprobados</div>
-      <div class="feat-desc">JSX rebuild de 5 páginas para coincidir exactamente con los Stitch HTML aprobados: Login (two-panel dark/light, AE monogram, focus-animated inputs), Contacts list (raw table + filter pills clasificación hot/warm/cold), Pipeline kanban (280px cols, STAGE_SHORT headers, grip handle, dashed empty), Properties (catálogo header + tab pills), Contact detail (layout two-pane 35%/65% profile/WhatsApp). Build Next.js 0 errores.</div></div>
+      <div class="feat-num">★</div>
+      <div><div class="feat-name">Obsidian Edge — Rebuild completo (v2.0, 16 Abr 2026)</div>
+      <div class="feat-desc">Las 9 páginas del CRM reconstruidas desde cero para coincidir exactamente con los Stitch HTML de referencia: Login, Dashboard, Pipeline, Propiedades, Clientes, KPI Agentes, Ava IA, Configuración, Conversaciones. forcedTheme="dark" bloqueado globalmente. AE monogram inline SVG en todos los puntos de logo. TypeScript: 0 errores. Commits 60bc817 + 3f32f75.</div></div>
     </li>
+    <li>
+      <div class="feat-num">19</div>
+      <div><div class="feat-name">Logo System v2 — AE Monogram inline SVG</div>
+      <div class="feat-desc">Logo component con 3 variantes: variant="login" (monogram 88px + Cinzel 700 stacked text), size="sm" iconOnly (36px sidebar), size="sm" (móvil). Inline SVG transparente — sin dependencia de archivos externos. Cinzel cargado via next/font/google.</div></div>
+    </li>
+    <li>
+      <div class="feat-num">20</div>
+      <div><div class="feat-name">KPIs por Agente — Views Supabase + Sparklines</div>
+      <div class="feat-desc">agent_monthly_kpis view: deals cerrados, revenue, conversión, pipeline por agente/mes. agent_response_times view: tiempo promedio lead→primer mensaje. agents-client.tsx con tabla interactiva, ResponseBadge (verde/amber/rojo), StalledBadge, top-agent gold border, pipeline bar chart, scatter plot. Sparklines recharts.</div></div>
+    </li>
+    <li>
+      <div class="feat-num">18</div>
+      <div><div class="feat-name">Ava Follow-up System automático</div>
+      <div class="feat-desc">agent/follow_up.py: detección de leads sin respuesta en 1/3/7 días. Endpoint POST /cron/follow-ups en FastAPI. Cron configurado en cron-job.org (daily 10:00 AM). Dedup guard para evitar follow-ups duplicados. SQL bug fix commit fe26b46.</div></div>
+    </li>
+    <li>
+      <div class="feat-num">1</div>
     <li>
       <div class="feat-num">1</div>
       <div><div class="feat-name">Pipeline Kanban con Drag &amp; Drop</div>
@@ -461,13 +478,13 @@
     </li>
     <li>
       <div class="feat-num">13</div>
-      <div><div class="feat-name">Design System v3 — Attio Broker + Obsidian</div>
-      <div class="feat-desc">Sidebar dark #111827 unificado. Content bg #FAFAF9. Manrope 800 display. ae-logo.svg via Next.js Image. Dark mode Obsidian con gold #C9A84C.</div></div>
+      <div><div class="feat-name">Design System v4 — Obsidian Edge (dark locked)</div>
+      <div class="feat-desc">forcedTheme="dark" en ThemeProvider — sin toggle de usuario. Body #0E0E0E, panel #14151C, card #1C1D27, deep #0D0E12. Estate Gold #C9963A (accents, CTAs). Gold glow #f5bd5d (borders activos). Glass: rgba(255,255,255,0.04) + blur(12px) + gold border. Manrope 800 display, Inter body, Cinzel para logo AE monogram.</div></div>
     </li>
   </ul>
 
   <div class="page-footer">
-    <span>Advance Estate CRM — Technical Report v1.9</span>
+    <span>Advance Estate CRM — Technical Report v2.0</span>
     <span>Página 3</span>
   </div>
 </div>
@@ -475,50 +492,34 @@
 <!-- PAGE 4 — DESIGN SYSTEM -->
 <div class="page">
   <div class="section-eyebrow">04 — Design System</div>
-  <h2>Identidad visual v3</h2>
-  <p class="section-lead">Design system propio basado en los templates "Attio Broker" (light) y "Obsidian" (dark). Aprobado y implementado el 12 de abril de 2026.</p>
+  <h2>Obsidian Edge v4 — Dark Luxury</h2>
+  <p class="section-lead">Theme único bloqueado: <code>forcedTheme="dark"</code>. Sin toggle de usuario. Aprobado y desplegado el 16 de abril de 2026. Fuente de verdad: <code>.stitch/designs/*.html</code>.</p>
 
-  <h3>Light mode — Attio Broker</h3>
+  <h3>Paleta de tokens</h3>
   <div class="swatch-row">
-    <div class="swatch" style="background:#111827;color:white;border-color:transparent;">
-      <div class="swatch-name" style="color:white;">Sidebar</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.5);">#111827</div>
+    <div class="swatch" style="background:#0E0E0E;color:white;border-color:#333;">
+      <div class="swatch-name" style="color:white;">Body BG</div>
+      <div class="swatch-hex" style="color:rgba(255,255,255,0.4);">#0E0E0E</div>
     </div>
-    <div class="swatch" style="background:#FAFAF9;">
-      <div class="swatch-name">Content BG</div>
-      <div class="swatch-hex">#FAFAF9</div>
+    <div class="swatch" style="background:#14151C;color:white;border-color:#333;">
+      <div class="swatch-name" style="color:white;">Panel</div>
+      <div class="swatch-hex" style="color:rgba(255,255,255,0.4);">#14151C</div>
     </div>
-    <div class="swatch" style="background:#e11d48;color:white;border-color:transparent;">
-      <div class="swatch-name" style="color:white;">Primary</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.6);">#e11d48</div>
+    <div class="swatch" style="background:#1C1D27;color:white;border-color:#333;">
+      <div class="swatch-name" style="color:white;">Card</div>
+      <div class="swatch-hex" style="color:rgba(255,255,255,0.4);">#1C1D27</div>
     </div>
-    <div class="swatch" style="background:#ffffff;">
-      <div class="swatch-name">Cards</div>
-      <div class="swatch-hex">#ffffff</div>
+    <div class="swatch" style="background:#0D0E12;color:white;border-color:#333;">
+      <div class="swatch-name" style="color:white;">Deep BG</div>
+      <div class="swatch-hex" style="color:rgba(255,255,255,0.4);">#0D0E12</div>
     </div>
-    <div class="swatch" style="background:#0f172a;color:white;border-color:transparent;">
-      <div class="swatch-name" style="color:white;">Text</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.5);">#0f172a</div>
+    <div class="swatch" style="background:#C9963A;color:white;border-color:transparent;">
+      <div class="swatch-name" style="color:white;">Estate Gold</div>
+      <div class="swatch-hex" style="color:rgba(255,255,255,0.7);">#C9963A</div>
     </div>
-  </div>
-
-  <h3>Dark mode — Obsidian</h3>
-  <div class="swatch-row">
-    <div class="swatch" style="background:#0D0D0D;color:white;border-color:#333;">
-      <div class="swatch-name" style="color:white;">Page BG</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.4);">#0D0D0D</div>
-    </div>
-    <div class="swatch" style="background:#161614;color:white;border-color:#333;">
-      <div class="swatch-name" style="color:white;">Cards</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.4);">#161614</div>
-    </div>
-    <div class="swatch" style="background:#C9A84C;color:white;border-color:transparent;">
-      <div class="swatch-name" style="color:white;">Gold</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.7);">#C9A84C</div>
-    </div>
-    <div class="swatch" style="background:#111827;color:white;border-color:transparent;">
-      <div class="swatch-name" style="color:white;">Sidebar</div>
-      <div class="swatch-hex" style="color:rgba(255,255,255,0.5);">#111827</div>
+    <div class="swatch" style="background:#f5bd5d;color:#222;border-color:transparent;">
+      <div class="swatch-name">Primary Gold</div>
+      <div class="swatch-hex" style="color:rgba(0,0,0,0.5);">#f5bd5d</div>
     </div>
   </div>
 
@@ -526,25 +527,26 @@
   <table>
     <thead><tr><th>Variable</th><th>Familia</th><th>Pesos</th><th>Uso</th></tr></thead>
     <tbody>
-      <tr><td><span class="tech-name">--font-manrope</span></td><td>Manrope</td><td>400, 600, 700, 800</td><td>Display, headings, sidebar, logo wordmark</td></tr>
-      <tr><td><span class="tech-name">--font-inter</span></td><td>Inter</td><td>400, 500, 600, 700</td><td>Body text, labels, tablas</td></tr>
+      <tr><td><span class="tech-name">--font-manrope</span></td><td>Manrope</td><td>600, 700, 800</td><td>Display, headings, valores KPI</td></tr>
+      <tr><td><span class="tech-name">--font-inter</span></td><td>Inter</td><td>400, 500, 600</td><td>Body text, labels, tablas</td></tr>
+      <tr><td><span class="tech-name">--font-cinzel</span></td><td>Cinzel</td><td>700</td><td>Logo AE monogram wordmark</td></tr>
       <tr><td><span class="tech-name">--font-mono</span></td><td>JetBrains Mono</td><td>400, 500</td><td>Código, IDs, valores numéricos</td></tr>
     </tbody>
   </table>
 
   <div class="card-grid">
     <div class="card">
-      <div class="card-title">Sidebar — Dark #111827</div>
-      <p style="font-size:13px;color:#475569;">Nav activo: <span class="inline-code">rose-600</span> con shadow glow rose. Pill "Ava activa" con ping animation. Sidebar unificado light/dark — siempre oscuro.</p>
+      <div class="card-title">Glass morphism pattern</div>
+      <p style="font-size:13px;color:#475569;">Cards y modales usan: <span class="inline-code">rgba(255,255,255,0.04)</span> bg + <span class="inline-code">blur(12px)</span> backdrop + <span class="inline-code">1px solid rgba(201,150,58,0.15)</span> border. Efecto de profundidad sin opacidad excesiva.</p>
     </div>
     <div class="card">
-      <div class="card-title">Logo — ae-logo.svg</div>
-      <p style="font-size:13px;color:#475569;">SVG vectorial 671KB (generado con IA, C2PA metadata). Renderizado vía Next.js <span class="inline-code">&lt;Image&gt;</span>. Wordmark en Manrope 800 weight.</p>
+      <div class="card-title">Logo System v2 — AE Monogram</div>
+      <p style="font-size:13px;color:#475569;">Inline SVG en <span class="inline-code">components/logo.tsx</span>. Transparente, vector-sharp, sin archivos externos. 3 variantes: login (88px + wordmark), iconOnly (36px sidebar), sm (móvil). Fondo siempre transparente. Logos nanobanana generados — integración pendiente.</p>
     </div>
   </div>
 
   <div class="page-footer">
-    <span>Advance Estate CRM — Technical Report v1.9</span>
+    <span>Advance Estate CRM — Technical Report v2.0</span>
     <span>Página 4</span>
   </div>
 </div>
@@ -610,7 +612,7 @@
   </div>
 
   <div class="page-footer">
-    <span>Advance Estate CRM — Technical Report v1.9</span>
+    <span>Advance Estate CRM — Technical Report v2.0</span>
     <span>Página 5</span>
   </div>
 </div>
@@ -619,43 +621,53 @@
 <div class="page">
   <div class="section-eyebrow">07 — Roadmap</div>
   <h2>Próximas features</h2>
-  <p class="section-lead">Backlog priorizado por impacto en el producto.</p>
+  <p class="section-lead">Backlog priorizado por impacto. Ver [[Advance CRM — Roadmap v3.0]] en wiki para detalle completo.</p>
 
   <ul class="timeline">
     <li>
-      <div class="tl-date">SIGUIENTE SESIÓN</div>
-      <div class="tl-title">Visual QA — 5 páginas <span class="badge badge-pending">pendiente</span></div>
-      <div class="tl-desc">Playwright screenshots con sesión autenticada en browser: dashboard, contacts, pipeline, properties, settings. Verificar que coinciden con Stitch designs.</div>
+      <div class="tl-date">P0 — URGENTE</div>
+      <div class="tl-title">Seguridad: rotar PAT + CRON_SECRET + RLS + rate limiting <span class="badge badge-pending">pendiente</span></div>
+      <div class="tl-desc">1) Rotar GitHub PAT expuesto en sesión 16 Abr. 2) Agregar CRON_SECRET en Railway para proteger /cron/follow-ups. 3) Auditar RLS Supabase por agente. 4) Rate limiting en /api/ava y /api/pdf. 5) HTTP security headers en next.config.ts.</div>
     </li>
     <li>
-      <div class="tl-date">SIGUIENTE SESIÓN</div>
-      <div class="tl-title">test_multimedia_guard.py para Ava <span class="badge badge-pending">pendiente</span></div>
-      <div class="tl-desc">Pruebas automatizadas para el multimedia guard de Ava: voz, imagen, video, texto. Verificar que ningún tipo de mensaje se descarta silenciosamente.</div>
+      <div class="tl-date">P1 — SIGUIENTE SESIÓN</div>
+      <div class="tl-title">Calendario de Citas — /dashboard/tasks <span class="badge badge-pending">pendiente</span></div>
+      <div class="tl-desc">Vista mensual con task pills por prioridad. Click en día abre TaskSheet con fecha pre-filled. Toggle tabla/calendario via ?view=. Google Calendar sync deferido (requiere Google Cloud OAuth).</div>
     </li>
     <li>
-      <div class="tl-date">BACKLOG</div>
-      <div class="tl-title">Meta Ads API <span class="badge badge-prod">pendiente</span></div>
-      <div class="tl-desc">Conectar /dashboard/ads con Marketing API de Meta. Campañas, leads desde ads, atribución fuente-contacto.</div>
+      <div class="tl-date">P1 — SIGUIENTE SESIÓN</div>
+      <div class="tl-title">Deal Detail Page — /dashboard/pipeline/[deal_id] <span class="badge badge-pending">pendiente</span></div>
+      <div class="tl-desc">Página dedicada con timeline de actividad, notas internas, historial de stages, documentos adjuntos, edit in-place.</div>
     </li>
     <li>
-      <div class="tl-date">BACKLOG</div>
-      <div class="tl-title">KPIs por Agente <span class="badge badge-prod">pendiente</span></div>
-      <div class="tl-desc">/dashboard/agents — leads atendidos, conversión, tiempo de respuesta y deals cerrados por agente.</div>
+      <div class="tl-date">P1 — SIGUIENTE SESIÓN</div>
+      <div class="tl-title">Notifications — campana funcional <span class="badge badge-pending">pendiente</span></div>
+      <div class="tl-desc">Tabla notifications en Supabase. Triggers: deal stalled >7 días, nuevo mensaje WhatsApp entrante, deal asignado. Badge en campana, dropdown, mark as read.</div>
     </li>
     <li>
-      <div class="tl-date">BACKLOG</div>
-      <div class="tl-title">Calendario de citas <span class="badge badge-prod">pendiente</span></div>
-      <div class="tl-desc">Vista calendar integrada con tareas y seguimientos. Posible integración con Google Calendar.</div>
+      <div class="tl-date">P2 — CON TOKEN</div>
+      <div class="tl-title">Meta Ads API <span class="badge badge-prod">bloqueado</span></div>
+      <div class="tl-desc">Conectar /dashboard/ads con Marketing API de Meta. Requiere: Meta System User token (ads_read) + Ad Account ID (act_XXXX). Ivan debe obtener esto antes de la sesión.</div>
+    </li>
+    <li>
+      <div class="tl-date">P3 — POLISH</div>
+      <div class="tl-title">Logos nanobanana <span class="badge badge-pending">pendiente</span></div>
+      <div class="tl-desc">Imágenes generadas con nanobanana en nanobanana-output/*.png. Evaluar opciones, convertir a SVG o usar con next/image optimizado. No es prioridad.</div>
+    </li>
+    <li>
+      <div class="tl-date">P3 — POLISH</div>
+      <div class="tl-title">Error monitoring + Analytics <span class="badge badge-prod">pendiente</span></div>
+      <div class="tl-desc">Sentry para errores en producción (npx @sentry/wizard -i nextjs). PostHog para analytics de uso.</div>
     </li>
     <li>
       <div class="tl-date">FUTURO</div>
       <div class="tl-title">App Móvil <span class="badge badge-prod">pendiente</span></div>
-      <div class="tl-desc">React Native + Expo. Misma DB Supabase. Push notifications para nuevos leads.</div>
+      <div class="tl-desc">React Native + Expo. Misma DB Supabase. Push notifications para nuevos leads WhatsApp.</div>
     </li>
     <li>
       <div class="tl-date">FUTURO</div>
       <div class="tl-title">Multi-tenant SaaS <span class="badge badge-prod">pendiente</span></div>
-      <div class="tl-desc">Aislamiento por organización. Onboarding self-service. Planes de precios. Objetivo: vender el CRM a otras franquicias RE/MAX.</div>
+      <div class="tl-desc">organization_id en todas las tablas. RLS por org + rol. Onboarding self-service. Planes Free/Pro/Enterprise. Objetivo: vender a otras franquicias RE/MAX.</div>
     </li>
   </ul>
 
@@ -675,11 +687,12 @@
       <tr><td><span class="tech-name">v1.7</span></td><td>13 Abr 2026</td><td class="tech-note">Login Template A-4 Premium Strip (38/62 split). ae-logo-final.svg a 260px. Google OAuth wired. Sidebar border-l-4. Code review + visual QA parcial.</td></tr>
       <tr><td><span class="tech-name">v1.8</span></td><td>13 Abr 2026</td><td class="tech-note">Dark mode: 8 archivos migrados de hex hardcoded a CSS variables. Ava multimedia guard fix (two-condition check para texto vacío + media_id). Login mobile logo.</td></tr>
       <tr><td><span class="tech-name">v1.9</span></td><td>14 Abr 2026</td><td class="tech-note">Dashboard header: search bar + notification bell + "Nuevo Trato" CTA. Seguimientos Pendientes con urgency bar + WhatsApp button. Properties filter tabs funcionales. Contacts search debounce 300ms. Contact detail tabs via ?tab= query param. Ava Settings UI (agency_config upsert).</td></tr>
+      <tr><td><span class="tech-name">v2.0</span></td><td>16 Abr 2026</td><td class="tech-note">Rebuild completo Obsidian Edge: 9 páginas (Login, Dashboard, Pipeline, Propiedades, Clientes, KPI Agentes, Ava IA, Configuración, Conversaciones) reconstruidas para coincidir exactamente con Stitch HTML. forcedTheme="dark" bloqueado. AE Monogram inline SVG (Logo System v2). Ava follow-up system (agent/follow_up.py + /cron/follow-ups). KPIs Agentes: views SQL + sparklines recharts. TypeScript 0 errores. Commits: 60bc817 + 3f32f75. Logo nanobanana: pendiente (no prioridad).</td></tr>
     </tbody>
   </table>
 
   <div class="page-footer">
-    <span>Advance Estate CRM — Technical Report v1.9</span>
+    <span>Advance Estate CRM — Technical Report v2.0</span>
     <span>Página 6</span>
   </div>
 </div>
