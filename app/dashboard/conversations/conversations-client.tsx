@@ -7,6 +7,7 @@ import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Search, Lock, MessageSquare } from "lucide-react";
 import { CLASSIFICATION_LABELS } from "@/lib/types";
+import { WhatsAppComposer } from "@/components/whatsapp-composer";
 
 interface ConversationMessage {
   id: string;
@@ -72,6 +73,8 @@ export function ConversationsClient({ initialConversations }: Props) {
   const [threadLoading, setThreadLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("todos");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [avaPaused, setAvaPaused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // stable supabase client ref
@@ -106,7 +109,7 @@ export function ConversationsClient({ initialConversations }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetch]);
 
-  // Fetch thread when contact changes
+  // Fetch thread when contact changes or after a message is sent
   useEffect(() => {
     if (!selectedContactId) {
       setThreadMessages([]);
@@ -124,7 +127,7 @@ export function ConversationsClient({ initialConversations }: Props) {
         setThreadLoading(false);
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedContactId]);
+  }, [selectedContactId, refreshKey]);
 
   // Realtime for active thread
   useEffect(() => {
@@ -146,6 +149,11 @@ export function ConversationsClient({ initialConversations }: Props) {
       .subscribe();
     return () => { supabase.removeChannel(channel); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedContactId]);
+
+  // Reset avaPaused when the selected contact changes
+  useEffect(() => {
+    setAvaPaused(false);
   }, [selectedContactId]);
 
   // Scroll to bottom on new thread messages
@@ -174,7 +182,16 @@ export function ConversationsClient({ initialConversations }: Props) {
 
   // Is the last message in thread from Ava (automated outbound)?
   const lastMsg = threadMessages[threadMessages.length - 1];
-  const avaActive = lastMsg?.is_automated && lastMsg?.direction === "outbound";
+  const avaActive = !avaPaused && (lastMsg?.is_automated === true && lastMsg?.direction === "outbound");
+
+  const handleTakeConversation = async () => {
+    if (!selectedContactId) return;
+    await supabase
+      .from("contacts")
+      .update({ ava_paused: true })
+      .eq("id", selectedContactId);
+    setAvaPaused(true);
+  };
 
   return (
     <div className="flex overflow-hidden" style={{ height: "100vh" }}>
@@ -446,33 +463,30 @@ export function ConversationsClient({ initialConversations }: Props) {
               }}
             >
               {avaActive ? (
-                <div
-                  className="flex items-center gap-3 rounded-xl px-5 py-3 cursor-not-allowed"
+                <button
+                  onClick={handleTakeConversation}
+                  className="flex items-center gap-3 rounded-xl px-5 py-3 w-full transition-opacity hover:opacity-80"
                   style={{
                     background: "var(--secondary)",
                     border: "1px solid var(--border)",
+                    cursor: "pointer",
                   }}
                 >
                   <Lock className="w-4 h-4 flex-shrink-0" style={{ color: "var(--muted-foreground)" }} />
-                  <p className="text-sm italic" style={{ color: "var(--muted-foreground)" }}>
-                    Ava está activa — toma la conversación para responder manualmente
-                  </p>
-                </div>
+                  <span className="text-sm italic" style={{ color: "var(--muted-foreground)" }}>
+                    Ava está activa —{" "}
+                    <span style={{ color: "var(--foreground)", fontStyle: "normal", textDecoration: "underline" }}>
+                      toma la conversación
+                    </span>{" "}
+                    para responder manualmente
+                  </span>
+                </button>
               ) : (
-                <div
-                  className="flex items-center gap-3 rounded-xl px-5 py-3"
-                  style={{
-                    background: "var(--secondary)",
-                    border: "1px solid var(--border)",
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Escribe un mensaje..."
-                    className="flex-1 bg-transparent outline-none text-sm"
-                    style={{ color: "var(--foreground)" }}
-                  />
-                </div>
+                <WhatsAppComposer
+                  contactId={selectedContactId!}
+                  phone={selectedContact?.phone ?? ""}
+                  onSent={() => setRefreshKey(k => k + 1)}
+                />
               )}
             </div>
           </>

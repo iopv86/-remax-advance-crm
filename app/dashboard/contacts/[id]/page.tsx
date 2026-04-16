@@ -46,7 +46,7 @@ const STAGE_ACCENT: Record<DealStage, string> = {
   financiamiento: "#7c3aed",
   contract: "#7c3aed",
   due_diligence: "#0d9488",
-  closed_won: "#10b981",
+  closed_won: "var(--emerald)",
   closed_lost: "#94a3b8",
 };
 
@@ -401,8 +401,8 @@ export default async function ContactDetailPage({
                           className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
                           style={{
                             background:
-                              task.status === "completed" ? "#10b981" :
-                              task.status === "in_progress" ? "#3b82f6" : "#94a3b8",
+                              task.status === "completed" ? "var(--emerald)" :
+                              task.status === "in_progress" ? "var(--blue, #3b82f6)" : "#94a3b8",
                           }}
                         />
                         <div className="flex-1 min-w-0">
@@ -568,8 +568,8 @@ export default async function ContactDetailPage({
                           className="w-1.5 h-1.5 rounded-full mt-2 shrink-0"
                           style={{
                             background:
-                              t.status === "completed" ? "#10b981" :
-                              t.status === "in_progress" ? "#3b82f6" : "#94a3b8",
+                              t.status === "completed" ? "var(--emerald)" :
+                              t.status === "in_progress" ? "var(--blue, #3b82f6)" : "#94a3b8",
                           }}
                         />
                         <div>

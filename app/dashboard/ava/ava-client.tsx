@@ -24,6 +24,10 @@ interface RecentMessage {
 interface Props {
   initialConfig: AvaConfig | null;
   recentMessages: RecentMessage[];
+  convToday: number;
+  responseRate: number;
+  closedMonth: number;
+  initialTone: string;
 }
 
 type Tone = "profesional" | "amigable" | "conciso";
@@ -33,7 +37,7 @@ function contactName(contact: RecentMessage["contact"]): string {
   return [contact.first_name, contact.last_name].filter(Boolean).join(" ") || "Sin nombre";
 }
 
-export function AvaClient({ initialConfig, recentMessages }: Props) {
+export function AvaClient({ initialConfig, recentMessages, convToday, responseRate, closedMonth, initialTone }: Props) {
   const supabase = createClient();
 
   const [isActive, setIsActive] = useState(initialConfig?.is_active ?? false);
@@ -43,7 +47,18 @@ export function AvaClient({ initialConfig, recentMessages }: Props) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const [tone, setTone] = useState<Tone>("profesional");
+  const [tone, setTone] = useState<Tone>(initialTone as Tone);
+
+  async function handleToneChange(newTone: Tone) {
+    setTone(newTone);
+    try {
+      await supabase
+        .from("agency_config")
+        .upsert({ key: "ava_tone", value: newTone }, { onConflict: "key" });
+    } catch {
+      // Non-critical — tone change still applied locally
+    }
+  }
 
   async function handleToggle() {
     if (!initialConfig) return;
@@ -132,9 +147,9 @@ export function AvaClient({ initialConfig, recentMessages }: Props) {
       {/* Stat pills */}
       <div className="px-7 pb-4 flex items-center gap-3 flex-wrap animate-fade-up">
         {[
-          { label: "32 conv. hoy", color: "var(--amber)" },
-          { label: "98% respuesta", color: "var(--emerald)" },
-          { label: "4 cierres este mes", color: "var(--blue)" },
+          { label: `${convToday} conv. hoy`, color: "var(--amber)" },
+          { label: `${responseRate}% respuesta`, color: "var(--emerald)" },
+          { label: `${closedMonth} cierres este mes`, color: "var(--blue)" },
         ].map(({ label, color }) => (
           <div
             key={label}
@@ -253,7 +268,7 @@ export function AvaClient({ initialConfig, recentMessages }: Props) {
                     {tones.map(({ key, label }) => (
                       <button
                         key={key}
-                        onClick={() => setTone(key)}
+                        onClick={() => handleToneChange(key)}
                         className="flex-1 rounded-lg py-2 text-xs font-semibold transition-all"
                         style={{
                           background: tone === key ? "var(--accent)" : "var(--secondary)",

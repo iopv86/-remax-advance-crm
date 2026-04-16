@@ -57,11 +57,15 @@ export default async function AgentDetailPage({
   params: Promise<{ agent_id: string }>;
 }) {
   const { agent_id } = await params;
+
   const supabase = await createClient();
 
-  // Auth guard
+  // Auth guard — must run before any other check
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
+
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  if (!UUID_RE.test(agent_id)) redirect("/dashboard/agents");
 
   // Fetch agent info + deals + KPI data in parallel
   const [
@@ -122,7 +126,7 @@ export default async function AgentDetailPage({
   const closedDeals    = (kpiRow as { deals_closed?: number } | null)?.deals_closed ?? 0;
   const totalRevenue   = (kpiRow as { total_revenue?: number } | null)?.total_revenue ?? 0;
 
-  const initials = agent.full_name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase();
+  const initials = agent.full_name.split(" ").map((n) => n[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
   const roleLabel = agent.role === "admin" ? "Administrador" : agent.role === "manager" ? "Gerente" : "Agente";
 
   // Sort deals: stalled first, then by age desc

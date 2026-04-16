@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { AvaConfigForm } from "./ava-config-form";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { InviteAgentDialog } from "@/components/invite-agent-dialog";
+import { createClient } from "@/lib/supabase/client";
 import type { Agent } from "@/lib/types";
 import {
   Users,
@@ -96,7 +98,7 @@ function InitialAvatar({ name, size = 36 }: { name: string; size?: number }) {
 
 // ── Tab content components ─────────────────────────
 
-function TabEquipo({ agents }: { agents: Agent[] }) {
+function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -116,6 +118,7 @@ function TabEquipo({ agents }: { agents: Agent[] }) {
           </h2>
         </div>
         <button
+          onClick={onInvite}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider"
           style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
         >
@@ -382,23 +385,50 @@ function TabIntegraciones() {
   );
 }
 
-function TabNotificaciones() {
-  const [emailOn, setEmailOn] = useState(true);
-  const [whatsappOn, setWhatsappOn] = useState(false);
-  const [newLeadOn, setNewLeadOn] = useState(true);
-  const [dealUpdateOn, setDealUpdateOn] = useState(true);
+const NOTIFICATION_DEFAULTS: Record<string, boolean> = {
+  email: true,
+  whatsapp: false,
+  new_lead: true,
+  deal_update: true,
+};
 
-  const toggles: {
-    key: string;
-    label: string;
-    description: string;
-    value: boolean;
-    setter: (v: boolean) => void;
-  }[] = [
-    { key: "email", label: "Alertas por Email", description: "Recibe notificaciones de nuevos leads en tu correo.", value: emailOn, setter: setEmailOn },
-    { key: "whatsapp", label: "Alertas por WhatsApp", description: "Notificaciones directas al número del agente.", value: whatsappOn, setter: setWhatsappOn },
-    { key: "new_lead", label: "Nuevo lead capturado", description: "Aviso inmediato cuando Ava califica un lead nuevo.", value: newLeadOn, setter: setNewLeadOn },
-    { key: "deal_update", label: "Actualización de deal", description: "Cuando un deal cambia de etapa en el pipeline.", value: dealUpdateOn, setter: setDealUpdateOn },
+function TabNotificaciones({ userId }: { userId: string }) {
+  const supabase = useMemo(() => createClient(), []);
+  const [prefs, setPrefs] = useState<Record<string, boolean>>(NOTIFICATION_DEFAULTS);
+
+  useEffect(() => {
+    supabase
+      .from("notification_preferences")
+      .select("key, enabled")
+      .eq("agent_id", userId)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const loaded: Record<string, boolean> = { ...NOTIFICATION_DEFAULTS };
+          for (const row of data) {
+            loaded[row.key] = row.enabled;
+          }
+          setPrefs(loaded);
+        }
+      });
+  }, [userId, supabase]);
+
+  async function handleToggle(key: string, newValue: boolean) {
+    const prev = prefs[key];
+    setPrefs((p) => ({ ...p, [key]: newValue }));
+    const { error } = await supabase
+      .from("notification_preferences")
+      .upsert({ agent_id: userId, key, enabled: newValue }, { onConflict: "agent_id,key" });
+    if (error) {
+      setPrefs((p) => ({ ...p, [key]: prev }));
+      console.error("Error saving preference:", error.message);
+    }
+  }
+
+  const toggles: { key: string; label: string; description: string }[] = [
+    { key: "email", label: "Alertas por Email", description: "Recibe notificaciones de nuevos leads en tu correo." },
+    { key: "whatsapp", label: "Alertas por WhatsApp", description: "Notificaciones directas al número del agente." },
+    { key: "new_lead", label: "Nuevo lead capturado", description: "Aviso inmediato cuando Ava califica un lead nuevo." },
+    { key: "deal_update", label: "Actualización de deal", description: "Cuando un deal cambia de etapa en el pipeline." },
   ];
 
   return (
@@ -420,38 +450,41 @@ function TabNotificaciones() {
       </div>
 
       <div className="card-glow rounded-xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
-        {toggles.map((t, idx) => (
-          <div
-            key={t.key}
-            className="flex items-center justify-between px-6 py-5"
-            style={idx > 0 ? { borderTop: "1px solid var(--border)" } : {}}
-          >
-            <div>
-              <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--foreground)" }}>{t.label}</p>
-              <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{t.description}</p>
-            </div>
-            <button
-              onClick={() => t.setter(!t.value)}
-              className="relative rounded-full transition-all flex-shrink-0 ml-6"
-              style={{
-                width: 44,
-                height: 24,
-                background: t.value ? "var(--primary)" : "var(--secondary)",
-                border: "1px solid var(--border)",
-              }}
+        {toggles.map((t, idx) => {
+          const value = prefs[t.key] ?? NOTIFICATION_DEFAULTS[t.key] ?? false;
+          return (
+            <div
+              key={t.key}
+              className="flex items-center justify-between px-6 py-5"
+              style={idx > 0 ? { borderTop: "1px solid var(--border)" } : {}}
             >
-              <span
-                className="absolute top-1 rounded-full transition-all"
+              <div>
+                <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--foreground)" }}>{t.label}</p>
+                <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{t.description}</p>
+              </div>
+              <button
+                onClick={() => handleToggle(t.key, !value)}
+                className="relative rounded-full transition-all flex-shrink-0 ml-6"
                 style={{
-                  width: 16,
-                  height: 16,
-                  background: t.value ? "var(--primary-foreground)" : "var(--muted-foreground)",
-                  left: t.value ? 24 : 4,
+                  width: 44,
+                  height: 24,
+                  background: value ? "var(--primary)" : "var(--secondary)",
+                  border: "1px solid var(--border)",
                 }}
-              />
-            </button>
-          </div>
-        ))}
+              >
+                <span
+                  className="absolute top-1 rounded-full transition-all"
+                  style={{
+                    width: 16,
+                    height: 16,
+                    background: value ? "var(--primary-foreground)" : "var(--muted-foreground)",
+                    left: value ? 24 : 4,
+                  }}
+                />
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -498,6 +531,7 @@ export function SettingsClient({ agents, currentAgent, currentUser, avaConfig }:
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeTab = (searchParams.get("tab") as Tab) || "equipo";
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   function navigate(tab: Tab) {
     const params = new URLSearchParams(searchParams.toString());
@@ -573,10 +607,11 @@ export function SettingsClient({ agents, currentAgent, currentUser, avaConfig }:
 
       {/* ── Content ── */}
       <main className="flex-1 p-8 overflow-y-auto animate-fade-up">
-        {activeTab === "equipo" && <TabEquipo agents={agents} />}
+        <InviteAgentDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
+        {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} />}
         {activeTab === "perfil" && <TabPerfil currentAgent={currentAgent} currentUser={currentUser} />}
         {activeTab === "integraciones" && <TabIntegraciones />}
-        {activeTab === "notificaciones" && <TabNotificaciones />}
+        {activeTab === "notificaciones" && <TabNotificaciones userId={currentUser?.id ?? ""} />}
         {activeTab === "ava" && <TabAva avaConfig={avaConfig} />}
       </main>
     </div>

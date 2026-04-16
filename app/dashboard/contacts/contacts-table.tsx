@@ -51,11 +51,11 @@ function getAvatarStyle(classification?: string) {
 function getStatusStyle(classification?: string) {
   switch (classification) {
     case "hot":
-      return { dot: "#10b981", bg: "#ecfdf5", color: "#059669", label: "🔥 Lead Caliente" };
+      return { dot: "var(--emerald)", bg: "#ecfdf5", color: "#059669", label: "🔥 Lead Caliente" };
     case "warm":
       return { dot: "#f97316", bg: "#fff7ed", color: "#ea580c", label: "Warm Lead" };
     case "cold":
-      return { dot: "#3b82f6", bg: "#eff6ff", color: "#2563eb", label: "Lead Frío" };
+      return { dot: "var(--blue, #3b82f6)", bg: "#eff6ff", color: "#2563eb", label: "Lead Frío" };
     default:
       return { dot: "#94a3b8", bg: "#f8fafc", color: "#64748b", label: "Nuevo" };
   }
