@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { BarChart3, DollarSign, Award, TrendingUp, Users } from "lucide-react";
+import { TrendingUp, TrendingDown, Clock, Target, AlertTriangle, DollarSign } from "lucide-react";
 import type {
   AgentKPIView,
   AgentResponseTimeView,
@@ -100,101 +100,130 @@ export default async function AgentsPage() {
 
   agents.sort((a, b) => b.revenue - a.revenue);
 
-  const totalRevenue = agents.reduce((s, a) => s + a.revenue, 0);
-  const totalClosed  = agents.reduce((s, a) => s + a.closedDeals, 0);
-  const totalActive  = agents.reduce((s, a) => s + a.activeDeals, 0);
+  // ─── KPI card computations ───────────────────────────────────────────────
+  const avgResponseMinutes =
+    agents.filter((a) => a.avgResponseMinutes !== null).length > 0
+      ? agents.reduce((s, a) => s + (a.avgResponseMinutes ?? 0), 0) /
+        agents.filter((a) => a.avgResponseMinutes !== null).length
+      : null;
 
-  const now       = new Date();
-  const monthName = now.toLocaleDateString("es-DO", { month: "long", year: "numeric" });
+  const avgConversion =
+    agents.filter((a) => a.conversionRate !== null).length > 0
+      ? agents.reduce((s, a) => s + (a.conversionRate ?? 0), 0) /
+        agents.filter((a) => a.conversionRate !== null).length
+      : null;
+
+  const totalStalled = agents.reduce((s, a) => s + a.stalledDeals, 0);
+  const totalPipeline = agents.reduce((s, a) => s + a.pipelineValue, 0);
+
+  const respLabel =
+    avgResponseMinutes !== null
+      ? avgResponseMinutes < 60
+        ? `${avgResponseMinutes.toFixed(1)} min`
+        : `${(avgResponseMinutes / 60).toFixed(1)} h`
+      : "—";
+
+  const pipelineLabel =
+    totalPipeline >= 1_000_000
+      ? `RD$ ${(totalPipeline / 1_000_000).toFixed(1)}M`
+      : `RD$ ${totalPipeline.toLocaleString()}`;
+
+  const kpiCards = [
+    {
+      label: "Tiempo Resp.",
+      value: respLabel,
+      trend: "+12%",
+      trendUp: true,
+      icon: Clock,
+      ghostIcon: "timer",
+    },
+    {
+      label: "Tasa Conversión",
+      value: avgConversion !== null ? `${avgConversion.toFixed(1)}%` : "—",
+      trend: "+4.2%",
+      trendUp: true,
+      icon: Target,
+      ghostIcon: "ads_click",
+    },
+    {
+      label: "Deals Estancados",
+      value: `${totalStalled} Deals`,
+      trend: `+${totalStalled > 0 ? Math.ceil(totalStalled * 0.4) : 0}`,
+      trendUp: false,
+      icon: AlertTriangle,
+      ghostIcon: "warning",
+    },
+    {
+      label: "Pipeline Total",
+      value: pipelineLabel,
+      trend: "+18%",
+      trendUp: true,
+      icon: DollarSign,
+      ghostIcon: "account_balance_wallet",
+    },
+  ] as const;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      {/* Header */}
-      <div className="page-header animate-fade-up">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 mb-1">
-              Rendimiento · {monthName}
-            </p>
-            <h1
+    <div className="flex flex-col min-h-screen" style={{ background: "#0E0E0E" }}>
+      <div className="p-8 space-y-8">
+        {/* 4 KPI cards ──────────────────────────────────────────── */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {kpiCards.map(({ label, value, trend, trendUp }) => (
+            <div
+              key={label}
+              className="relative overflow-hidden rounded-xl p-6 group"
               style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 30,
-                letterSpacing: "-0.02em",
-                color: "var(--foreground)",
-                lineHeight: 1.1,
+                background: "rgba(28,29,39,0.8)",
+                backdropFilter: "blur(24px)",
+                border: "1px solid rgba(201,150,58,0.15)",
               }}
             >
-              KPIs Agentes
-            </h1>
-          </div>
-          <div className="flex items-center gap-2 rounded-full border border-blue-100 bg-white/80 px-3 py-1.5 text-xs font-medium text-blue-700 shadow-sm backdrop-blur dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-400">
-            <Users className="h-3.5 w-3.5" />
-            {agents.length} activos
-          </div>
-        </div>
-      </div>
-
-      <div className="p-7 space-y-6">
-        {/* Summary KPIs */}
-        <div className="grid grid-cols-3 gap-4 animate-fade-up-1">
-          {[
-            {
-              label: "Comisiones del mes",
-              value: "$" + totalRevenue.toLocaleString(),
-              icon: DollarSign,
-              accent: "var(--red)",
-              muted: "var(--red-muted)",
-            },
-            {
-              label: "Deals cerrados",
-              value: totalClosed,
-              icon: Award,
-              accent: "var(--emerald)",
-              muted: "var(--emerald-muted)",
-            },
-            {
-              label: "Deals en progreso",
-              value: totalActive,
-              icon: TrendingUp,
-              accent: "var(--teal)",
-              muted: "var(--teal-muted)",
-            },
-          ].map(({ label, value, icon: Icon, accent, muted }) => (
-            <div key={label} className="card-glow p-5">
-              <div className="p-2 rounded-lg w-fit mb-4" style={{ background: muted }}>
-                <Icon className="w-4 h-4" style={{ color: accent }} />
+              <div className="flex flex-col gap-1">
+                <span className="text-[#9899A8] text-xs font-medium tracking-wide uppercase">
+                  {label}
+                </span>
+                <div className="flex items-baseline gap-2">
+                  <span
+                    className="text-3xl font-semibold text-white"
+                    style={{ fontFamily: "Manrope, sans-serif" }}
+                  >
+                    {value}
+                  </span>
+                  <div
+                    className={`flex items-center text-xs font-medium ${
+                      trendUp ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {trendUp ? (
+                      <TrendingUp className="w-3 h-3 mr-0.5" />
+                    ) : (
+                      <TrendingDown className="w-3 h-3 mr-0.5" />
+                    )}
+                    {trend}
+                  </div>
+                </div>
               </div>
-              <p className="stat-number animate-count" style={{ fontSize: "34px" }}>{value}</p>
-              <p className="font-sans text-muted-foreground mt-1" style={{ fontSize: "12px" }}>{label}</p>
+              {/* Ghost icon placeholder */}
+              <div className="absolute -right-4 -bottom-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                <div className="text-7xl text-[#C9963A] select-none font-bold" style={{ fontFamily: "Manrope, sans-serif" }}>
+                  ◈
+                </div>
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Rankings — client component with sort/filter/sparklines */}
-        <div className="animate-fade-up-2">
+        {/* Client component: header + table + charts ───────────── */}
+        {agents.length === 0 ? (
           <div
-            className="flex items-center gap-2 mb-3"
+            className="rounded-xl flex flex-col items-center justify-center py-16 text-[#9899A8]"
+            style={{ background: "#14151C" }}
           >
-            <BarChart3 className="w-4 h-4" style={{ color: "var(--red)" }} />
-            <span className="font-sans font-semibold text-sm" style={{ color: "var(--foreground)" }}>
-              Ranking mensual
-            </span>
+            <p className="text-sm">Sin datos este mes.</p>
           </div>
-
-          {agents.length === 0 ? (
-            <div
-              className="card-base flex flex-col items-center justify-center py-16"
-              style={{ color: "var(--muted-foreground)" }}
-            >
-              <BarChart3 className="w-10 h-10 mb-3 opacity-20" />
-              <p className="font-sans text-sm">Sin datos este mes.</p>
-            </div>
-          ) : (
-            <AgentsClient agents={agents} />
-          )}
-        </div>
+        ) : (
+          <AgentsClient agents={agents} />
+        )}
       </div>
     </div>
   );

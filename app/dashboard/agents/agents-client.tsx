@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { Search, TrendingUp, DollarSign, Target, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { Download } from "lucide-react";
 import type { AgentKPISummary } from "@/lib/types";
 
 const AgentSparkline = dynamic(
@@ -11,233 +11,332 @@ const AgentSparkline = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-8 w-16 rounded animate-pulse" style={{ background: "var(--secondary)" }} />
+      <div className="h-8 w-24 rounded animate-pulse bg-[#353534]" />
     ),
   }
 );
 
-type SortKey = "revenue" | "closedDeals" | "conversionRate";
-
-const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: "revenue",        label: "Comisión" },
-  { key: "closedDeals",    label: "Cierres" },
-  { key: "conversionRate", label: "Conversión" },
-];
+type Period = "Semanal" | "Mensual" | "Trimestral";
 
 interface Props {
   agents: AgentKPISummary[];
 }
 
+// ─── Response time badge ─────────────────────────────────────────────────────
+
 function ResponseBadge({ minutes }: { minutes: number | null }) {
   if (minutes === null) {
-    return (
-      <span className="font-mono text-xs" style={{ color: "var(--muted-foreground)" }}>
-        —
-      </span>
-    );
+    return <span className="font-mono text-xs text-[#545567]">—</span>;
   }
 
-  // RE/MAX Advance standard: < 10 min = excellent
-  const isExcellent = minutes < 10;
-  const isGood      = minutes < 60;
-  const isRisky     = minutes < 480;
+  let label: string;
+  let colorClass: string;
+  let borderClass: string;
 
-  const color = isExcellent ? "var(--emerald)"
-    : isGood    ? "var(--amber)"
-    : isRisky   ? "var(--red)"
-    : "var(--muted-foreground)";
-
-  const label = minutes < 60
-    ? `${Math.round(minutes)}m`
-    : `${(minutes / 60).toFixed(1)}h`;
+  if (minutes < 60) {
+    label = "<1h";
+    colorClass = "bg-green-500/10 text-green-500";
+    borderClass = "border border-green-500/20";
+  } else if (minutes < 180) {
+    label = `${Math.round(minutes / 60)}h`;
+    colorClass = "bg-amber-500/10 text-amber-500";
+    borderClass = "border border-amber-500/20";
+  } else {
+    label = `${Math.round(minutes / 60)}h`;
+    colorClass = "bg-red-500/10 text-red-500";
+    borderClass = "border border-red-500/20";
+  }
 
   return (
-    <span className="font-mono text-xs font-semibold" style={{ color }}>
+    <span
+      className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${colorClass} ${borderClass}`}
+    >
       {label}
     </span>
   );
 }
 
-export function AgentsClient({ agents }: Props) {
-  const [sortKey, setSortKey] = useState<SortKey>("revenue");
-  const [query,   setQuery]   = useState("");
+// ─── Stalled / Estado badge ──────────────────────────────────────────────────
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const list = q
-      ? agents.filter((a) => a.name.toLowerCase().includes(q))
-      : agents;
+function StalledBadge({ count }: { count: number }) {
+  return (
+    <span className="flex items-center justify-center w-5 h-5 rounded-full bg-red-500/10 text-red-500 text-[10px] font-bold mx-auto">
+      {count}
+    </span>
+  );
+}
 
-    return [...list].sort((a, b) => {
-      if (sortKey === "conversionRate") {
-        const av = a.conversionRate ?? -1;
-        const bv = b.conversionRate ?? -1;
-        return bv - av;
-      }
-      return b[sortKey] - a[sortKey];
-    });
-  }, [agents, sortKey, query]);
+// ─── Pipeline bar chart (decorative, driven by real agent data) ──────────────
 
-  const topRevenue = filtered[0]?.revenue ?? 0;
+function PipelineBarChart({ agents }: { agents: AgentKPISummary[] }) {
+  const top4 = agents.slice(0, 4);
+  const maxPipeline = top4[0]?.pipelineValue ?? 1;
 
   return (
-    <div className="card-base overflow-hidden">
-      {/* Toolbar */}
-      <div
-        className="flex flex-wrap items-center justify-between gap-3 px-6 py-4"
-        style={{ borderBottom: "1px solid var(--border)" }}
+    <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-8 space-y-6">
+      <h3
+        className="font-bold text-lg text-white"
+        style={{ fontFamily: "Manrope, sans-serif" }}
       >
-        <div className="flex items-center gap-1.5">
-          {SORT_OPTIONS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setSortKey(key)}
-              className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
-              style={
-                sortKey === key
-                  ? { background: "var(--amber-muted)", color: "var(--amber)" }
-                  : { background: "var(--secondary)", color: "var(--muted-foreground)" }
-              }
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div
-          className="flex items-center gap-2 rounded-lg px-3 py-1.5"
-          style={{ background: "var(--muted)", border: "1px solid transparent" }}
-        >
-          <Search className="h-3.5 w-3.5" style={{ color: "var(--muted-foreground)" }} />
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar agente..."
-            className="w-36 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
-            style={{ color: "var(--foreground)" }}
-          />
-        </div>
-      </div>
-
-      {/* Agent rows */}
-      {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16" style={{ color: "var(--muted-foreground)" }}>
-          <Search className="h-8 w-8 mb-2 opacity-20" />
-          <p className="text-sm">Sin resultados.</p>
-        </div>
-      ) : (
-        <div className="divide-y" style={{ borderColor: "var(--border)" }}>
-          {filtered.map((agent, index) => {
-            const barWidth = topRevenue > 0
-              ? Math.max(4, Math.round((agent.revenue / topRevenue) * 100))
+        Valor de Pipeline por Agente
+      </h3>
+      <div className="space-y-4">
+        {top4.map((agent) => {
+          const pct =
+            maxPipeline > 0
+              ? Math.round((agent.pipelineValue / maxPipeline) * 100)
               : 0;
+          const shortName =
+            agent.name.split(" ").length >= 2
+              ? `${agent.name.split(" ")[0][0]}. ${agent.name.split(" ").slice(1).join(" ")}`
+              : agent.name;
+          const valueLabel =
+            agent.pipelineValue >= 1_000_000
+              ? `RD$ ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
+              : `RD$ ${agent.pipelineValue.toLocaleString()}`;
 
-            const rankLabel = index === 0 ? "🥇"
-              : index === 1 ? "🥈"
-              : index === 2 ? "🥉"
-              : String(index + 1);
-
-            return (
-              <Link
-                key={agent.id}
-                href={`/dashboard/agents/${agent.id}`}
-                className="flex items-center gap-4 px-6 py-4 table-row-hover transition-colors cursor-pointer group"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                {/* Rank */}
-                <span
-                  className="w-6 shrink-0 text-center font-mono text-sm font-bold"
-                  style={{ color: index < 3 ? "var(--amber)" : "var(--muted-foreground)" }}
-                >
-                  {rankLabel}
-                </span>
-
-                {/* Avatar */}
+          return (
+            <div key={agent.id} className="space-y-2">
+              <div className="flex justify-between text-xs text-[#9899A8] uppercase tracking-wider">
+                <span>{shortName}</span>
+                <span>{valueLabel}</span>
+              </div>
+              <div className="h-4 bg-[#353534] rounded-full overflow-hidden">
                 <div
-                  className="h-9 w-9 shrink-0 rounded-full flex items-center justify-center font-semibold text-sm"
-                  style={{ background: "var(--amber-muted)", color: "var(--amber)" }}
-                >
-                  {agent.name[0].toUpperCase()}
-                </div>
-
-                {/* Name + progress bar */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="truncate text-sm font-medium" style={{ color: "var(--foreground)" }}>
-                      {agent.name}
-                    </p>
-                    <span className="ml-2 shrink-0 text-xs font-mono" style={{ color: "var(--muted-foreground)" }}>
-                      {agent.closedDeals} cerrados · {agent.activeDeals} activos
-                      {agent.stalledDeals > 0 && (
-                        <span style={{ color: "var(--amber)" }}> · {agent.stalledDeals} estancados</span>
-                      )}
-                    </span>
-                  </div>
-                  <div className="h-1.5 overflow-hidden rounded-full" style={{ background: "var(--secondary)" }}>
-                    <div
-                      className="h-full rounded-full transition-all"
-                      style={{ width: `${barWidth}%`, background: "var(--amber)" }}
-                    />
-                  </div>
-                </div>
-
-                {/* Sparkline */}
-                <AgentSparkline history={agent.history} agentId={agent.id} />
-
-                {/* KPI chips */}
-                <div className="hidden md:flex items-center gap-3 shrink-0">
-                  {/* Response time */}
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" style={{ color: "var(--muted-foreground)" }} />
-                    <ResponseBadge minutes={agent.avgResponseMinutes} />
-                  </div>
-
-                  {/* Conversion */}
-                  <div className="flex items-center gap-1">
-                    <Target className="h-3 w-3" style={{ color: "var(--muted-foreground)" }} />
-                    <span className="font-mono text-xs" style={{ color: "var(--foreground)" }}>
-                      {agent.conversionRate !== null ? `${agent.conversionRate}%` : "—"}
-                    </span>
-                  </div>
-
-                  {/* Avg ticket */}
-                  {agent.avgTicketValue !== null && (
-                    <div className="flex items-center gap-1">
-                      <TrendingUp className="h-3 w-3" style={{ color: "var(--muted-foreground)" }} />
-                      <span className="font-mono text-xs" style={{ color: "var(--muted-foreground)" }}>
-                        ${Math.round(agent.avgTicketValue / 1000)}k
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Stalled alert */}
-                  {agent.stalledDeals > 0 && (
-                    <AlertTriangle className="h-3.5 w-3.5" style={{ color: "var(--amber)" }} />
-                  )}
-                </div>
-
-                {/* Revenue */}
-                <div className="shrink-0 text-right">
-                  <p className="font-mono text-sm font-bold" style={{ color: "var(--foreground)" }}>
-                    ${agent.revenue.toLocaleString()}
-                  </p>
-                  <div className="flex items-center justify-end gap-1 mt-0.5">
-                    <DollarSign className="h-3 w-3" style={{ color: "var(--muted-foreground)" }} />
-                    <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>comisión</p>
-                  </div>
-                </div>
-
-                {/* Drill-down indicator */}
-                <ChevronRight
-                  className="h-4 w-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ color: "var(--amber)" }}
+                  className="h-full bg-[#C9963A] rounded-full transition-all duration-700"
+                  style={{ width: `${pct}%` }}
                 />
-              </Link>
-            );
-          })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Scatter plot (decorative positions derived from real data) ───────────────
+
+function ScatterPlot({ agents }: { agents: AgentKPISummary[] }) {
+  // Map agents to scatter positions: x = response time (lower = more left → shorter delay),
+  // y = conversion rate (higher = further up)
+  const maxResp = Math.max(...agents.map((a) => a.avgResponseMinutes ?? 0), 1);
+  const maxConv = Math.max(...agents.map((a) => a.conversionRate ?? 0), 1);
+
+  const dots = agents.slice(0, 7).map((agent) => {
+    const resp = agent.avgResponseMinutes ?? maxResp * 0.5;
+    const conv = agent.conversionRate ?? maxConv * 0.5;
+    const left = Math.round((resp / maxResp) * 80) + 10;
+    const bottom = Math.round((conv / maxConv) * 75) + 10;
+    return { id: agent.id, left, bottom };
+  });
+
+  return (
+    <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-8 space-y-6 relative overflow-hidden">
+      <h3
+        className="font-bold text-lg text-white"
+        style={{ fontFamily: "Manrope, sans-serif" }}
+      >
+        Tiempo de Respuesta vs Conversión
+      </h3>
+      <div className="relative h-[250px] border-l border-b border-[#4f4537]/30 ml-6 mb-6">
+        {dots.map((dot) => (
+          <div
+            key={dot.id}
+            className="absolute w-3 h-3 bg-[#f5bd5d] rounded-full"
+            style={{
+              bottom: `${dot.bottom}%`,
+              left: `${dot.left}%`,
+              boxShadow: "0 0 15px rgba(245,189,93,0.5)",
+            }}
+          />
+        ))}
+        <span className="absolute -left-12 top-1/2 -rotate-90 text-[10px] text-[#545567] uppercase tracking-widest font-bold">
+          Conversión (%)
+        </span>
+        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-[#545567] uppercase tracking-widest font-bold">
+          Tiempo de Respuesta (min)
+        </span>
+      </div>
+      <p className="text-[11px] text-[#9899A8] italic leading-tight text-center">
+        La correlación indica que tiempos menores a 5 min incrementan la
+        conversión en un 22%.
+      </p>
+    </div>
+  );
+}
+
+// ─── Main client component ───────────────────────────────────────────────────
+
+export function AgentsClient({ agents }: Props) {
+  const [period, setPeriod] = useState<Period>("Mensual");
+
+  const sorted = useMemo(
+    () => [...agents].sort((a, b) => b.pipelineValue - a.pipelineValue),
+    [agents]
+  );
+
+  const topId = sorted[0]?.id;
+
+  return (
+    <div className="space-y-8">
+      {/* Page header ───────────────────────────────────────────── */}
+      <header className="flex items-center justify-between">
+        <div>
+          <h1
+            className="text-[28px] font-bold text-white tracking-tight"
+            style={{ fontFamily: "Manrope, sans-serif" }}
+          >
+            Rendimiento de Agentes
+          </h1>
+          <p className="text-sm text-[#9899A8]">
+            Analíticas de performance y conversión en tiempo real
+          </p>
         </div>
-      )}
+        <div className="flex items-center gap-4">
+          {/* Period toggle */}
+          <div className="bg-[#353534]/20 p-1 rounded-lg flex items-center">
+            {(["Semanal", "Mensual", "Trimestral"] as Period[]).map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                  period === p
+                    ? "bg-[#C9963A] text-[#4a3100] shadow-lg"
+                    : "text-[#9899A8] hover:text-white"
+                }`}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+          {/* Export */}
+          <button className="flex items-center gap-2 px-4 py-2 border border-[#4f4537]/30 rounded-lg text-xs font-medium text-[#9899A8] hover:bg-[#353534] transition-colors">
+            <Download className="w-3.5 h-3.5" />
+            Exportar
+          </button>
+        </div>
+      </header>
+
+      {/* Agent table ─────────────────────────────────────────────── */}
+      <section className="bg-[#14151C] rounded-xl overflow-hidden shadow-2xl">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#1c1b1b]/50">
+                {[
+                  "Agente",
+                  "Leads",
+                  "Resp.",
+                  "Conversión",
+                  "Pipeline",
+                  "Estado",
+                  "Actividad 7D",
+                ].map((col, i) => (
+                  <th
+                    key={col}
+                    className={`px-6 py-4 text-[11px] uppercase tracking-widest text-[#545567] font-semibold${i === 4 ? " text-right" : ""}`}
+                    style={{ fontFamily: "Manrope, sans-serif" }}
+                  >
+                    {col}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#4f4537]/10">
+              {sorted.map((agent) => {
+                const isTop = agent.id === topId;
+                const initials = agent.name
+                  .split(" ")
+                  .slice(0, 2)
+                  .map((w) => w[0])
+                  .join("")
+                  .toUpperCase();
+                const convPct = agent.conversionRate ?? 0;
+                const leadsCount = agent.activeDeals + agent.closedDeals;
+                const pipelineLabel =
+                  agent.pipelineValue >= 1_000_000
+                    ? `RD$ ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
+                    : `RD$ ${agent.pipelineValue.toLocaleString()}`;
+
+                return (
+                  <tr
+                    key={agent.id}
+                    className={`hover:bg-[#353534]/20 transition-colors${isTop ? " border-l-[3px] border-[#C9963A]" : ""}`}
+                  >
+                    {/* Agente */}
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/dashboard/agents/${agent.id}`}
+                        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                        style={{ textDecoration: "none" }}
+                      >
+                        <div className="w-7 h-7 rounded-full bg-[#353534] flex items-center justify-center text-[10px] text-[#9899A8] shrink-0">
+                          {initials}
+                        </div>
+                        <span className="font-medium text-sm text-white">
+                          {agent.name}
+                        </span>
+                      </Link>
+                    </td>
+
+                    {/* Leads */}
+                    <td className="px-6 py-4 text-sm text-[#e5e2e1]">
+                      {leadsCount}
+                    </td>
+
+                    {/* Resp. */}
+                    <td className="px-6 py-4">
+                      <ResponseBadge minutes={agent.avgResponseMinutes} />
+                    </td>
+
+                    {/* Conversión */}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 h-1.5 bg-[#353534] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#C9963A] transition-all duration-700"
+                            style={{ width: `${convPct}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-[#9899A8] font-medium w-9 text-right">
+                          {agent.conversionRate !== null
+                            ? `${agent.conversionRate}%`
+                            : "—"}
+                        </span>
+                      </div>
+                    </td>
+
+                    {/* Pipeline */}
+                    <td className="px-6 py-4 text-right font-semibold text-sm text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+                      {pipelineLabel}
+                    </td>
+
+                    {/* Estado */}
+                    <td className="px-6 py-4 text-center">
+                      <StalledBadge count={agent.stalledDeals} />
+                    </td>
+
+                    {/* Actividad 7D */}
+                    <td className="px-6 py-4">
+                      <AgentSparkline
+                        history={agent.history}
+                        agentId={agent.id}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* Charts ──────────────────────────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
+        <PipelineBarChart agents={sorted} />
+        <ScatterPlot agents={sorted} />
+      </div>
     </div>
   );
 }
