@@ -16,7 +16,7 @@ export function Logo({
   size = "md",
   variant = "sidebar",
 }: LogoProps) {
-  const monogramSize = size === "sm" ? 40 : size === "md" ? 52 : 68;
+  const monogramSize = size === "sm" ? 44 : size === "md" ? 62 : 76;
   const nameSize = size === "sm" ? "13px" : size === "md" ? "15px" : "19px";
   const subSize = size === "sm" ? "9px" : "10px";
 
@@ -29,7 +29,7 @@ export function Logo({
           alt="Advance Estate"
           width={320}
           height={128}
-          style={{ width: 320, height: "auto", objectFit: "contain" }}
+          style={{ width: 320, height: "auto", objectFit: "contain", mixBlendMode: "screen" }}
           unoptimized
           priority
         />
@@ -50,6 +50,7 @@ export function Logo({
           height: monogramSize,
           objectFit: "contain",
           flexShrink: 0,
+          mixBlendMode: "screen",
         }}
         unoptimized
       />
