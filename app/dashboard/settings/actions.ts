@@ -36,10 +36,22 @@ export async function saveAvaConfig(
   return { ok: true };
 }
 
+type AgentRole = "admin" | "manager" | "agent" | "viewer";
+
+interface InviteAgentParams {
+  email: string;
+  fullName: string;
+  role: AgentRole;
+  phone?: string;
+  whatsappNumber?: string;
+  maxLeadsPerWeek?: number;
+}
+
 export async function inviteAgent(
-  email: string,
-  fullName: string
+  params: InviteAgentParams
 ): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { email, fullName, role, phone, whatsappNumber, maxLeadsPerWeek } = params;
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "No autorizado" };
@@ -49,15 +61,40 @@ export async function inviteAgent(
   if (!fullName || fullName.trim().length < 2) return { ok: false, error: "Nombre requerido" };
   if (fullName.length > 100) return { ok: false, error: "Nombre muy largo" };
 
+  const validRoles: AgentRole[] = ["admin", "manager", "agent", "viewer"];
+  if (!validRoles.includes(role)) return { ok: false, error: "Rol inválido" };
+
   const serviceSupabase = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { error } = await serviceSupabase.auth.admin.inviteUserByEmail(email, {
+  // Check if email already exists in agents table
+  const { data: existing } = await serviceSupabase
+    .from("agents")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  if (existing) return { ok: false, error: "Este agente ya existe en el sistema" };
+
+  const { data: inviteData, error: inviteError } = await serviceSupabase.auth.admin.inviteUserByEmail(email, {
     data: { full_name: fullName.trim() },
   });
 
-  if (error) return { ok: false, error: error.message };
+  if (inviteError) return { ok: false, error: inviteError.message };
+
+  // Insert agent record immediately so role/phone are set before acceptance
+  await serviceSupabase.from("agents").insert({
+    id: inviteData.user.id,
+    email: email.toLowerCase(),
+    full_name: fullName.trim(),
+    role,
+    phone: phone?.trim() || null,
+    whatsapp_number: whatsappNumber?.trim() || null,
+    max_leads_per_week: maxLeadsPerWeek ?? null,
+    is_active: false, // activated on first login
+  });
+
   return { ok: true };
 }

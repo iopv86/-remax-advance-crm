@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { TrendingUp, TrendingDown, Clock, Target, AlertTriangle, DollarSign } from "lucide-react";
 import type {
   AgentKPIView,
@@ -58,6 +59,13 @@ function toAgentKPISummary(
 
 export default async function AgentsPage() {
   const supabase = await createClient();
+
+  // Role guard — only admin and manager
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user?.email) {
+    const { data: agent } = await supabase.from("agents").select("role").eq("email", user.email).maybeSingle();
+    if (agent && !["admin", "manager"].includes(agent.role)) redirect("/dashboard");
+  }
 
   const [
     { data: rawAgents },

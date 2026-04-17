@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 import { Megaphone, TrendingUp, MousePointerClick, Users, DollarSign, Eye } from "lucide-react";
 
 const PLATFORM_LABELS: Record<string, string> = {
@@ -23,6 +24,13 @@ const PLATFORM_COLOR: Record<string, string> = {
 
 export default async function AdsPage() {
   const supabase = await createClient();
+
+  // Role guard — only admin and manager
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user?.email) {
+    const { data: agent } = await supabase.from("agents").select("role").eq("email", user.email).maybeSingle();
+    if (agent && !["admin", "manager"].includes(agent.role)) redirect("/dashboard");
+  }
 
   const { data: campaigns } = await supabase
     .from("campaigns")

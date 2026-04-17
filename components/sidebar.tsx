@@ -22,25 +22,28 @@ import { toast } from "sonner";
 import { Logo } from "@/components/logo";
 import { QuickActionSheets } from "@/components/quick-action-sheets";
 
-const navItems = [
-  { href: "/dashboard",               label: "Dashboard",       icon: LayoutGrid },
-  { href: "/dashboard/contacts",      label: "Clientes",        icon: Users },
-  { href: "/dashboard/pipeline",      label: "Oportunidades",   icon: Kanban },
-  { href: "/dashboard/properties",    label: "Propiedades",     icon: Building2 },
-  { href: "/dashboard/tasks",         label: "Tareas",          icon: CheckSquare },
-  { href: "/dashboard/conversations", label: "Conversaciones",  icon: MessageSquare },
-  { href: "/dashboard/agents",        label: "KPIs Agentes",    icon: BarChart3 },
-  { href: "/dashboard/ads",           label: "Publicidad",      icon: Megaphone },
+const ALL_NAV_ITEMS = [
+  { href: "/dashboard",               label: "Dashboard",       icon: LayoutGrid, roles: ["admin","manager","agent","viewer"] },
+  { href: "/dashboard/contacts",      label: "Clientes",        icon: Users,      roles: ["admin","manager","agent"] },
+  { href: "/dashboard/pipeline",      label: "Oportunidades",   icon: Kanban,     roles: ["admin","manager","agent"] },
+  { href: "/dashboard/properties",    label: "Propiedades",     icon: Building2,  roles: ["admin","manager","agent"] },
+  { href: "/dashboard/tasks",         label: "Tareas",          icon: CheckSquare,roles: ["admin","manager","agent"] },
+  { href: "/dashboard/conversations", label: "Conversaciones",  icon: MessageSquare, roles: ["admin","manager","agent"] },
+  { href: "/dashboard/agents",        label: "KPIs Agentes",    icon: BarChart3,  roles: ["admin","manager"] },
+  { href: "/dashboard/ads",           label: "Publicidad",      icon: Megaphone,  roles: ["admin","manager"] },
 ];
 
-const settingsItems = [
-  { href: "/dashboard/settings",      label: "Configuración",   icon: Settings },
-  { href: "/dashboard/settings/AvaIA", label: "Ava IA",          icon: Bot,      sub: true },
+const ALL_SETTINGS_ITEMS = [
+  { href: "/dashboard/settings",       label: "Configuración",  icon: Settings, sub: false, roles: ["admin"] },
+  { href: "/dashboard/settings/AvaIA", label: "Ava IA",         icon: Bot,      sub: true,  roles: ["admin"] },
 ];
 
-export function Sidebar() {
+export function Sidebar({ role = "agent" }: { role?: string }) {
   const pathname = usePathname();
   const router = useRouter();
+
+  const navItems = ALL_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const settingsItems = ALL_SETTINGS_ITEMS.filter((item) => item.roles.includes(role));
 
   async function handleLogout() {
     await fetch("/api/auth/sign-out", { method: "POST" });

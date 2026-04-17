@@ -8,6 +8,10 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Role guard — only admin
+  const { data: roleCheck } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
+  if (roleCheck && roleCheck.role !== "admin") redirect("/dashboard");
+
   const [{ data: agents }, { data: agent }] = await Promise.all([
     supabase
       .from("agents")

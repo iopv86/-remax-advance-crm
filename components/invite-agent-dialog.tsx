@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { X } from "lucide-react";
+import { X, UserPlus, Phone, MessageCircle, Mail, User, Shield } from "lucide-react";
 import { inviteAgent } from "@/app/dashboard/settings/actions";
 
 interface Props {
@@ -9,26 +9,117 @@ interface Props {
   onClose: () => void;
 }
 
+type AgentRole = "admin" | "manager" | "agent" | "viewer";
+
+const ROLES: { value: AgentRole; label: string; description: string; color: string }[] = [
+  { value: "admin",   label: "Administrador", description: "Acceso total al sistema",          color: "#f87171" },
+  { value: "manager", label: "Gerente",        description: "Ve todos los datos del equipo",   color: "#f5bd5d" },
+  { value: "agent",   label: "Agente",         description: "Solo sus propios clientes/deals", color: "#60a5fa" },
+  { value: "viewer",  label: "Visualizador",   description: "Solo lectura, sin editar",        color: "#a8a29e" },
+];
+
+const T = {
+  bg: "#141418",
+  border: "rgba(201,150,58,0.15)",
+  muted: "rgba(255,255,255,0.3)",
+  surface: "rgba(255,255,255,0.04)",
+  gold: "#C9963A",
+  goldLight: "#f5bd5d",
+  onSurface: "#e5e2e1",
+};
+
+function Field({
+  label, icon: Icon, children,
+}: { label: string; icon: React.ElementType; children: React.ReactNode }) {
+  return (
+    <div>
+      <label style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        fontSize: 10,
+        fontWeight: 700,
+        textTransform: "uppercase",
+        letterSpacing: "0.12em",
+        color: T.muted,
+        marginBottom: 8,
+      }}>
+        <Icon size={11} />
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
+function TextInput({
+  value, onChange, placeholder, type = "text", required = false,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  type?: string;
+  required?: boolean;
+}) {
+  return (
+    <input
+      type={type}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      required={required}
+      style={{
+        width: "100%",
+        background: T.surface,
+        border: `1px solid rgba(255,255,255,0.08)`,
+        borderRadius: 10,
+        padding: "10px 14px",
+        fontSize: 14,
+        color: T.onSurface,
+        outline: "none",
+        boxSizing: "border-box",
+        transition: "border 0.15s",
+      }}
+      onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
+      onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }}
+    />
+  );
+}
+
 export function InviteAgentDialog({ open, onClose }: Props) {
-  const [email, setEmail] = useState("");
+  const [email, setEmail]       = useState("");
   const [fullName, setFullName] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [role, setRole]         = useState<AgentRole>("agent");
+  const [phone, setPhone]       = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [maxLeads, setMaxLeads] = useState("");
+  const [error, setError]       = useState<string | null>(null);
+  const [success, setSuccess]   = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  function reset() {
+    setEmail(""); setFullName(""); setRole("agent");
+    setPhone(""); setWhatsapp(""); setMaxLeads("");
+    setError(null); setSuccess(false);
+  }
+
+  function handleClose() { reset(); onClose(); }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     startTransition(async () => {
-      const result = await inviteAgent(email, fullName);
+      const result = await inviteAgent({
+        email,
+        fullName,
+        role,
+        phone: phone || undefined,
+        whatsappNumber: whatsapp || undefined,
+        maxLeadsPerWeek: maxLeads ? parseInt(maxLeads, 10) : undefined,
+      });
       if (result.ok) {
         setSuccess(true);
-        setTimeout(() => {
-          setSuccess(false);
-          setEmail("");
-          setFullName("");
-          onClose();
-        }, 1500);
+        setTimeout(() => { reset(); onClose(); }, 1800);
       } else {
         setError(result.error ?? "Error desconocido");
       }
@@ -39,93 +130,191 @@ export function InviteAgentDialog({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,0.6)" }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 50,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.7)",
+        backdropFilter: "blur(4px)",
       }}
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
     >
-      <div
-        className="relative w-full max-w-md rounded-2xl p-8"
-        style={{ background: "var(--card)", border: "1px solid var(--border)" }}
-      >
+      <div style={{
+        position: "relative",
+        width: "100%",
+        maxWidth: 520,
+        maxHeight: "90vh",
+        overflowY: "auto",
+        borderRadius: 24,
+        padding: "32px 32px 28px",
+        background: T.bg,
+        border: T.border,
+        boxShadow: "0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,150,58,0.12)",
+      }}>
+        {/* Close */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-1 rounded-lg hover:opacity-70"
-          style={{ color: "var(--muted-foreground)" }}
+          onClick={handleClose}
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            background: "rgba(255,255,255,0.05)",
+            border: "none",
+            color: T.muted,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+          }}
         >
-          <X className="w-5 h-5" />
+          <X size={16} />
         </button>
 
-        <h2
-          className="text-lg font-semibold mb-6"
-          style={{ color: "var(--foreground)" }}
-        >
-          Invitar agente
-        </h2>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+          <div style={{
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            background: "rgba(201,150,58,0.1)",
+            border: "1px solid rgba(201,150,58,0.2)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}>
+            <UserPlus size={20} color={T.gold} />
+          </div>
+          <div>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: T.onSurface, fontFamily: "Manrope, sans-serif" }}>
+              Invitar agente
+            </h2>
+            <p style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
+              Se enviará un correo de activación
+            </p>
+          </div>
+        </div>
 
         {success ? (
-          <p
-            className="text-center py-4"
-            style={{ color: "var(--emerald)" }}
-          >
-            Invitación enviada
-          </p>
+          <div style={{
+            textAlign: "center",
+            padding: "32px 0",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 12,
+          }}>
+            <div style={{
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              background: "rgba(16,185,129,0.1)",
+              border: "1px solid rgba(16,185,129,0.25)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 24,
+            }}>
+              ✓
+            </div>
+            <p style={{ fontSize: 15, fontWeight: 600, color: "#34d399" }}>Invitación enviada</p>
+            <p style={{ fontSize: 12, color: T.muted }}>{email}</p>
+          </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                className="block text-xs uppercase tracking-widest mb-2"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                Nombre completo
-              </label>
-              <input
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Ana García"
-                className="w-full rounded-lg px-4 py-3 text-sm outline-none"
-                style={{
-                  background: "var(--secondary)",
-                  border: "1px solid var(--border)",
-                  color: "var(--foreground)",
-                }}
-                required
-              />
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+
+            {/* Name + Email */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <Field label="Nombre completo" icon={User}>
+                <TextInput value={fullName} onChange={setFullName} placeholder="Ana García" required />
+              </Field>
+              <Field label="Correo electrónico" icon={Mail}>
+                <TextInput value={email} onChange={setEmail} placeholder="ana@advance.com" type="email" required />
+              </Field>
             </div>
-            <div>
-              <label
-                className="block text-xs uppercase tracking-widest mb-2"
-                style={{ color: "var(--muted-foreground)" }}
-              >
-                Correo electrónico
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="agente@advanceestate.com"
-                className="w-full rounded-lg px-4 py-3 text-sm outline-none"
-                style={{
-                  background: "var(--secondary)",
-                  border: "1px solid var(--border)",
-                  color: "var(--foreground)",
-                }}
-                required
-              />
+
+            {/* Role selector */}
+            <Field label="Rol en el sistema" icon={Shield}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                {ROLES.map((r) => (
+                  <button
+                    key={r.value}
+                    type="button"
+                    onClick={() => setRole(r.value)}
+                    style={{
+                      textAlign: "left",
+                      padding: "10px 14px",
+                      borderRadius: 10,
+                      background: role === r.value ? `${r.color}14` : T.surface,
+                      border: `1px solid ${role === r.value ? `${r.color}40` : "rgba(255,255,255,0.07)"}`,
+                      cursor: "pointer",
+                      transition: "all 0.15s",
+                    }}
+                  >
+                    <p style={{ fontSize: 13, fontWeight: 600, color: role === r.value ? r.color : T.onSurface }}>
+                      {r.label}
+                    </p>
+                    <p style={{ fontSize: 10, color: T.muted, marginTop: 2 }}>
+                      {r.description}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </Field>
+
+            {/* Phone + WhatsApp */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+              <Field label="Teléfono" icon={Phone}>
+                <TextInput value={phone} onChange={setPhone} placeholder="+1 809 000 0000" />
+              </Field>
+              <Field label="WhatsApp" icon={MessageCircle}>
+                <TextInput value={whatsapp} onChange={setWhatsapp} placeholder="+1 809 000 0000" />
+              </Field>
             </div>
+
+            {/* Max leads */}
+            <Field label="Máx. leads por semana (opcional)" icon={UserPlus}>
+              <TextInput
+                value={maxLeads}
+                onChange={setMaxLeads}
+                placeholder="Ej. 20 (dejar vacío = sin límite)"
+                type="number"
+              />
+            </Field>
+
             {error && (
-              <p className="text-sm" style={{ color: "var(--destructive)" }}>
+              <p style={{ fontSize: 13, color: "#f87171", padding: "8px 12px", background: "rgba(248,113,113,0.08)", borderRadius: 8, border: "1px solid rgba(248,113,113,0.15)" }}>
                 {error}
               </p>
             )}
+
             <button
               type="submit"
               disabled={isPending}
-              className="w-full h-11 rounded-lg font-medium text-sm transition-opacity hover:opacity-90 disabled:opacity-50"
-              style={{ background: "var(--amber)", color: "var(--background)" }}
+              style={{
+                width: "100%",
+                height: 48,
+                borderRadius: 12,
+                background: isPending ? "rgba(201,150,58,0.5)" : `linear-gradient(135deg, ${T.goldLight}, ${T.gold})`,
+                border: "none",
+                color: "#281900",
+                fontSize: 14,
+                fontWeight: 700,
+                cursor: isPending ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                transition: "opacity 0.15s",
+              }}
             >
-              {isPending ? "Enviando..." : "Enviar invitación"}
+              <UserPlus size={16} />
+              {isPending ? "Enviando invitación..." : "Enviar invitación"}
             </button>
           </form>
         )}
