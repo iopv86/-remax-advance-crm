@@ -119,7 +119,7 @@ export default function LoginPage() {
                 color: "#9899A8",
               }}
             >
-              Donde se cierran los mejores negocios.
+              A tu centro de operaciones inmobiliarias.
             </p>
           </header>
 
