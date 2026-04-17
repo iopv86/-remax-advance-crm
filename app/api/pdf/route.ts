@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ProposalDocument } from "@/lib/pdf-proposal";
 import type { AgencyConfig } from "@/lib/pdf-proposal";
 import type { Property } from "@/lib/types";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -54,6 +55,18 @@ export async function POST(req: NextRequest) {
   } = await sessionClient.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  }
+
+  // Rate limit: 10 PDFs per minute per user
+  const rl = checkRateLimit(`pdf:${user.id}`, 10, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Demasiadas solicitudes. Espera un momento." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) },
+      }
+    );
   }
 
   let body: { propertyIds: string[] };
