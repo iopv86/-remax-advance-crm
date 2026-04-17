@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import {
@@ -17,7 +17,42 @@ import {
   Edit3,
   Save,
   X,
+  Camera,
 } from "lucide-react";
+
+// Inline SVG social icons
+function IconInstagram({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+    </svg>
+  );
+}
+function IconFacebook({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    </svg>
+  );
+}
+function IconLinkedin({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+      <rect x="2" y="9" width="4" height="12"/>
+      <circle cx="4" cy="4" r="2"/>
+    </svg>
+  );
+}
+function IconTiktok({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V9.02a8.16 8.16 0 0 0 4.77 1.52V7.1a4.85 4.85 0 0 1-1-.41z"/>
+    </svg>
+  );
+}
 
 interface Agent {
   id: string;
@@ -30,6 +65,10 @@ interface Agent {
   is_active: boolean;
   max_leads_per_week: number | null;
   created_at: string;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  linkedin_url: string | null;
+  tiktok_url: string | null;
 }
 
 interface Stats {
@@ -64,6 +103,13 @@ const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }>
   agent:   { bg: "rgba(59,130,246,0.12)",  color: "#60a5fa", border: "rgba(59,130,246,0.25)" },
   viewer:  { bg: "rgba(120,113,108,0.15)", color: "#a8a29e", border: "rgba(120,113,108,0.3)" },
 };
+
+const SOCIAL_META = [
+  { key: "instagram_url", label: "Instagram", icon: IconInstagram, color: "#e1306c", placeholder: "https://instagram.com/tu_usuario" },
+  { key: "facebook_url",  label: "Facebook",  icon: IconFacebook,  color: "#1877f2", placeholder: "https://facebook.com/tu_perfil" },
+  { key: "linkedin_url",  label: "LinkedIn",  icon: IconLinkedin,  color: "#0a66c2", placeholder: "https://linkedin.com/in/tu_perfil" },
+  { key: "tiktok_url",    label: "TikTok",    icon: IconTiktok,    color: "#fe2c55", placeholder: "https://tiktok.com/@tu_usuario" },
+] as const;
 
 function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType;
@@ -119,8 +165,14 @@ function StatCard({ icon: Icon, label, value, color }: {
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
-  return (
+function InfoRow({ icon: Icon, label, value, href, iconColor }: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  href?: string;
+  iconColor?: string;
+}) {
+  const inner = (
     <div style={{
       display: "flex",
       alignItems: "center",
@@ -132,32 +184,76 @@ function InfoRow({ icon: Icon, label, value }: { icon: React.ElementType; label:
         width: 36,
         height: 36,
         borderRadius: 10,
-        background: "rgba(201,150,58,0.08)",
+        background: iconColor ? `${iconColor}15` : "rgba(201,150,58,0.08)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         flexShrink: 0,
       }}>
-        <Icon size={16} color={T.gold} />
+        <Icon size={16} color={iconColor ?? T.gold} />
       </div>
-      <div>
+      <div style={{ minWidth: 0 }}>
         <p style={{ fontSize: 10, fontWeight: 600, color: T.stone500, textTransform: "uppercase", letterSpacing: "0.1em" }}>
           {label}
         </p>
-        <p style={{ fontSize: 14, fontWeight: 500, color: T.onSurface, marginTop: 2 }}>
+        <p style={{
+          fontSize: 14,
+          fontWeight: 500,
+          color: href ? T.primary : T.onSurface,
+          marginTop: 2,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}>
           {value || "—"}
         </p>
       </div>
     </div>
   );
+
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none", display: "block" }}>
+        {inner}
+      </a>
+    );
+  }
+  return inner;
+}
+
+function inputStyle(focused: boolean = false) {
+  return {
+    width: "100%",
+    background: "rgba(255,255,255,0.04)",
+    border: `1px solid ${focused ? "rgba(201,150,58,0.5)" : "rgba(255,255,255,0.1)"}`,
+    borderRadius: 10,
+    padding: "10px 14px",
+    fontSize: 14,
+    color: T.onSurface,
+    outline: "none",
+    boxSizing: "border-box" as const,
+    transition: "border 0.15s",
+  };
 }
 
 export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: Stats }) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [fullName, setFullName] = useState(agent?.full_name ?? "");
-  const [phone, setPhone] = useState(agent?.phone ?? "");
-  const [whatsapp, setWhatsapp] = useState(agent?.whatsapp_number ?? "");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  // Edit fields
+  const [fullName, setFullName]   = useState(agent?.full_name ?? "");
+  const [phone, setPhone]         = useState(agent?.phone ?? "");
+  const [whatsapp, setWhatsapp]   = useState(agent?.whatsapp_number ?? "");
+  const [instagram, setInstagram] = useState(agent?.instagram_url ?? "");
+  const [facebook, setFacebook]   = useState(agent?.facebook_url ?? "");
+  const [linkedin, setLinkedin]   = useState(agent?.linkedin_url ?? "");
+  const [tiktok, setTiktok]       = useState(agent?.tiktok_url ?? "");
+
+  // Avatar display (optimistic update after upload)
+  const [avatarUrl, setAvatarUrl] = useState(agent?.avatar_url ?? null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const initials = fullName
     .split(" ")
@@ -172,13 +268,62 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
     ? new Date(agent.created_at).toLocaleDateString("es-DO", { month: "long", year: "numeric" })
     : "—";
 
+  // ─── Avatar upload ────────────────────────────────────────────────────────
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !agent) return;
+
+    setUploadingAvatar(true);
+    const supabase = createClient();
+
+    const ext = file.name.split(".").pop() ?? "jpg";
+    const path = `${agent.id}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    if (uploadError) {
+      toast.error("Error al subir imagen");
+      setUploadingAvatar(false);
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from("avatars").getPublicUrl(path);
+
+    const { error: updateError } = await supabase
+      .from("agents")
+      .update({ avatar_url: publicUrl })
+      .eq("id", agent.id);
+
+    setUploadingAvatar(false);
+
+    if (updateError) {
+      toast.error("Error al guardar foto");
+    } else {
+      setAvatarUrl(publicUrl + `?t=${Date.now()}`);
+      toast.success("Foto de perfil actualizada");
+    }
+  }
+
+  // ─── Save profile ─────────────────────────────────────────────────────────
+
   async function handleSave() {
     if (!agent) return;
     setSaving(true);
     const supabase = createClient();
     const { error } = await supabase
       .from("agents")
-      .update({ full_name: fullName, phone: phone || null, whatsapp_number: whatsapp || null })
+      .update({
+        full_name:      fullName,
+        phone:          phone || null,
+        whatsapp_number: whatsapp || null,
+        instagram_url:  instagram || null,
+        facebook_url:   facebook || null,
+        linkedin_url:   linkedin || null,
+        tiktok_url:     tiktok || null,
+      })
       .eq("id", agent.id);
     setSaving(false);
     if (error) {
@@ -193,11 +338,33 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
     setFullName(agent?.full_name ?? "");
     setPhone(agent?.phone ?? "");
     setWhatsapp(agent?.whatsapp_number ?? "");
+    setInstagram(agent?.instagram_url ?? "");
+    setFacebook(agent?.facebook_url ?? "");
+    setLinkedin(agent?.linkedin_url ?? "");
+    setTiktok(agent?.tiktok_url ?? "");
     setEditing(false);
   }
 
+  const socialValues: Record<string, string> = {
+    instagram_url: instagram,
+    facebook_url:  facebook,
+    linkedin_url:  linkedin,
+    tiktok_url:    tiktok,
+  };
+
+  const hasSocial = [agent?.instagram_url, agent?.facebook_url, agent?.linkedin_url, agent?.tiktok_url].some(Boolean);
+
   return (
     <div style={{ background: T.bg, minHeight: "100vh", color: T.onSurface }}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        style={{ display: "none" }}
+        onChange={handleAvatarChange}
+      />
+
       {/* Header strip */}
       <div style={{
         background: "linear-gradient(135deg, rgba(201,150,58,0.06) 0%, rgba(14,14,14,0) 60%)",
@@ -210,24 +377,67 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
 
         {/* Avatar + name + role */}
         <div style={{ display: "flex", alignItems: "flex-end", gap: 28, paddingBottom: 32 }}>
-          {/* Avatar */}
-          <div style={{ position: "relative", flexShrink: 0 }}>
+          {/* Avatar with upload overlay */}
+          <div
+            style={{ position: "relative", flexShrink: 0, cursor: "pointer" }}
+            onClick={() => fileInputRef.current?.click()}
+            title="Cambiar foto de perfil"
+          >
+            {avatarUrl ? (
+              <img
+                src={avatarUrl}
+                alt={agent?.full_name}
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: 24,
+                  objectFit: "cover",
+                  boxShadow: "0 0 0 3px rgba(201,150,58,0.2), 0 20px 40px rgba(0,0,0,0.4)",
+                  display: "block",
+                }}
+              />
+            ) : (
+              <div style={{
+                width: 96,
+                height: 96,
+                borderRadius: 24,
+                background: `linear-gradient(135deg, ${T.primary}, ${T.primaryContainer})`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 32,
+                fontWeight: 800,
+                color: "#281900",
+                fontFamily: "Manrope, sans-serif",
+                boxShadow: "0 0 0 3px rgba(201,150,58,0.2), 0 20px 40px rgba(0,0,0,0.4)",
+              }}>
+                {initials}
+              </div>
+            )}
+
+            {/* Upload overlay */}
             <div style={{
-              width: 96,
-              height: 96,
+              position: "absolute",
+              inset: 0,
               borderRadius: 24,
-              background: `linear-gradient(135deg, ${T.primary}, ${T.primaryContainer})`,
+              background: "rgba(0,0,0,0.55)",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 32,
-              fontWeight: 800,
-              color: "#281900",
-              fontFamily: "Manrope, sans-serif",
-              boxShadow: "0 0 0 3px rgba(201,150,58,0.2), 0 20px 40px rgba(0,0,0,0.4)",
-            }}>
-              {initials}
+              gap: 4,
+              opacity: uploadingAvatar ? 1 : 0,
+              transition: "opacity 0.2s",
+            }}
+              onMouseEnter={(e) => { if (!uploadingAvatar) (e.currentTarget as HTMLDivElement).style.opacity = "1"; }}
+              onMouseLeave={(e) => { if (!uploadingAvatar) (e.currentTarget as HTMLDivElement).style.opacity = "0"; }}
+            >
+              <Camera size={20} color="#fff" />
+              <span style={{ fontSize: 9, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                {uploadingAvatar ? "Subiendo..." : "Cambiar"}
+              </span>
             </div>
+
             {/* Active indicator */}
             <div style={{
               position: "absolute",
@@ -238,6 +448,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
               borderRadius: "50%",
               background: agent?.is_active ? "#10b981" : "#78716c",
               border: "2px solid #0e0e0e",
+              zIndex: 1,
             }} />
           </div>
 
@@ -354,13 +565,13 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
 
         {/* Stats row */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
-          <StatCard icon={Users}      label="Clientes"        value={stats.totalContacts} color={T.primary} />
-          <StatCard icon={Briefcase}  label="Deals activos"   value={stats.totalDeals}    color="#60a5fa" />
-          <StatCard icon={TrendingUp} label="Deals ganados"   value={stats.dealsWon}      color="#10b981" />
-          <StatCard icon={CheckSquare} label="Tareas pendientes" value={stats.pendingTasks} color="#f87171" />
+          <StatCard icon={Users}       label="Clientes"           value={stats.totalContacts} color={T.primary} />
+          <StatCard icon={Briefcase}   label="Deals activos"      value={stats.totalDeals}    color="#60a5fa" />
+          <StatCard icon={TrendingUp}  label="Deals ganados"      value={stats.dealsWon}      color="#10b981" />
+          <StatCard icon={CheckSquare} label="Tareas pendientes"  value={stats.pendingTasks}  color="#f87171" />
         </div>
 
-        {/* Two columns: info + edit */}
+        {/* Two columns: info + edit/account */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 28, alignItems: "start" }}>
 
           {/* Left: contact info */}
@@ -386,10 +597,42 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
             <InfoRow icon={MessageCircle} label="WhatsApp"   value={agent?.whatsapp_number ?? ""} />
             <InfoRow icon={Shield}        label="Rol"        value={ROLE_LABELS[role] ?? role} />
             <InfoRow icon={User}          label="Max leads / semana" value={agent?.max_leads_per_week ? String(agent.max_leads_per_week) : "Sin límite"} />
+
+            {/* Social links (view mode) */}
+            {hasSocial && (
+              <>
+                <p style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.14em",
+                  color: T.stone500,
+                  marginTop: 20,
+                  marginBottom: 4,
+                }}>
+                  Redes sociales
+                </p>
+                {SOCIAL_META.map(({ key, label, icon, color }) => {
+                  const val = (agent as unknown as Record<string, string | null>)[key];
+                  if (!val) return null;
+                  return (
+                    <InfoRow
+                      key={key}
+                      icon={icon}
+                      label={label}
+                      value={val.replace(/^https?:\/\//, "")}
+                      href={val}
+                      iconColor={color}
+                    />
+                  );
+                })}
+              </>
+            )}
+
             <div style={{ height: 16 }} />
           </div>
 
-          {/* Right: edit form (visible only when editing) or activity */}
+          {/* Right: edit form or account card */}
           <div>
             {editing ? (
               <div style={{
@@ -418,18 +661,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                     <input
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      style={{
-                        width: "100%",
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                        fontSize: 14,
-                        color: T.onSurface,
-                        outline: "none",
-                        boxSizing: "border-box",
-                        transition: "border 0.15s",
-                      }}
+                      style={inputStyle()}
                       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
                       onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
                     />
@@ -444,18 +676,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="+1 809 000 0000"
-                      style={{
-                        width: "100%",
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                        fontSize: 14,
-                        color: T.onSurface,
-                        outline: "none",
-                        boxSizing: "border-box",
-                        transition: "border 0.15s",
-                      }}
+                      style={inputStyle()}
                       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
                       onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
                     />
@@ -470,21 +691,40 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       value={whatsapp}
                       onChange={(e) => setWhatsapp(e.target.value)}
                       placeholder="+1 809 000 0000"
-                      style={{
-                        width: "100%",
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        borderRadius: 10,
-                        padding: "10px 14px",
-                        fontSize: 14,
-                        color: T.onSurface,
-                        outline: "none",
-                        boxSizing: "border-box",
-                        transition: "border 0.15s",
-                      }}
+                      style={inputStyle()}
                       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
                       onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
                     />
+                  </div>
+
+                  {/* Divider */}
+                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 18 }}>
+                    <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: T.stone500, marginBottom: 16 }}>
+                      Redes sociales
+                    </p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                      {SOCIAL_META.map(({ key, label, icon: Icon, color, placeholder }) => (
+                        <div key={key}>
+                          <label style={{ fontSize: 11, fontWeight: 600, color: T.stone500, textTransform: "uppercase", letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                            <Icon size={12} color={color} />
+                            {label}
+                          </label>
+                          <input
+                            value={socialValues[key]}
+                            onChange={(e) => {
+                              if (key === "instagram_url") setInstagram(e.target.value);
+                              else if (key === "facebook_url") setFacebook(e.target.value);
+                              else if (key === "linkedin_url") setLinkedin(e.target.value);
+                              else if (key === "tiktok_url") setTiktok(e.target.value);
+                            }}
+                            placeholder={placeholder}
+                            style={inputStyle()}
+                            onFocus={(e) => { e.target.style.borderColor = `${color}80`; }}
+                            onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
