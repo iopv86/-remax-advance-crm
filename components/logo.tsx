@@ -29,7 +29,7 @@ export function Logo({
           alt="Advance Estate"
           width={320}
           height={128}
-          style={{ width: 320, height: "auto", objectFit: "contain", mixBlendMode: "screen" }}
+          style={{ width: 320, height: "auto", objectFit: "contain" }}
           unoptimized
           priority
         />
@@ -50,7 +50,6 @@ export function Logo({
           height: monogramSize,
           objectFit: "contain",
           flexShrink: 0,
-          mixBlendMode: "screen",
         }}
         unoptimized
       />
