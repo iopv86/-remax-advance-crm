@@ -71,8 +71,18 @@ export default function LoginPage() {
           }}
         />
         {/* Logo — centered brand showcase */}
-        <div className="absolute z-30 inset-0 flex flex-col items-center justify-center gap-4">
+        <div className="absolute z-30 inset-0 flex flex-col items-center justify-center gap-5">
           <Logo variant="login" size="lg" />
+          <p style={{
+            fontFamily: "var(--font-inter), Inter, sans-serif",
+            fontSize: "11px",
+            fontWeight: 400,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "rgba(201,150,58,0.6)",
+          }}>
+            Donde se cierran los mejores negocios
+          </p>
         </div>
       </section>
 
@@ -109,7 +119,7 @@ export default function LoginPage() {
                 color: "#9899A8",
               }}
             >
-              Portal exclusivo para gestión patrimonial.
+              Donde se cierran los mejores negocios.
             </p>
           </header>
 
