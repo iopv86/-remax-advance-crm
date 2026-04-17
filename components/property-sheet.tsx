@@ -113,6 +113,30 @@ export function PropertySheet({
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
+
+    // Validate total count
+    if (images.length + files.length > 10) {
+      toast.error("Máximo 10 fotos por propiedad");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    // Validate each file
+    const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
+    const MAX_MB = 5;
+    for (const file of files) {
+      if (!ALLOWED.includes(file.type)) {
+        toast.error(`Formato no soportado: ${file.name} (usa JPG, PNG o WebP)`);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+      if (file.size > MAX_MB * 1024 * 1024) {
+        toast.error(`${file.name} supera los ${MAX_MB}MB`);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+    }
+
     setUploading(true);
     const supabase = createClient();
     const uploaded: string[] = [];

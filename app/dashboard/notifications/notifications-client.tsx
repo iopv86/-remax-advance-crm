@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, CheckCheck, ExternalLink } from "lucide-react";
+import { Bell, CheckCheck, ExternalLink, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import type { NotificationRow } from "./page";
@@ -34,6 +34,19 @@ const TYPE_LABELS: Record<string, string> = {
   deal_stalled:  "Deal estancado",
   deal_won:      "Deal ganado",
 };
+
+type FilterValue = "all" | "unread" | "new_whatsapp" | "deal_assigned" | "deal_stalled" | "deal_won";
+
+const FILTER_TABS: { value: FilterValue; label: string }[] = [
+  { value: "all",           label: "Todas" },
+  { value: "unread",        label: "No leídas" },
+  { value: "new_whatsapp",  label: "💬 WhatsApp" },
+  { value: "deal_assigned", label: "🏷️ Asignados" },
+  { value: "deal_stalled",  label: "⏰ Estancados" },
+  { value: "deal_won",      label: "🏆 Ganados" },
+];
+
+const PAGE_SIZE = 30;
 
 function timeAgo(iso: string): string {
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
@@ -84,15 +97,100 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
   const router = useRouter();
   const [notifications, setNotifications] = useState<NotificationRow[]>(initialNotifications);
   const [unread, setUnread] = useState(initialUnread);
-  const [filter, setFilter] = useState<"all" | "unread">("all");
+  const [filter, setFilter] = useState<FilterValue>("all");
   const [marking, setMarking] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(initialNotifications.length === PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const filtered = filter === "unread"
-    ? notifications.filter((n) => !n.read)
-    : notifications;
+  // ── Real-time subscription ──────────────────────────────────────────────────
+  useEffect(() => {
+    const supabase = createClient();
+    let userId: string | null = null;
+
+    supabase.auth.getUser().then(({ data }) => {
+      userId = data.user?.id ?? null;
+      if (!userId) return;
+
+      const channel = supabase
+        .channel("notifications-page")
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            const newNotif = payload.new as NotificationRow;
+            setNotifications((prev) => [newNotif, ...prev]);
+            setUnread((n) => n + 1);
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    });
+  }, []);
+
+  // ── Infinite scroll ─────────────────────────────────────────────────────────
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    const oldest = notifications[notifications.length - 1];
+    if (!oldest) return;
+
+    setLoadingMore(true);
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("id, user_id, type, title, body, read, link, created_at")
+      .order("created_at", { ascending: false })
+      .lt("created_at", oldest.created_at)
+      .limit(PAGE_SIZE);
+
+    if (error) {
+      toast.error("Error cargando más notificaciones");
+      setLoadingMore(false);
+      return;
+    }
+
+    const rows = (data ?? []) as NotificationRow[];
+    setNotifications((prev) => [...prev, ...rows]);
+    setHasMore(rows.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [loadingMore, hasMore, notifications]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  // ── Filter logic ────────────────────────────────────────────────────────────
+  const filtered =
+    filter === "all"
+      ? notifications
+      : filter === "unread"
+      ? notifications.filter((n) => !n.read)
+      : notifications.filter((n) => n.type === filter);
 
   const groups = groupByDate(filtered);
 
+  // ── Actions ─────────────────────────────────────────────────────────────────
   async function markRead(n: NotificationRow) {
     if (n.read) {
       if (n.link) router.push(n.link);
@@ -222,37 +320,44 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
 
       {/* ── Content ──────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: 720, margin: "0 auto", padding: "32px 24px 80px" }}>
-        {/* Filter tabs */}
+
+        {/* Filter tabs — horizontally scrollable */}
         <div
           style={{
             display: "flex",
             gap: 4,
-            background: BG_ELEVATED,
-            borderRadius: 9999,
-            padding: 4,
-            width: "fit-content",
+            overflowX: "auto",
+            WebkitOverflowScrolling: "touch" as React.CSSProperties["WebkitOverflowScrolling"],
+            scrollbarWidth: "none" as React.CSSProperties["scrollbarWidth"],
             marginBottom: 32,
+            paddingBottom: 2,
           }}
         >
-          {(["all", "unread"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              style={{
-                padding: "6px 18px",
-                borderRadius: 9999,
-                fontSize: 12,
-                fontWeight: filter === f ? 700 : 500,
-                border: "none",
-                cursor: "pointer",
-                transition: "all 0.15s",
-                background: filter === f ? GOLD : "transparent",
-                color: filter === f ? "#0D0E12" : TEXT_MUTED,
-              }}
-            >
-              {f === "all" ? "Todas" : `No leídas${unread > 0 ? ` (${unread})` : ""}`}
-            </button>
-          ))}
+          {FILTER_TABS.map((tab) => {
+            const isActive = filter === tab.value;
+            const count = tab.value === "unread" && unread > 0 ? ` (${unread})` : "";
+            return (
+              <button
+                key={tab.value}
+                onClick={() => setFilter(tab.value)}
+                style={{
+                  padding: "7px 16px",
+                  borderRadius: 9999,
+                  fontSize: 12,
+                  fontWeight: isActive ? 700 : 500,
+                  border: isActive ? "none" : `1px solid ${BORDER_GOLD}`,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  background: isActive ? GOLD : BG_ELEVATED,
+                  color: isActive ? "#0D0E12" : TEXT_MUTED,
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                {tab.label}{count}
+              </button>
+            );
+          })}
         </div>
 
         {/* Empty state */}
@@ -463,9 +568,44 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
                 </div>
               </section>
             ))}
+
+            {/* Infinite scroll sentinel */}
+            <div ref={sentinelRef} style={{ height: 1 }} />
+
+            {/* Loading more indicator */}
+            {loadingMore && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  padding: "16px 0",
+                  color: TEXT_DIM,
+                }}
+              >
+                <Loader2
+                  style={{ width: 18, height: 18, animation: "spin 1s linear infinite" }}
+                />
+              </div>
+            )}
+
+            {/* End of list */}
+            {!hasMore && notifications.length >= PAGE_SIZE && (
+              <p
+                style={{
+                  textAlign: "center",
+                  fontSize: 11,
+                  color: TEXT_DIM,
+                  letterSpacing: "0.05em",
+                }}
+              >
+                — fin —
+              </p>
+            )}
           </div>
         )}
       </div>
+
+      <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }

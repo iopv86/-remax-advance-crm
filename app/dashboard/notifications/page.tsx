@@ -6,9 +6,9 @@ export default async function NotificationsPage() {
 
   const { data: notifications } = await supabase
     .from("notifications")
-    .select("id, type, title, body, read, link, created_at")
+    .select("id, user_id, type, title, body, read, link, created_at")
     .order("created_at", { ascending: false })
-    .limit(100);
+    .limit(30);
 
   const { count: unreadCount } = await supabase
     .from("notifications")
@@ -25,6 +25,7 @@ export default async function NotificationsPage() {
 
 export interface NotificationRow {
   id: string;
+  user_id: string;
   type: string;
   title: string;
   body: string | null;
