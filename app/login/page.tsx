@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+
 import { Logo } from "@/components/logo";
 
 export default function LoginPage() {
@@ -24,14 +25,23 @@ export default function LoginPage() {
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast.error(error.message);
+    try {
+      const res = await fetch("/api/auth/sign-in", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Error al iniciar sesión");
+        setLoading(false);
+      } else {
+        router.push("/dashboard");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Error de red. Intenta de nuevo.");
       setLoading(false);
-    } else {
-      router.push("/dashboard");
-      router.refresh();
     }
   }
 
