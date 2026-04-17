@@ -8,6 +8,7 @@ import { NotificationBell } from "@/components/notification-bell";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { MessageCircle, Plus } from "lucide-react";
+import Link from "next/link";
 
 // ─── Design tokens (Obsidian Edge) ───────────────────────────────────────────
 const T = {
@@ -229,10 +230,26 @@ export default function DashboardPage() {
   const [pendingTasks, setPendingTasks] = useState<Task[]>([]);
   const [pipelineStages, setPipelineStages] = useState<PipelineStage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [agentName, setAgentName] = useState("Ivan");
+  const [agentInitials, setAgentInitials] = useState("I");
 
   useEffect(() => {
     async function load() {
       const supabase = createClient();
+      // Load current agent name
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        const { data: agent } = await supabase
+          .from("agents")
+          .select("full_name")
+          .eq("email", user.email)
+          .single();
+        if (agent?.full_name) {
+          setAgentName(agent.full_name.split(" ")[0]);
+          const parts = agent.full_name.split(" ");
+          setAgentInitials(parts.map((p: string) => p[0]).join("").slice(0, 2).toUpperCase());
+        }
+      }
       const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
       const today = new Date().toISOString().split("T")[0];
 
@@ -397,16 +414,21 @@ export default function DashboardPage() {
               {(() => {
                 const h = new Date().getHours();
                 const greeting = h < 12 ? "Buenos días" : h < 19 ? "Buenas tardes" : "Buenas noches";
-                return `${greeting}, Ivan`;
+                return `${greeting}, ${agentName}`;
               })()}
             </p>
             <p style={{ fontSize: 10, color: T.stone500, textTransform: "uppercase", letterSpacing: "0.05em" }}>
               {new Date().toLocaleDateString("es-DO", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
             </p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <NotificationBell />
-            <button
+            {/* Calendar — links to Google Calendar */}
+            <a
+              href="https://calendar.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Abrir Google Calendar"
               style={{
                 width: 40,
                 height: 40,
@@ -415,14 +437,56 @@ export default function DashboardPage() {
                 justifyContent: "center",
                 borderRadius: "50%",
                 background: "transparent",
-                border: "none",
+                border: "1px solid transparent",
                 color: "#a8a29e",
                 cursor: "pointer",
+                textDecoration: "none",
+                transition: "all 0.15s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "rgba(201,150,58,0.1)";
+                (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(201,150,58,0.3)";
+                (e.currentTarget as HTMLAnchorElement).style.color = T.primary;
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.background = "transparent";
+                (e.currentTarget as HTMLAnchorElement).style.borderColor = "transparent";
+                (e.currentTarget as HTMLAnchorElement).style.color = "#a8a29e";
               }}
             >
-              <MaterialIcon name="calendar_today" style={{ fontSize: 22 }} />
-            </button>
+              <MaterialIcon name="calendar_today" style={{ fontSize: 20 }} />
+            </a>
             <div style={{ width: 1, height: 32, background: "rgba(255,255,255,0.1)" }} />
+            {/* Profile avatar */}
+            <Link
+              href="/dashboard/profile"
+              title="Mi perfil"
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: `linear-gradient(135deg, ${T.primary}, ${T.primaryContainer})`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 13,
+                fontWeight: 700,
+                color: "#281900",
+                textDecoration: "none",
+                flexShrink: 0,
+                boxShadow: "0 0 0 2px rgba(201,150,58,0.2)",
+                transition: "box-shadow 0.15s",
+                fontFamily: "Manrope, sans-serif",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 0 3px rgba(201,150,58,0.5)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 0 0 2px rgba(201,150,58,0.2)";
+              }}
+            >
+              {agentInitials}
+            </Link>
           </div>
         </div>
       </header>

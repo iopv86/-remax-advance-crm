@@ -15,9 +15,9 @@ import {
   Megaphone,
   BarChart3,
   Sparkles,
+  UserCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { Logo } from "@/components/logo";
 import { QuickActionSheets } from "@/components/quick-action-sheets";
@@ -43,8 +43,7 @@ export function Sidebar() {
   const router = useRouter();
 
   async function handleLogout() {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await fetch("/api/auth/sign-out", { method: "POST" });
     toast.success("Sesión cerrada");
     router.push("/login");
     router.refresh();
@@ -60,7 +59,7 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
-        <Logo size="xl" iconOnly />
+        <Logo size="md" />
       </div>
 
       {/* Ava status pill */}
@@ -140,8 +139,20 @@ export function Sidebar() {
         <QuickActionSheets />
       </div>
 
-      {/* Logout */}
-      <div className="px-3 pb-5 pt-1">
+      {/* Profile + Logout */}
+      <div className="px-3 pb-5 pt-1 space-y-1">
+        <Link
+          href="/dashboard/profile"
+          className={cn(
+            "flex w-full items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all hover:bg-white/5",
+            pathname.startsWith("/dashboard/profile")
+              ? "text-[#C9963A] bg-[rgba(201,150,58,0.08)]"
+              : "text-gray-400 hover:text-white"
+          )}
+        >
+          <UserCircle className={cn("h-4 w-4", pathname.startsWith("/dashboard/profile") ? "text-[#C9963A]" : "text-gray-500")} />
+          Mi Perfil
+        </Link>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all hover:bg-white/5"

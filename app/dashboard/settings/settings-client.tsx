@@ -697,27 +697,6 @@ function TabNotificaciones({ userId }: { userId: string }) {
   );
 }
 
-// ── TabAva ───────────────────────────────────────────
-
-function TabAva({ avaConfig }: { avaConfig: Props["avaConfig"] }) {
-  return (
-    <div>
-      <ContentHeader section="Asistente" title="Configuración de Ava" />
-
-      <div className="rounded-2xl p-6 max-w-2xl" style={GLASS_CARD}>
-        <p className="text-xs mb-5" style={{ color: "#9899A8" }}>
-          Estos valores se aplican al endpoint{" "}
-          <code className="font-mono px-1 py-0.5 rounded" style={{ background: "#1a1b22", color: GOLD_LIGHT }}>
-            /api/ava
-          </code>{" "}
-          del CRM en tiempo real.
-        </p>
-        <AvaConfigForm initial={avaConfig} />
-      </div>
-    </div>
-  );
-}
-
 // ── SettingsClient ───────────────────────────────────
 
 export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
