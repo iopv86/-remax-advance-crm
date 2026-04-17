@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { CLASSIFICATION_LABELS } from "@/lib/types";
 import type { Contact, Task } from "@/lib/types";
+import { NotificationBell } from "@/components/notification-bell";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { MessageCircle, Plus } from "lucide-react";
@@ -404,22 +405,7 @@ export default function DashboardPage() {
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <button
-              style={{
-                width: 40,
-                height: 40,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: "50%",
-                background: "transparent",
-                border: "none",
-                color: "#a8a29e",
-                cursor: "pointer",
-              }}
-            >
-              <MaterialIcon name="notifications" style={{ fontSize: 22 }} />
-            </button>
+            <NotificationBell />
             <button
               style={{
                 width: 40,
