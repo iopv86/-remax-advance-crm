@@ -260,6 +260,25 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
         className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
         style={{ pointerEvents: "auto" }}
       >
+        <Link
+          href={`/dashboard/pipeline/${deal.id}`}
+          onClick={(e) => e.stopPropagation()}
+          title="Ver detalle"
+          style={{
+            padding: "3px 6px",
+            borderRadius: "0.125rem",
+            background: "rgba(255,255,255,0.06)",
+            border: "1px solid rgba(201,150,58,0.2)",
+            color: "#9899A8",
+            fontSize: 11,
+            cursor: "pointer",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
+          }}
+        >
+          Ver
+        </Link>
         <button
           onClick={(e) => onEdit(deal, e)}
           title="Editar"

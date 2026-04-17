@@ -49,14 +49,21 @@ export interface Deal {
   property_id?: string;
   agent_id: string;
   stage: DealStage;
+  previous_stage?: DealStage;
   deal_value?: number;
   currency?: CurrencyType;
   commission_percentage?: number;
+  commission_value?: number;
   expected_close_date?: string;
   actual_close_date?: string;
+  stage_entered_at?: string;
   lost_reason?: string;
+  lost_detail?: string;
+  won_notes?: string;
   notes?: string;
+  priority?: "low" | "medium" | "high" | "urgent";
   created_at: string;
+  updated_at?: string;
   contact?: Contact;
   agent?: Agent;
 }
