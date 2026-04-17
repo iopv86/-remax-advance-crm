@@ -35,7 +35,7 @@ const navItems = [
 
 const settingsItems = [
   { href: "/dashboard/settings",      label: "Configuración",   icon: Settings },
-  { href: "/dashboard/ava",           label: "Ava IA",          icon: Bot,      sub: true },
+  { href: "/dashboard/settings/AvaIA", label: "Ava IA",          icon: Bot,      sub: true },
 ];
 
 export function Sidebar() {
@@ -60,7 +60,7 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
-        <Logo size="md" iconOnly />
+        <Logo size="xl" iconOnly />
       </div>
 
       {/* Ava status pill */}

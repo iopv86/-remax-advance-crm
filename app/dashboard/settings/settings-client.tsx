@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { AvaConfigForm } from "./ava-config-form";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InviteAgentDialog } from "@/components/invite-agent-dialog";
 import { createClient } from "@/lib/supabase/client";
@@ -20,21 +19,16 @@ import {
   Search,
 } from "lucide-react";
 
+// Bot is used in TabIntegraciones (Railway card)
+
 // ── Types ───────────────────────────────────────────
 
-type Tab = "equipo" | "perfil" | "integraciones" | "notificaciones" | "ava";
+type Tab = "equipo" | "perfil" | "integraciones" | "notificaciones";
 
 interface Props {
   agents: Agent[];
   currentAgent: Agent | null;
   currentUser: { email?: string; id: string } | null;
-  avaConfig: {
-    ava_name: string;
-    agency_name: string;
-    agency_tagline: string;
-    ava_markets: string;
-    ava_custom_instructions: string;
-  };
 }
 
 // ── Design tokens ───────────────────────────────────
@@ -76,12 +70,6 @@ const NAV_GROUPS: {
     label: "EQUIPO",
     items: [
       { key: "equipo", name: "Agentes" },
-    ],
-  },
-  {
-    label: "ASISTENTE",
-    items: [
-      { key: "ava", name: "Ava IA" },
     ],
   },
 ];
@@ -732,7 +720,7 @@ function TabAva({ avaConfig }: { avaConfig: Props["avaConfig"] }) {
 
 // ── SettingsClient ───────────────────────────────────
 
-export function SettingsClient({ agents, currentAgent, currentUser, avaConfig }: Props) {
+export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -832,7 +820,6 @@ export function SettingsClient({ agents, currentAgent, currentUser, avaConfig }:
         {activeTab === "perfil" && <TabPerfil currentAgent={currentAgent} currentUser={currentUser} />}
         {activeTab === "integraciones" && <TabIntegraciones />}
         {activeTab === "notificaciones" && <TabNotificaciones userId={currentUser?.id ?? ""} />}
-        {activeTab === "ava" && <TabAva avaConfig={avaConfig} />}
       </main>
     </div>
   );

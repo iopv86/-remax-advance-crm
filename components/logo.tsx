@@ -5,7 +5,7 @@ interface LogoProps {
   className?: string;
   /** Show monogram only — no wordmark text */
   iconOnly?: boolean;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   /** "login" renders the full lockup for the brand strip */
   variant?: "sidebar" | "login";
 }
@@ -16,7 +16,7 @@ export function Logo({
   size = "md",
   variant = "sidebar",
 }: LogoProps) {
-  const monogramSize = size === "sm" ? 44 : size === "md" ? 62 : 76;
+  const monogramSize = size === "sm" ? 44 : size === "md" ? 62 : size === "lg" ? 76 : 92;
   const nameSize = size === "sm" ? "13px" : size === "md" ? "15px" : "19px";
   const subSize = size === "sm" ? "9px" : "10px";
 
