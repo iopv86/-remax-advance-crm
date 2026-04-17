@@ -29,10 +29,13 @@ const navItems = [
   { href: "/dashboard/properties",    label: "Propiedades",     icon: Building2 },
   { href: "/dashboard/tasks",         label: "Tareas",          icon: CheckSquare },
   { href: "/dashboard/conversations", label: "Conversaciones",  icon: MessageSquare },
-  { href: "/dashboard/ava",           label: "Ava IA",          icon: Bot },
   { href: "/dashboard/agents",        label: "KPIs Agentes",    icon: BarChart3 },
   { href: "/dashboard/ads",           label: "Publicidad",      icon: Megaphone },
+];
+
+const settingsItems = [
   { href: "/dashboard/settings",      label: "Configuración",   icon: Settings },
+  { href: "/dashboard/ava",           label: "Ava IA",          icon: Bot,      sub: true },
 ];
 
 export function Sidebar() {
@@ -57,7 +60,7 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="px-5 pt-6 pb-5">
-        <Logo size="sm" iconOnly />
+        <Logo size="md" iconOnly />
       </div>
 
       {/* Ava status pill */}
@@ -102,6 +105,29 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {/* Settings group */}
+        <div className="pt-1">
+          {settingsItems.map(({ href, label, icon: Icon, sub }) => {
+            const active = pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={cn(
+                  "flex items-center gap-3 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
+                  sub ? "pl-10 pr-5" : "px-5",
+                  active
+                    ? "text-[#C9963A] border-[#C9963A] bg-[rgba(201,150,58,0.08)]"
+                    : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
+                )}
+              >
+                <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#C9963A]" : "text-gray-500")} />
+                <span>{label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </nav>
 
       {/* Quick actions */}
