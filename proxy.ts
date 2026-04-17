@@ -26,10 +26,18 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
-  const isPublic = pathname === "/login" || pathname === "/";
 
-  if (!user && !isPublic) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  // Protect /dashboard/* routes
+  if (!user && pathname.startsWith("/dashboard")) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Protect API routes (except /api/ava which uses its own secret-header auth)
+  const protectedApiPrefixes = ["/api/messages", "/api/pdf"];
+  if (!user && protectedApiPrefixes.some((p) => pathname.startsWith(p))) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 
   return supabaseResponse;
