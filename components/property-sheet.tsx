@@ -201,8 +201,8 @@ export function PropertySheet({
         className="w-full sm:max-w-lg overflow-y-auto p-0"
       >
         <SheetHeader
-          className="p-6 pb-4 sticky top-0 bg-white z-10"
-          style={{ borderBottom: "1px solid var(--border)" }}
+          className="p-6 pb-4 sticky top-0 z-10"
+          style={{ borderBottom: "1px solid var(--border)", background: "var(--card)" }}
         >
           <SheetTitle
             style={{
