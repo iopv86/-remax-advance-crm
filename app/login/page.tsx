@@ -70,9 +70,9 @@ export default function LoginPage() {
             filter: "grayscale(1) brightness(0.5)",
           }}
         />
-        {/* Logo — top left */}
-        <div className="absolute z-30" style={{ top: 48, left: 48 }}>
-          <Logo variant="login" />
+        {/* Logo — centered brand showcase */}
+        <div className="absolute z-30 inset-0 flex flex-col items-center justify-center gap-4">
+          <Logo variant="login" size="lg" />
         </div>
       </section>
 

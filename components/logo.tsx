@@ -27,9 +27,9 @@ export function Logo({
         <Image
           src="/canva-logotipo.png"
           alt="Advance Estate"
-          width={320}
-          height={128}
-          style={{ width: 320, height: "auto", objectFit: "contain" }}
+          width={480}
+          height={192}
+          style={{ width: 480, height: "auto", objectFit: "contain" }}
           unoptimized
           priority
         />
