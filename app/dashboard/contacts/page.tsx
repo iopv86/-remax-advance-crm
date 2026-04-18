@@ -17,7 +17,7 @@ export default async function ContactsPage({
   let query = supabase
     .from("contacts")
     .select(
-      "id, first_name, last_name, phone, email, lead_classification, lead_status, source, lead_score, budget_min, budget_max, budget_currency, property_type_interest, preferred_locations, last_activity_at, created_at, agent:agents(full_name)"
+      "id, first_name, last_name, phone, email, lead_classification, lead_status, source, lead_score, budget_min, budget_max, budget_currency, property_type_interest, preferred_locations, last_activity_at, created_at, agent:agents!contacts_agent_id_fkey(full_name)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -40,7 +40,10 @@ export default async function ContactsPage({
     query = query.eq("lead_status", params.status);
   }
 
-  const { data: contacts } = await query;
+  const { data: contacts, error: contactsError } = await query;
+  if (contactsError) {
+    console.error('[contacts] query error:', JSON.stringify(contactsError));
+  }
 
   const total = contacts?.length ?? 0;
 
