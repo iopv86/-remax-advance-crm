@@ -5,7 +5,8 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Search, Lock, MessageSquare } from "lucide-react";
+import { Search, Lock, MessageSquare, ExternalLink, ArrowRight } from "lucide-react";
+import Link from "next/link";
 import { CLASSIFICATION_LABELS } from "@/lib/types";
 import { WhatsAppComposer } from "@/components/whatsapp-composer";
 
@@ -75,6 +76,8 @@ export function ConversationsClient({ initialConversations }: Props) {
   const [filter, setFilter] = useState<Filter>("todos");
   const [refreshKey, setRefreshKey] = useState(0);
   const [avaPaused, setAvaPaused] = useState(false);
+  const [assignedAgent, setAssignedAgent] = useState<{ full_name: string | null } | null>(null);
+  const [contactDeals, setContactDeals] = useState<{ id: string; title: string; stage: string; value: number | null }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // stable supabase client ref
@@ -154,6 +157,42 @@ export function ConversationsClient({ initialConversations }: Props) {
   // Reset avaPaused when the selected contact changes
   useEffect(() => {
     setAvaPaused(false);
+  }, [selectedContactId]);
+
+  // Fetch assigned agent + deals for the selected contact
+  useEffect(() => {
+    if (!selectedContactId) {
+      setAssignedAgent(null);
+      setContactDeals([]);
+      return;
+    }
+    (async () => {
+      const { data: contact } = await supabase
+        .from("contacts")
+        .select("assigned_agent_id")
+        .eq("id", selectedContactId)
+        .single();
+
+      if (contact?.assigned_agent_id) {
+        const { data: agent } = await supabase
+          .from("agents")
+          .select("full_name")
+          .eq("id", contact.assigned_agent_id)
+          .single();
+        setAssignedAgent(agent);
+      } else {
+        setAssignedAgent(null);
+      }
+
+      const { data: deals } = await supabase
+        .from("deals")
+        .select("id, title, stage, value")
+        .eq("contact_id", selectedContactId)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setContactDeals((deals ?? []) as { id: string; title: string; stage: string; value: number | null }[]);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedContactId]);
 
   // Scroll to bottom on new thread messages
@@ -556,7 +595,19 @@ export function ConversationsClient({ initialConversations }: Props) {
                 {contactName(selectedContact)}
               </h3>
               {selectedContact.phone && (
-                <p className="text-xs text-[#9899A8] mb-4">{selectedContact.phone}</p>
+                <p className="text-xs text-[#9899A8] mb-2">{selectedContact.phone}</p>
+              )}
+
+              {/* Profile link */}
+              {selectedContact.id && (
+                <Link
+                  href={`/dashboard/contacts/${selectedContact.id}`}
+                  className="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-widest mb-4 transition-opacity hover:opacity-70"
+                  style={{ color: "#C9963A" }}
+                >
+                  Ver perfil completo
+                  <ExternalLink className="w-2.5 h-2.5" />
+                </Link>
               )}
 
               {/* Badges */}
@@ -615,7 +666,7 @@ export function ConversationsClient({ initialConversations }: Props) {
             </div>
 
             {/* Assigned agent section */}
-            <div className="mb-8">
+            <div className="mb-6">
               <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#545567] mb-4">
                 Agente Asignado
               </h4>
@@ -630,14 +681,45 @@ export function ConversationsClient({ initialConversations }: Props) {
                   className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ background: "rgba(201,150,58,0.15)", color: "#C9963A" }}
                 >
-                  A
+                  {assignedAgent?.full_name?.[0]?.toUpperCase() ?? "—"}
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-[#e5e2e1]">Administrador</p>
-                  <p className="text-[10px] text-[#9899A8]">Avance CRM</p>
+                  <p className="text-xs font-semibold text-[#e5e2e1]">
+                    {assignedAgent?.full_name ?? "Sin asignar"}
+                  </p>
+                  <p className="text-[10px] text-[#9899A8]">RE/MAX Advance</p>
                 </div>
               </div>
             </div>
+
+            {/* Deals section */}
+            {contactDeals.length > 0 && (
+              <div className="mb-8">
+                <h4 className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#545567] mb-4">
+                  Oportunidades
+                </h4>
+                <div className="space-y-2">
+                  {contactDeals.map((deal) => (
+                    <Link
+                      key={deal.id}
+                      href={`/dashboard/pipeline/${deal.id}`}
+                      className="flex items-center justify-between p-3 rounded-xl border group transition-colors hover:border-[rgba(201,150,58,0.3)]"
+                      style={{
+                        background: "#1C1D27",
+                        borderColor: "rgba(79,69,55,0.1)",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold text-[#e5e2e1] truncate">{deal.title}</p>
+                        <p className="text-[10px] text-[#9899A8] capitalize">{deal.stage.replace(/_/g, " ")}</p>
+                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-[#545567] flex-shrink-0 ml-2 group-hover:text-[#C9963A] transition-colors" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Timeline */}
             {threadMessages.length > 0 && (
