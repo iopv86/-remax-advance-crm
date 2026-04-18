@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Rate limit: 10 PDFs per minute per user
-  const rl = checkRateLimit(`pdf:${user.id}`, 10, 60_000);
+  const rl = await checkRateLimit(`pdf:${user.id}`, 10, 60_000);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: "Demasiadas solicitudes. Espera un momento." },

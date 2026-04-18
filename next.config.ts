@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const securityHeaders = [
   {
@@ -53,4 +54,13 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  // Suppress Sentry CLI output unless running in CI.
+  silent: !process.env.CI,
+
+  widenClientFileUpload: true,
+  disableLogger: true,
+
+  // Route Sentry traffic through /monitoring to avoid ad-blockers.
+  tunnelRoute: "/monitoring",
+});

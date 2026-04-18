@@ -3,6 +3,7 @@ import { Cinzel, Inter, Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
+import { PHProvider } from "@/components/posthog-provider";
 
 const cinzel = Cinzel({
   subsets: ["latin"],
@@ -47,10 +48,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${cinzel.variable} ${inter.variable} ${manrope.variable} ${mono.variable} h-full`}>
-        <ThemeProvider>
-          {children}
-          <Toaster richColors position="top-right" />
-        </ThemeProvider>
+        <PHProvider>
+          <ThemeProvider>
+            {children}
+            <Toaster richColors position="top-right" />
+          </ThemeProvider>
+        </PHProvider>
       </body>
     </html>
   );

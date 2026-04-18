@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
       request.headers.get("x-vercel-forwarded-for") ??
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "unknown";
-    const rl = checkRateLimit(`sign-in:${ip}`, 10, 15 * 60 * 1000);
+    const rl = await checkRateLimit(`sign-in:${ip}`, 10, 15 * 60 * 1000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Demasiados intentos. Intenta de nuevo en 15 minutos." },

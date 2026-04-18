@@ -18,6 +18,29 @@ function sanitizeField(value: string, maxLen: number): string {
   return value.replace(/[\r\n\t\x00-\x1f\x7f]/g, " ").trim().slice(0, maxLen);
 }
 
+// Allowlist for media_url origins — only WhatsApp / Meta CDN domains accepted.
+const ALLOWED_MEDIA_HOSTNAMES = new Set([
+  "mmg.whatsapp.net",
+  "pps.whatsapp.net",
+  "media.whatsapp.net",
+  "lookaside.fbsbx.com",
+  "lookaside.instagram.com",
+]);
+
+function isAllowedMediaUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== "https:") return false;
+    const host = parsed.hostname.toLowerCase();
+    return (
+      ALLOWED_MEDIA_HOSTNAMES.has(host) ||
+      [...ALLOWED_MEDIA_HOSTNAMES].some((d) => host.endsWith(`.${d}`))
+    );
+  } catch {
+    return false;
+  }
+}
+
 // ─── Agency config ────────────────────────────────────────────────────────────
 
 interface AvaConfig {
@@ -142,7 +165,7 @@ export async function POST(request: NextRequest) {
 
   // Rate limit: 60 requests per minute per source IP (Ava sends at most ~10/min)
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const rl = checkRateLimit(`ava:${ip}`, 60, 60_000);
+  const rl = await checkRateLimit(`ava:${ip}`, 60, 60_000);
   if (!rl.allowed) {
     return NextResponse.json(
       { error: "Rate limit exceeded" },
@@ -241,6 +264,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No response from model" }, { status: 500 });
     }
 
+    // Validate media_url against allowlist before persisting (M5)
+    const safeMediaUrl =
+      media_url && isAllowedMediaUrl(media_url) ? media_url : null;
+    if (media_url && !safeMediaUrl) {
+      console.warn("[ava] rejected media_url with disallowed domain:", media_url);
+    }
+
     // Save outbound message + media fields if present
     await supabase.from("messages").insert({
       contact_id,
@@ -248,7 +278,7 @@ export async function POST(request: NextRequest) {
       channel: "whatsapp",
       content: responseText,
       is_automated: true,
-      ...(media_url ? { media_url } : {}),
+      ...(safeMediaUrl ? { media_url: safeMediaUrl } : {}),
       ...(media_type ? { media_type } : {}),
     });
 
