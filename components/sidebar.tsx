@@ -19,8 +19,6 @@ import {
   UserCircle,
   Bell,
   FileBarChart,
-  Target,
-  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -42,10 +40,8 @@ const ALL_NAV_ITEMS = [
 ];
 
 const ALL_SETTINGS_ITEMS = [
-  { href: "/dashboard/settings",                 label: "Configuración",  icon: Settings,   sub: false, roles: ["admin"] },
-  { href: "/dashboard/settings/AvaIA",           label: "Ava IA",         icon: Bot,        sub: true,  roles: ["admin"] },
-  { href: "/dashboard/settings/objectives",      label: "Objetivos",      icon: Target,     sub: true,  roles: ["admin", "manager"] },
-  { href: "/dashboard/settings/round-robin",     label: "Round Robin",    icon: RefreshCw,  sub: true,  roles: ["admin", "manager"] },
+  { href: "/dashboard/settings",       label: "Configuración",  icon: Settings,   sub: false, roles: ["admin"] },
+  { href: "/dashboard/settings/AvaIA", label: "Ava IA",         icon: Bot,        sub: true,  roles: ["admin"] },
 ];
 
 export function Sidebar({ role = "agent" }: { role?: string }) {

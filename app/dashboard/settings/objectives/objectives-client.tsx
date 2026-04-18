@@ -21,7 +21,7 @@ const BORDER = "rgba(201,150,58,0.15)";
 const TEXT_PRIMARY = "#E8E3DC";
 const TEXT_MUTED   = "#9899A8";
 
-export function ObjectivesClient({ agents: initial }: { agents: AgentRow[] }) {
+export function ObjectivesClient({ agents: initial, embedded = false }: { agents: AgentRow[]; embedded?: boolean }) {
   const [agents, setAgents] = useState<AgentRow[]>(initial);
   const [saving, setSaving] = useState<string | null>(null);
 
@@ -52,31 +52,8 @@ export function ObjectivesClient({ agents: initial }: { agents: AgentRow[] }) {
     admin: "Admin", manager: "Manager", agent: "Agente", viewer: "Viewer",
   };
 
-  return (
-    <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
-      {/* Header */}
-      <header style={{
-        position: "sticky", top: 0, zIndex: 40,
-        background: "rgba(13,14,18,0.92)", backdropFilter: "blur(16px)",
-        borderBottom: `1px solid ${BORDER}`,
-        padding: "20px 40px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-      }}>
-        <div>
-          <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: GOLD, margin: "0 0 4px" }}>
-            Configuración
-          </p>
-          <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 26, letterSpacing: "-0.02em", margin: 0 }}>
-            Objetivos por Agente
-          </h1>
-        </div>
-        <p style={{ fontSize: 13, color: TEXT_MUTED, maxWidth: 320, textAlign: "right", lineHeight: 1.5 }}>
-          Define metas mensuales de captaciones y facturación para cada agente.
-          El progreso se muestra en el KPI de Agentes.
-        </p>
-      </header>
-
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "40px 24px 80px" }}>
+  const content = (
+    <div style={{ maxWidth: embedded ? undefined : 900, margin: embedded ? undefined : "0 auto", padding: embedded ? "0" : "40px 24px 80px" }}>
         {/* Legend */}
         <div style={{ display: "flex", gap: 24, marginBottom: 32 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: TEXT_MUTED }}>
@@ -204,7 +181,34 @@ export function ObjectivesClient({ agents: initial }: { agents: AgentRow[] }) {
             </div>
           )}
         </div>
-      </div>
+    </div>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
+      <header style={{
+        position: "sticky", top: 0, zIndex: 40,
+        background: "rgba(13,14,18,0.92)", backdropFilter: "blur(16px)",
+        borderBottom: `1px solid ${BORDER}`,
+        padding: "20px 40px",
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+      }}>
+        <div>
+          <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: GOLD, margin: "0 0 4px" }}>
+            Configuración
+          </p>
+          <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 26, letterSpacing: "-0.02em", margin: 0 }}>
+            Objetivos por Agente
+          </h1>
+        </div>
+        <p style={{ fontSize: 13, color: TEXT_MUTED, maxWidth: 320, textAlign: "right", lineHeight: 1.5 }}>
+          Define metas mensuales de captaciones y facturación para cada agente.
+          El progreso se muestra en el KPI de Agentes.
+        </p>
+      </header>
+      {content}
     </div>
   );
 }
