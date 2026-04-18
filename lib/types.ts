@@ -185,6 +185,8 @@ export interface AgentKPISummary {
   avgResponseMinutes: number | null;
   leadToContactRate: number | null;
   history: AgentHistoricalKPIView[];
+  captacionesObjetivo: number | null;
+  facturacionObjetivo: number | null;
 }
 
 export const CLASSIFICATION_COLORS: Record<LeadClassification, string> = {

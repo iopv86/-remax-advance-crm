@@ -7,7 +7,7 @@ import type { Contact, Task } from "@/lib/types";
 import { NotificationBell } from "@/components/notification-bell";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import { MessageCircle, Plus } from "lucide-react";
+import { MessageCircle, Plus, TrendingUp, Users, DollarSign, BarChart2, MapPin, X } from "lucide-react";
 import Link from "next/link";
 
 // ─── Design tokens (Obsidian Edge) ───────────────────────────────────────────
@@ -232,6 +232,27 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [agentName, setAgentName] = useState("Ivan");
   const [agentInitials, setAgentInitials] = useState("I");
+  const [insightOpen, setInsightOpen] = useState(false);
+  const [insightLoading, setInsightLoading] = useState(false);
+  const [insightData, setInsightData] = useState<{
+    summary: { totalDeals: number; wonDeals: number; conversionRate: string; revenue90: number; avgDealValue: number; pipelineValue: number; leads30: number; leadsDelta: string | null };
+    topAgent: { name: string; revenue: number } | null;
+    revenueByMonth: { month: string; value: number }[];
+    topZones: { zone: string; count: number }[];
+    leadSources: { source: string; count: number }[];
+  } | null>(null);
+
+  async function openInsight() {
+    setInsightOpen(true);
+    if (insightData) return; // already loaded
+    setInsightLoading(true);
+    try {
+      const res = await fetch("/api/market-insights");
+      if (res.ok) setInsightData(await res.json());
+    } finally {
+      setInsightLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -765,35 +786,20 @@ export default function DashboardPage() {
               position: "relative",
               overflow: "hidden",
             }}>
-              {/* Background decoration */}
-              <div style={{
-                position: "absolute",
-                right: -40,
-                bottom: -40,
-                opacity: 0.08,
-                pointerEvents: "none",
-              }}>
-                <span
-                  className="material-symbols-outlined"
-                  style={{
-                    fontSize: 160,
-                    color: T.primary,
-                    fontVariationSettings: "'FILL' 1",
-                  }}
-                >
-                  insights
-                </span>
+              <div style={{ position: "absolute", right: -40, bottom: -40, opacity: 0.06, pointerEvents: "none" }}>
+                <BarChart2 size={160} color={T.primary} />
               </div>
               <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: T.primary, marginBottom: 8 }}>
                 Market Insight
               </p>
-              <h3 style={{ fontSize: 14, fontWeight: 700, color: T.onSurface, marginBottom: 12 }}>
-                Tendencia Inmobiliaria Luxury
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: T.onSurface, marginBottom: 8 }}>
+                Análisis del Mercado
               </h3>
-              <p style={{ fontSize: 12, color: T.stone500, lineHeight: 1.6 }}>
-                Las propiedades frente al mar han visto un incremento del 8.2% en plusvalía trimestral.
+              <p style={{ fontSize: 12, color: T.stone500, lineHeight: 1.6, marginBottom: 0 }}>
+                Datos reales de los últimos 90 días: pipeline activo, conversión, zonas líderes y rendimiento por agente.
               </p>
               <button
+                onClick={openInsight}
                 style={{
                   marginTop: 16,
                   padding: "8px 16px",
@@ -807,13 +813,169 @@ export default function DashboardPage() {
                   border: "none",
                   cursor: "pointer",
                   transition: "box-shadow 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
                 }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 12px rgba(245,189,93,0.3)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "none"; }}
               >
-                Generar Reporte IA
+                <TrendingUp size={12} />
+                Ver Reporte
               </button>
             </div>
+
+            {/* Market Insight Modal */}
+            {insightOpen && (
+              <div
+                style={{
+                  position: "fixed", inset: 0, zIndex: 9999,
+                  background: "rgba(0,0,0,0.75)", backdropFilter: "blur(6px)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  padding: 24,
+                }}
+                onClick={(e) => { if (e.target === e.currentTarget) setInsightOpen(false); }}
+              >
+                <div style={{
+                  background: "#0D0E12", border: `1px solid rgba(201,150,58,0.2)`,
+                  borderRadius: 20, width: "100%", maxWidth: 680,
+                  maxHeight: "90vh", overflowY: "auto", padding: 32, position: "relative",
+                }}>
+                  {/* Header */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
+                    <div>
+                      <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.15em", color: T.primary, margin: "0 0 6px" }}>
+                        Market Insight · Últimos 90 días
+                      </p>
+                      <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 24, color: T.onSurface, margin: 0 }}>
+                        Análisis del Mercado
+                      </h2>
+                    </div>
+                    <button
+                      onClick={() => setInsightOpen(false)}
+                      style={{ background: "rgba(255,255,255,0.05)", border: "none", borderRadius: 8, padding: 8, cursor: "pointer", color: T.stone500 }}
+                    >
+                      <X size={18} />
+                    </button>
+                  </div>
+
+                  {insightLoading && (
+                    <div style={{ textAlign: "center", padding: "48px 0", color: T.stone500 }}>
+                      <div style={{ width: 32, height: 32, border: `2px solid rgba(201,150,58,0.2)`, borderTopColor: T.primary, borderRadius: "50%", animation: "spin 0.8s linear infinite", margin: "0 auto 16px" }} />
+                      <p style={{ fontSize: 13 }}>Cargando datos reales…</p>
+                      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                    </div>
+                  )}
+
+                  {!insightLoading && insightData && (() => {
+                    const { summary, topAgent, revenueByMonth, topZones, leadSources } = insightData;
+                    const SOURCE_LABELS: Record<string, string> = {
+                      ctwa_ad: "Meta Ads CTWA", lead_form: "Lead Form", referral: "Referidos",
+                      walk_in: "Visita directa", website: "Website", social_media: "Redes sociales", other: "Otro",
+                    };
+                    const maxMonth = Math.max(...revenueByMonth.map((m) => m.value), 1);
+                    const maxZone  = Math.max(...topZones.map((z) => z.count), 1);
+                    const maxSrc   = Math.max(...leadSources.map((s) => s.count), 1);
+                    const fmtMoney = (v: number) => v >= 1_000_000 ? `$${(v / 1_000_000).toFixed(1)}M` : v >= 1_000 ? `$${(v / 1_000).toFixed(0)}K` : `$${v.toLocaleString()}`;
+
+                    return (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+                        {/* KPI grid */}
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
+                          {[
+                            { icon: <DollarSign size={16} color={T.primary} />, label: "Ingresos 90d", value: fmtMoney(summary.revenue90) },
+                            { icon: <TrendingUp size={16} color="#22c55e" />,  label: "Conversión", value: `${summary.conversionRate}%` },
+                            { icon: <BarChart2 size={16} color="#60a5fa" />,   label: "Pipeline activo", value: fmtMoney(summary.pipelineValue) },
+                            { icon: <Users size={16} color="#a78bfa" />,        label: "Nuevos leads 30d", value: summary.leads30 + (summary.leadsDelta ? ` (${Number(summary.leadsDelta) >= 0 ? "+" : ""}${summary.leadsDelta}%)` : "") },
+                            { icon: <TrendingUp size={16} color={T.primary} />, label: "Deal promedio", value: fmtMoney(summary.avgDealValue) },
+                            { icon: <Users size={16} color="#22c55e" />,        label: "Deals ganados", value: `${summary.wonDeals} / ${summary.totalDeals}` },
+                          ].map(({ icon, label, value }) => (
+                            <div key={label} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, padding: "14px 16px" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>{icon}<span style={{ fontSize: 10, color: T.stone500, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span></div>
+                              <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: T.onSurface, margin: 0 }}>{value}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Top agent */}
+                        {topAgent && (
+                          <div style={{ background: "rgba(201,150,58,0.06)", border: "1px solid rgba(201,150,58,0.15)", borderRadius: 12, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+                            <span style={{ fontSize: 22 }}>🏆</span>
+                            <div>
+                              <p style={{ fontSize: 11, color: T.primary, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", margin: "0 0 2px" }}>Top performer 90 días</p>
+                              <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 15, color: T.onSurface, margin: 0 }}>{topAgent.name} — {fmtMoney(topAgent.revenue)}</p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Revenue by month */}
+                        {revenueByMonth.length > 0 && (
+                          <div>
+                            <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: T.stone500, letterSpacing: "0.1em", margin: "0 0 12px" }}>Ingresos por mes</p>
+                            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                              {revenueByMonth.map((m) => (
+                                <div key={m.month} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                                  <span style={{ fontSize: 11, color: T.stone500, width: 52, flexShrink: 0 }}>{m.month}</span>
+                                  <div style={{ flex: 1, height: 6, background: "rgba(255,255,255,0.05)", borderRadius: 9999, overflow: "hidden" }}>
+                                    <div style={{ height: "100%", width: `${(m.value / maxMonth) * 100}%`, background: T.primary, borderRadius: 9999, transition: "width 0.5s" }} />
+                                  </div>
+                                  <span style={{ fontSize: 11, fontWeight: 600, color: T.onSurface, width: 64, textAlign: "right", flexShrink: 0 }}>{fmtMoney(m.value)}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Top zones + lead sources row */}
+                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+                          {topZones.length > 0 && (
+                            <div>
+                              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                                <MapPin size={13} color={T.primary} />
+                                <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: T.stone500, letterSpacing: "0.1em", margin: 0 }}>Zonas con más demanda</p>
+                              </div>
+                              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                                {topZones.map((z) => (
+                                  <div key={z.zone} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ flex: 1, height: 5, background: "rgba(255,255,255,0.05)", borderRadius: 9999, overflow: "hidden" }}>
+                                      <div style={{ height: "100%", width: `${(z.count / maxZone) * 100}%`, background: "#60a5fa", borderRadius: 9999 }} />
+                                    </div>
+                                    <span style={{ fontSize: 11, color: T.onSurface, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: 100 }}>{z.zone}</span>
+                                    <span style={{ fontSize: 10, color: T.stone500, flexShrink: 0 }}>{z.count}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          {leadSources.length > 0 && (
+                            <div>
+                              <p style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", color: T.stone500, letterSpacing: "0.1em", margin: "0 0 12px" }}>Origen de leads</p>
+                              <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+                                {leadSources.slice(0, 5).map((s) => (
+                                  <div key={s.source} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                    <div style={{ flex: 1, height: 5, background: "rgba(255,255,255,0.05)", borderRadius: 9999, overflow: "hidden" }}>
+                                      <div style={{ height: "100%", width: `${(s.count / maxSrc) * 100}%`, background: "#a78bfa", borderRadius: 9999 }} />
+                                    </div>
+                                    <span style={{ fontSize: 11, color: T.onSurface, flexShrink: 0 }}>{SOURCE_LABELS[s.source] ?? s.source}</span>
+                                    <span style={{ fontSize: 10, color: T.stone500, flexShrink: 0 }}>{s.count}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {!insightLoading && !insightData && (
+                    <p style={{ textAlign: "center", color: T.stone500, fontSize: 13, padding: "32px 0" }}>
+                      No hay datos disponibles.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </section>

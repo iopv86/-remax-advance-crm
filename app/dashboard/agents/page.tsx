@@ -33,7 +33,7 @@ function isHistoricalRow(row: unknown): row is AgentHistoricalKPIView {
 // ─── Builder ─────────────────────────────────────────────────────────────────
 
 function toAgentKPISummary(
-  agent: { id: string; full_name: string; role: AgentRole },
+  agent: { id: string; full_name: string; role: AgentRole; captaciones_objetivo?: number | null; facturacion_objetivo?: number | null },
   kpi: AgentKPIView | undefined,
   rt: AgentResponseTimeView | undefined,
   history: AgentHistoricalKPIView[]
@@ -42,16 +42,18 @@ function toAgentKPISummary(
     id: agent.id,
     name: agent.full_name,
     role: agent.role,
-    closedDeals:       kpi?.deals_closed        ?? 0,
-    activeDeals:       kpi?.deals_active         ?? 0,
-    revenue:           kpi?.total_revenue        ?? 0,
-    pipelineValue:     kpi?.pipeline_value       ?? 0,
-    avgTicketValue:    kpi?.avg_ticket_value      ?? null,
-    stalledDeals:      kpi?.stalled_deals_count  ?? 0,
-    conversionRate:    kpi?.conversion_rate       ?? null,
-    avgResponseMinutes: rt?.avg_response_minutes  ?? null,
-    leadToContactRate:  rt?.lead_to_contact_rate  ?? null,
+    closedDeals:          kpi?.deals_closed        ?? 0,
+    activeDeals:          kpi?.deals_active         ?? 0,
+    revenue:              kpi?.total_revenue        ?? 0,
+    pipelineValue:        kpi?.pipeline_value       ?? 0,
+    avgTicketValue:       kpi?.avg_ticket_value      ?? null,
+    stalledDeals:         kpi?.stalled_deals_count  ?? 0,
+    conversionRate:       kpi?.conversion_rate       ?? null,
+    avgResponseMinutes:   rt?.avg_response_minutes  ?? null,
+    leadToContactRate:    rt?.lead_to_contact_rate  ?? null,
     history,
+    captacionesObjetivo:  agent.captaciones_objetivo ?? null,
+    facturacionObjetivo:  agent.facturacion_objetivo ?? null,
   };
 }
 
@@ -75,7 +77,7 @@ export default async function AgentsPage() {
   ] = await Promise.all([
     supabase
       .from("agents")
-      .select("id, full_name, role")
+      .select("id, full_name, role, captaciones_objetivo, facturacion_objetivo")
       .eq("is_active", true),
     supabase
       .from("agent_monthly_kpis")

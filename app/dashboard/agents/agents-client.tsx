@@ -230,6 +230,8 @@ export function AgentsClient({ agents }: Props) {
                   "Resp.",
                   "Conversión",
                   "Pipeline",
+                  "Captaciones",
+                  "Facturación",
                   "Estado",
                   "Actividad 7D",
                 ].map((col, i) => (
@@ -258,6 +260,13 @@ export function AgentsClient({ agents }: Props) {
                   agent.pipelineValue >= 1_000_000
                     ? `RD$ ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
                     : `RD$ ${agent.pipelineValue.toLocaleString()}`;
+
+                const captPct = agent.captacionesObjetivo && agent.captacionesObjetivo > 0
+                  ? Math.min(100, Math.round((agent.closedDeals / agent.captacionesObjetivo) * 100))
+                  : null;
+                const factPct = agent.facturacionObjetivo && agent.facturacionObjetivo > 0
+                  ? Math.min(100, Math.round((agent.revenue / agent.facturacionObjetivo) * 100))
+                  : null;
 
                 return (
                   <tr
@@ -310,6 +319,40 @@ export function AgentsClient({ agents }: Props) {
                     {/* Pipeline */}
                     <td className="px-6 py-4 text-right font-semibold text-sm text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
                       {pipelineLabel}
+                    </td>
+
+                    {/* Captaciones objetivo */}
+                    <td className="px-6 py-4">
+                      {captPct !== null ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-[#353534] rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-700"
+                              style={{ width: `${captPct}%`, background: captPct >= 100 ? "#22c55e" : captPct >= 60 ? "#C9963A" : "#ef4444" }}
+                            />
+                          </div>
+                          <span className="text-xs text-[#9899A8] font-medium w-9 text-right">{captPct}%</span>
+                        </div>
+                      ) : (
+                        <span className="font-mono text-xs text-[#545567]">—</span>
+                      )}
+                    </td>
+
+                    {/* Facturación objetivo */}
+                    <td className="px-6 py-4">
+                      {factPct !== null ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 h-1.5 bg-[#353534] rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-700"
+                              style={{ width: `${factPct}%`, background: factPct >= 100 ? "#22c55e" : factPct >= 60 ? "#C9963A" : "#ef4444" }}
+                            />
+                          </div>
+                          <span className="text-xs text-[#9899A8] font-medium w-9 text-right">{factPct}%</span>
+                        </div>
+                      ) : (
+                        <span className="font-mono text-xs text-[#545567]">—</span>
+                      )}
                     </td>
 
                     {/* Estado */}

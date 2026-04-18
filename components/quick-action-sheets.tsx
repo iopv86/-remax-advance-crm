@@ -47,6 +47,14 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+const SOURCE_OPTIONS = [
+  { value: "referral",     label: "Referido" },
+  { value: "walk_in",      label: "Visita directa / Oficina" },
+  { value: "website",      label: "Website" },
+  { value: "social_media", label: "Redes sociales" },
+  { value: "other",        label: "Otro" },
+];
+
 // ── Contact form ─────────────────────────────────────────────────────────────
 
 function NewContactForm({ onClose }: { onClose: () => void }) {
@@ -54,6 +62,9 @@ function NewContactForm({ onClose }: { onClose: () => void }) {
     first_name: "",
     last_name: "",
     phone: "",
+    email: "",
+    source: "referral",
+    source_detail: "",
     lead_classification: "warm" as LeadClassification,
   });
   const [loading, setLoading] = useState(false);
@@ -68,12 +79,19 @@ function NewContactForm({ onClose }: { onClose: () => void }) {
       toast.error("El nombre es obligatorio");
       return;
     }
+    if (!form.phone.trim() && !form.email.trim()) {
+      toast.error("Ingresa al menos un teléfono o email");
+      return;
+    }
     setLoading(true);
     const supabase = createClient();
     const { error } = await supabase.from("contacts").insert({
       first_name: form.first_name.trim(),
       last_name: form.last_name.trim() || null,
       phone: form.phone.trim() || null,
+      email: form.email.trim() || null,
+      source: form.source as "referral" | "walk_in" | "website" | "social_media" | "other",
+      source_detail: form.source_detail.trim() || null,
       lead_classification: form.lead_classification,
       lead_status: "new",
     });
@@ -88,21 +106,23 @@ function NewContactForm({ onClose }: { onClose: () => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div>
-        <Label>Nombre *</Label>
-        <Input
-          placeholder="María"
-          value={form.first_name}
-          onChange={(e) => set("first_name", e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Apellido</Label>
-        <Input
-          placeholder="García"
-          value={form.last_name}
-          onChange={(e) => set("last_name", e.target.value)}
-        />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label>Nombre *</Label>
+          <Input
+            placeholder="María"
+            value={form.first_name}
+            onChange={(e) => set("first_name", e.target.value)}
+          />
+        </div>
+        <div>
+          <Label>Apellido</Label>
+          <Input
+            placeholder="García"
+            value={form.last_name}
+            onChange={(e) => set("last_name", e.target.value)}
+          />
+        </div>
       </div>
       <div>
         <Label>Teléfono</Label>
@@ -112,6 +132,41 @@ function NewContactForm({ onClose }: { onClose: () => void }) {
           onChange={(e) => set("phone", e.target.value)}
         />
       </div>
+      <div>
+        <Label>Email</Label>
+        <Input
+          type="email"
+          placeholder="maria@ejemplo.com"
+          value={form.email}
+          onChange={(e) => set("email", e.target.value)}
+        />
+      </div>
+      <div>
+        <Label>Origen del cliente</Label>
+        <Select
+          value={form.source}
+          onValueChange={(v) => v && set("source", v)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SOURCE_OPTIONS.map((o) => (
+              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      {(form.source === "referral" || form.source === "other") && (
+        <div>
+          <Label>{form.source === "referral" ? "¿Quién refirió?" : "Detalle"}</Label>
+          <Input
+            placeholder={form.source === "referral" ? "Nombre del referidor" : "Describe el origen"}
+            value={form.source_detail}
+            onChange={(e) => set("source_detail", e.target.value)}
+          />
+        </div>
+      )}
       <div>
         <Label>Clasificación</Label>
         <Select
