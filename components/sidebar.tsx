@@ -18,6 +18,7 @@ import {
   Sparkles,
   UserCircle,
   Bell,
+  FileBarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -34,6 +35,7 @@ const ALL_NAV_ITEMS = [
   { href: "/dashboard/conversations",   label: "Conversaciones",  icon: MessageSquare,roles: ["admin","manager","agent"] },
   { href: "/dashboard/notifications",   label: "Notificaciones",  icon: Bell,         roles: ["admin","manager","agent"] },
   { href: "/dashboard/agents",          label: "KPIs Agentes",    icon: BarChart3,    roles: ["admin","manager"] },
+  { href: "/dashboard/reports",         label: "Reportes",        icon: FileBarChart, roles: ["admin","manager"] },
   { href: "/dashboard/ads",             label: "Publicidad",      icon: Megaphone,    roles: ["admin","manager"] },
 ];
 

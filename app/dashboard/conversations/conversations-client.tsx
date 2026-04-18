@@ -77,7 +77,7 @@ export function ConversationsClient({ initialConversations }: Props) {
   const [refreshKey, setRefreshKey] = useState(0);
   const [avaPaused, setAvaPaused] = useState(false);
   const [assignedAgent, setAssignedAgent] = useState<{ full_name: string | null } | null>(null);
-  const [contactDeals, setContactDeals] = useState<{ id: string; title: string; stage: string; value: number | null }[]>([]);
+  const [contactDeals, setContactDeals] = useState<{ id: string; stage: string; deal_value: number | null; currency: string | null }[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // stable supabase client ref
@@ -186,11 +186,11 @@ export function ConversationsClient({ initialConversations }: Props) {
 
       const { data: deals } = await supabase
         .from("deals")
-        .select("id, title, stage, value")
+        .select("id, stage, deal_value, currency")
         .eq("contact_id", selectedContactId)
         .order("created_at", { ascending: false })
         .limit(5);
-      setContactDeals((deals ?? []) as { id: string; title: string; stage: string; value: number | null }[]);
+      setContactDeals((deals ?? []) as { id: string; stage: string; deal_value: number | null; currency: string | null }[]);
     })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedContactId]);
@@ -711,8 +711,14 @@ export function ConversationsClient({ initialConversations }: Props) {
                       }}
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold text-[#e5e2e1] truncate">{deal.title}</p>
-                        <p className="text-[10px] text-[#9899A8] capitalize">{deal.stage.replace(/_/g, " ")}</p>
+                        <p className="text-xs font-semibold text-[#e5e2e1] truncate capitalize">
+                          {deal.stage.replace(/_/g, " ")}
+                        </p>
+                        {deal.deal_value && (
+                          <p className="text-[10px] text-[#9899A8]">
+                            {deal.currency ?? "USD"} {deal.deal_value.toLocaleString("es-DO")}
+                          </p>
+                        )}
                       </div>
                       <ArrowRight className="w-3.5 h-3.5 text-[#545567] flex-shrink-0 ml-2 group-hover:text-[#C9963A] transition-colors" />
                     </Link>
