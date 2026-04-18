@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   LayoutGrid,
   Users,
@@ -16,21 +17,24 @@ import {
   BarChart3,
   Sparkles,
   UserCircle,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Logo } from "@/components/logo";
 import { QuickActionSheets } from "@/components/quick-action-sheets";
+import { createClient } from "@/lib/supabase/client";
 
 const ALL_NAV_ITEMS = [
-  { href: "/dashboard",               label: "Dashboard",       icon: LayoutGrid, roles: ["admin","manager","agent","viewer"] },
-  { href: "/dashboard/contacts",      label: "Clientes",        icon: Users,      roles: ["admin","manager","agent"] },
-  { href: "/dashboard/pipeline",      label: "Oportunidades",   icon: Kanban,     roles: ["admin","manager","agent"] },
-  { href: "/dashboard/properties",    label: "Propiedades",     icon: Building2,  roles: ["admin","manager","agent"] },
-  { href: "/dashboard/tasks",         label: "Tareas",          icon: CheckSquare,roles: ["admin","manager","agent"] },
-  { href: "/dashboard/conversations", label: "Conversaciones",  icon: MessageSquare, roles: ["admin","manager","agent"] },
-  { href: "/dashboard/agents",        label: "KPIs Agentes",    icon: BarChart3,  roles: ["admin","manager"] },
-  { href: "/dashboard/ads",           label: "Publicidad",      icon: Megaphone,  roles: ["admin","manager"] },
+  { href: "/dashboard",                 label: "Dashboard",       icon: LayoutGrid,   roles: ["admin","manager","agent","viewer"] },
+  { href: "/dashboard/contacts",        label: "Clientes",        icon: Users,        roles: ["admin","manager","agent"] },
+  { href: "/dashboard/pipeline",        label: "Oportunidades",   icon: Kanban,       roles: ["admin","manager","agent"] },
+  { href: "/dashboard/properties",      label: "Propiedades",     icon: Building2,    roles: ["admin","manager","agent"] },
+  { href: "/dashboard/tasks",           label: "Tareas",          icon: CheckSquare,  roles: ["admin","manager","agent"] },
+  { href: "/dashboard/conversations",   label: "Conversaciones",  icon: MessageSquare,roles: ["admin","manager","agent"] },
+  { href: "/dashboard/notifications",   label: "Notificaciones",  icon: Bell,         roles: ["admin","manager","agent"] },
+  { href: "/dashboard/agents",          label: "KPIs Agentes",    icon: BarChart3,    roles: ["admin","manager"] },
+  { href: "/dashboard/ads",             label: "Publicidad",      icon: Megaphone,    roles: ["admin","manager"] },
 ];
 
 const ALL_SETTINGS_ITEMS = [
@@ -41,6 +45,29 @@ const ALL_SETTINGS_ITEMS = [
 export function Sidebar({ role = "agent" }: { role?: string }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    const supabase = createClient();
+
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("read", false)
+      .then(({ count }) => setUnreadCount(count ?? 0));
+
+    supabase.auth.getUser().then(({ data }) => {
+      const userId = data.user?.id;
+      if (!userId) return;
+      const channel = supabase
+        .channel("sidebar-notif-count")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, () => {
+          setUnreadCount((n) => n + 1);
+        })
+        .subscribe();
+      return () => supabase.removeChannel(channel);
+    });
+  }, []);
 
   const navItems = ALL_NAV_ITEMS.filter((item) => item.roles.includes(role));
   const settingsItems = ALL_SETTINGS_ITEMS.filter((item) => item.roles.includes(role));
@@ -90,6 +117,8 @@ export function Sidebar({ role = "agent" }: { role?: string }) {
             href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(href);
+          const isNotif = href === "/dashboard/notifications";
+          const badge = isNotif && unreadCount > 0;
 
           return (
             <Link
@@ -103,7 +132,24 @@ export function Sidebar({ role = "agent" }: { role?: string }) {
               )}
             >
               <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#C9963A]" : "text-gray-500")} />
-              <span>{label}</span>
+              <span className="flex-1">{label}</span>
+              {badge && (
+                <span
+                  style={{
+                    background: "#ef4444",
+                    color: "#fff",
+                    fontSize: 10,
+                    fontWeight: 700,
+                    padding: "1px 6px",
+                    borderRadius: 9999,
+                    lineHeight: 1.6,
+                    minWidth: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
             </Link>
           );
         })}
