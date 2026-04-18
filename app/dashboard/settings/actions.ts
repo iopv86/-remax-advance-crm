@@ -19,6 +19,12 @@ export async function saveAvaConfig(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "No autorizado" };
 
+  // Role guard — only admin/manager can modify agency config
+  const { data: callerRole } = await supabase.from("agents").select("role").eq("email", user.email!).single();
+  if (!callerRole || !["admin", "manager"].includes(callerRole.role)) {
+    return { ok: false, error: "No autorizado" };
+  }
+
   if (config.ava_custom_instructions && config.ava_custom_instructions.length > 5000) {
     return { ok: false, error: "Las instrucciones no pueden superar 5000 caracteres" };
   }
@@ -55,6 +61,12 @@ export async function inviteAgent(
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "No autorizado" };
+
+  // Role guard — only admin can invite agents
+  const { data: callerRole } = await supabase.from("agents").select("role").eq("email", user.email!).single();
+  if (!callerRole || callerRole.role !== "admin") {
+    return { ok: false, error: "No autorizado" };
+  }
 
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRe.test(email)) return { ok: false, error: "Correo inválido" };

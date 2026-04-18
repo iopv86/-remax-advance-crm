@@ -16,6 +16,10 @@ export default async function AvaIAPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Role guard — admin/manager only
+  const { data: roleRow } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
+  if (!roleRow || !["admin", "manager"].includes(roleRow.role)) redirect("/dashboard");
+
   // ── Parallel fetches ────────────────────────────────────────────────────
   const [avaConfigRes, recentMessagesRes, convTodayRes, toneRes, agencyRowsRes] =
     await Promise.allSettled([

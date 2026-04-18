@@ -1,17 +1,25 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import type { Deal } from "@/lib/types";
 import { NewDealButton } from "@/components/quick-action-sheets";
 import { PipelineClient } from "./pipeline-client";
 
 export default async function PipelinePage() {
   const supabase = await createClient();
+  const session = await getSessionAgent();
 
-  const { data: deals } = await supabase
+  let dealsQuery = supabase
     .from("deals")
     .select(
       "id, contact_id, stage, deal_value, currency, expected_close_date, notes, created_at, contact:contacts(first_name, last_name, lead_classification, phone)"
     )
     .order("created_at", { ascending: false });
+
+  if (!isPrivileged(session.role)) {
+    dealsQuery = dealsQuery.eq("agent_id", session.agentId);
+  }
+
+  const { data: deals } = await dealsQuery;
 
   const typedDeals = (deals as unknown as Deal[]) ?? [];
 

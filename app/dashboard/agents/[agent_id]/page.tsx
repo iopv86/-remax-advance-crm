@@ -64,6 +64,10 @@ export default async function AgentDetailPage({
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
+  // Role guard — admin/manager only (same as parent /agents page)
+  const { data: callerRole } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
+  if (!callerRole || !["admin", "manager"].includes(callerRole.role)) redirect("/dashboard");
+
   const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (!UUID_RE.test(agent_id)) redirect("/dashboard/agents");
 

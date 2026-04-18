@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import type { Contact } from "@/lib/types";
 import { ContactsTable } from "./contacts-table";
 import { ContactsFilterBar } from "./contacts-filter-bar";
@@ -11,6 +12,7 @@ export default async function ContactsPage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
+  const session = await getSessionAgent();
 
   let query = supabase
     .from("contacts")
@@ -20,9 +22,15 @@ export default async function ContactsPage({
     .order("created_at", { ascending: false })
     .limit(100);
 
+  if (!isPrivileged(session.role)) {
+    query = query.eq("agent_id", session.agentId);
+  }
+
   if (params.q) {
+    // Sanitize: strip PostgREST filter metacharacters, limit length
+    const safeQ = params.q.replace(/[(),]/g, "").slice(0, 100);
     query = query.or(
-      `first_name.ilike.%${params.q}%,last_name.ilike.%${params.q}%,phone.ilike.%${params.q}%,email.ilike.%${params.q}%`
+      `first_name.ilike.%${safeQ}%,last_name.ilike.%${safeQ}%,phone.ilike.%${safeQ}%,email.ilike.%${safeQ}%`
     );
   }
   if (params.classification) {

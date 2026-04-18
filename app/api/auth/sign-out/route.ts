@@ -22,6 +22,9 @@ export async function POST() {
     }
   );
 
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
   await supabase.auth.signOut();
 
   return NextResponse.json({ success: true });

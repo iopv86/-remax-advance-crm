@@ -7,6 +7,12 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Role guard — org-wide analytics are admin/manager only
+  const { data: agentRow } = await supabase.from("agents").select("role").eq("email", user.email!).single();
+  if (!agentRow || !["admin", "manager"].includes(agentRow.role)) {
+    return NextResponse.json({ error: "No autorizado" }, { status: 403 });
+  }
+
   const now = new Date();
   const startOf30 = new Date(now); startOf30.setDate(now.getDate() - 30);
   const startOf90 = new Date(now); startOf90.setDate(now.getDate() - 90);

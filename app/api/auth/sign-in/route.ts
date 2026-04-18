@@ -1,9 +1,25 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 10 attempts per IP per 15 minutes
+    // Prefer Vercel-injected headers (not spoofable by client) over x-forwarded-for
+    const ip =
+      request.headers.get("x-real-ip") ??
+      request.headers.get("x-vercel-forwarded-for") ??
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+      "unknown";
+    const rl = checkRateLimit(`sign-in:${ip}`, 10, 15 * 60 * 1000);
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Demasiados intentos. Intenta de nuevo en 15 minutos." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil((rl.resetAt - Date.now()) / 1000)) } }
+      );
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {

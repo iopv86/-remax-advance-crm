@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { TasksClient } from "./tasks-client";
 import type { Task } from "@/lib/types";
 import { startOfDay, isAfter, parseISO, isToday } from "date-fns";
@@ -17,9 +17,7 @@ export default async function TasksPage({
 }) {
   const params = await searchParams;
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  const session = await getSessionAgent();
 
   // Fetch tasks
   let query = supabase
@@ -31,17 +29,28 @@ export default async function TasksPage({
     .order("created_at", { ascending: false })
     .limit(300);
 
+  if (!isPrivileged(session.role)) {
+    query = query.eq("agent_id", session.agentId);
+  }
+
   if (params.q) query = (query as typeof query).ilike("title", `%${params.q}%`);
   if (params.priority) query = (query as typeof query).eq("priority", params.priority);
   if (params.status) query = (query as typeof query).eq("status", params.status);
 
+  // For contacts picker: agents see only their contacts; admins/managers see all
+  let contactsQuery = supabase
+    .from("contacts")
+    .select("id, first_name, last_name")
+    .order("created_at", { ascending: false })
+    .limit(100);
+
+  if (!isPrivileged(session.role)) {
+    contactsQuery = contactsQuery.eq("agent_id", session.agentId);
+  }
+
   const [{ data: rawTasks }, { data: rawContacts }] = await Promise.all([
     query,
-    supabase
-      .from("contacts")
-      .select("id, first_name, last_name")
-      .order("created_at", { ascending: false })
-      .limit(100),
+    contactsQuery,
   ]);
 
   const tasks = (rawTasks ?? []) as unknown as Task[];
