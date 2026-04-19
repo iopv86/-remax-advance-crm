@@ -81,6 +81,9 @@ function toAgentKPISummary(
     history,
     captacionesObjetivo: agent.captaciones_objetivo  ?? null,
     facturacionObjetivo: agent.facturacion_objetivo  ?? null,
+    taskCompletionRate:  kpi?.task_completion_rate   ?? null,
+    avgFollowupDays:     kpi?.avg_followup_days       ?? null,
+    fastResponseRate:    kpi?.fast_response_rate      ?? null,
   };
 }
 

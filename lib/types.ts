@@ -143,6 +143,9 @@ export interface AgentKPIView {
   avg_ticket_value: number | null;
   stalled_deals_count: number;
   conversion_rate: number | null;
+  task_completion_rate: number | null;
+  avg_followup_days: number | null;
+  fast_response_rate: number | null;
 }
 
 /** Raw row from agent_response_times view */
@@ -187,6 +190,9 @@ export interface AgentKPISummary {
   history: AgentHistoricalKPIView[];
   captacionesObjetivo: number | null;
   facturacionObjetivo: number | null;
+  taskCompletionRate: number | null;
+  avgFollowupDays: number | null;
+  fastResponseRate: number | null;
 }
 
 export const CLASSIFICATION_COLORS: Record<LeadClassification, string> = {

@@ -15,6 +15,9 @@ import {
   X,
   ExternalLink,
   RefreshCw,
+  Zap,
+  CheckSquare,
+  Repeat,
 } from "lucide-react";
 import type { AgentKPISummary } from "@/lib/types";
 import type { StalledDeal, PipelineStageBreakdown } from "./page";
@@ -380,6 +383,24 @@ export function AgentsClient({
   const totalStalled = agents.reduce((s, a) => s + a.stalledDeals, 0);
   const totalPipeline = agents.reduce((s, a) => s + a.pipelineValue, 0);
 
+  const agentsWithFast = agents.filter((a) => a.fastResponseRate !== null);
+  const avgFastResponse =
+    agentsWithFast.length > 0
+      ? agentsWithFast.reduce((s, a) => s + (a.fastResponseRate ?? 0), 0) / agentsWithFast.length
+      : null;
+
+  const agentsWithTask = agents.filter((a) => a.taskCompletionRate !== null);
+  const avgTaskCompletion =
+    agentsWithTask.length > 0
+      ? agentsWithTask.reduce((s, a) => s + (a.taskCompletionRate ?? 0), 0) / agentsWithTask.length
+      : null;
+
+  const agentsWithFollowup = agents.filter((a) => a.avgFollowupDays !== null);
+  const avgFollowupDays =
+    agentsWithFollowup.length > 0
+      ? agentsWithFollowup.reduce((s, a) => s + (a.avgFollowupDays ?? 0), 0) / agentsWithFollowup.length
+      : null;
+
   const respLabel =
     avgResponseMinutes !== null
       ? avgResponseMinutes < 60
@@ -612,6 +633,96 @@ export function AgentsClient({
               </div>
               <div className="absolute -right-4 -bottom-4 opacity-5 text-7xl text-[#C9963A] select-none font-bold" style={{ fontFamily: "Manrope, sans-serif" }}>◈</div>
             </Link>
+          </div>
+
+          {/* Operational KPI cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Fast response rate */}
+            <div
+              className="relative overflow-hidden rounded-xl p-5"
+              style={{
+                background: "rgba(28,29,39,0.6)",
+                border: "1px solid rgba(201,150,58,0.1)",
+              }}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-[#9899A8] text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                  <Zap className="w-3 h-3 text-[#C9963A]" /> Resp. &lt;10 min
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className="text-2xl font-bold text-white"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                >
+                  {avgFastResponse !== null ? `${avgFastResponse.toFixed(1)}%` : "—"}
+                </span>
+                {avgFastResponse !== null && (
+                  <span className="text-[10px] text-[#9899A8]">de leads respondidos</span>
+                )}
+              </div>
+              <p className="text-[10px] text-[#545567] mt-1">
+                Estándar RE/MAX: &gt;50%
+              </p>
+            </div>
+
+            {/* Task completion rate */}
+            <div
+              className="relative overflow-hidden rounded-xl p-5"
+              style={{
+                background: "rgba(28,29,39,0.6)",
+                border: "1px solid rgba(201,150,58,0.1)",
+              }}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-[#9899A8] text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                  <CheckSquare className="w-3 h-3 text-[#C9963A]" /> Tareas Completadas
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className="text-2xl font-bold text-white"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                >
+                  {avgTaskCompletion !== null ? `${avgTaskCompletion.toFixed(1)}%` : "—"}
+                </span>
+                {avgTaskCompletion !== null && (
+                  <span className="text-[10px] text-[#9899A8]">promedio equipo</span>
+                )}
+              </div>
+              <p className="text-[10px] text-[#545567] mt-1">
+                {avgTaskCompletion === null ? "Sin tareas registradas" : "Objetivo: >80%"}
+              </p>
+            </div>
+
+            {/* Avg followup cadence */}
+            <div
+              className="relative overflow-hidden rounded-xl p-5"
+              style={{
+                background: "rgba(28,29,39,0.6)",
+                border: "1px solid rgba(201,150,58,0.1)",
+              }}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <span className="text-[#9899A8] text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                  <Repeat className="w-3 h-3 text-[#C9963A]" /> Cadencia Seguimiento
+                </span>
+              </div>
+              <div className="flex items-baseline gap-1.5">
+                <span
+                  className="text-2xl font-bold text-white"
+                  style={{ fontFamily: "Manrope, sans-serif" }}
+                >
+                  {avgFollowupDays !== null ? `${avgFollowupDays.toFixed(1)}d` : "—"}
+                </span>
+                {avgFollowupDays !== null && (
+                  <span className="text-[10px] text-[#9899A8]">entre mensajes</span>
+                )}
+              </div>
+              <p className="text-[10px] text-[#545567] mt-1">
+                {avgFollowupDays === null ? "Sin datos suficientes" : "Objetivo: <3 días"}
+              </p>
+            </div>
           </div>
 
           {/* Agent table */}
