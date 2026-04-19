@@ -157,6 +157,8 @@ export function PropertiesClient({ initialProperties }: Props) {
   const [dormFilter, setDormFilter] = useState<DormFilter>(0);
   const [showDisponible, setShowDisponible] = useState(false);
   const [showReservado, setShowReservado] = useState(false);
+  const [propPage, setPropPage] = useState(1);
+  const PROP_PAGE_SIZE = 50;
 
   function getProject(p: Property): string {
     const city = (p.city ?? "").toUpperCase();
@@ -197,6 +199,11 @@ export function PropertiesClient({ initialProperties }: Props) {
     if (showReservado && !showDisponible && p.status !== "reserved") return false;
     return true;
   });
+
+  const totalPages = Math.ceil(filtered.length / PROP_PAGE_SIZE);
+  const pagedItems = filtered.slice((propPage - 1) * PROP_PAGE_SIZE, propPage * PROP_PAGE_SIZE);
+
+  function resetPage() { setPropPage(1); }
 
   function openCreate() {
     setEditProperty(null);
@@ -338,7 +345,7 @@ export function PropertiesClient({ initialProperties }: Props) {
           {PROJECTS.map((proj) => (
             <button
               key={proj}
-              onClick={() => setProjectFilter(proj)}
+              onClick={() => { setProjectFilter(proj); resetPage(); }}
               style={pillBtn(projectFilter === proj)}
             >
               {proj === "all" ? "Todos" : proj}
@@ -355,7 +362,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               {TIPOS.map((t) => (
                 <button
                   key={t}
-                  onClick={() => setTipoFilter(t)}
+                  onClick={() => { setTipoFilter(t); resetPage(); }}
                   style={{
                     ...pillBtn(tipoFilter === t),
                     borderRadius: 6,
@@ -377,7 +384,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               max={5_000_000}
               step={50_000}
               value={maxPrice}
-              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              onChange={(e) => { setMaxPrice(Number(e.target.value)); resetPage(); }}
               style={{
                 width: "100%",
                 height: 4,
@@ -421,7 +428,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               {DORMS.map(({ label, val }) => (
                 <button
                   key={val}
-                  onClick={() => setDormFilter(dormFilter === val ? 0 : val)}
+                  onClick={() => { setDormFilter(dormFilter === val ? 0 : val); resetPage(); }}
                   style={dormBtn(dormFilter === val)}
                 >
                   {label}
@@ -437,7 +444,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               {/* Disponible */}
               <label
                 style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-                onClick={() => setShowDisponible((v) => !v)}
+                onClick={() => { setShowDisponible((v) => !v); resetPage(); }}
               >
                 <div
                   style={{
@@ -463,7 +470,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               {/* Reservado */}
               <label
                 style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-                onClick={() => setShowReservado((v) => !v)}
+                onClick={() => { setShowReservado((v) => !v); resetPage(); }}
               >
                 <div
                   style={{
@@ -624,7 +631,7 @@ export function PropertiesClient({ initialProperties }: Props) {
                 type="text"
                 placeholder="Buscar propiedad…"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); resetPage(); }}
                 style={{
                   background: BG_ELEVATED,
                   border: "none",
@@ -724,7 +731,7 @@ export function PropertiesClient({ initialProperties }: Props) {
                 gap: 28,
               }}
             >
-              {filtered.map((p) => {
+              {pagedItems.map((p) => {
                 const badge = statusBadge(p.status);
                 const project = getProject(p);
                 const isSelected = selectedIds.has(p.id);
@@ -1077,6 +1084,60 @@ export function PropertiesClient({ initialProperties }: Props) {
                 );
               })}
             </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, paddingTop: 32 }}>
+                <button
+                  onClick={() => setPropPage((p) => Math.max(1, p - 1))}
+                  disabled={propPage === 1}
+                  style={{
+                    width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
+                    background: "transparent", color: propPage === 1 ? "rgba(154,144,136,0.3)" : "#9A9088",
+                    cursor: propPage === 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  ‹
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1)
+                  .filter((n) => n === 1 || n === totalPages || Math.abs(n - propPage) <= 1)
+                  .reduce<(number | "…")[]>((acc, n) => {
+                    if (acc.length && (n as number) - (acc[acc.length - 1] as number) > 1) acc.push("…");
+                    acc.push(n);
+                    return acc;
+                  }, [])
+                  .map((p, i) =>
+                    p === "…" ? (
+                      <span key={`e${i}`} style={{ width: 32, textAlign: "center", color: "#9A9088", fontSize: 13 }}>…</span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => setPropPage(p as number)}
+                        style={{
+                          width: 32, height: 32, borderRadius: 8, fontSize: 13, fontWeight: 600,
+                          cursor: "pointer", border: "1px solid",
+                          borderColor: p === propPage ? "#C9963A" : "rgba(255,255,255,0.08)",
+                          background: p === propPage ? "#C9963A" : "transparent",
+                          color: p === propPage ? "#0D0E12" : "#9A9088",
+                        }}
+                      >
+                        {p}
+                      </button>
+                    )
+                  )}
+                <button
+                  onClick={() => setPropPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={propPage === totalPages}
+                  style={{
+                    width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
+                    background: "transparent", color: propPage === totalPages ? "rgba(154,144,136,0.3)" : "#9A9088",
+                    cursor: propPage === totalPages ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  }}
+                >
+                  ›
+                </button>
+              </div>
+            )}
           )}
         </div>
       </div>

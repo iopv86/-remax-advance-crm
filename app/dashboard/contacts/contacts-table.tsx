@@ -8,6 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { createClient } from "@/lib/supabase/client";
 import { ContactSheet } from "@/components/contact-sheet";
+import { Pagination } from "@/components/pagination";
 import type { Contact } from "@/lib/types";
 
 // ── Design tokens (Obsidian Edge) ────────────────────────────────────────────
@@ -150,11 +151,19 @@ function AgentAvatar({ agent }: { agent?: Contact["agent"] }) {
 }
 
 // ── Props ─────────────────────────────────────────────────────────────────────
-interface Props {
-  contacts: Contact[];
+interface PaginationProps {
+  currentPage: number;
+  totalCount: number;
+  pageSize: number;
+  buildHref: (page: number) => string;
 }
 
-export function ContactsTable({ contacts: initial }: Props) {
+interface Props {
+  contacts: Contact[];
+  pagination?: PaginationProps;
+}
+
+export function ContactsTable({ contacts: initial, pagination }: Props) {
   const router = useRouter();
   const [editContact, setEditContact] = useState<Contact | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -547,27 +556,16 @@ export function ContactsTable({ contacts: initial }: Props) {
         </div>
 
         {/* Pagination footer */}
-        <div
-          style={{
-            padding: "20px 32px",
-            background: T.surfaceContainerLow,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            borderTop: `1px solid rgba(79,69,55,0.10)`,
-          }}
-        >
-          <p
-            style={{
-              fontSize: 12,
-              color: T.onSurfaceVariant,
-              fontWeight: 500,
-              margin: 0,
-            }}
-          >
-            Mostrando {initial.length} contacto{initial.length !== 1 ? "s" : ""}
-          </p>
-        </div>
+        {pagination && (
+          <div style={{ padding: "4px 32px 8px", borderTop: `1px solid rgba(79,69,55,0.10)` }}>
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalCount={pagination.totalCount}
+              pageSize={pagination.pageSize}
+              buildHref={pagination.buildHref}
+            />
+          </div>
+        )}
       </div>
 
       <ContactSheet
