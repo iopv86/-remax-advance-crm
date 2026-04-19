@@ -36,7 +36,7 @@ export default async function DealDetailPage({
          commission_percentage, commission_value, expected_close_date,
          actual_close_date, lost_reason, notes, priority, created_at, updated_at,
          contact:contacts(id, first_name, last_name, email, phone),
-         property:properties(id, title, location_city, location_sector, price, currency),
+         property:properties(id, title, city, sector, price, currency),
          agent:agents(id, full_name, email)`
       )
       .eq("id", deal_id)
@@ -60,7 +60,7 @@ export default async function DealDetailPage({
 
   return (
     <DealDetailClient
-      deal={dealResult.data as unknown as Deal & { property?: { id: string; title: string; location_city?: string; location_sector?: string } | null }}
+      deal={dealResult.data as unknown as Deal & { property?: { id: string; title: string; city?: string; sector?: string } | null }}
       history={(historyResult.data ?? []) as unknown as StageHistoryEntry[]}
     />
   );

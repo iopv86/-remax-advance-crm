@@ -50,8 +50,8 @@ interface DealWithProperty extends Deal {
   property?: {
     id: string;
     title: string;
-    location_city?: string;
-    location_sector?: string;
+    city?: string;
+    sector?: string;
   } | null;
 }
 
@@ -368,9 +368,9 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                   ) : (
                     <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>Sin propiedad asignada</span>
                   )}
-                  {property?.location_sector && (
+                  {property?.sector && (
                     <p className="text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>
-                      {property.location_sector}{property.location_city ? `, ${property.location_city}` : ""}
+                      {property.sector}{property.city ? `, ${property.city}` : ""}
                     </p>
                   )}
                 </div>
