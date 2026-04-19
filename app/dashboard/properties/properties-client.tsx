@@ -724,6 +724,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               </Button>
             </div>
           ) : (
+            <>
             <div
               style={{
                 display: "grid",
@@ -1054,9 +1055,9 @@ export function PropertiesClient({ initialProperties }: Props) {
                           )}
                         </div>
 
-                        {/* Arrow */}
+                        {/* Arrow — navigate to detail */}
                         <button
-                          onClick={(e) => { e.stopPropagation(); openEdit(p); }}
+                          onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/properties/${p.id}`); }}
                           style={{
                             background: "none",
                             border: "none",
@@ -1138,6 +1139,7 @@ export function PropertiesClient({ initialProperties }: Props) {
                 </button>
               </div>
             )}
+            </>
           )}
         </div>
       </div>
