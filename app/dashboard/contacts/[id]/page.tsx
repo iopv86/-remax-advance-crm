@@ -9,6 +9,8 @@ import { STAGE_LABELS } from "@/lib/types";
 import type { Deal, Task, Message, DealStage, LeadClassification } from "@/lib/types";
 import { ContactActions } from "./contact-actions";
 import { ContactWhatsApp } from "./contact-whatsapp";
+import { ContactDocuments } from "./contact-documents";
+import type { ContactDocument } from "./contact-documents";
 
 type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
 
@@ -100,6 +102,12 @@ export default async function ContactDetailPage({
     .select("id, title, priority, status, due_date, created_at")
     .eq("contact_id", id)
     .order("due_date", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  const { data: contactDocs } = await supabase
+    .from("contact_documents")
+    .select("id, contact_id, agent_id, name, doc_type, file_url, file_size, mime_type, created_at")
+    .eq("contact_id", id)
     .order("created_at", { ascending: false });
 
   const { data: messages } = await supabase
@@ -615,15 +623,13 @@ export default async function ContactDetailPage({
             </div>
           )}
 
-          {/* Documentos tab — placeholder */}
+          {/* Documentos tab */}
           {activeTab === "documentos" && (
-            <div className="flex-1 flex flex-col items-center justify-center p-12" style={{ color: "#94a3b8" }}>
-              <svg className="w-12 h-12 mb-3 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p className="text-sm font-medium">Documentos — próximamente</p>
-              <p className="text-xs mt-1">Contratos, propuestas y fichas técnicas</p>
-            </div>
+            <ContactDocuments
+              contactId={id}
+              agentId={session.agentId}
+              initialDocs={(contactDocs ?? []) as ContactDocument[]}
+            />
           )}
         </section>
       </div>
