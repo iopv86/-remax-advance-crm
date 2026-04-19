@@ -234,9 +234,11 @@ function Spec({ icon, label, value }: { icon: React.ReactNode; label: string; va
 export function PropertyDetailClient({
   property,
   deals,
+  canEdit,
 }: {
   property: PropertyDetail;
   deals: DealEntry[];
+  canEdit: boolean;
 }) {
   const router = useRouter();
   const status = STATUS_MAP[property.status] ?? STATUS_MAP.inactive;
@@ -296,16 +298,18 @@ export function PropertyDetailClient({
               Ver portal
             </a>
           )}
-          <Link
-            href={`/dashboard/properties?edit=${property.id}`}
-            style={{
-              display: "flex", alignItems: "center", gap: 6,
-              padding: "6px 14px", background: GOLD, color: BG_BODY,
-              fontSize: 13, fontWeight: 600, borderRadius: 8, textDecoration: "none",
-            }}
-          >
-            Editar
-          </Link>
+          {canEdit && (
+            <Link
+              href={`/dashboard/properties?edit=${property.id}`}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "6px 14px", background: GOLD, color: BG_BODY,
+                fontSize: 13, fontWeight: 600, borderRadius: 8, textDecoration: "none",
+              }}
+            >
+              Editar
+            </Link>
+          )}
         </div>
       </header>
 

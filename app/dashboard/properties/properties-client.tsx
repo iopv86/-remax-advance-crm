@@ -130,11 +130,16 @@ function dormBtn(active: boolean): React.CSSProperties {
 
 interface Props {
   initialProperties: Property[];
+  currentAgentId: string;
+  currentRole: string;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function PropertiesClient({ initialProperties }: Props) {
+export function PropertiesClient({ initialProperties, currentAgentId, currentRole }: Props) {
+  function canWrite(property: Property): boolean {
+    return property.agent_id === currentAgentId || currentRole === "admin" || currentRole === "manager";
+  }
   const router = useRouter();
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -859,7 +864,8 @@ export function PropertiesClient({ initialProperties }: Props) {
                         )}
                       </div>
 
-                      {/* Edit / Delete overlay */}
+                      {/* Edit / Delete overlay — only for property owner, admin, or manager */}
+                      {canWrite(p) && (
                       <div
                         style={{
                           position: "absolute",
@@ -911,6 +917,7 @@ export function PropertiesClient({ initialProperties }: Props) {
                           </svg>
                         </button>
                       </div>
+                      )}
                     </div>
 
                     {/* Card body */}

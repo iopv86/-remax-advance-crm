@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { PropertyDetailClient } from "./property-detail-client";
@@ -12,6 +12,7 @@ export default async function PropertyDetailPage({
   const supabase = await createClient();
   const session = await getSessionAgent();
 
+  // All agents can view any property; RLS enforces select=true
   const { data: property, error } = await supabase
     .from("properties")
     .select(
@@ -22,10 +23,8 @@ export default async function PropertyDetailPage({
 
   if (error || !property) return notFound();
 
-  // Non-privileged agents can only view their own properties
-  if (!isPrivileged(session.role) && property.agent_id !== session.agentId) {
-    redirect("/dashboard/properties");
-  }
+  const canEdit =
+    property.agent_id === session.agentId || isPrivileged(session.role);
 
   // Fetch linked deals for this property
   const { data: deals } = await supabase
@@ -41,6 +40,7 @@ export default async function PropertyDetailPage({
     <PropertyDetailClient
       property={property as any}
       deals={(deals as any[]) ?? []}
+      canEdit={canEdit}
     />
   );
 }

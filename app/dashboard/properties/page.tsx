@@ -7,19 +7,20 @@ export default async function PropertiesPage() {
   const supabase = await createClient();
   const session = await getSessionAgent();
 
-  let query = supabase
+  // All agents see all properties; write access is enforced per-row in the UI and by RLS
+  const { data: properties } = await supabase
     .from("properties")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(200);
 
-  if (!isPrivileged(session.role)) {
-    query = query.eq("agent_id", session.agentId);
-  }
-
-  const { data: properties } = await query;
-
   const list = (properties as unknown as Property[]) ?? [];
 
-  return <PropertiesClient initialProperties={list} />;
+  return (
+    <PropertiesClient
+      initialProperties={list}
+      currentAgentId={session.agentId}
+      currentRole={session.role}
+    />
+  );
 }
