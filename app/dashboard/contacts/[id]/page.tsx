@@ -11,6 +11,8 @@ import { ContactActions } from "./contact-actions";
 import { ContactWhatsApp } from "./contact-whatsapp";
 import { ContactDocuments } from "./contact-documents";
 import type { ContactDocument } from "./contact-documents";
+import { ContactActivity } from "./contact-activity";
+import type { ContactActivity as ContactActivityType } from "./contact-activity";
 
 type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
 
@@ -103,6 +105,13 @@ export default async function ContactDetailPage({
     .eq("contact_id", id)
     .order("due_date", { ascending: true })
     .order("created_at", { ascending: false });
+
+  const { data: contactActivities } = await supabase
+    .from("activities")
+    .select("id, contact_id, deal_id, agent_id, activity_type, title, description, scheduled_at, completed_at, duration_minutes, is_automated, created_at")
+    .eq("contact_id", id)
+    .order("created_at", { ascending: false })
+    .limit(100);
 
   const { data: contactDocs } = await supabase
     .from("contact_documents")
@@ -558,69 +567,13 @@ export default async function ContactDetailPage({
             </div>
           )}
 
-          {/* Actividad tab — tasks + timeline */}
+          {/* Actividad tab */}
           {activeTab === "actividad" && (
-            <div className="p-8 space-y-6">
-              <h3 className="text-sm font-bold uppercase tracking-widest" style={{ color: "#94a3b8" }}>
-                Seguimientos
-              </h3>
-              {(tasks ?? []).length === 0 ? (
-                <p className="text-sm py-8 text-center" style={{ color: "#94a3b8" }}>Sin seguimientos.</p>
-              ) : (
-                <div className="space-y-2">
-                  {(tasks as unknown as Task[]).map((t) => (
-                    <div
-                      key={t.id}
-                      className="flex items-center justify-between p-4 rounded-xl border"
-                      style={{ background: "var(--background)", borderColor: "var(--border)" }}
-                    >
-                      <div className="flex items-start gap-3 min-w-0">
-                        <div
-                          className="w-1.5 h-1.5 rounded-full mt-2 shrink-0"
-                          style={{
-                            background:
-                              t.status === "completed" ? "var(--emerald)" :
-                              t.status === "in_progress" ? "var(--blue, #3b82f6)" : "#94a3b8",
-                          }}
-                        />
-                        <div>
-                          <p className="text-sm font-semibold" style={{ color: "#1C1917" }}>{t.title}</p>
-                          {t.due_date && (
-                            <p className="text-xs mt-0.5" style={{ color: "#94a3b8" }}>
-                              {format(new Date(t.due_date), "d MMM yyyy", { locale: es })}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        <span
-                          className="text-[10px] font-bold uppercase px-2 py-0.5 rounded"
-                          style={{
-                            background: t.priority === "urgent" ? "#fef2f2" : "#f8fafc",
-                            color: t.priority === "urgent" ? "#dc2626" : "#64748b",
-                          }}
-                        >
-                          {PRIORITY_LABELS[t.priority] ?? t.priority}
-                        </span>
-                        <span
-                          className="text-[10px] font-bold uppercase px-2 py-0.5 rounded"
-                          style={{
-                            background: t.status === "completed" ? "#ecfdf5" :
-                              t.status === "in_progress" ? "#eff6ff" : "#f8fafc",
-                            color: t.status === "completed" ? "#059669" :
-                              t.status === "in_progress" ? "#2563eb" : "#64748b",
-                          }}
-                        >
-                          {t.status === "completed" ? "Completado" :
-                            t.status === "in_progress" ? "En progreso" :
-                            t.status === "cancelled" ? "Cancelado" : "Pendiente"}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <ContactActivity
+              contactId={id}
+              agentId={session.agentId}
+              initialActivities={(contactActivities ?? []) as ContactActivityType[]}
+            />
           )}
 
           {/* Documentos tab */}
