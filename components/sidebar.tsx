@@ -31,6 +31,7 @@ const ALL_NAV_ITEMS = [
   { href: "/dashboard/contacts",        label: "Clientes",        icon: Users,        roles: ["admin","manager","agent"] },
   { href: "/dashboard/pipeline",        label: "Oportunidades",   icon: Kanban,       roles: ["admin","manager","agent"] },
   { href: "/dashboard/properties",      label: "Propiedades",     icon: Building2,    roles: ["admin","manager","agent"] },
+  { href: "/dashboard/proposals",       label: "Propuestas",      icon: Sparkles,     roles: ["admin","manager","agent"] },
   { href: "/dashboard/tasks",           label: "Tareas",          icon: CheckSquare,  roles: ["admin","manager","agent"] },
   { href: "/dashboard/conversations",   label: "Conversaciones",  icon: MessageSquare,roles: ["admin","manager","agent"] },
   { href: "/dashboard/notifications",   label: "Notificaciones",  icon: Bell,         roles: ["admin","manager","agent"] },

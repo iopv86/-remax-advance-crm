@@ -142,6 +142,10 @@ export function PropertiesClient({ initialProperties }: Props) {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [proposalModalOpen, setProposalModalOpen] = useState(false);
+  const [proposalCreatingSlug, setProposalCreatingSlug] = useState(false);
+  const [proposalShareSlug, setProposalShareSlug] = useState<string | null>(null);
+  const [proposalForm, setProposalForm] = useState({ title: "", message: "", contactName: "" });
   const [search, setSearch] = useState("");
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -244,6 +248,31 @@ export function PropertiesClient({ initialProperties }: Props) {
     a.click();
     URL.revokeObjectURL(url);
     toast.success("PDF generado y descargado");
+  }
+
+  async function handleCreateProposal() {
+    if (!selectedIds.size) return;
+    setProposalCreatingSlug(true);
+    const res = await fetch("/api/proposals", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        propertyIds: Array.from(selectedIds),
+        title: proposalForm.title.trim() || null,
+        message: proposalForm.message.trim() || null,
+        contactName: proposalForm.contactName.trim() || null,
+      }),
+    });
+    setProposalCreatingSlug(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({})) as { error?: string };
+      toast.error(err.error ?? "Error creando propuesta");
+      return;
+    }
+    const { slug } = await res.json() as { slug: string };
+    setProposalModalOpen(false);
+    setProposalShareSlug(slug);
+    setProposalForm({ title: "", message: "", contactName: "" });
   }
 
   async function handleDelete(p: Property) {
@@ -465,8 +494,7 @@ export function PropertiesClient({ initialProperties }: Props) {
         {selectedIds.size > 0 && (
           <div style={{ paddingTop: 20, borderTop: `1px solid ${BG_SURFACE}`, marginTop: 20 }}>
             <button
-              onClick={handleGeneratePdf}
-              disabled={generatingPdf}
+              onClick={() => setProposalModalOpen(true)}
               style={{
                 width: "100%",
                 background: GOLD,
@@ -474,6 +502,31 @@ export function PropertiesClient({ initialProperties }: Props) {
                 padding: "10px 0",
                 borderRadius: 10,
                 fontWeight: 700,
+                fontSize: 11,
+                textTransform: "uppercase",
+                letterSpacing: "0.1em",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 6,
+              }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Crear propuesta ({selectedIds.size})
+            </button>
+            <button
+              onClick={handleGeneratePdf}
+              disabled={generatingPdf}
+              style={{
+                width: "100%",
+                marginTop: 8,
+                background: BG_SURFACE,
+                color: TEXT_PRIMARY,
+                padding: "9px 0",
+                borderRadius: 10,
+                fontWeight: 600,
                 fontSize: 11,
                 textTransform: "uppercase",
                 letterSpacing: "0.1em",
@@ -487,7 +540,7 @@ export function PropertiesClient({ initialProperties }: Props) {
               }}
             >
               <FileText style={{ width: 14, height: 14 }} />
-              {generatingPdf ? "Generando…" : `PDF (${selectedIds.size})`}
+              {generatingPdf ? "Generando…" : "Bajar PDF"}
             </button>
             <button
               onClick={() => setSelectedIds(new Set())}
@@ -1035,6 +1088,242 @@ export function PropertiesClient({ initialProperties }: Props) {
         property={editProperty}
         onSaved={onSaved}
       />
+
+      {/* Create proposal modal */}
+      {proposalModalOpen && (
+        <div
+          onClick={() => setProposalModalOpen(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 50,
+            background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#1C1D27", border: `1px solid rgba(201,150,58,0.2)`,
+              borderRadius: 16, padding: 28, width: "100%", maxWidth: 480,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+            }}
+          >
+            <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "#F5F0E8", margin: "0 0 6px" }}>
+              Crear propuesta
+            </h2>
+            <p style={{ fontSize: 12, color: "#6B7280", fontFamily: "Inter, sans-serif", margin: "0 0 20px" }}>
+              {selectedIds.size} {selectedIds.size === 1 ? "propiedad seleccionada" : "propiedades seleccionadas"}
+            </p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "#9A9088", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  Nombre del cliente (opcional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: María García"
+                  value={proposalForm.contactName}
+                  onChange={(e) => setProposalForm((f) => ({ ...f, contactName: e.target.value }))}
+                  style={{
+                    width: "100%", background: "#0D0E12", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8, padding: "9px 12px", color: "#F5F0E8", fontSize: 14,
+                    fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "#9A9088", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  Título (opcional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ej: Opciones en Piantini"
+                  value={proposalForm.title}
+                  onChange={(e) => setProposalForm((f) => ({ ...f, title: e.target.value }))}
+                  style={{
+                    width: "100%", background: "#0D0E12", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8, padding: "9px 12px", color: "#F5F0E8", fontSize: 14,
+                    fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
+                  }}
+                />
+              </div>
+              <div>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "#9A9088", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                  Mensaje de presentación (opcional)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="Hola, estas son las propiedades que seleccioné especialmente para ti…"
+                  value={proposalForm.message}
+                  onChange={(e) => setProposalForm((f) => ({ ...f, message: e.target.value }))}
+                  style={{
+                    width: "100%", background: "#0D0E12", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8, padding: "9px 12px", color: "#F5F0E8", fontSize: 14,
+                    fontFamily: "Inter, sans-serif", outline: "none", resize: "none", boxSizing: "border-box",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+              <button
+                onClick={() => setProposalModalOpen(false)}
+                style={{
+                  flex: 1, padding: "10px 0", borderRadius: 8, background: "#0D0E12",
+                  border: "1px solid rgba(255,255,255,0.1)", color: "#9A9088",
+                  fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreateProposal}
+                disabled={proposalCreatingSlug}
+                style={{
+                  flex: 2, padding: "10px 0", borderRadius: 8, background: GOLD,
+                  border: "none", color: "#1A0E00",
+                  fontSize: 13, fontWeight: 700, cursor: proposalCreatingSlug ? "not-allowed" : "pointer",
+                  fontFamily: "Inter, sans-serif", opacity: proposalCreatingSlug ? 0.7 : 1,
+                }}
+              >
+                {proposalCreatingSlug ? "Creando…" : "Generar link compartible"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share proposal modal */}
+      {proposalShareSlug && (
+        <div
+          onClick={() => setProposalShareSlug(null)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 50,
+            background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)",
+            display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#1C1D27", border: `1px solid rgba(201,150,58,0.3)`,
+              borderRadius: 16, padding: 28, width: "100%", maxWidth: 480,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
+            }}
+          >
+            {/* Success checkmark */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{
+                width: 40, height: 40, borderRadius: "50%",
+                background: "rgba(16,185,129,0.15)", border: "1px solid rgba(16,185,129,0.3)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <div>
+                <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 16, color: "#F5F0E8", margin: 0 }}>
+                  ¡Propuesta lista!
+                </p>
+                <p style={{ fontSize: 12, color: "#6B7280", margin: 0, fontFamily: "Inter, sans-serif" }}>
+                  Compártela con tu cliente
+                </p>
+              </div>
+            </div>
+
+            {/* URL display */}
+            <div style={{
+              background: "#0D0E12", border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 8, padding: "10px 14px", marginBottom: 16,
+              display: "flex", alignItems: "center", gap: 8,
+            }}>
+              <span style={{ flex: 1, fontSize: 12, color: "#9A9088", fontFamily: "Inter, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {typeof window !== "undefined" ? `${window.location.origin}/p/${proposalShareSlug}` : `/p/${proposalShareSlug}`}
+              </span>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/p/${proposalShareSlug}`);
+                  toast.success("Link copiado");
+                }}
+                style={{
+                  background: "rgba(201,150,58,0.1)", border: "1px solid rgba(201,150,58,0.2)",
+                  borderRadius: 6, padding: "4px 10px", color: GOLD, fontSize: 11,
+                  fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif", whiteSpace: "nowrap",
+                }}
+              >
+                Copiar
+              </button>
+            </div>
+
+            {/* Share buttons */}
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/p/${proposalShareSlug}`;
+                  const text = encodeURIComponent(`Te comparto una selección de propiedades:\n${url}`);
+                  window.open(`https://wa.me/?text=${text}`, "_blank");
+                }}
+                style={{
+                  flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  padding: "9px 0", borderRadius: 8, background: "rgba(37,211,102,0.1)",
+                  border: "1px solid rgba(37,211,102,0.2)", color: "#25D366",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
+                </svg>
+                WhatsApp
+              </button>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/p/${proposalShareSlug}`;
+                  const subject = encodeURIComponent("Propuesta de propiedades");
+                  const body = encodeURIComponent(`Te comparto una selección de propiedades:\n${url}`);
+                  window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+                }}
+                style={{
+                  flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  padding: "9px 0", borderRadius: 8, background: "rgba(124,159,232,0.1)",
+                  border: "1px solid rgba(124,159,232,0.2)", color: "#7c9fe8",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                </svg>
+                Correo
+              </button>
+            </div>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={() => {
+                  window.open(`/p/${proposalShareSlug}`, "_blank");
+                }}
+                style={{
+                  flex: 1, padding: "9px 0", borderRadius: 8, background: "#0D0E12",
+                  border: "1px solid rgba(255,255,255,0.1)", color: "#9A9088",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                }}
+              >
+                Ver propuesta
+              </button>
+              <button
+                onClick={() => { setProposalShareSlug(null); setSelectedIds(new Set()); }}
+                style={{
+                  flex: 1, padding: "9px 0", borderRadius: 8, background: GOLD,
+                  border: "none", color: "#1A0E00",
+                  fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                }}
+              >
+                Listo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
