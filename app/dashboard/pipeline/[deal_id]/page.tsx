@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { DealDetailClient } from "./deal-detail-client";
-import type { Deal, DealStage } from "@/lib/types";
+import type { Deal, DealStage, Task } from "@/lib/types";
 
 interface StageHistoryEntry {
   id: string;
@@ -28,7 +28,7 @@ export default async function DealDetailPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [dealResult, historyResult] = await Promise.all([
+  const [dealResult, historyResult, tasksResult] = await Promise.all([
     supabase
       .from("deals")
       .select(
@@ -51,6 +51,13 @@ export default async function DealDetailPage({
       .eq("deal_id", deal_id)
       .order("created_at", { ascending: false })
       .limit(50),
+
+    supabase
+      .from("tasks")
+      .select("id, title, description, due_date, priority, status, completed_at, created_at")
+      .eq("deal_id", deal_id)
+      .order("created_at", { ascending: false })
+      .limit(50),
   ]);
 
   if (dealResult.error || !dealResult.data) notFound();
@@ -62,6 +69,7 @@ export default async function DealDetailPage({
     <DealDetailClient
       deal={dealResult.data as unknown as Deal & { property?: { id: string; title: string; city?: string; sector?: string } | null }}
       history={(historyResult.data ?? []) as unknown as StageHistoryEntry[]}
+      initialTasks={(tasksResult.data ?? []) as unknown as Task[]}
     />
   );
 }

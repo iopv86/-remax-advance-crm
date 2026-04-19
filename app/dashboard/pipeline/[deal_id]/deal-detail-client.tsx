@@ -7,9 +7,10 @@ import { toast } from "sonner";
 import {
   ArrowLeft, Building2, User, CalendarDays, DollarSign,
   ChevronRight, Pencil, Check, X, Clock, TrendingUp,
+  CheckSquare, Square, Plus, MessageSquare,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { STAGE_LABELS, type Deal, type DealStage } from "@/lib/types";
+import { STAGE_LABELS, type Deal, type DealStage, type Task } from "@/lib/types";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -35,6 +36,12 @@ const STAGE_COLORS: Record<string, string> = {
   closed_lost: "#64748b",
 };
 
+const PRIORITY_COLORS: Record<string, string> = {
+  high: "#ef4444",
+  medium: "#f59e0b",
+  low: "#64748b",
+};
+
 interface StageHistoryEntry {
   id: string;
   from_stage: DealStage | null;
@@ -58,11 +65,17 @@ interface DealWithProperty extends Deal {
 interface Props {
   deal: DealWithProperty;
   history: StageHistoryEntry[];
+  initialTasks: Task[];
 }
 
-export function DealDetailClient({ deal: initialDeal, history }: Props) {
+function sanitizePhone(phone: string): string {
+  return phone.replace(/[\s\-\+\(\)]/g, "");
+}
+
+export function DealDetailClient({ deal: initialDeal, history, initialTasks }: Props) {
   const router = useRouter();
   const [deal, setDeal] = useState(initialDeal);
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
   // Editing state
   const [editingStage, setEditingStage] = useState(false);
@@ -75,6 +88,13 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
   const [notesValue, setNotesValue] = useState(deal.notes ?? "");
   const [closeDateValue, setCloseDateValue] = useState(deal.expected_close_date ?? "");
   const [saving, setSaving] = useState(false);
+
+  // Task state
+  const [addingTask, setAddingTask] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDue, setNewTaskDue] = useState("");
+  const [newTaskPriority, setNewTaskPriority] = useState<"high" | "medium" | "low">("medium");
+  const [savingTask, setSavingTask] = useState(false);
 
   const contact = deal.contact as { id: string; first_name?: string | null; last_name?: string | null; email?: string | null; phone?: string | null } | null;
   const property = deal.property;
@@ -102,7 +122,6 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
       .update({ stage: stageValue, updated_at: new Date().toISOString() })
       .eq("id", deal.id);
     if (error) { toast.error("Error guardando stage"); setSaving(false); return; }
-    // Log history
     await supabase.from("deal_stage_history").insert({
       deal_id: deal.id,
       from_stage: deal.stage,
@@ -160,10 +179,67 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
     setSaving(false);
   }
 
+  async function toggleTask(task: Task) {
+    const newStatus = task.status === "completed" ? "pending" : "completed";
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("tasks")
+      .update({
+        status: newStatus,
+        completed_at: newStatus === "completed" ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", task.id);
+    if (error) { toast.error("Error actualizando tarea"); return; }
+    setTasks((prev) =>
+      prev.map((t) => t.id === task.id ? { ...t, status: newStatus as Task["status"] } : t)
+    );
+  }
+
+  async function addTask() {
+    if (!newTaskTitle.trim()) return;
+    setSavingTask(true);
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setSavingTask(false); return; }
+
+    const { data: agentRow } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("email", user.email!)
+      .single();
+
+    const payload: Record<string, unknown> = {
+      title: newTaskTitle.trim(),
+      deal_id: deal.id,
+      contact_id: deal.contact_id ?? null,
+      agent_id: agentRow?.id ?? user.id,
+      priority: newTaskPriority,
+      status: "pending",
+      is_automated: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    if (newTaskDue) payload.due_date = new Date(newTaskDue).toISOString();
+
+    const { data, error } = await supabase.from("tasks").insert(payload).select().single();
+    if (error) { toast.error("Error creando tarea"); setSavingTask(false); return; }
+    setTasks((prev) => [data as Task, ...prev]);
+    setNewTaskTitle("");
+    setNewTaskDue("");
+    setNewTaskPriority("medium");
+    setAddingTask(false);
+    toast.success("Tarea creada");
+    setSavingTask(false);
+  }
+
   const stageColor = STAGE_COLORS[deal.stage] ?? "#C9963A";
   const stageIdx = ALL_STAGES.indexOf(deal.stage);
   const isLost = deal.stage === "closed_lost";
   const isWon = deal.stage === "closed_won";
+
+  const pendingTasks = tasks.filter((t) => t.status !== "completed");
+  const doneTasks = tasks.filter((t) => t.status === "completed");
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -197,7 +273,6 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
           </div>
         </div>
 
-        {/* Stage badge + value */}
         <div className="flex items-center gap-3">
           <span
             className="px-3 py-1 rounded-full text-xs font-bold"
@@ -252,7 +327,7 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {/* ── Left: Deal info ──────────────────────────────────────────── */}
+          {/* ── Left: Deal info + Notes + Tasks ─────────────────────────── */}
           <div className="lg:col-span-2 space-y-5">
             {/* Info card */}
             <div className="card-base p-5">
@@ -286,10 +361,7 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                       </button>
                     </div>
                   ) : (
-                    <button
-                      onClick={() => setEditingStage(true)}
-                      className="flex items-center gap-2 group"
-                    >
+                    <button onClick={() => setEditingStage(true)} className="flex items-center gap-2 group">
                       <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
                         {STAGE_LABELS[deal.stage]}
                       </span>
@@ -348,7 +420,19 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                     <span className="text-sm" style={{ color: "var(--muted-foreground)" }}>—</span>
                   )}
                   {contact?.phone && (
-                    <p className="text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>{contact.phone}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{contact.phone}</p>
+                      <a
+                        href={`https://wa.me/${sanitizePhone(contact.phone)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title="Abrir WhatsApp"
+                        className="flex items-center justify-center w-5 h-5 rounded-full transition-opacity hover:opacity-80"
+                        style={{ background: "rgba(37,211,102,0.15)", color: "#25D366" }}
+                      >
+                        <MessageSquare className="w-2.5 h-2.5" />
+                      </a>
+                    </div>
                   )}
                 </div>
 
@@ -359,7 +443,7 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                   </p>
                   {property ? (
                     <Link
-                      href={`/dashboard/properties`}
+                      href="/dashboard/properties"
                       className="text-sm font-semibold hover:underline"
                       style={{ color: "var(--foreground)" }}
                     >
@@ -461,7 +545,6 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                   </button>
                 )}
               </div>
-
               {editingNotes ? (
                 <div className="space-y-3">
                   <textarea
@@ -503,6 +586,142 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                 </p>
               )}
             </div>
+
+            {/* ── Tasks panel ───────────────────────────────────────────── */}
+            <div className="card-base p-5">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                  Tareas
+                  {pendingTasks.length > 0 && (
+                    <span
+                      className="ml-2 px-1.5 py-0.5 rounded-full text-[9px]"
+                      style={{ background: "rgba(201,150,58,0.15)", color: "#C9963A" }}
+                    >
+                      {pendingTasks.length}
+                    </span>
+                  )}
+                </p>
+                <button
+                  onClick={() => setAddingTask((v) => !v)}
+                  className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg transition-colors hover:bg-muted"
+                  style={{ color: "var(--muted-foreground)" }}
+                >
+                  <Plus className="w-3 h-3" /> Nueva tarea
+                </button>
+              </div>
+
+              {/* Add task form */}
+              {addingTask && (
+                <div className="mb-4 p-3 rounded-lg space-y-2" style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
+                  <input
+                    autoFocus
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") addTask(); if (e.key === "Escape") setAddingTask(false); }}
+                    placeholder="Título de la tarea…"
+                    className="w-full text-sm px-2.5 py-1.5 rounded-lg"
+                    style={{
+                      background: "var(--background)", color: "var(--foreground)",
+                      border: "1px solid var(--border)", outline: "none",
+                    }}
+                  />
+                  <div className="flex gap-2">
+                    <input
+                      type="date"
+                      value={newTaskDue}
+                      onChange={(e) => setNewTaskDue(e.target.value)}
+                      className="flex-1 text-xs px-2 py-1.5 rounded-lg"
+                      style={{
+                        background: "var(--background)", color: "var(--foreground)",
+                        border: "1px solid var(--border)", outline: "none",
+                      }}
+                    />
+                    <select
+                      value={newTaskPriority}
+                      onChange={(e) => setNewTaskPriority(e.target.value as "high" | "medium" | "low")}
+                      className="text-xs px-2 py-1.5 rounded-lg"
+                      style={{
+                        background: "var(--background)", color: "var(--foreground)",
+                        border: "1px solid var(--border)", outline: "none",
+                      }}
+                    >
+                      <option value="high">Alta</option>
+                      <option value="medium">Media</option>
+                      <option value="low">Baja</option>
+                    </select>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={() => setAddingTask(false)}
+                      className="px-3 py-1.5 text-xs rounded-lg"
+                      style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={addTask}
+                      disabled={savingTask || !newTaskTitle.trim()}
+                      className="px-3 py-1.5 text-xs font-bold rounded-lg"
+                      style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+                    >
+                      {savingTask ? "Guardando…" : "Crear tarea"}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Task list */}
+              {tasks.length === 0 && !addingTask ? (
+                <p className="text-xs py-4 text-center" style={{ color: "var(--muted-foreground)" }}>
+                  Sin tareas. Haz clic en Nueva tarea para agregar.
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  {[...pendingTasks, ...doneTasks].map((task) => {
+                    const isDone = task.status === "completed";
+                    const priorityColor = PRIORITY_COLORS[task.priority ?? "medium"] ?? "#64748b";
+                    return (
+                      <div
+                        key={task.id}
+                        className="flex items-start gap-2.5 px-2 py-2 rounded-lg transition-colors hover:bg-muted/50"
+                      >
+                        <button
+                          onClick={() => toggleTask(task)}
+                          className="mt-0.5 shrink-0 transition-colors"
+                          style={{ color: isDone ? "#10b981" : "var(--muted-foreground)" }}
+                        >
+                          {isDone ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-sm leading-snug"
+                            style={{
+                              color: isDone ? "var(--muted-foreground)" : "var(--foreground)",
+                              textDecoration: isDone ? "line-through" : "none",
+                            }}
+                          >
+                            {task.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span
+                              className="text-[9px] font-bold uppercase"
+                              style={{ color: priorityColor }}
+                            >
+                              {task.priority === "high" ? "Alta" : task.priority === "medium" ? "Media" : "Baja"}
+                            </span>
+                            {task.due_date && (
+                              <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+                                · {format(parseISO(task.due_date), "d MMM", { locale: es })}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* ── Right: Stage history timeline ─────────────────────────── */}
@@ -521,7 +740,6 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                   const color = STAGE_COLORS[entry.to_stage] ?? "#C9963A";
                   return (
                     <div key={entry.id} className="flex gap-3">
-                      {/* Timeline line */}
                       <div className="flex flex-col items-center">
                         <div
                           className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
@@ -531,8 +749,6 @@ export function DealDetailClient({ deal: initialDeal, history }: Props) {
                           <div className="w-px flex-1 my-1" style={{ background: "var(--border)", minHeight: 20 }} />
                         )}
                       </div>
-
-                      {/* Content */}
                       <div className="pb-4 min-w-0">
                         <p className="text-xs font-semibold" style={{ color: "var(--foreground)" }}>
                           {STAGE_LABELS[entry.to_stage]}
