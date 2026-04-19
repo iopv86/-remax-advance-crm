@@ -43,8 +43,9 @@ const ALL_NAV_ITEMS = [
 ];
 
 const ALL_SETTINGS_ITEMS = [
-  { href: "/dashboard/settings",       label: "Configuración",  icon: Settings,   sub: false, roles: ["admin"] },
-  { href: "/dashboard/settings/AvaIA", label: "Ava IA",         icon: Bot,        sub: true,  roles: ["admin"] },
+  { href: "/dashboard/settings",           label: "Configuración",  icon: Settings,      sub: false, roles: ["admin"] },
+  { href: "/dashboard/settings/AvaIA",    label: "Ava IA",         icon: Bot,           sub: true,  roles: ["admin"] },
+  { href: "/dashboard/settings/templates", label: "Plantillas WA",  icon: MessageSquare, sub: true,  roles: ["admin"] },
 ];
 
 export function Sidebar({ role = "agent" }: { role?: string }) {

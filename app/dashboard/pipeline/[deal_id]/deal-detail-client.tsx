@@ -443,7 +443,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks }: P
                   </p>
                   {property ? (
                     <Link
-                      href="/dashboard/properties"
+                      href={`/dashboard/properties/${property.id}`}
                       className="text-sm font-semibold hover:underline"
                       style={{ color: "var(--foreground)" }}
                     >

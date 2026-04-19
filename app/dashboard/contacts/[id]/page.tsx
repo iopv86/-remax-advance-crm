@@ -13,6 +13,7 @@ import { ContactDocuments } from "./contact-documents";
 import type { ContactDocument } from "./contact-documents";
 import { ContactActivity } from "./contact-activity";
 import type { ContactActivity as ContactActivityType } from "./contact-activity";
+import { ContactEditButton } from "./contact-edit-button";
 
 type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
 
@@ -203,12 +204,7 @@ export default async function ContactDetailPage({
           >
             Exportar
           </button>
-          <button
-            className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all hover:brightness-95"
-            style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-          >
-            Editar
-          </button>
+          <ContactEditButton contact={contact} />
         </div>
       </header>
 
