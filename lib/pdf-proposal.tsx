@@ -306,7 +306,7 @@ export function ProposalDocument({ properties, agent, config }: ProposalDocProps
         </View>
 
         {properties.map((p) => {
-          const location = [p.location_sector, p.location_city].filter(Boolean).join(", ");
+          const location = [p.sector, p.city].filter(Boolean).join(", ");
           const specs = [
             p.bedrooms != null ? `${p.bedrooms} hab.` : null,
             p.bathrooms != null ? `${p.bathrooms} baños` : null,

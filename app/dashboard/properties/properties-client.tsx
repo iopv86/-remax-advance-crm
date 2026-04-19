@@ -154,11 +154,9 @@ export function PropertiesClient({ initialProperties }: Props) {
   const [showDisponible, setShowDisponible] = useState(false);
   const [showReservado, setShowReservado] = useState(false);
 
-  // Project tag is derived from location_city for now — the DB doesn't have an explicit project field.
-  // We derive project from location_city: if it contains "COL", "BCR", or "Green Valley".
   function getProject(p: Property): string {
-    const city = (p.location_city ?? "").toUpperCase();
-    const sector = (p.location_sector ?? "").toUpperCase();
+    const city = (p.city ?? "").toUpperCase();
+    const sector = (p.sector ?? "").toUpperCase();
     const combined = city + " " + sector;
     if (combined.includes("COL")) return "COL";
     if (combined.includes("BCR")) return "BCR";
@@ -172,8 +170,8 @@ export function PropertiesClient({ initialProperties }: Props) {
       const q = search.toLowerCase();
       if (
         !p.title.toLowerCase().includes(q) &&
-        !(p.location_city ?? "").toLowerCase().includes(q) &&
-        !(p.location_sector ?? "").toLowerCase().includes(q)
+        !(p.city ?? "").toLowerCase().includes(q) &&
+        !(p.sector ?? "").toLowerCase().includes(q)
       ) return false;
     }
     if (projectFilter !== "all") {
@@ -916,9 +914,9 @@ export function PropertiesClient({ initialProperties }: Props) {
                           }}
                         >
                           {p.title}
-                          {(p.location_city || p.location_sector) && (
+                          {(p.city || p.sector) && (
                             <span style={{ display: "block", marginTop: 2, fontSize: 11, color: TEXT_DIM }}>
-                              {[p.location_sector, p.location_city].filter(Boolean).join(", ")}
+                              {[p.sector, p.city].filter(Boolean).join(", ")}
                             </span>
                           )}
                         </p>

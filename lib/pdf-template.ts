@@ -45,7 +45,7 @@ export function buildProposalHtml(
         .filter(Boolean)
         .join(" &nbsp;·&nbsp; ");
 
-      const location = [p.location_sector, p.location_city].filter(Boolean).join(", ");
+      const location = [p.sector, p.city].filter(Boolean).join(", ");
 
       return `
       <div style="page-break-inside:avoid;background:#ffffff;border-radius:16px;padding:28px;margin-bottom:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);border:1px solid #e2e8f0;">

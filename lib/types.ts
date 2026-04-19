@@ -77,8 +77,8 @@ export interface Property {
   transaction_type: "sale" | "rent";
   price?: number;
   currency?: CurrencyType;
-  location_city?: string;
-  location_sector?: string;
+  city?: string;
+  sector?: string;
   bedrooms?: number;
   bathrooms?: number;
   area_m2?: number;
