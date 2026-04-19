@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import type { ActivityItem } from "../page";
@@ -111,10 +112,15 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
           const elapsed = item.ts
             ? formatDistanceToNow(new Date(item.ts), { addSuffix: false, locale: es })
             : "—";
+          const itemId = item.id.startsWith("c-") ? item.id.slice(2) : item.id.slice(2);
+          const href = item.type === "contact"
+            ? `/dashboard/contacts/${itemId}`
+            : `/dashboard/pipeline/${itemId}`;
 
           return (
-            <div
+            <Link
               key={item.id}
+              href={href}
               className="table-row-hover"
               style={{
                 display: "flex",
@@ -123,6 +129,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
                 padding: "13px 24px",
                 borderBottom: idx < items.length - 1 ? `1px solid ${T.borderSubtle}` : "none",
                 transition: "background 0.15s",
+                textDecoration: "none",
               }}
             >
               <ItemIcon type={item.type} stage={item.stage} />
@@ -165,7 +172,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
               }}>
                 {elapsed}
               </span>
-            </div>
+            </Link>
           );
         })}
       </div>
