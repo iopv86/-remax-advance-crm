@@ -19,6 +19,7 @@ import {
   UserCircle,
   Bell,
   FileBarChart,
+  CalendarCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ const ALL_NAV_ITEMS = [
   { href: "/dashboard/properties",      label: "Propiedades",     icon: Building2,    roles: ["admin","manager","agent"] },
   { href: "/dashboard/proposals",       label: "Propuestas",      icon: Sparkles,     roles: ["admin","manager","agent"] },
   { href: "/dashboard/tasks",           label: "Tareas",          icon: CheckSquare,  roles: ["admin","manager","agent"] },
+  { href: "/dashboard/visitas",         label: "Visitas",         icon: CalendarCheck, roles: ["admin","manager","agent"] },
   { href: "/dashboard/conversations",   label: "Conversaciones",  icon: MessageSquare,roles: ["admin","manager","agent"] },
   { href: "/dashboard/notifications",   label: "Notificaciones",  icon: Bell,         roles: ["admin","manager","agent"] },
   { href: "/dashboard/agents",          label: "KPIs Agentes",    icon: BarChart3,    roles: ["admin","manager"] },
