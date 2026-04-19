@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { notFound } from "next/navigation";
 import { formatDistanceToNow, format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -77,6 +78,7 @@ export default async function ContactDetailPage({
       ? rawTab
       : "resumen";
   const supabase = await createClient();
+  const session = await getSessionAgent();
 
   const { data: contact } = await supabase
     .from("contacts")
@@ -85,6 +87,7 @@ export default async function ContactDetailPage({
     .single();
 
   if (!contact) notFound();
+  if (!isPrivileged(session.role) && contact.agent_id !== session.agentId) notFound();
 
   const { data: deals } = await supabase
     .from("deals")

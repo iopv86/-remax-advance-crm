@@ -1,5 +1,6 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { DealDetailClient } from "./deal-detail-client";
 import type { Deal, DealStage } from "@/lib/types";
 
@@ -53,6 +54,9 @@ export default async function DealDetailPage({
   ]);
 
   if (dealResult.error || !dealResult.data) notFound();
+
+  const session = await getSessionAgent();
+  if (!isPrivileged(session.role) && dealResult.data.agent_id !== session.agentId) notFound();
 
   return (
     <DealDetailClient

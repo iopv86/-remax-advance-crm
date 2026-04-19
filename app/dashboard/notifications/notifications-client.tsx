@@ -101,6 +101,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
   const [marking, setMarking] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(initialNotifications.length === PAGE_SIZE);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   // ── Real-time subscription ──────────────────────────────────────────────────
@@ -110,6 +111,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
 
     supabase.auth.getUser().then(({ data }) => {
       userId = data.user?.id ?? null;
+      setCurrentUserId(userId);
       if (!userId) return;
 
       const channel = supabase
@@ -138,7 +140,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
 
   // ── Infinite scroll ─────────────────────────────────────────────────────────
   const loadMore = useCallback(async () => {
-    if (loadingMore || !hasMore) return;
+    if (loadingMore || !hasMore || !currentUserId) return;
     const oldest = notifications[notifications.length - 1];
     if (!oldest) return;
 
@@ -147,6 +149,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
     const { data, error } = await supabase
       .from("notifications")
       .select("id, user_id, type, title, body, read, link, created_at")
+      .eq("user_id", currentUserId)
       .order("created_at", { ascending: false })
       .lt("created_at", oldest.created_at)
       .limit(PAGE_SIZE);
@@ -161,7 +164,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
     setNotifications((prev) => [...prev, ...rows]);
     setHasMore(rows.length === PAGE_SIZE);
     setLoadingMore(false);
-  }, [loadingMore, hasMore, notifications]);
+  }, [loadingMore, hasMore, notifications, currentUserId]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -213,12 +216,13 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
   }
 
   async function markAllRead() {
-    if (unread === 0) return;
+    if (unread === 0 || !currentUserId) return;
     setMarking(true);
     const supabase = createClient();
     const { error } = await supabase
       .from("notifications")
       .update({ read: true })
+      .eq("user_id", currentUserId)
       .eq("read", false);
     if (error) {
       toast.error("Error al marcar todas como leídas");
