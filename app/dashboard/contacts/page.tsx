@@ -97,39 +97,51 @@ export default async function ContactsPage({
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {/* Export button */}
-          <button
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "8px 16px",
-              background: "#2a2a2a",
-              color: "#e5e2e1",
-              fontSize: 14,
-              fontWeight: 500,
-              borderRadius: 8,
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-              <polyline points="16 6 12 2 8 6" />
-              <line x1="12" y1="2" x2="12" y2="15" />
-            </svg>
-            Exportar
-          </button>
+          {/* Export button — links to CSV export API with current filters */}
+          {(() => {
+            const exportParams = new URLSearchParams();
+            if (params.q)             exportParams.set("q", params.q);
+            if (params.classification) exportParams.set("classification", params.classification);
+            if (params.status)         exportParams.set("status", params.status);
+            const href = `/api/contacts/export${exportParams.size > 0 ? `?${exportParams}` : ""}`;
+            return (
+              <a
+                href={href}
+                download
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 16px",
+                  background: "#2a2a2a",
+                  color: "#e5e2e1",
+                  fontSize: 14,
+                  fontWeight: 500,
+                  borderRadius: 8,
+                  border: "1px solid rgba(201,150,58,0.2)",
+                  cursor: "pointer",
+                  textDecoration: "none",
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+                Exportar CSV
+              </a>
+            );
+          })()}
 
           {/* Nuevo Cliente gold button */}
           <NewContactButton />
