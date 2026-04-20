@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { STAGE_LABELS, type Deal, type DealStage, type Task } from "@/lib/types";
+import { DealActivityPanel, type DealActivity } from "./deal-activity";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -66,13 +67,15 @@ interface Props {
   deal: DealWithProperty;
   history: StageHistoryEntry[];
   initialTasks: Task[];
+  initialActivities: DealActivity[];
+  agentId: string;
 }
 
 function sanitizePhone(phone: string): string {
   return phone.replace(/[\s\-\+\(\)]/g, "");
 }
 
-export function DealDetailClient({ deal: initialDeal, history, initialTasks }: Props) {
+export function DealDetailClient({ deal: initialDeal, history, initialTasks, initialActivities, agentId }: Props) {
   const router = useRouter();
   const [deal, setDeal] = useState(initialDeal);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -723,6 +726,13 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks }: P
                 </div>
               )}
             </div>
+            {/* Activity timeline */}
+            <DealActivityPanel
+              dealId={deal.id}
+              contactId={deal.contact_id}
+              agentId={agentId}
+              initialActivities={initialActivities}
+            />
           </div>
 
           {/* ── Right: Stage history timeline ─────────────────────────── */}
