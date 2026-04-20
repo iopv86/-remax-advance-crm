@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -9,19 +10,21 @@ const service = createServiceClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
-function randomSlug(len = 10): string {
+function randomSlug(len = 12): string {
   const chars = "abcdefghijkmnpqrstuvwxyz23456789";
-  let s = "";
-  for (let i = 0; i < len; i++) {
-    s += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return s;
+  const bytes = crypto.getRandomValues(new Uint8Array(len));
+  return Array.from(bytes, (b) => chars[b % chars.length]).join("");
 }
 
 export async function POST(req: NextRequest) {
   const client = await createClient();
   const { data: { user } } = await client.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  const rl = await checkRateLimit(`proposals:${user.id}`, 20, 3_600_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Demasiadas propuestas. Intenta más tarde." }, { status: 429 });
+  }
 
   let body: {
     propertyIds: string[];

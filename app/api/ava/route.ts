@@ -164,7 +164,11 @@ export async function POST(request: NextRequest) {
   }
 
   // Rate limit: 60 requests per minute per source IP (Ava sends at most ~10/min)
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip =
+    request.headers.get("x-real-ip") ??
+    request.headers.get("x-vercel-forwarded-for") ??
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
   const rl = await checkRateLimit(`ava:${ip}`, 60, 60_000);
   if (!rl.allowed) {
     return NextResponse.json(

@@ -62,15 +62,30 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Verify contact_id exists to prevent orphan messages
+  // Verify contact_id exists and enforce ownership for non-privileged agents
   const { data: contactExists, error: contactErr } = await serviceSupabase
     .from("contacts")
-    .select("id")
+    .select("id, agent_id")
     .eq("id", contact_id)
     .single();
 
   if (contactErr || !contactExists) {
     return NextResponse.json({ error: "Contacto no encontrado" }, { status: 404 });
+  }
+
+  const { data: requestingAgent } = await serviceSupabase
+    .from("agents")
+    .select("id, role")
+    .eq("email", user.email!)
+    .single();
+
+  if (!requestingAgent) {
+    return NextResponse.json({ error: "Agente no encontrado" }, { status: 404 });
+  }
+
+  const privileged = ["admin", "manager"].includes(requestingAgent.role ?? "");
+  if (!privileged && contactExists.agent_id !== requestingAgent.id) {
+    return NextResponse.json({ error: "No autorizado para este contacto" }, { status: 403 });
   }
 
   // Send via Meta Cloud API if credentials are available
@@ -113,7 +128,7 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Error guardando mensaje" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, message });

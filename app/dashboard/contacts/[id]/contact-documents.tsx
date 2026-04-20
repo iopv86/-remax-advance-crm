@@ -75,7 +75,25 @@ export function ContactDocuments({
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const ALLOWED_MIME_TYPES = new Set([
+    "application/pdf",
+    "image/jpeg", "image/png", "image/webp",
+    "application/msword",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.ms-excel",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  ]);
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
+
   async function uploadFile(file: File) {
+    if (!ALLOWED_MIME_TYPES.has(file.type)) {
+      toast.error("Tipo de archivo no permitido. Solo PDF, imágenes, Word y Excel.");
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("El archivo supera el límite de 10 MB.");
+      return;
+    }
     setUploading(true);
     const supabase = createClient();
 

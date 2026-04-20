@@ -35,7 +35,15 @@ export async function proxy(request: NextRequest) {
   }
 
   // Protect API routes (except /api/ava which uses its own secret-header auth)
-  const protectedApiPrefixes = ["/api/messages", "/api/pdf", "/api/market-insights"];
+  const protectedApiPrefixes = [
+    "/api/messages",
+    "/api/pdf",
+    "/api/market-insights",
+    "/api/contacts",
+    "/api/proposals",
+    "/api/agents",
+    "/api/auth/sign-out",
+  ];
   if (!user && protectedApiPrefixes.some((p) => pathname.startsWith(p))) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }

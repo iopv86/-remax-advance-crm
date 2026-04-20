@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_EVENTS = ["open", "property_view", "pdf_download", "whatsapp_click", "email_click"];
@@ -10,6 +11,16 @@ const service = createServiceClient(
 );
 
 export async function POST(req: NextRequest) {
+  const ip =
+    req.headers.get("x-real-ip") ??
+    req.headers.get("x-vercel-forwarded-for") ??
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    "unknown";
+
+  const rl = await checkRateLimit(`proposal-view:${ip}`, 30, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.json({ ok: false }, { status: 429 });
+  }
   let body: { proposalId: string; propertyId?: string; eventType?: string };
   try {
     body = await req.json();
