@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import type { Contact } from "@/lib/types";
@@ -126,11 +127,13 @@ export default async function ContactsPage({
       </header>
 
       <section style={{ padding: "32px 32px 48px" }}>
-        <ContactsFilterBar
-          currentClassification={params.classification}
-          currentSearch={params.q}
-          totalCount={total}
-        />
+        <Suspense fallback={null}>
+          <ContactsFilterBar
+            currentClassification={params.classification}
+            currentSearch={params.q}
+            totalCount={total}
+          />
+        </Suspense>
         <ContactsTable
           contacts={(contacts as unknown as Contact[]) ?? []}
           pagination={{ currentPage, totalCount: total, pageSize: PAGE_SIZE, basePath: "/dashboard/contacts", filterParams: paginationFilterParams }}
