@@ -66,14 +66,13 @@ export function DashboardClient({ data }: { data: DashboardData }) {
     <div style={{ background: T.bg, minHeight: "100vh", color: T.surface }}>
 
       {/* ── Sticky header ── */}
-      <header style={{
+      <header className="hidden md:flex" style={{
         position: "sticky",
         top: 0,
         height: 56,
         background: "rgba(13,14,18,0.92)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 32px",
@@ -171,7 +170,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       </header>
 
       {/* ── Canvas ── */}
-      <section style={{ padding: "24px 32px 56px", display: "flex", flexDirection: "column", gap: 20 }}>
+      <section className="px-4 py-5 pb-10 flex flex-col gap-5 md:px-8 md:py-6 md:pb-14">
 
         {/* ── Hero welcome strip ── */}
         <div
@@ -196,7 +195,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
             pointerEvents: "none",
           }} />
 
-          <div style={{ position: "relative", padding: "24px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
+          <div className="relative flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between md:gap-6 md:p-8">
 
             {/* Left: Greeting */}
             <div style={{ minWidth: 0 }}>
@@ -223,9 +222,8 @@ export function DashboardClient({ data }: { data: DashboardData }) {
               </p>
             </div>
 
-            {/* Center: Quick stats inline */}
-            <div style={{
-              display: "flex",
+            {/* Center: Quick stats inline — desktop only */}
+            <div className="hidden md:flex" style={{
               alignItems: "center",
               gap: 0,
               borderRadius: 12,
@@ -271,8 +269,8 @@ export function DashboardClient({ data }: { data: DashboardData }) {
               ))}
             </div>
 
-            {/* Right: Quick action buttons */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            {/* Right: Quick action buttons — desktop only */}
+            <div className="hidden md:flex" style={{ alignItems: "center", gap: 8, flexShrink: 0 }}>
               <Link
                 href="/dashboard/contacts?new=1"
                 style={{
@@ -347,15 +345,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
         </div>
 
         {/* ── Row 3: 3-column bento ── */}
-        <div
-          className="animate-fade-up-2"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1.2fr 0.85fr",
-            gap: 20,
-            alignItems: "start",
-          }}
-        >
+        <div className="animate-fade-up-2 grid grid-cols-1 gap-5 items-start md:grid-cols-[1fr_1.2fr_0.85fr]">
           {/* Col 1: Revenue chart */}
           <RevenueChart data={revenue6m} />
 

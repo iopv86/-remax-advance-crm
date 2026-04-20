@@ -64,7 +64,7 @@ function KpiCard({ card }: { card: CardDef }) {
         width: "100%",
       }} />
 
-      <div style={{ padding: "20px 24px 22px" }}>
+      <div className="p-4 md:p-5">
         {/* Label + icon */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <span style={{
@@ -90,10 +90,9 @@ function KpiCard({ card }: { card: CardDef }) {
         </div>
 
         {/* Value */}
-        <div style={{
+        <div className="text-[26px] md:text-[38px]" style={{
           fontFamily: "Manrope, sans-serif",
           fontWeight: 800,
-          fontSize: 38,
           letterSpacing: "-0.04em",
           lineHeight: 1,
           color: card.heroColor,
@@ -200,11 +199,7 @@ export function KpiCards({ kpi }: { kpi: KPIData }) {
   ];
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
-      gap: 20,
-    }}>
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
       {cards.map((card) => (
         <KpiCard key={card.label} card={card} />
       ))}
