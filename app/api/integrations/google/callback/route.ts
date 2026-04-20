@@ -45,13 +45,20 @@ export async function GET(request: NextRequest) {
   const { data: agent } = await supabase.from("agents").select("id").eq("email", user.email!).maybeSingle();
   if (!agent) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=error`);
 
-  await supabase.from("agent_integrations").upsert({
+  const { error: upsertError } = await supabase.from("agent_integrations").upsert({
     agent_id:      agent.id,
     provider:      "google_calendar",
     access_token:  tokens.access_token,
     refresh_token: tokens.refresh_token ?? null,
     token_expiry:  tokens.expires_in ? new Date(Date.now() + tokens.expires_in * 1000).toISOString() : null,
   }, { onConflict: "agent_id,provider" });
+
+  if (upsertError) {
+    console.error("[GCal callback] upsert error:", upsertError.message, upsertError.code);
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=error`
+    );
+  }
 
   return NextResponse.redirect(
     `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=connected`

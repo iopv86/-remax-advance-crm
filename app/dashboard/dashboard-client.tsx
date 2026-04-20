@@ -93,7 +93,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
             <span style={{ fontFamily: "Cinzel, serif", fontWeight: 700, fontSize: 12, color: "#1A0E00", letterSpacing: "-0.02em" }}>AE</span>
           </div>
           <span style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 14, color: T.surface, letterSpacing: "-0.01em" }}>
-            Advance CRM
+            Advance Estate
           </span>
         </div>
 
