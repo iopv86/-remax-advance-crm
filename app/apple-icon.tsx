@@ -12,9 +12,9 @@ export default function AppleIcon() {
 
   return new ImageResponse(
     (
-      <div style={{ width: 180, height: 180, background: "#0D0E12", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 180, height: 180, background: "#0D0E12", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={src} width={148} height={148} style={{ objectFit: "contain" }} alt="" />
+        <img src={src} width={290} height={290} style={{ objectFit: "contain" }} alt="" />
       </div>
     ),
     { ...size }
