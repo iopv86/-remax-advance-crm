@@ -100,6 +100,7 @@ export function TasksClient({
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editTask, setEditTask] = useState<Task | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [syncingGcalId, setSyncingGcalId] = useState<string | null>(null);
 
   const createQueryString = useCallback((updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -188,6 +189,54 @@ export function TasksClient({
     setSheetOpen(false);
     setEditTask(null);
     router.refresh();
+  }
+
+  async function syncGcal(task: Task, e: React.MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!gcalConnected) {
+      toast.error("Conecta Google Calendar primero");
+      return;
+    }
+    setSyncingGcalId(task.id);
+    try {
+      const res = await fetch("/api/integrations/google/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task_id: task.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error ?? "Error al sincronizar con Google Calendar");
+      } else {
+        toast.success("Tarea sincronizada con Google Calendar");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Error de red al sincronizar");
+    } finally {
+      setSyncingGcalId(null);
+    }
+  }
+
+  async function unsyncGcal(task: Task, e: React.MouseEvent) {
+    e.stopPropagation();
+    e.preventDefault();
+    setSyncingGcalId(task.id);
+    try {
+      const res = await fetch(`/api/integrations/google/sync?task_id=${task.id}`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success("Evento eliminado de Google Calendar");
+        router.refresh();
+      } else {
+        const data = await res.json();
+        toast.error(data.error ?? "Error al desincronizar");
+      }
+    } catch {
+      toast.error("Error de red");
+    } finally {
+      setSyncingGcalId(null);
+    }
   }
 
   const today = startOfDay(new Date());
@@ -351,6 +400,10 @@ export function TasksClient({
           onToggleComplete={toggleComplete}
           deletingId={deletingId}
           today={today}
+          gcalConnected={gcalConnected}
+          syncingGcalId={syncingGcalId}
+          onSyncGcal={syncGcal}
+          onUnsyncGcal={unsyncGcal}
         />
       ) : (
         <CalendarView
@@ -382,9 +435,13 @@ interface ListViewProps {
   onToggleComplete: (t: Task) => Promise<void>;
   deletingId: string | null;
   today: Date;
+  gcalConnected?: boolean;
+  syncingGcalId?: string | null;
+  onSyncGcal?: (t: Task, e: React.MouseEvent) => void;
+  onUnsyncGcal?: (t: Task, e: React.MouseEvent) => void;
 }
 
-function ListView({ tasks, onEdit, onDelete, onToggleComplete, deletingId, today }: ListViewProps) {
+function ListView({ tasks, onEdit, onDelete, onToggleComplete, deletingId, today, gcalConnected, syncingGcalId, onSyncGcal, onUnsyncGcal }: ListViewProps) {
   if (tasks.length === 0) {
     return (
       <div className="card-base flex flex-col items-center justify-center py-20" style={{ color: "var(--muted-foreground)" }}>
@@ -453,16 +510,23 @@ function ListView({ tasks, onEdit, onDelete, onToggleComplete, deletingId, today
 
                 {/* Title + contact */}
                 <div className="min-w-0">
-                  <p
-                    className="text-sm font-semibold truncate"
-                    style={{
-                      color: isCompleted ? "var(--muted-foreground)" : "var(--foreground)",
-                      textDecoration: isCompleted ? "line-through" : "none",
-                      opacity: isCompleted ? 0.6 : 1,
-                    }}
-                  >
-                    {task.title}
-                  </p>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <p
+                      className="text-sm font-semibold truncate"
+                      style={{
+                        color: isCompleted ? "var(--muted-foreground)" : "var(--foreground)",
+                        textDecoration: isCompleted ? "line-through" : "none",
+                        opacity: isCompleted ? 0.6 : 1,
+                      }}
+                    >
+                      {task.title}
+                    </p>
+                    {task.gcal_event_id && (
+                      <span title="Sincronizado con Google Calendar" className="shrink-0">
+                        <CalendarCheck className="w-3 h-3" style={{ color: "#4285F4" }} />
+                      </span>
+                    )}
+                  </div>
                   {contactName && (
                     <p className="text-xs mt-0.5 truncate" style={{ color: "var(--muted-foreground)" }}>
                       {contactName}
@@ -529,6 +593,20 @@ function ListView({ tasks, onEdit, onDelete, onToggleComplete, deletingId, today
 
                 {/* Actions */}
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {gcalConnected && (
+                    <button
+                      onClick={(e) => task.gcal_event_id ? onUnsyncGcal?.(task, e) : onSyncGcal?.(task, e)}
+                      disabled={syncingGcalId === task.id}
+                      className="p-1.5 rounded transition-colors disabled:opacity-40"
+                      style={task.gcal_event_id
+                        ? { color: "#4285F4", background: "rgba(66,133,244,0.1)" }
+                        : { color: "var(--muted-foreground)" }
+                      }
+                      title={task.gcal_event_id ? "Quitar de Google Calendar" : "Sincronizar con Google Calendar"}
+                    >
+                      <CalendarCheck className="w-3 h-3" />
+                    </button>
+                  )}
                   <button
                     onClick={(e) => onEdit(task, e)}
                     className="p-1.5 rounded hover:bg-stone-100 dark:hover:bg-stone-800 text-slate-400 hover:text-slate-700 transition-colors"
@@ -584,16 +662,23 @@ function ListView({ tasks, onEdit, onDelete, onToggleComplete, deletingId, today
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p
-                  className="text-sm font-semibold truncate"
-                  style={{
-                    color: isCompleted ? "var(--muted-foreground)" : "var(--foreground)",
-                    textDecoration: isCompleted ? "line-through" : "none",
-                    opacity: isCompleted ? 0.6 : 1,
-                  }}
-                >
-                  {task.title}
-                </p>
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <p
+                    className="text-sm font-semibold truncate"
+                    style={{
+                      color: isCompleted ? "var(--muted-foreground)" : "var(--foreground)",
+                      textDecoration: isCompleted ? "line-through" : "none",
+                      opacity: isCompleted ? 0.6 : 1,
+                    }}
+                  >
+                    {task.title}
+                  </p>
+                  {task.gcal_event_id && (
+                    <span title="Sincronizado con Google Calendar" className="shrink-0">
+                      <CalendarCheck className="w-3 h-3" style={{ color: "#4285F4" }} />
+                    </span>
+                  )}
+                </div>
                 {contactName && (
                   <p className="text-xs mt-0.5 truncate" style={{ color: "var(--muted-foreground)" }}>
                     {contactName}
@@ -641,6 +726,20 @@ function ListView({ tasks, onEdit, onDelete, onToggleComplete, deletingId, today
 
               {/* Actions */}
               <div className="flex items-center gap-1 shrink-0">
+                {gcalConnected && (
+                  <button
+                    onClick={(e) => task.gcal_event_id ? onUnsyncGcal?.(task, e) : onSyncGcal?.(task, e)}
+                    disabled={syncingGcalId === task.id}
+                    className="p-1.5 rounded transition-colors disabled:opacity-40"
+                    style={task.gcal_event_id
+                      ? { color: "#4285F4", background: "rgba(66,133,244,0.1)" }
+                      : { color: "var(--muted-foreground)" }
+                    }
+                    title={task.gcal_event_id ? "Quitar de Google Calendar" : "Sincronizar con Google Calendar"}
+                  >
+                    <CalendarCheck className="w-3.5 h-3.5" />
+                  </button>
+                )}
                 <button
                   onClick={(e) => onEdit(task, e)}
                   className="p-1.5 rounded text-slate-400 hover:text-slate-700 transition-colors"

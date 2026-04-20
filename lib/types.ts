@@ -114,6 +114,8 @@ export interface Task {
   updated_at?: string;
   created_at: string;
   contact?: Contact;
+  gcal_event_id?: string | null;
+  gcal_synced_at?: string | null;
 }
 
 export const STAGE_LABELS: Record<DealStage, string> = {
