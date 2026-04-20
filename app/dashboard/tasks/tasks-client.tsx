@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import {
   List, CalendarDays, ChevronLeft, ChevronRight,
-  Plus, Pencil, Trash2, CheckCircle2, Search,
+  Plus, Pencil, Trash2, CheckCircle2, Search, CalendarCheck,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { TaskSheet } from "@/components/task-sheet";
@@ -38,6 +38,8 @@ interface TasksClientProps {
   initialStatus?: string;
   initialSearch?: string;
   initialMonth?: string;
+  gcalConnected?: boolean;
+  gcalParam?: string;
 }
 
 // ── Calendar helpers ──────────────────────────────────────────────────────────
@@ -77,10 +79,17 @@ const WEEK_DAYS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
 export function TasksClient({
   tasks: initial, contacts, stats,
   initialView, initialPriority, initialStatus, initialSearch, initialMonth,
+  gcalConnected = false, gcalParam,
 }: TasksClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (gcalParam === "connected") toast.success("Google Calendar conectado correctamente");
+    if (gcalParam === "error") toast.error("Error conectando Google Calendar. Intenta de nuevo.");
+    if (gcalParam === "not_configured") toast.error("Google Calendar no está configurado en el servidor.");
+  }, [gcalParam]);
 
   const [tasks, setTasks] = useState<Task[]>(initial);
   const [view, setView] = useState<"list" | "calendar">(initialView);
@@ -204,6 +213,30 @@ export function TasksClient({
 
   return (
     <>
+      {/* ── Google Calendar banner ─────────────────────────────────────────── */}
+      {!gcalConnected && (
+        <div
+          className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 mb-5"
+          style={{ background: "rgba(201,150,58,0.07)", border: "1px solid rgba(201,150,58,0.18)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <CalendarCheck className="w-4 h-4 shrink-0" style={{ color: "#C9963A" }} />
+            <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+              Conecta{" "}
+              <span className="font-semibold" style={{ color: "var(--foreground)" }}>Google Calendar</span>
+              {" "}para sincronizar tus tareas automáticamente.
+            </p>
+          </div>
+          <a
+            href="/api/integrations/google/auth"
+            className="shrink-0 text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+            style={{ background: "rgba(201,150,58,0.15)", color: "#C9963A" }}
+          >
+            Conectar
+          </a>
+        </div>
+      )}
+
       {/* ── Stats row ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {statsCards.map((s) => (

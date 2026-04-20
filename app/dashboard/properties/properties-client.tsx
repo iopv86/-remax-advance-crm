@@ -715,7 +715,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
             >
               {pagedItems.map((p) => {
                 const badge = statusBadge(p.status);
-                const project = getProject(p);
                 const isSelected = selectedIds.has(p.id);
 
                 return (
@@ -784,22 +783,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
                           gap: 6,
                         }}
                       >
-                        {project && (
-                          <span
-                            style={{
-                              ...projectTagStyle(project),
-                              padding: "3px 10px",
-                              borderRadius: 4,
-                              fontSize: 10,
-                              fontWeight: 700,
-                              letterSpacing: "0.12em",
-                              textTransform: "uppercase",
-                            }}
-                          >
-                            {project}
-                          </span>
-                        )}
-                        {/* Type as secondary tag if there's a project */}
+                        {/* Type tag */}
                         <span
                           style={{
                             background: "rgba(13,14,18,0.80)",

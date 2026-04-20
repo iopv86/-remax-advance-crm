@@ -13,6 +13,7 @@ export default async function TasksPage({
     status?: string;
     view?: string;
     month?: string;
+    gcal?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -47,6 +48,14 @@ export default async function TasksPage({
   if (!isPrivileged(session.role)) {
     contactsQuery = contactsQuery.eq("agent_id", session.agentId);
   }
+
+  // Check if agent has Google Calendar connected
+  const { data: gcalIntegration } = await supabase
+    .from("agent_integrations")
+    .select("id")
+    .eq("agent_id", session.agentId)
+    .eq("provider", "google_calendar")
+    .maybeSingle();
 
   const [{ data: rawTasks }, { data: rawContacts }] = await Promise.all([
     query,
@@ -100,6 +109,8 @@ export default async function TasksPage({
           initialStatus={params.status}
           initialSearch={params.q}
           initialMonth={params.month}
+          gcalConnected={!!gcalIntegration}
+          gcalParam={params.gcal}
         />
       </div>
     </div>
