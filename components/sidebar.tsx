@@ -163,6 +163,7 @@ export function Sidebar({
             <Link
               key={href}
               href={href}
+              onClick={onMobileClose}
               className={cn(
                 "flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
                 active
@@ -201,6 +202,7 @@ export function Sidebar({
               <Link
                 key={href}
                 href={href}
+                onClick={onMobileClose}
                 className={cn(
                   "flex items-center gap-3 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
                   sub ? "pl-10 pr-5" : "px-5",

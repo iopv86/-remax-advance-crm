@@ -321,14 +321,14 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
         fontFamily: "Inter, sans-serif",
       }}
     >
-      {/* ── Filter Sidebar ───────────────────────────────────────────────── */}
+      {/* ── Filter Sidebar — desktop only ───────────────────────────────── */}
       <aside
+        className="hidden md:flex"
         style={{
           width: 220,
           flexShrink: 0,
           background: "#0E0E0E",
           borderRight: `1px solid ${BG_SURFACE}`,
-          display: "flex",
           flexDirection: "column",
           padding: "28px 20px",
           gap: 0,
@@ -577,6 +577,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         {/* Top toolbar */}
         <header
+          className="px-4 py-4 md:px-10 md:py-5"
           style={{
             position: "sticky",
             top: 0,
@@ -585,18 +586,19 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
             backdropFilter: "blur(16px)",
             borderBottom: `1px solid rgba(32,31,31,0.50)`,
             display: "flex",
+            flexWrap: "wrap",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "20px 40px",
+            gap: 10,
           }}
         >
           {/* Page title + count */}
           <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
             <h2
+              className="text-[22px] md:text-[28px]"
               style={{
                 fontFamily: "Manrope, sans-serif",
                 fontWeight: 800,
-                fontSize: 28,
                 letterSpacing: "-0.02em",
                 color: TEXT_PRIMARY,
                 margin: 0,
@@ -610,7 +612,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
           </div>
 
           {/* Search + actions */}
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
             {/* Search */}
             <div style={{ position: "relative" }}>
               <svg
@@ -637,6 +639,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
                 placeholder="Buscar propiedad…"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); resetPage(); }}
+                className="w-[160px] md:w-[220px]"
                 style={{
                   background: BG_ELEVATED,
                   border: "none",
@@ -644,7 +647,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
                   padding: "8px 16px 8px 32px",
                   fontSize: 12,
                   color: TEXT_PRIMARY,
-                  width: 220,
                   outline: "none",
                 }}
               />
@@ -682,12 +684,40 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
           </div>
         </header>
 
+        {/* Mobile-only filter strip */}
+        <div className="flex md:hidden items-center gap-2 px-4 py-3 overflow-x-auto" style={{ borderBottom: `1px solid ${BG_SURFACE}` }}>
+          {PROJECTS.map((proj) => (
+            <button
+              key={proj}
+              onClick={() => { setProjectFilter(proj); resetPage(); }}
+              style={{
+                ...pillBtn(projectFilter === proj),
+                whiteSpace: "nowrap",
+              }}
+            >
+              {proj === "all" ? "Todos" : proj}
+            </button>
+          ))}
+          <div style={{ width: 1, height: 20, background: BG_SURFACE, flexShrink: 0, margin: "0 4px" }} />
+          {TIPOS.map((t) => (
+            <button
+              key={t}
+              onClick={() => { setTipoFilter(t); resetPage(); }}
+              style={{
+                ...pillBtn(tipoFilter === t),
+                borderRadius: 6,
+                whiteSpace: "nowrap",
+              }}
+            >
+              {t === "all" ? "Tipo: todos" : t}
+            </button>
+          ))}
+        </div>
+
         {/* Property grid */}
         <div
-          style={{
-            padding: "32px 40px 80px",
-            flex: 1,
-          }}
+          className="px-4 py-6 pb-20 md:px-10 md:py-8 md:pb-20"
+          style={{ flex: 1 }}
         >
           {filtered.length === 0 ? (
             <div
@@ -731,10 +761,9 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
           ) : (
             <>
             <div
+              className="grid gap-5 md:gap-7"
               style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                gap: 28,
+                gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))",
               }}
             >
               {pagedItems.map((p) => {
