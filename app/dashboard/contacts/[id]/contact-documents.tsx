@@ -98,7 +98,7 @@ export function ContactDocuments({
     const supabase = createClient();
 
     const ext = file.name.split(".").pop() ?? "bin";
-    const path = `${contactId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    const path = `${contactId}/${crypto.randomUUID()}.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from("contact-documents")
@@ -110,12 +110,6 @@ export function ContactDocuments({
       return;
     }
 
-    const { data: urlData } = supabase.storage
-      .from("contact-documents")
-      .getPublicUrl(path);
-
-    // Since bucket is private, use a signed URL pattern — store the path, generate signed URL on access
-    // Actually store the storage path, fetch signed URL dynamically for download
     const { data: inserted, error: dbError } = await supabase
       .from("contact_documents")
       .insert({

@@ -82,7 +82,8 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
 
       {/* Stage bars */}
       {pipeline.length > 0 && (
-        <div style={{ display: "flex", gap: 6, alignItems: "stretch" }}>
+        <div style={{ overflowX: "auto", overflowY: "visible", marginLeft: -4, paddingLeft: 4, paddingBottom: 4 }}>
+        <div style={{ display: "flex", gap: 6, alignItems: "stretch", minWidth: "max-content" }}>
           {pipeline.map((stage, i) => {
             const widthPct = totalCount > 0 ? (stage.count / totalCount) * 100 : 0;
             const color = STAGE_COLORS[Math.min(i, STAGE_COLORS.length - 1)];
@@ -147,6 +148,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
               </div>
             );
           })}
+        </div>
         </div>
       )}
     </div>

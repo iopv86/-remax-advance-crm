@@ -124,8 +124,8 @@ export async function POST(req: NextRequest) {
       })
     );
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Error generando PDF";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("[pdf] render error:", err);
+    return NextResponse.json({ error: "Error generando PDF" }, { status: 500 });
   }
 
   return new NextResponse(pdfBuffer as unknown as BodyInit, {

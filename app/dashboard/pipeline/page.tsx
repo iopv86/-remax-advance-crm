@@ -45,22 +45,9 @@ export default async function PipelinePage() {
       }}
     >
       {/* Page Header */}
-      <div
-        style={{
-          padding: "32px 48px 0",
-          flexShrink: 0,
-          background: "#121319",
-        }}
-      >
+      <div className="px-4 pt-6 pb-0 md:px-12 md:pt-8" style={{ flexShrink: 0, background: "#121319" }}>
         {/* Breadcrumb + title row */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginBottom: 40,
-          }}
-        >
+        <div className="flex flex-col gap-3 mb-6 md:flex-row md:justify-between md:items-end md:mb-10">
           <div>
             <nav
               style={{
@@ -79,10 +66,10 @@ export default async function PipelinePage() {
               <span style={{ color: "#f5bd5d" }}>Pipeline</span>
             </nav>
             <h1
+              className="text-[26px] md:text-[36px]"
               style={{
                 fontFamily: "Manrope, var(--font-manrope), sans-serif",
                 fontWeight: 800,
-                fontSize: 36,
                 color: "#e3e1ea",
                 letterSpacing: "-0.02em",
                 lineHeight: 1,
@@ -92,7 +79,7 @@ export default async function PipelinePage() {
             </h1>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }} className="md:items-end">
             <span
               style={{
                 color: "#9899A8",
@@ -104,10 +91,10 @@ export default async function PipelinePage() {
               Volumen Total del Pipeline
             </span>
             <div
+              className="text-[20px] md:text-[28px]"
               style={{
                 fontFamily: "Manrope, var(--font-manrope), sans-serif",
                 fontWeight: 700,
-                fontSize: 28,
                 color: "#f5bd5d",
               }}
             >
@@ -137,13 +124,7 @@ export default async function PipelinePage() {
       </div>
 
       {/* Kanban Board */}
-      <div
-        style={{
-          flex: 1,
-          overflowX: "auto",
-          padding: "0 48px 48px",
-        }}
-      >
+      <div className="px-4 pb-10 md:px-12 md:pb-12" style={{ flex: 1, overflowX: "auto" }}>
         <PipelineClient deals={typedDeals} />
       </div>
     </div>

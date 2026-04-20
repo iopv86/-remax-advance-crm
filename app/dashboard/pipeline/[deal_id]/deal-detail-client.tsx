@@ -152,6 +152,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks }: P
   }
 
   async function saveNotes() {
+    if (notesValue.length > 5000) { toast.error("Notas demasiado largas (máx 5000 caracteres)"); return; }
     setSaving(true);
     const supabase = createClient();
     const { error } = await supabase

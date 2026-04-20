@@ -38,7 +38,7 @@ export function DashboardShell({
           <Logo size="sm" />
         </div>
 
-        <main className="flex-1 overflow-auto page-bg">{children}</main>
+        <main className="flex-1 overflow-x-hidden overflow-y-auto page-bg">{children}</main>
       </div>
     </div>
   );

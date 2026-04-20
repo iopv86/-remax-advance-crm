@@ -143,7 +143,7 @@ export function PropertySheet({
 
     for (const file of files) {
       const ext = file.name.split(".").pop();
-      const path = `properties/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `properties/${crypto.randomUUID()}.${ext}`;
       const { error } = await supabase.storage
         .from("property-images")
         .upload(path, file, { upsert: false });

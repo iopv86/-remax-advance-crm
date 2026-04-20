@@ -87,8 +87,10 @@ export async function GET(req: NextRequest) {
       `first_name.ilike.%${safeQ}%,last_name.ilike.%${safeQ}%,phone.ilike.%${safeQ}%,email.ilike.%${safeQ}%`
     );
   }
-  if (classification) query = query.eq("lead_classification", classification);
-  if (status)         query = query.eq("lead_status", status);
+  const VALID_CLASSIFICATIONS = ["hot","warm","cold","not_qualified"];
+  const VALID_STATUSES = ["new","contacted","follow_up","qualified","proposal","negotiation","closed_won","closed_lost","inactive"];
+  if (classification && VALID_CLASSIFICATIONS.includes(classification)) query = query.eq("lead_classification", classification);
+  if (status && VALID_STATUSES.includes(status))                        query = query.eq("lead_status", status);
 
   const { data, error } = await query;
   if (error) {
