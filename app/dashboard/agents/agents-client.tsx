@@ -301,7 +301,7 @@ function ScatterPlot({ agents }: { agents: AgentKPISummary[] }) {
   });
 
   return (
-    <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-8 space-y-6 relative overflow-hidden">
+    <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-4 md:p-8 space-y-6 relative overflow-hidden">
       <h3
         className="font-bold text-lg text-white"
         style={{ fontFamily: "Manrope, sans-serif" }}
@@ -728,7 +728,7 @@ export function AgentsClient({
           {/* Agent table */}
           <section className="bg-[#14151C] rounded-xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+              <table className="w-full min-w-max text-left border-collapse">
                 <thead>
                   <tr className="bg-[#1c1b1b]/50">
                     {[
@@ -908,7 +908,7 @@ export function AgentsClient({
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
             {/* Pipeline by agent */}
-            <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-8 space-y-5">
+            <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-4 md:p-8 space-y-5">
               <h3 className="font-bold text-lg text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
                 Pipeline por Agente
               </h3>
@@ -943,7 +943,7 @@ export function AgentsClient({
             </div>
 
             {/* Pipeline by stage */}
-            <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-8 space-y-5">
+            <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-4 md:p-8 space-y-5">
               <h3 className="font-bold text-lg text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
                 Pipeline por Etapa
               </h3>
@@ -961,7 +961,7 @@ export function AgentsClient({
       {/* ── Objetivos Tab ────────────────────────────────────────── */}
       {activeTab === "objetivos" && (
         <div
-          className="rounded-xl p-8"
+          className="rounded-xl p-4 md:p-8"
           style={{
             background: "rgba(14,15,20,0.8)",
             border: "1px solid rgba(201,150,58,0.12)",
@@ -986,7 +986,7 @@ export function AgentsClient({
       {/* ── Round Robin Tab ──────────────────────────────────────── */}
       {activeTab === "round-robin" && (
         <div
-          className="rounded-xl p-8"
+          className="rounded-xl p-4 md:p-8"
           style={{
             background: "rgba(14,15,20,0.8)",
             border: "1px solid rgba(201,150,58,0.12)",

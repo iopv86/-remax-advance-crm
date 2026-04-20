@@ -78,6 +78,7 @@ export function ConversationsClient({ initialConversations }: Props) {
   const [avaPaused, setAvaPaused] = useState(false);
   const [assignedAgent, setAssignedAgent] = useState<{ full_name: string | null } | null>(null);
   const [contactDeals, setContactDeals] = useState<{ id: string; stage: string; deal_value: number | null; currency: string | null }[]>([]);
+  const [mobilePanel, setMobilePanel] = useState<"list" | "chat">("list");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // stable supabase client ref
@@ -204,6 +205,7 @@ export function ConversationsClient({ initialConversations }: Props) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("contact", id);
     router.push(`${pathname}?${params.toString()}`);
+    setMobilePanel("chat");
   }
 
   // Filter + search
@@ -243,9 +245,8 @@ export function ConversationsClient({ initialConversations }: Props) {
     <div className="flex overflow-hidden" style={{ height: "100vh" }}>
       {/* ── LEFT PANEL: Conversation list ── */}
       <section
-        className="flex flex-col flex-shrink-0 border-r"
+        className={`flex-col flex-shrink-0 border-r w-full md:w-[280px] ${mobilePanel === "list" ? "flex" : "hidden"} md:flex`}
         style={{
-          width: 280,
           background: "#14151C",
           borderColor: "rgba(79,69,55,0.1)",
         }}
@@ -383,7 +384,7 @@ export function ConversationsClient({ initialConversations }: Props) {
 
       {/* ── CENTER PANEL: Chat ── */}
       <section
-        className="flex-1 flex flex-col overflow-hidden"
+        className={`flex-col overflow-hidden flex-1 ${mobilePanel === "chat" ? "flex" : "hidden"} md:flex`}
         style={{ background: "#0D0E12" }}
       >
         {!selectedContactId ? (
@@ -395,7 +396,7 @@ export function ConversationsClient({ initialConversations }: Props) {
           <>
             {/* Chat header */}
             <div
-              className="flex items-center justify-between px-8 flex-shrink-0 z-10 backdrop-blur-md border-b"
+              className="flex items-center justify-between px-4 md:px-8 flex-shrink-0 z-10 backdrop-blur-md border-b"
               style={{
                 height: 64,
                 background: "rgba(13,14,18,0.9)",
@@ -403,6 +404,13 @@ export function ConversationsClient({ initialConversations }: Props) {
               }}
             >
               <div className="flex items-center gap-4">
+                <button
+                  onClick={() => setMobilePanel("list")}
+                  className="md:hidden text-[#9899A8] hover:text-white transition-colors p-1"
+                  aria-label="Volver a lista"
+                >
+                  ←
+                </button>
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
                   style={{ background: "rgba(201,150,58,0.15)", color: "#C9963A" }}
@@ -445,7 +453,7 @@ export function ConversationsClient({ initialConversations }: Props) {
             </div>
 
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-8 flex flex-col gap-6">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-6">
               {threadLoading ? (
                 <div className="flex items-center justify-center h-full text-[#545567]">
                   <p className="text-sm">Cargando mensajes...</p>
@@ -556,7 +564,7 @@ export function ConversationsClient({ initialConversations }: Props) {
 
       {/* ── RIGHT PANEL: Contact profile ── */}
       <section
-        className="flex flex-col flex-shrink-0 overflow-y-auto border-l"
+        className="hidden lg:flex flex-col flex-shrink-0 overflow-y-auto border-l"
         style={{
           width: 320,
           background: "#14151C",

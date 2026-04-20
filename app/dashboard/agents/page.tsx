@@ -292,7 +292,7 @@ export default async function AgentsPage({
       className="flex flex-col min-h-screen"
       style={{ background: "#0E0E0E" }}
     >
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <AgentsClient
           agents={agents}
           currentPeriod={currentPeriod}

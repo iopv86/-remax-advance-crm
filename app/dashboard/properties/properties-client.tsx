@@ -32,7 +32,6 @@ const STATUS_LABELS: Record<string, string> = {
 
 // ─── Filter types ─────────────────────────────────────────────────────────────
 
-type ProjectFilter = "all" | "COL" | "Green Valley" | "BCR";
 type TipoFilter = "all" | "Casa" | "Apto" | "Terreno";
 type DormFilter = 0 | 1 | 2 | 3 | 4;
 
@@ -156,7 +155,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   // Filter state
-  const [projectFilter, setProjectFilter] = useState<ProjectFilter>("all");
   const [tipoFilter, setTipoFilter] = useState<TipoFilter>("all");
   const [maxPrice, setMaxPrice] = useState(5_000_000);
   const [dormFilter, setDormFilter] = useState<DormFilter>(0);
@@ -164,16 +162,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
   const [showReservado, setShowReservado] = useState(false);
   const [propPage, setPropPage] = useState(1);
   const PROP_PAGE_SIZE = 50;
-
-  function getProject(p: Property): string {
-    const city = (p.city ?? "").toUpperCase();
-    const sector = (p.sector ?? "").toUpperCase();
-    const combined = city + " " + sector;
-    if (combined.includes("COL")) return "COL";
-    if (combined.includes("BCR")) return "BCR";
-    if (combined.includes("GREEN") || combined.includes("VALLEY")) return "Green Valley";
-    return "";
-  }
 
   // Filtering
   const filtered = properties.filter((p) => {
@@ -184,10 +172,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
         !(p.city ?? "").toLowerCase().includes(q) &&
         !(p.sector ?? "").toLowerCase().includes(q)
       ) return false;
-    }
-    if (projectFilter !== "all") {
-      const proj = getProject(p);
-      if (proj !== projectFilter) return false;
     }
     if (tipoFilter !== "all") {
       const t = TIPO_MAP[p.property_type] ?? "Terreno";
@@ -302,7 +286,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
     router.refresh();
   }
 
-  const PROJECTS: ProjectFilter[] = ["all", "COL", "Green Valley", "BCR"];
   const TIPOS: TipoFilter[] = ["all", "Casa", "Apto", "Terreno"];
   const DORMS: { label: string; val: DormFilter }[] = [
     { label: "1", val: 1 },
@@ -335,29 +318,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
           overflowY: "auto",
         }}
       >
-        {/* Project pill filter */}
-        <div
-          style={{
-            background: BG_ELEVATED,
-            borderRadius: 9999,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 4,
-            padding: 4,
-            marginBottom: 28,
-          }}
-        >
-          {PROJECTS.map((proj) => (
-            <button
-              key={proj}
-              onClick={() => { setProjectFilter(proj); resetPage(); }}
-              style={pillBtn(projectFilter === proj)}
-            >
-              {proj === "all" ? "Todos" : proj}
-            </button>
-          ))}
-        </div>
-
         {/* Spacer area for filters */}
         <div style={{ display: "flex", flexDirection: "column", gap: 28, flex: 1 }}>
           {/* Tipo */}
@@ -686,19 +646,6 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
 
         {/* Mobile-only filter strip */}
         <div className="flex md:hidden items-center gap-2 px-4 py-3 overflow-x-auto" style={{ borderBottom: `1px solid ${BG_SURFACE}` }}>
-          {PROJECTS.map((proj) => (
-            <button
-              key={proj}
-              onClick={() => { setProjectFilter(proj); resetPage(); }}
-              style={{
-                ...pillBtn(projectFilter === proj),
-                whiteSpace: "nowrap",
-              }}
-            >
-              {proj === "all" ? "Todos" : proj}
-            </button>
-          ))}
-          <div style={{ width: 1, height: 20, background: BG_SURFACE, flexShrink: 0, margin: "0 4px" }} />
           {TIPOS.map((t) => (
             <button
               key={t}

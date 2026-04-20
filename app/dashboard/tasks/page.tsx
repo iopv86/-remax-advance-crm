@@ -90,7 +90,7 @@ export default async function TasksPage({
       </div>
 
       {/* Client */}
-      <div className="flex-1 p-6 animate-fade-up-1">
+      <div className="flex-1 px-4 py-5 md:p-6 animate-fade-up-1">
         <TasksClient
           tasks={tasks}
           contacts={contacts}

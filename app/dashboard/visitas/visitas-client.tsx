@@ -723,11 +723,12 @@ export function VisitasClient({
     <div style={{ minHeight: "100vh", background: BG_BODY }}>
       {/* Sticky header */}
       <header
+        className="px-4 md:px-8"
         style={{
           position: "sticky", top: 0, zIndex: 40,
           background: "rgba(13,14,18,0.85)", backdropFilter: "blur(12px)",
           display: "flex", justifyContent: "space-between", alignItems: "center",
-          padding: "0 32px", height: 88,
+          height: 88,
           borderBottom: `1px solid ${BORDER_DIM}`,
         }}
       >
@@ -753,7 +754,7 @@ export function VisitasClient({
         </button>
       </header>
 
-      <div style={{ padding: "28px 32px 64px" }}>
+      <div className="px-4 py-7 pb-16 md:px-8">
         {/* Filter pills */}
         <div style={{ display: "flex", gap: 8, marginBottom: 28 }}>
           {filterBtn("upcoming", "Próximas")}
@@ -807,7 +808,7 @@ export function VisitasClient({
                   </div>
 
                   {/* Cards grid */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16, paddingLeft: 60 }}>
+                  <div className="pl-0 md:pl-[60px]" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(280px, 100%), 1fr))", gap: 16 }}>
                     {dayShowings.map((s) => (
                       <ShowingCard
                         key={s.id}
