@@ -263,7 +263,34 @@ export function TasksClient({
   return (
     <>
       {/* ── Google Calendar banner ─────────────────────────────────────────── */}
-      {!gcalConnected && (
+      {gcalConnected ? (
+        <div
+          className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 mb-5"
+          style={{ background: "rgba(66,133,244,0.06)", border: "1px solid rgba(66,133,244,0.18)" }}
+        >
+          <div className="flex items-center gap-2.5">
+            <CalendarCheck className="w-4 h-4 shrink-0" style={{ color: "#4285F4" }} />
+            <p className="text-sm font-medium" style={{ color: "var(--foreground)" }}>
+              Google Calendar conectado
+            </p>
+          </div>
+          <button
+            onClick={async () => {
+              const res = await fetch("/api/integrations/google/auth", { method: "DELETE" });
+              if (res.ok) {
+                toast.success("Google Calendar desconectado");
+                router.refresh();
+              } else {
+                toast.error("Error al desconectar");
+              }
+            }}
+            className="shrink-0 text-xs px-3 py-1.5 rounded-lg transition-colors hover:opacity-80"
+            style={{ background: "rgba(100,116,139,0.1)", color: "var(--muted-foreground)" }}
+          >
+            Desconectar
+          </button>
+        </div>
+      ) : (
         <div
           className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 mb-5"
           style={{ background: "rgba(201,150,58,0.07)", border: "1px solid rgba(201,150,58,0.18)" }}
