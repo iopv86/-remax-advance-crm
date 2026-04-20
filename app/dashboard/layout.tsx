@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Sidebar } from "@/components/sidebar";
+import { DashboardShell } from "@/components/dashboard-shell";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient();
@@ -15,12 +15,5 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const role = (agent?.role as string) ?? "agent";
 
-  return (
-    <div className="flex h-full">
-      <Sidebar role={role} />
-      <main className="flex-1 overflow-auto page-bg">
-        {children}
-      </main>
-    </div>
-  );
+  return <DashboardShell role={role}>{children}</DashboardShell>;
 }

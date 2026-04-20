@@ -155,7 +155,8 @@ interface PaginationProps {
   currentPage: number;
   totalCount: number;
   pageSize: number;
-  buildHref: (page: number) => string;
+  basePath: string;
+  filterParams?: Record<string, string>;
 }
 
 interface Props {
@@ -562,7 +563,8 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
               currentPage={pagination.currentPage}
               totalCount={pagination.totalCount}
               pageSize={pagination.pageSize}
-              buildHref={pagination.buildHref}
+              basePath={pagination.basePath}
+              filterParams={pagination.filterParams}
             />
           </div>
         )}

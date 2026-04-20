@@ -7,10 +7,17 @@ interface PaginationProps {
   currentPage: number;
   totalCount: number;
   pageSize: number;
-  buildHref: (page: number) => string;
+  basePath: string;
+  filterParams?: Record<string, string>;
 }
 
-export function Pagination({ currentPage, totalCount, pageSize, buildHref }: PaginationProps) {
+export function Pagination({ currentPage, totalCount, pageSize, basePath, filterParams }: PaginationProps) {
+  function buildHref(page: number) {
+    const p = new URLSearchParams(filterParams ?? {});
+    if (page > 1) p.set("page", String(page));
+    const qs = p.toString();
+    return `${basePath}${qs ? `?${qs}` : ""}`;
+  }
   const totalPages = Math.ceil(totalCount / pageSize);
   if (totalPages <= 1) return null;
 

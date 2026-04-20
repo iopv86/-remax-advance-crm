@@ -64,23 +64,18 @@ export default async function ContactsPage({
 
   const total = totalCount ?? 0;
 
-  // Build href for pagination links (preserves filters)
-  function buildExportHref() {
-    const p = new URLSearchParams();
-    if (params.q)             p.set("q", params.q);
-    if (params.classification) p.set("classification", params.classification);
-    if (params.status)         p.set("status", params.status);
-    return `/api/contacts/export${p.size > 0 ? `?${p}` : ""}`;
-  }
+  // Build export href (server-side, used in <a> tag only)
+  const exportFilterParts: string[] = [];
+  if (params.q)              exportFilterParts.push(`q=${encodeURIComponent(params.q)}`);
+  if (params.classification) exportFilterParts.push(`classification=${encodeURIComponent(params.classification)}`);
+  if (params.status)         exportFilterParts.push(`status=${encodeURIComponent(params.status)}`);
+  const exportHref = `/api/contacts/export${exportFilterParts.length > 0 ? `?${exportFilterParts.join("&")}` : ""}`;
 
-  function buildPageHref(page: number) {
-    const p = new URLSearchParams();
-    if (params.q)             p.set("q", params.q);
-    if (params.classification) p.set("classification", params.classification);
-    if (params.status)         p.set("status", params.status);
-    if (page > 1)              p.set("page", String(page));
-    return `/dashboard/contacts${p.size > 0 ? `?${p}` : ""}`;
-  }
+  // Serializable filter params for pagination (no function needed)
+  const paginationFilterParams: Record<string, string> = {};
+  if (params.q)              paginationFilterParams.q = params.q;
+  if (params.classification) paginationFilterParams.classification = params.classification;
+  if (params.status)         paginationFilterParams.status = params.status;
 
   return (
     <div style={{ minHeight: "100vh", background: "#0e0e0e" }}>
@@ -110,7 +105,7 @@ export default async function ContactsPage({
 
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <a
-            href={buildExportHref()}
+            href={exportHref}
             download
             style={{
               display: "flex", alignItems: "center", gap: 8,
@@ -138,7 +133,7 @@ export default async function ContactsPage({
         />
         <ContactsTable
           contacts={(contacts as unknown as Contact[]) ?? []}
-          pagination={{ currentPage, totalCount: total, pageSize: PAGE_SIZE, buildHref: buildPageHref }}
+          pagination={{ currentPage, totalCount: total, pageSize: PAGE_SIZE, basePath: "/dashboard/contacts", filterParams: paginationFilterParams }}
         />
       </section>
     </div>

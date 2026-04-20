@@ -20,6 +20,7 @@ import {
   Bell,
   FileBarChart,
   CalendarCheck,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -48,7 +49,15 @@ const ALL_SETTINGS_ITEMS = [
   { href: "/dashboard/settings/templates", label: "Plantillas WA",  icon: MessageSquare, sub: true,  roles: ["admin"] },
 ];
 
-export function Sidebar({ role = "agent" }: { role?: string }) {
+export function Sidebar({
+  role = "agent",
+  mobileOpen = false,
+  onMobileClose,
+}: {
+  role?: string;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
@@ -86,16 +95,40 @@ export function Sidebar({ role = "agent" }: { role?: string }) {
   }
 
   return (
-    <aside
-      className="flex flex-col w-[260px] shrink-0 min-h-screen overflow-y-auto"
-      style={{
-        background: "var(--sidebar)",
-        borderRight: "1px solid var(--sidebar-border)",
-      }}
-    >
-      {/* Logo */}
-      <div className="px-5 pt-6 pb-5">
+    <>
+      {/* Mobile backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 md:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
+      <aside
+        className={cn(
+          "flex flex-col w-[260px] shrink-0 overflow-y-auto z-50",
+          // Mobile: fixed off-screen, slides in when open
+          "fixed inset-y-0 left-0 transition-transform duration-300",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop: normal flow, always visible
+          "md:relative md:inset-auto md:translate-x-0 md:min-h-screen"
+        )}
+        style={{
+          background: "var(--sidebar)",
+          borderRight: "1px solid var(--sidebar-border)",
+        }}
+      >
+      {/* Logo + mobile close button */}
+      <div className="px-5 pt-6 pb-5 flex items-center justify-between">
         <Logo size="md" />
+        <button
+          className="md:hidden flex items-center justify-center w-7 h-7 rounded-lg"
+          style={{ color: "#9899A8", background: "rgba(255,255,255,0.05)" }}
+          onClick={onMobileClose}
+          aria-label="Cerrar menú"
+        >
+          <X className="h-4 w-4" />
+        </button>
       </div>
 
       {/* Ava status pill */}
@@ -217,6 +250,7 @@ export function Sidebar({ role = "agent" }: { role?: string }) {
           Cerrar sesión
         </button>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
