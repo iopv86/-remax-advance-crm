@@ -1,0 +1,26 @@
+{
+  "name": "Advance Estate CRM",
+  "short_name": "AE CRM",
+  "description": "CRM inmobiliario con IA para RE/MAX Advance",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D0E12",
+  "theme_color": "#C9963A",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "screenshots": [],
+  "categories": ["business", "productivity"]
+}

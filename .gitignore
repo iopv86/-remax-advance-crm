@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# QA screenshots and dev artifacts
+public/qa/*.png
+public/qa/*.py
+public/ss_*.png
+public/test_*.png
+public/logo-gallery*.html
+public/logo-gallery-preview.png
+public/logo-preview-canva.html
+public/nanobanana/
+nanobanana-output/
+dev-server*.log
