@@ -51,3 +51,8 @@ public/logo-preview-canva.html
 public/nanobanana/
 nanobanana-output/
 dev-server*.log
+
+# Playwright
+/playwright-report/
+/test-results/
+.env.e2e
