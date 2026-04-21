@@ -1,24 +1,60 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
+const META_GRAPH_VERSION = "v19.0";
+const META_FIELDS = "campaign_id,campaign_name,impressions,clicks,spend,leads,reach,actions";
+const DATE_PRESET = "last_30d";
+
+interface MetaInsightRow {
+  campaign_id: string;
+  campaign_name: string;
+  impressions: string;
+  clicks: string;
+  spend: string;
+  reach: string;
+  date_start: string;
+  leads?: number;
+  actions?: Array<{ action_type: string; value: string }>;
+}
+
+interface MetaApiResponse {
+  data: MetaInsightRow[];
+  paging?: { cursors?: { after?: string }; next?: string };
+  error?: { message: string; code: number };
+}
+
+function extractLeads(row: MetaInsightRow): number {
+  // Meta returns leads either as a top-level field or inside actions[]
+  if (typeof row.leads === "number") return row.leads;
+  const leadAction = row.actions?.find(
+    (a) => a.action_type === "lead" || a.action_type === "onsite_conversion.lead_grouped"
+  );
+  return leadAction ? parseInt(leadAction.value, 10) : 0;
+}
+
 // POST /api/meta/sync
-// Syncs Meta Ads campaign insights into meta_ad_insights table.
-// Requires META_ACCESS_TOKEN and META_AD_ACCOUNT_ID env vars.
-// Call via cron or manually from the Ads dashboard.
+// Fetches Meta Ads campaign insights and upserts into meta_ad_insights.
+// Auth: admin session OR valid CRON_SECRET Bearer token.
 export async function POST(request: Request) {
-  // Verify cron secret or admin session
   const authHeader = request.headers.get("authorization");
   const isCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
 
   if (!isCron) {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const { data: agent } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
-    if (!agent || agent.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("role")
+      .eq("email", user.email!)
+      .maybeSingle();
+    if (!agent || agent.role !== "admin")
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const token     = process.env.META_ACCESS_TOKEN;
+  const token = process.env.META_ACCESS_TOKEN;
   const accountId = process.env.META_AD_ACCOUNT_ID;
 
   if (!token || !accountId) {
@@ -28,11 +64,52 @@ export async function POST(request: Request) {
     );
   }
 
-  // TODO: call Meta Graph API and upsert into meta_ad_insights
-  // Example: GET https://graph.facebook.com/v19.0/{accountId}/insights
-  //   ?fields=campaign_id,campaign_name,impressions,clicks,spend,leads&date_preset=last_30d
-  //   &access_token={token}
-  // Then upsert rows into meta_ad_insights using ON CONFLICT(campaign_id, date) DO UPDATE
+  // Fetch from Meta Graph API (paginated)
+  const allRows: MetaInsightRow[] = [];
+  let url: string | null =
+    `https://graph.facebook.com/${META_GRAPH_VERSION}/act_${accountId}/insights` +
+    `?fields=${META_FIELDS}&date_preset=${DATE_PRESET}&level=campaign&access_token=${token}`;
 
-  return NextResponse.json({ message: "Meta Ads sync stub — configure META_ACCESS_TOKEN to activate." });
+  while (url) {
+    const res = await fetch(url);
+    const json = (await res.json()) as MetaApiResponse;
+
+    if (json.error) {
+      return NextResponse.json(
+        { error: `Meta API error ${json.error.code}: ${json.error.message}` },
+        { status: 502 }
+      );
+    }
+
+    allRows.push(...(json.data ?? []));
+    url = json.paging?.next ?? null;
+  }
+
+  if (allRows.length === 0) {
+    return NextResponse.json({ message: "No insights returned by Meta API.", upserted: 0 });
+  }
+
+  // Shape rows for upsert
+  const rows = allRows.map((r) => ({
+    campaign_id: r.campaign_id,
+    campaign_name: r.campaign_name,
+    date: r.date_start,
+    impressions: parseInt(r.impressions, 10) || 0,
+    clicks: parseInt(r.clicks, 10) || 0,
+    spend: parseFloat(r.spend) || 0,
+    reach: parseInt(r.reach, 10) || 0,
+    leads: extractLeads(r),
+    cpl: extractLeads(r) > 0 ? parseFloat(r.spend) / extractLeads(r) : null,
+  }));
+
+  const supabase = await createClient();
+  const { error: upsertError } = await supabase
+    .from("meta_ad_insights")
+    .upsert(rows, { onConflict: "campaign_id,date" });
+
+  if (upsertError) {
+    return NextResponse.json({ error: upsertError.message }, { status: 500 });
+  }
+
+  return NextResponse.json({ message: "Meta Ads sync complete.", upserted: rows.length });
 }
