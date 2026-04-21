@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const GCAL_EVENTS_URL = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
@@ -28,11 +31,16 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Rate limit: 60 sync ops per minute per user
+  const rl = await checkRateLimit(`gcal-sync:${user.id}`, 60, 60_000);
+  if (!rl.allowed) return NextResponse.json({ error: "Demasiadas solicitudes" }, { status: 429 });
+
   let body: { task_id?: string };
   try { body = await request.json(); } catch { body = {}; }
 
   const { task_id } = body;
   if (!task_id) return NextResponse.json({ error: "task_id required" }, { status: 400 });
+  if (!UUID_RE.test(task_id)) return NextResponse.json({ error: "task_id inválido" }, { status: 400 });
 
   // Fetch the agent
   const { data: agent } = await supabase
@@ -151,9 +159,13 @@ export async function DELETE(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const rl2 = await checkRateLimit(`gcal-sync:${user.id}`, 60, 60_000);
+  if (!rl2.allowed) return NextResponse.json({ error: "Demasiadas solicitudes" }, { status: 429 });
+
   const { searchParams } = new URL(request.url);
   const task_id = searchParams.get("task_id");
   if (!task_id) return NextResponse.json({ error: "task_id required" }, { status: 400 });
+  if (!UUID_RE.test(task_id)) return NextResponse.json({ error: "task_id inválido" }, { status: 400 });
 
   const { data: agent } = await supabase.from("agents").select("id").eq("email", user.email!).maybeSingle();
   if (!agent) return NextResponse.json({ error: "Agent not found" }, { status: 404 });

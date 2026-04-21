@@ -1,11 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-export async function GET() {
+export async function GET(req: Request) {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Rate limit: 30 requests per minute per user
+  const rl = await checkRateLimit(`market-insights:${user.id}`, 30, 60_000);
+  if (!rl.allowed) return NextResponse.json({ error: "Demasiadas solicitudes" }, { status: 429 });
 
   // Role guard — org-wide analytics are admin/manager only
   const { data: agentRow } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
@@ -16,7 +21,6 @@ export async function GET() {
   const now = new Date();
   const startOf30 = new Date(now); startOf30.setDate(now.getDate() - 30);
   const startOf90 = new Date(now); startOf90.setDate(now.getDate() - 90);
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
 
   const [
     { data: deals },
@@ -49,8 +53,6 @@ export async function GET() {
   const conv90     = allDeals.length > 0 ? ((won90.length / allDeals.length) * 100).toFixed(1) : "0";
 
   // ── Last 30 days vs prior 30 days ──────────────────────────────────────
-  const deals30    = allDeals.filter((d) => new Date(d.created_at) >= startOf30);
-  const dealsP30   = allDeals.filter((d) => new Date(d.created_at) < startOf30);
   const leads30    = allContacts.filter((c) => new Date(c.created_at) >= startOf30).length;
   const leadsP30   = allContacts.filter((c) => new Date(c.created_at) < startOf30).length;
   const leadsDelta = leadsP30 > 0 ? (((leads30 - leadsP30) / leadsP30) * 100).toFixed(0) : null;

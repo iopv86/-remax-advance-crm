@@ -2,6 +2,7 @@ import { randomBytes } from "crypto";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // GET /api/integrations/google/auth
 // Redirects the authenticated agent to Google OAuth consent screen.
@@ -10,6 +11,12 @@ export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin}/login`);
+
+  // Rate limit: 5 OAuth initiations per minute per user
+  const rl = await checkRateLimit(`gcal-auth:${user.id}`, 5, 60_000);
+  if (!rl.allowed) {
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin}/dashboard/tasks?gcal=rate_limited`);
+  }
 
   const clientId  = process.env.GOOGLE_CLIENT_ID;
   const appOrigin = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
