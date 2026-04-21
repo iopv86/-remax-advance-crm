@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // GET /api/meta/insights
 // Returns aggregated meta_ad_insights data.
@@ -9,6 +10,9 @@ export async function GET() {
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const rl = await checkRateLimit(`meta-insights:${user.id}`, 30, 60_000);
+  if (!rl.allowed) return NextResponse.json({ error: "Demasiadas solicitudes" }, { status: 429 });
 
   const { data: agent } = await supabase
     .from("agents")

@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 function safeCompare(a: string, b: string): boolean {
   try {
@@ -56,6 +57,10 @@ export async function POST(request: Request) {
       data: { user },
     } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const rl = await checkRateLimit(`meta-sync:${user.id}`, 10, 60_000);
+    if (!rl.allowed) return NextResponse.json({ error: "Demasiadas solicitudes" }, { status: 429 });
+
     const { data: agent } = await supabase
       .from("agents")
       .select("role")
@@ -66,7 +71,9 @@ export async function POST(request: Request) {
   }
 
   const token = process.env.META_ACCESS_TOKEN;
-  const accountId = process.env.META_AD_ACCOUNT_ID;
+  const rawAccountId = process.env.META_AD_ACCOUNT_ID;
+  // Strip act_ prefix if user included it — API call adds it
+  const accountId = rawAccountId?.replace(/^act_/, "");
 
   if (!token || !accountId) {
     return NextResponse.json(
@@ -122,5 +129,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: upsertError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ message: "Meta Ads sync complete.", upserted: rows.length });
+  const origin = process.env.NEXT_PUBLIC_APP_URL ?? "";
+  return NextResponse.redirect(`${origin}/dashboard/ads?tab=meta&synced=${rows.length}`, { status: 303 });
 }
