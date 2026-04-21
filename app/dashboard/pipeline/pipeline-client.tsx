@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { DealSheet } from "@/components/deal-sheet";
+import { AgentFilter, type AgentFilterOption } from "@/components/agent-filter";
 import { STAGE_LABELS } from "@/lib/types";
 import type { Deal, DealStage } from "@/lib/types";
 import Link from "next/link";
@@ -31,6 +32,8 @@ interface ContactOption {
 
 interface Props {
   deals: Deal[];
+  agents?: AgentFilterOption[];
+  canFilterByAgent?: boolean;
 }
 
 // ── Stage config ──────────────────────────────────────────────────────────────
@@ -162,12 +165,13 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             style={{
               background: "rgba(59,130,246,0.1)",
               color: "#93c5fd",
-              fontSize: "10px",
-              padding: "2px 6px",
+              fontSize: "11px",
+              padding: "2px 8px",
               borderRadius: "0.125rem",
-              fontWeight: 700,
+              fontWeight: 600,
               textTransform: "uppercase",
-              letterSpacing: "-0.02em",
+              letterSpacing: "0.06em",
+              fontFamily: "Inter, sans-serif",
             }}
           >
             {contact?.lead_classification ?? "Lead"}
@@ -255,10 +259,10 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
         </div>
       </div>
 
-      {/* Edit / delete actions — re-enable pointer events */}
+      {/* Edit / delete actions — separate row below content, no overlap */}
       <div
-        className="absolute bottom-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ pointerEvents: "auto" }}
+        className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        style={{ pointerEvents: "auto", marginTop: 10, justifyContent: "flex-end" }}
       >
         <Link
           href={`/dashboard/pipeline/${deal.id}`}
@@ -333,17 +337,6 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
         </button>
       </div>
 
-      {/* Contact link — pointer events enabled */}
-      {contactId && (
-        <Link
-          href={`/dashboard/contacts/${contactId}`}
-          onClick={(e) => e.stopPropagation()}
-          className="absolute inset-0"
-          style={{ pointerEvents: "none" }}
-          tabIndex={-1}
-          aria-hidden
-        />
-      )}
     </div>
   );
 }
@@ -381,7 +374,11 @@ function DroppableColumn({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export function PipelineClient({ deals: initial }: Props) {
+export function PipelineClient({
+  deals: initial,
+  agents = [],
+  canFilterByAgent = false,
+}: Props) {
   const router = useRouter();
   const [deals, setDeals] = useState<Deal[]>(initial);
   const [editDeal, setEditDeal] = useState<Deal | null>(null);
@@ -390,10 +387,19 @@ export function PipelineClient({ deals: initial }: Props) {
   const [contacts, setContacts] = useState<ContactOption[]>([]);
   const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
   const [overStage, setOverStage] = useState<DealStage | null>(null);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 
   useEffect(() => {
     setDeals(initial);
   }, [initial]);
+
+  const visibleDeals = useMemo(
+    () =>
+      selectedAgentId
+        ? deals.filter((d) => d.agent_id === selectedAgentId)
+        : deals,
+    [deals, selectedAgentId]
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
@@ -492,7 +498,7 @@ export function PipelineClient({ deals: initial }: Props) {
 
   const grouped = STAGE_ORDER.reduce(
     (acc, stage) => {
-      acc[stage] = deals.filter((d) => d.stage === stage);
+      acc[stage] = visibleDeals.filter((d) => d.stage === stage);
       return acc;
     },
     {} as Record<DealStage, Deal[]>
@@ -505,6 +511,37 @@ export function PipelineClient({ deals: initial }: Props) {
         .kanban-scroll::-webkit-scrollbar-track { background: #0d0e14; }
         .kanban-scroll::-webkit-scrollbar-thumb { background: #34343b; border-radius: 10px; }
       `}</style>
+
+      {canFilterByAgent && agents.length > 0 && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+            marginBottom: 20,
+            flexWrap: "wrap",
+          }}
+        >
+          <AgentFilter
+            agents={agents}
+            value={selectedAgentId}
+            onChange={setSelectedAgentId}
+            label="Filtrar por agente"
+          />
+          {selectedAgentId && (
+            <span
+              style={{
+                fontSize: 12,
+                color: "#9A9088",
+                fontFamily: "Inter, sans-serif",
+              }}
+            >
+              Mostrando {visibleDeals.length} de {deals.length} oportunidades
+            </span>
+          )}
+        </div>
+      )}
 
       <DndContext
         sensors={sensors}

@@ -12,6 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { Download, TrendingUp, Users, DollarSign, Award } from "lucide-react";
+import { AgentFilter } from "@/components/agent-filter";
 import type { DealRow, AgentRow } from "./page";
 
 // ─── Tokens ────────────────────────────────────────────────────────────────────
@@ -75,13 +76,17 @@ interface Props {
 
 export function ReportsClient({ deals, agents, totalLeads }: Props) {
   const [dateRange, setDateRange] = useState<30 | 90 | 365>(90);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 
   const cutoff = useMemo(() => cutoffDate(dateRange), [dateRange]);
 
-  const filtered = useMemo(
-    () => deals.filter((d) => new Date(d.created_at) >= cutoff),
-    [deals, cutoff]
-  );
+  const filtered = useMemo(() => {
+    return deals.filter((d) => {
+      if (new Date(d.created_at) < cutoff) return false;
+      if (selectedAgentId && d.agent_id !== selectedAgentId) return false;
+      return true;
+    });
+  }, [deals, cutoff, selectedAgentId]);
 
   // ── KPI cards ───────────────────────────────────────────────────────────────
   const closedWon   = filtered.filter((d) => d.stage === "closed_won");
@@ -211,6 +216,37 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
       </header>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px 80px" }}>
+
+        {/* ── Agent filter ─────────────────────────────────────────────────── */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 16,
+            marginBottom: 24,
+            flexWrap: "wrap",
+          }}
+        >
+          <AgentFilter
+            agents={agents.map((a) => ({ id: a.id, full_name: a.full_name }))}
+            value={selectedAgentId}
+            onChange={setSelectedAgentId}
+            label="Filtrar por agente"
+          />
+          {selectedAgentId && (
+            <span
+              style={{
+                fontSize: 12,
+                color: TEXT_MUTED,
+                fontFamily: "Inter, sans-serif",
+                paddingBottom: 6,
+              }}
+            >
+              Reporte filtrado · {filtered.length} deal{filtered.length === 1 ? "" : "s"} en el período
+            </span>
+          )}
+        </div>
 
         {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 40 }}>

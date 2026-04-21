@@ -23,6 +23,7 @@ import type { AgentKPISummary } from "@/lib/types";
 import type { StalledDeal, PipelineStageBreakdown } from "./page";
 import { RoundRobinClient } from "@/app/dashboard/settings/round-robin/round-robin-client";
 import { ObjectivesClient } from "@/app/dashboard/settings/objectives/objectives-client";
+import { AgentFilter } from "@/components/agent-filter";
 
 const AgentSparkline = dynamic(
   () => import("./agent-sparkline").then((m) => m.AgentSparkline),
@@ -344,12 +345,25 @@ export function AgentsClient({
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabId>("kpis");
   const [stalledOpen, setStalledOpen] = useState(false);
+  const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
 
-  const sorted = useMemo(
+  const sortedAll = useMemo(
     () => [...agents].sort((a, b) => b.pipelineValue - a.pipelineValue),
     [agents]
   );
-  const topId = sorted[0]?.id;
+  const sorted = useMemo(
+    () =>
+      selectedAgentId
+        ? sortedAll.filter((a) => a.id === selectedAgentId)
+        : sortedAll,
+    [sortedAll, selectedAgentId]
+  );
+  const topId = sortedAll[0]?.id;
+
+  const filterAgents = useMemo(
+    () => agents.map((a) => ({ id: a.id, full_name: a.name })),
+    [agents]
+  );
 
   // Period label mapping
   const PERIOD_LABELS: Record<"7" | "30" | "90", string> = {
@@ -514,6 +528,36 @@ export function AgentsClient({
       {/* ── KPIs Tab ─────────────────────────────────────────────── */}
       {activeTab === "kpis" && (
         <div className="space-y-8">
+          {/* Agent filter row */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              justifyContent: "space-between",
+              gap: 16,
+              flexWrap: "wrap",
+            }}
+          >
+            <AgentFilter
+              agents={filterAgents}
+              value={selectedAgentId}
+              onChange={setSelectedAgentId}
+              label="Filtrar por agente"
+            />
+            {selectedAgentId && (
+              <span
+                style={{
+                  fontSize: 12,
+                  color: TEXT_MUTED,
+                  fontFamily: "Inter, sans-serif",
+                  paddingBottom: 6,
+                }}
+              >
+                Vista individual · 1 de {sortedAll.length} agentes
+              </span>
+            )}
+          </div>
+
           {/* Summary cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {/* Tiempo de respuesta */}

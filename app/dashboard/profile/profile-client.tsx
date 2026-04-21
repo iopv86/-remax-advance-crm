@@ -105,11 +105,20 @@ const ROLE_COLORS: Record<string, { bg: string; color: string; border: string }>
 };
 
 const SOCIAL_META = [
-  { key: "instagram_url", label: "Instagram", icon: IconInstagram, color: "#e1306c", placeholder: "https://instagram.com/tu_usuario" },
-  { key: "facebook_url",  label: "Facebook",  icon: IconFacebook,  color: "#1877f2", placeholder: "https://facebook.com/tu_perfil" },
-  { key: "linkedin_url",  label: "LinkedIn",  icon: IconLinkedin,  color: "#0a66c2", placeholder: "https://linkedin.com/in/tu_perfil" },
-  { key: "tiktok_url",    label: "TikTok",    icon: IconTiktok,    color: "#fe2c55", placeholder: "https://tiktok.com/@tu_usuario" },
+  { key: "instagram_url", label: "Instagram", icon: IconInstagram, color: "#e1306c", prefix: "instagram.com/", urlBase: "https://instagram.com/", placeholder: "tu_usuario" },
+  { key: "facebook_url",  label: "Facebook",  icon: IconFacebook,  color: "#1877f2", prefix: "facebook.com/",  urlBase: "https://facebook.com/",  placeholder: "tu.perfil" },
+  { key: "linkedin_url",  label: "LinkedIn",  icon: IconLinkedin,  color: "#0a66c2", prefix: "linkedin.com/in/", urlBase: "https://linkedin.com/in/", placeholder: "tu-perfil" },
+  { key: "tiktok_url",    label: "TikTok",    icon: IconTiktok,    color: "#fe2c55", prefix: "tiktok.com/@",    urlBase: "https://tiktok.com/@",    placeholder: "tu_usuario" },
 ] as const;
+
+// Strip full URLs down to just the username when loading from DB (handles legacy full-URL data)
+function toUsername(val: string | null | undefined): string {
+  if (!val) return "";
+  return val
+    .replace(/^https?:\/\/(www\.)?/, "")  // strip protocol + optional www
+    .replace(/^(instagram|facebook|linkedin|tiktok)\.com\/(in\/|@)?/, "")  // strip domain + path prefix
+    .replace(/\/$/, "");  // strip trailing slash
+}
 
 function StatCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType;
@@ -245,10 +254,10 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
   const [fullName, setFullName]   = useState(agent?.full_name ?? "");
   const [phone, setPhone]         = useState(agent?.phone ?? "");
   const [whatsapp, setWhatsapp]   = useState(agent?.whatsapp_number ?? "");
-  const [instagram, setInstagram] = useState(agent?.instagram_url ?? "");
-  const [facebook, setFacebook]   = useState(agent?.facebook_url ?? "");
-  const [linkedin, setLinkedin]   = useState(agent?.linkedin_url ?? "");
-  const [tiktok, setTiktok]       = useState(agent?.tiktok_url ?? "");
+  const [instagram, setInstagram] = useState(toUsername(agent?.instagram_url));
+  const [facebook, setFacebook]   = useState(toUsername(agent?.facebook_url));
+  const [linkedin, setLinkedin]   = useState(toUsername(agent?.linkedin_url));
+  const [tiktok, setTiktok]       = useState(toUsername(agent?.tiktok_url));
 
   // Avatar display (optimistic update after upload)
   const [avatarUrl, setAvatarUrl] = useState(agent?.avatar_url ?? null);
@@ -319,10 +328,10 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
         full_name:      fullName,
         phone:          phone || null,
         whatsapp_number: whatsapp || null,
-        instagram_url:  instagram || null,
-        facebook_url:   facebook || null,
-        linkedin_url:   linkedin || null,
-        tiktok_url:     tiktok || null,
+        instagram_url:  toUsername(instagram) || null,
+        facebook_url:   toUsername(facebook) || null,
+        linkedin_url:   toUsername(linkedin) || null,
+        tiktok_url:     toUsername(tiktok) || null,
       })
       .eq("id", agent.id);
     setSaving(false);
@@ -338,10 +347,10 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
     setFullName(agent?.full_name ?? "");
     setPhone(agent?.phone ?? "");
     setWhatsapp(agent?.whatsapp_number ?? "");
-    setInstagram(agent?.instagram_url ?? "");
-    setFacebook(agent?.facebook_url ?? "");
-    setLinkedin(agent?.linkedin_url ?? "");
-    setTiktok(agent?.tiktok_url ?? "");
+    setInstagram(toUsername(agent?.instagram_url));
+    setFacebook(toUsername(agent?.facebook_url));
+    setLinkedin(toUsername(agent?.linkedin_url));
+    setTiktok(toUsername(agent?.tiktok_url));
     setEditing(false);
   }
 
@@ -612,16 +621,17 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                 }}>
                   Redes sociales
                 </p>
-                {SOCIAL_META.map(({ key, label, icon, color }) => {
-                  const val = (agent as unknown as Record<string, string | null>)[key];
-                  if (!val) return null;
+                {SOCIAL_META.map(({ key, label, icon, color, prefix, urlBase }) => {
+                  const raw = (agent as unknown as Record<string, string | null>)[key];
+                  const username = toUsername(raw);
+                  if (!username) return null;
                   return (
                     <InfoRow
                       key={key}
                       icon={icon}
                       label={label}
-                      value={val.replace(/^https?:\/\//, "")}
-                      href={val}
+                      value={prefix + username}
+                      href={urlBase + username}
                       iconColor={color}
                     />
                   );
@@ -703,25 +713,37 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       Redes sociales
                     </p>
                     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                      {SOCIAL_META.map(({ key, label, icon: Icon, color, placeholder }) => (
+                      {SOCIAL_META.map(({ key, label, icon: Icon, color, prefix, placeholder }) => (
                         <div key={key}>
                           <label style={{ fontSize: 11, fontWeight: 600, color: T.stone500, textTransform: "uppercase", letterSpacing: "0.1em", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
                             <Icon size={12} color={color} />
                             {label}
                           </label>
-                          <input
-                            value={socialValues[key]}
-                            onChange={(e) => {
-                              if (key === "instagram_url") setInstagram(e.target.value);
-                              else if (key === "facebook_url") setFacebook(e.target.value);
-                              else if (key === "linkedin_url") setLinkedin(e.target.value);
-                              else if (key === "tiktok_url") setTiktok(e.target.value);
-                            }}
-                            placeholder={placeholder}
-                            style={inputStyle()}
-                            onFocus={(e) => { e.target.style.borderColor = `${color}80`; }}
-                            onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
-                          />
+                          <div style={{ display: "flex", alignItems: "center", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, overflow: "hidden", background: "rgba(255,255,255,0.04)" }}>
+                            <span style={{ padding: "10px 10px 10px 14px", fontSize: 12, color: T.stone500, whiteSpace: "nowrap", borderRight: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+                              {prefix}
+                            </span>
+                            <input
+                              value={socialValues[key]}
+                              onChange={(e) => {
+                                if (key === "instagram_url") setInstagram(e.target.value);
+                                else if (key === "facebook_url") setFacebook(e.target.value);
+                                else if (key === "linkedin_url") setLinkedin(e.target.value);
+                                else if (key === "tiktok_url") setTiktok(e.target.value);
+                              }}
+                              placeholder={placeholder}
+                              style={{ ...inputStyle(), border: "none", borderRadius: 0, background: "transparent", flex: 1 }}
+                              onFocus={(e) => { (e.target.closest("div") as HTMLElement).style.borderColor = `${color}80`; }}
+                              onBlur={(e) => {
+                                (e.target.closest("div") as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)";
+                                const v = toUsername(e.target.value);
+                                if (key === "instagram_url") setInstagram(v);
+                                else if (key === "facebook_url") setFacebook(v);
+                                else if (key === "linkedin_url") setLinkedin(v);
+                                else if (key === "tiktok_url") setTiktok(v);
+                              }}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>

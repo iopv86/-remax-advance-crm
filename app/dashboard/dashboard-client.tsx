@@ -9,6 +9,8 @@ import { PipelineSummary } from "./components/pipeline-summary";
 import { RevenueChart } from "./components/revenue-chart";
 import { ActivityFeed } from "./components/activity-feed";
 import { TasksDue } from "./components/tasks-due";
+import { AvaStatusCard } from "./components/ava-status-card";
+import { AgentKpiChart } from "./components/agent-kpi-chart";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 export const T = {
@@ -59,7 +61,7 @@ const TODAY_LABEL = new Date().toLocaleDateString("es-DO", {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function DashboardClient({ data }: { data: DashboardData }) {
-  const { session, kpi, pipeline, revenue6m, activity, tasks } = data;
+  const { session, kpi, pipeline, revenue6m, activity, tasks, ava, agentKpis } = data;
   const agentInitials = initials(session.fullName);
 
   return (
@@ -74,29 +76,11 @@ export function DashboardClient({ data }: { data: DashboardData }) {
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
         alignItems: "center",
-        justifyContent: "space-between",
+        justifyContent: "flex-end",
         padding: "0 32px",
         zIndex: 40,
         borderBottom: `1px solid ${T.borderSubtle}`,
       }}>
-        {/* Logo / wordmark */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 28,
-            height: 28,
-            borderRadius: 7,
-            background: `linear-gradient(135deg, ${T.goldLight}, ${T.gold})`,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}>
-            <span style={{ fontFamily: "Cinzel, serif", fontWeight: 700, fontSize: 12, color: "#1A0E00", letterSpacing: "-0.02em" }}>AE</span>
-          </div>
-          <span style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 14, color: T.surface, letterSpacing: "-0.01em" }}>
-            Advance Estate
-          </span>
-        </div>
-
         {/* Right: actions */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <NotificationBell />
@@ -352,8 +336,16 @@ export function DashboardClient({ data }: { data: DashboardData }) {
           {/* Col 2: Activity feed */}
           <ActivityFeed items={activity} />
 
-          {/* Col 3: Tasks focus */}
-          <TasksDue tasks={tasks} dueToday={kpi.tasksDueToday} overdue={kpi.tasksOverdue} />
+          {/* Col 3: Tasks + Ava stacked */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <TasksDue tasks={tasks} dueToday={kpi.tasksDueToday} overdue={kpi.tasksOverdue} />
+            <AvaStatusCard isActive={ava.isActive} msgsToday={ava.msgsToday} />
+          </div>
+        </div>
+
+        {/* ── Row 4: Agent KPI chart ── */}
+        <div className="animate-fade-up-2">
+          <AgentKpiChart agents={agentKpis} />
         </div>
       </section>
     </div>

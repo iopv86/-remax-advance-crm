@@ -1,13 +1,14 @@
 "use client";
 
 import {
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import type { RevenuePoint } from "../page";
 import { T } from "../dashboard-client";
@@ -80,13 +81,7 @@ export function RevenueChart({ data }: { data: RevenuePoint[] }) {
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={160}>
-          <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
-            <defs>
-              <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%"   stopColor="#C9963A" stopOpacity={0.35} />
-                <stop offset="100%" stopColor="#C9963A" stopOpacity={0.02} />
-              </linearGradient>
-            </defs>
+          <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }} barCategoryGap="28%">
             <CartesianGrid
               strokeDasharray="3 3"
               stroke="rgba(255,255,255,0.04)"
@@ -105,17 +100,17 @@ export function RevenueChart({ data }: { data: RevenuePoint[] }) {
               tickLine={false}
               width={48}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#C9963A"
-              strokeWidth={2}
-              fill="url(#goldGrad)"
-              dot={{ r: 3, fill: "#C9963A", strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: "#E8B84B", strokeWidth: 0 }}
-            />
-          </AreaChart>
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(201,150,58,0.06)" }} />
+            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={index === data.length - 1 ? "#E8B84B" : "#C9963A"}
+                  fillOpacity={index === data.length - 1 ? 1 : 0.75}
+                />
+              ))}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       )}
     </div>

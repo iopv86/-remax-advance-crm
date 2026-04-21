@@ -21,6 +21,8 @@ import {
   FileBarChart,
   CalendarCheck,
   X,
+  ChevronDown,
+  ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -28,25 +30,31 @@ import { Logo } from "@/components/logo";
 import { QuickActionSheets } from "@/components/quick-action-sheets";
 import { createClient } from "@/lib/supabase/client";
 
-const ALL_NAV_ITEMS = [
+const ALL_PRIMARY_NAV_ITEMS = [
   { href: "/dashboard",                 label: "Dashboard",       icon: LayoutGrid,   roles: ["admin","manager","agent","viewer"] },
   { href: "/dashboard/contacts",        label: "Clientes",        icon: Users,        roles: ["admin","manager","agent"] },
   { href: "/dashboard/pipeline",        label: "Oportunidades",   icon: Kanban,       roles: ["admin","manager","agent"] },
   { href: "/dashboard/properties",      label: "Propiedades",     icon: Building2,    roles: ["admin","manager","agent"] },
-  { href: "/dashboard/proposals",       label: "Propuestas",      icon: Sparkles,     roles: ["admin","manager","agent"] },
-  { href: "/dashboard/tasks",           label: "Tareas",          icon: CheckSquare,  roles: ["admin","manager","agent"] },
-  { href: "/dashboard/visitas",         label: "Visitas",         icon: CalendarCheck, roles: ["admin","manager","agent"] },
-  { href: "/dashboard/conversations",   label: "Conversaciones",  icon: MessageSquare,roles: ["admin","manager","agent"] },
-  { href: "/dashboard/notifications",   label: "Notificaciones",  icon: Bell,         roles: ["admin","manager","agent"] },
+];
+
+const ALL_SECONDARY_NAV_ITEMS = [
   { href: "/dashboard/agents",          label: "KPIs Agentes",    icon: BarChart3,    roles: ["admin","manager"] },
   { href: "/dashboard/reports",         label: "Reportes",        icon: FileBarChart, roles: ["admin","manager"] },
   { href: "/dashboard/ads",             label: "Publicidad",      icon: Megaphone,    roles: ["admin","manager"] },
 ];
 
+const ALL_ACTIVITY_ITEMS = [
+  { href: "/dashboard/proposals",       label: "Propuestas",      icon: Sparkles,     roles: ["admin","manager","agent"] },
+  { href: "/dashboard/tasks",           label: "Tareas",          icon: CheckSquare,  roles: ["admin","manager","agent"] },
+  { href: "/dashboard/visitas",         label: "Visitas",         icon: CalendarCheck, roles: ["admin","manager","agent"] },
+  { href: "/dashboard/conversations",   label: "Conversaciones",  icon: MessageSquare,roles: ["admin","manager","agent"] },
+  { href: "/dashboard/notifications",   label: "Notificaciones",  icon: Bell,         roles: ["admin","manager","agent"] },
+];
+
 const ALL_SETTINGS_ITEMS = [
   { href: "/dashboard/settings",           label: "Configuración",  icon: Settings,      sub: false, roles: ["admin"] },
-  { href: "/dashboard/settings/AvaIA",    label: "Ava IA",         icon: Bot,           sub: true,  roles: ["admin"] },
-  { href: "/dashboard/settings/templates", label: "Plantillas WA",  icon: MessageSquare, sub: true,  roles: ["admin"] },
+  { href: "/dashboard/settings/AvaIA",     label: "Ava IA",         icon: Bot,           sub: true,  roles: ["admin"] },
+  { href: "/dashboard/settings/templates", label: "Plantillas WA",  icon: MessageSquare, sub: true,  roles: ["admin"], parent: "/dashboard/settings/AvaIA" },
 ];
 
 export function Sidebar({
@@ -61,6 +69,7 @@ export function Sidebar({
   const pathname = usePathname();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [activitiesOpen, setActivitiesOpen] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
@@ -84,8 +93,12 @@ export function Sidebar({
     });
   }, []);
 
-  const navItems = ALL_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const primaryNavItems = ALL_PRIMARY_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const secondaryNavItems = ALL_SECONDARY_NAV_ITEMS.filter((item) => item.roles.includes(role));
+  const activityItems = ALL_ACTIVITY_ITEMS.filter((item) => item.roles.includes(role));
   const settingsItems = ALL_SETTINGS_ITEMS.filter((item) => item.roles.includes(role));
+  const hasActivityActive = activityItems.some((item) => pathname.startsWith(item.href));
+  const unreadBadgeTotal = activityItems.some((i) => i.href === "/dashboard/notifications") ? unreadCount : 0;
 
   async function handleLogout() {
     await fetch("/api/auth/sign-out", { method: "POST" });
@@ -151,13 +164,11 @@ export function Sidebar({
 
       {/* Nav */}
       <nav className="flex-1 space-y-0.5">
-        {navItems.map(({ href, label, icon: Icon }) => {
+        {primaryNavItems.map(({ href, label, icon: Icon }) => {
           const active =
             href === "/dashboard"
               ? pathname === "/dashboard"
               : pathname.startsWith(href);
-          const isNotif = href === "/dashboard/notifications";
-          const badge = isNotif && unreadCount > 0;
 
           return (
             <Link
@@ -173,7 +184,28 @@ export function Sidebar({
             >
               <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#C9963A]" : "text-gray-500")} />
               <span className="flex-1">{label}</span>
-              {badge && (
+            </Link>
+          );
+        })}
+
+        {/* Actividades (collapsible) */}
+        {activityItems.length > 0 && (
+          <div>
+            <button
+              type="button"
+              onClick={() => setActivitiesOpen((v) => !v)}
+              aria-expanded={activitiesOpen}
+              aria-controls="sidebar-actividades-group"
+              className={cn(
+                "w-full flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
+                hasActivityActive && !activitiesOpen
+                  ? "text-[#C9963A] border-[#C9963A] bg-[rgba(201,150,58,0.08)]"
+                  : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
+              )}
+            >
+              <ListChecks className={cn("h-4 w-4 shrink-0", hasActivityActive ? "text-[#C9963A]" : "text-gray-500")} />
+              <span className="flex-1 text-left">Actividades</span>
+              {!activitiesOpen && unreadBadgeTotal > 0 && (
                 <span
                   style={{
                     background: "#ef4444",
@@ -187,17 +219,88 @@ export function Sidebar({
                     textAlign: "center",
                   }}
                 >
-                  {unreadCount > 99 ? "99+" : unreadCount}
+                  {unreadBadgeTotal > 99 ? "99+" : unreadBadgeTotal}
                 </span>
               )}
+              <ChevronDown
+                className={cn(
+                  "h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200",
+                  activitiesOpen ? "rotate-0" : "-rotate-90"
+                )}
+              />
+            </button>
+            {activitiesOpen && (
+              <div id="sidebar-actividades-group" className="space-y-0.5">
+                {activityItems.map(({ href, label, icon: Icon }) => {
+                  const active = pathname.startsWith(href);
+                  const isNotif = href === "/dashboard/notifications";
+                  const badge = isNotif && unreadCount > 0;
+                  return (
+                    <Link
+                      key={href}
+                      href={href}
+                      onClick={onMobileClose}
+                      className={cn(
+                        "flex items-center gap-3 pl-10 pr-5 py-2 text-sm font-medium transition-all duration-150 border-l-4",
+                        active
+                          ? "text-[#C9963A] border-[#C9963A] bg-[rgba(201,150,58,0.08)]"
+                          : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
+                      )}
+                    >
+                      <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#C9963A]" : "text-gray-500")} />
+                      <span className="flex-1">{label}</span>
+                      {badge && (
+                        <span
+                          style={{
+                            background: "#ef4444",
+                            color: "#fff",
+                            fontSize: 10,
+                            fontWeight: 700,
+                            padding: "1px 6px",
+                            borderRadius: 9999,
+                            lineHeight: 1.6,
+                            minWidth: 18,
+                            textAlign: "center",
+                          }}
+                        >
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {secondaryNavItems.map(({ href, label, icon: Icon }) => {
+          const active = pathname.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              onClick={onMobileClose}
+              className={cn(
+                "flex items-center gap-3 px-5 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
+                active
+                  ? "text-[#C9963A] border-[#C9963A] bg-[rgba(201,150,58,0.08)]"
+                  : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"
+              )}
+            >
+              <Icon className={cn("h-4 w-4 shrink-0", active ? "text-[#C9963A]" : "text-gray-500")} />
+              <span className="flex-1">{label}</span>
             </Link>
           );
         })}
 
         {/* Settings group */}
         <div className="pt-1">
-          {settingsItems.map(({ href, label, icon: Icon, sub }) => {
+          {settingsItems.map((item) => {
+            const { href, label, icon: Icon, sub } = item;
             const active = pathname.startsWith(href);
+            // Plantillas WA is nested under Ava IA → deeper indent
+            const isNested = "parent" in item && !!(item as { parent?: string }).parent;
             return (
               <Link
                 key={href}
@@ -205,7 +308,7 @@ export function Sidebar({
                 onClick={onMobileClose}
                 className={cn(
                   "flex items-center gap-3 py-2.5 text-sm font-medium transition-all duration-150 border-l-4",
-                  sub ? "pl-10 pr-5" : "px-5",
+                  isNested ? "pl-[60px] pr-5" : sub ? "pl-10 pr-5" : "px-5",
                   active
                     ? "text-[#C9963A] border-[#C9963A] bg-[rgba(201,150,58,0.08)]"
                     : "text-gray-400 border-transparent hover:text-white hover:bg-white/5"

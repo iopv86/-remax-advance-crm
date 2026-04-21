@@ -11,7 +11,7 @@ export default async function PipelinePage() {
   let dealsQuery = supabase
     .from("deals")
     .select(
-      "id, contact_id, stage, deal_value, currency, expected_close_date, notes, created_at, contact:contacts(first_name, last_name, lead_classification, phone)"
+      "id, contact_id, agent_id, stage, deal_value, currency, expected_close_date, notes, created_at, contact:contacts(first_name, last_name, lead_classification, phone)"
     )
     .order("created_at", { ascending: false });
 
@@ -19,9 +19,20 @@ export default async function PipelinePage() {
     dealsQuery = dealsQuery.eq("agent_id", session.agentId);
   }
 
-  const { data: deals } = await dealsQuery;
+  const [{ data: deals }, { data: agentsData }] = await Promise.all([
+    dealsQuery,
+    isPrivileged(session.role)
+      ? supabase
+          .from("agents")
+          .select("id, full_name")
+          .eq("is_active", true)
+          .order("full_name", { ascending: true })
+      : Promise.resolve({ data: [] as { id: string; full_name: string | null }[] }),
+  ]);
 
   const typedDeals = (deals as unknown as Deal[]) ?? [];
+  const agents = (agentsData ?? []) as { id: string; full_name: string | null }[];
+  const canFilterByAgent = isPrivileged(session.role);
 
   const totalPipeline = typedDeals
     .filter((d) => d.stage !== "closed_lost")
@@ -125,7 +136,11 @@ export default async function PipelinePage() {
 
       {/* Kanban Board */}
       <div className="px-4 pb-10 md:px-12 md:pb-12" style={{ flex: 1, overflowX: "auto" }}>
-        <PipelineClient deals={typedDeals} />
+        <PipelineClient
+          deals={typedDeals}
+          agents={agents}
+          canFilterByAgent={canFilterByAgent}
+        />
       </div>
     </div>
   );

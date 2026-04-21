@@ -720,7 +720,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
                 return (
                   <div
                     key={p.id}
-                    onClick={() => toggleSelect(p.id)}
+                    onClick={() => router.push(`/dashboard/properties/${p.id}`)}
                     onMouseEnter={() => setHoveredId(p.id)}
                     onMouseLeave={() => setHoveredId(null)}
                     style={{
@@ -803,6 +803,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
 
                       {/* Selection indicator */}
                       <div
+                        onClick={(e) => { e.stopPropagation(); toggleSelect(p.id); }}
                         style={{
                           position: "absolute",
                           top: 12,
@@ -815,6 +816,8 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
+                          cursor: "pointer",
+                          zIndex: 2,
                         }}
                       >
                         {isSelected && (

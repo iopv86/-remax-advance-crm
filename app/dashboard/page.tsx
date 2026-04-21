@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { DashboardClient } from "./dashboard-client";
+import type { AgentKpi } from "./components/agent-kpi-chart";
 
 // ─── Data types ──────────────────────────────────────────────────────────────
 export interface KPIData {
@@ -55,6 +56,8 @@ export interface DashboardData {
   revenue6m: RevenuePoint[];
   activity: ActivityItem[];
   tasks: TaskItem[];
+  ava: { isActive: boolean; msgsToday: number };
+  agentKpis: AgentKpi[];
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -303,6 +306,30 @@ export default async function DashboardPage() {
 
   const revenue6m: RevenuePoint[] = await Promise.all(revenue6mPromises);
 
+  // ─── Ava status + today's WhatsApp messages ───────────────────────────────
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const [avaConfigRes, avaMsgsRes] = await Promise.all([
+    supabase.from("ava_config").select("is_active").single(),
+    supabase
+      .from("messages")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", todayStart.toISOString()),
+  ]);
+
+  const ava = {
+    isActive: Boolean(avaConfigRes.data?.is_active),
+    msgsToday: avaMsgsRes.count ?? 0,
+  };
+
+  // ─── Agent KPI rollup (current month) ─────────────────────────────────────
+  const { data: agentKpisData } = await supabase
+    .from("agent_monthly_kpis")
+    .select("agent_id, full_name, deals_closed, total_revenue, conversion_rate, fast_response_rate");
+
+  const agentKpis: AgentKpi[] = agentKpisData ?? [];
+
   const data: DashboardData = {
     session: { agentId: session.agentId, fullName: session.fullName, role: session.role },
     kpi: {
@@ -314,6 +341,8 @@ export default async function DashboardPage() {
     revenue6m,
     activity: activityItems,
     tasks,
+    ava,
+    agentKpis,
   };
 
   return <DashboardClient data={data} />;

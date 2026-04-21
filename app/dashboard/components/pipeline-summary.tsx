@@ -90,13 +90,16 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
             const isWon = stage.stage === "closed_won";
 
             return (
-              <div
+              <Link
                 key={stage.stage}
+                href="/dashboard/pipeline"
                 style={{
                   flex: `${Math.max(widthPct, 4)} 0 0`,
                   display: "flex",
                   flexDirection: "column",
                   gap: 8,
+                  textDecoration: "none",
+                  cursor: "pointer",
                 }}
               >
                 {/* Bar */}
@@ -145,7 +148,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
                     </p>
                   )}
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
