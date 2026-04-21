@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
 
   if (upsertError) {
     console.error("[GCal callback] upsert error:", upsertError.message, upsertError.code);
-    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=db_error`);
   }
 
   return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=connected`);

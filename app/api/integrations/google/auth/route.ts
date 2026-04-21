@@ -1,5 +1,4 @@
 import { randomBytes } from "crypto";
-import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
