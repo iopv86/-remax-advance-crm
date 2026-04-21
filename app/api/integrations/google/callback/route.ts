@@ -13,23 +13,26 @@ export async function GET(request: NextRequest) {
   const state = searchParams.get("state");
 
   if (error || !code) {
-    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=denied`);
   }
 
   // Validate CSRF state
   const cookieStore = await cookies();
   const savedState = cookieStore.get("gcal_oauth_state")?.value;
   cookieStore.delete("gcal_oauth_state");
-  if (!savedState || !state) {
-    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+  if (!savedState) {
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=no_cookie`);
+  }
+  if (!state) {
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=no_state`);
   }
   try {
     const sa = Buffer.from(savedState), sb = Buffer.from(state);
     if (sa.length !== sb.length || !timingSafeEqual(sa, sb)) {
-      return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+      return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=state_mismatch`);
     }
   } catch {
-    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=state_error`);
   }
 
   const clientId     = process.env.GOOGLE_CLIENT_ID;
@@ -49,7 +52,7 @@ export async function GET(request: NextRequest) {
   });
 
   if (!tokenRes.ok) {
-    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=token_error`);
   }
 
   const tokens = await tokenRes.json();
@@ -58,7 +61,7 @@ export async function GET(request: NextRequest) {
   if (!user) return NextResponse.redirect(`${appOrigin}/login`);
 
   const { data: agent } = await supabase.from("agents").select("id").eq("email", user.email!).maybeSingle();
-  if (!agent) return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+  if (!agent) return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=no_agent`);
 
   const { error: upsertError } = await supabase.from("agent_integrations").upsert({
     agent_id:      agent.id,

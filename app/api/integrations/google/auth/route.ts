@@ -26,16 +26,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=not_configured`);
   }
 
-  // Generate CSRF state token and store in short-lived cookie
+  // Generate CSRF state token — set cookie directly on redirect response
+  // (cookies().set() inside GET Route Handlers does not reliably persist on NextResponse.redirect)
   const state = randomBytes(16).toString("hex");
-  const cookieStore = await cookies();
-  cookieStore.set("gcal_oauth_state", state, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    maxAge: 300, // 5 minutes
-    path: "/",
-    sameSite: "lax",
-  });
 
   const params = new URLSearchParams({
     client_id:     clientId,
@@ -47,7 +40,15 @@ export async function GET(request: NextRequest) {
     state,
   });
 
-  return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  const response = NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+  response.cookies.set("gcal_oauth_state", state, {
+    httpOnly: true,
+    secure:   process.env.NODE_ENV === "production",
+    maxAge:   300,
+    path:     "/",
+    sameSite: "lax",
+  });
+  return response;
 }
 
 // DELETE /api/integrations/google/auth
