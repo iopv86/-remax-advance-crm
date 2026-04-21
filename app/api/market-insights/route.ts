@@ -8,7 +8,7 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   // Role guard — org-wide analytics are admin/manager only
-  const { data: agentRow } = await supabase.from("agents").select("role").eq("email", user.email!).single();
+  const { data: agentRow } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
   if (!agentRow || !["admin", "manager"].includes(agentRow.role)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 403 });
   }

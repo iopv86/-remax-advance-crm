@@ -1,7 +1,17 @@
+import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
 import { checkRateLimit } from "@/lib/rate-limit";
+
+function safeCompare(a: string, b: string): boolean {
+  try {
+    const ba = Buffer.from(a), bb = Buffer.from(b);
+    return ba.length === bb.length && timingSafeEqual(ba, bb);
+  } catch {
+    return false;
+  }
+}
 
 function getOpenAI() {
   return new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -159,7 +169,7 @@ export async function POST(request: NextRequest) {
   // Verify shared secret — called by the external Python WhatsApp agent
   const authHeader = request.headers.get("authorization");
   const secret = process.env.AVA_WEBHOOK_SECRET;
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (!secret || !safeCompare(authHeader ?? "", `Bearer ${secret}`)) {
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
 

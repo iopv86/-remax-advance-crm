@@ -1,3 +1,5 @@
+import { timingSafeEqual } from "crypto";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,8 +10,25 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code  = searchParams.get("code");
   const error = searchParams.get("error");
+  const state = searchParams.get("state");
 
   if (error || !code) {
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+  }
+
+  // Validate CSRF state
+  const cookieStore = await cookies();
+  const savedState = cookieStore.get("gcal_oauth_state")?.value;
+  cookieStore.delete("gcal_oauth_state");
+  if (!savedState || !state) {
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+  }
+  try {
+    const sa = Buffer.from(savedState), sb = Buffer.from(state);
+    if (sa.length !== sb.length || !timingSafeEqual(sa, sb)) {
+      return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
+    }
+  } catch {
     return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
   }
 

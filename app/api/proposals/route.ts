@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     .from("agents")
     .select("id")
     .eq("email", user.email!)
-    .single();
+    .maybeSingle();
 
   if (!agent) return NextResponse.json({ error: "Agente no encontrado" }, { status: 404 });
 
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
     .from("agents")
     .select("id")
     .eq("email", user.email!)
-    .single();
+    .maybeSingle();
   if (!agent) return NextResponse.json({ proposals: [] });
 
   const { data: proposals } = await service

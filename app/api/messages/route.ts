@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     .from("contacts")
     .select("id, agent_id")
     .eq("id", contact_id)
-    .single();
+    .maybeSingle();
 
   if (contactErr || !contactExists) {
     return NextResponse.json({ error: "Contacto no encontrado" }, { status: 404 });
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     .from("agents")
     .select("id, role")
     .eq("email", user.email!)
-    .single();
+    .maybeSingle();
 
   if (!requestingAgent) {
     return NextResponse.json({ error: "Agente no encontrado" }, { status: 404 });

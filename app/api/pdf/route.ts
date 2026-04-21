@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
   return new NextResponse(pdfBuffer as unknown as BodyInit, {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="propuesta-${configResult.agency_name.toLowerCase().replace(/\s+/g, "-")}.pdf"`,
+      "Content-Disposition": `attachment; filename="propuesta-${configResult.agency_name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}.pdf"`,
       "Content-Length": String(pdfBuffer.length),
     },
   });

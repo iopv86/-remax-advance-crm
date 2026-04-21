@@ -1,5 +1,15 @@
+import { timingSafeEqual } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+
+function safeCompare(a: string, b: string): boolean {
+  try {
+    const ba = Buffer.from(a), bb = Buffer.from(b);
+    return ba.length === bb.length && timingSafeEqual(ba, bb);
+  } catch {
+    return false;
+  }
+}
 
 const META_GRAPH_VERSION = "v19.0";
 const META_FIELDS = "campaign_id,campaign_name,impressions,clicks,spend,leads,reach,actions";
@@ -37,7 +47,8 @@ function extractLeads(row: MetaInsightRow): number {
 // Auth: admin session OR valid CRON_SECRET Bearer token.
 export async function POST(request: Request) {
   const authHeader = request.headers.get("authorization");
-  const isCron = authHeader === `Bearer ${process.env.CRON_SECRET}`;
+  const cronSecret = process.env.CRON_SECRET;
+  const isCron = !!cronSecret && safeCompare(authHeader ?? "", `Bearer ${cronSecret}`);
 
   if (!isCron) {
     const supabase = await createClient();

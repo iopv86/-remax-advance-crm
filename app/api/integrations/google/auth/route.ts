@@ -1,10 +1,16 @@
+import { randomBytes } from "crypto";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/integrations/google/auth
-// Redirects the agent to Google OAuth consent screen.
+// Redirects the authenticated agent to Google OAuth consent screen.
 // Requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars.
 export async function GET(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin}/login`);
+
   const clientId  = process.env.GOOGLE_CLIENT_ID;
   const appOrigin = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
   const redirectUri = `${appOrigin}/api/integrations/google/callback`;
@@ -13,6 +19,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=not_configured`);
   }
 
+  // Generate CSRF state token and store in short-lived cookie
+  const state = randomBytes(16).toString("hex");
+  const cookieStore = await cookies();
+  cookieStore.set("gcal_oauth_state", state, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 300, // 5 minutes
+    path: "/",
+    sameSite: "lax",
+  });
+
   const params = new URLSearchParams({
     client_id:     clientId,
     redirect_uri:  redirectUri,
@@ -20,6 +37,7 @@ export async function GET(request: NextRequest) {
     scope:         "https://www.googleapis.com/auth/calendar.events",
     access_type:   "offline",
     prompt:        "consent",
+    state,
   });
 
   return NextResponse.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
