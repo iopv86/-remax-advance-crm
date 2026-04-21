@@ -1,18 +1,16 @@
 import { createClient } from "@/lib/supabase/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/integrations/google/auth
 // Redirects the agent to Google OAuth consent screen.
 // Requires GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET env vars.
-export async function GET() {
-  const clientId    = process.env.GOOGLE_CLIENT_ID;
-  const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://remax-advance-crm.vercel.app"}/api/integrations/google/callback`;
+export async function GET(request: NextRequest) {
+  const clientId  = process.env.GOOGLE_CLIENT_ID;
+  const appOrigin = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
+  const redirectUri = `${appOrigin}/api/integrations/google/callback`;
 
   if (!clientId) {
-    return NextResponse.json(
-      { error: "GOOGLE_CLIENT_ID not configured." },
-      { status: 503 }
-    );
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=not_configured`);
   }
 
   const params = new URLSearchParams({

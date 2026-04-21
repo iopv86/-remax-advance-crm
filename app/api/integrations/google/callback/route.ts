@@ -4,24 +4,22 @@ import { NextRequest, NextResponse } from "next/server";
 // GET /api/integrations/google/callback
 // Handles OAuth callback, exchanges code for tokens, stores in agent_integrations.
 export async function GET(request: NextRequest) {
+  const appOrigin  = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
   const { searchParams } = new URL(request.url);
   const code  = searchParams.get("code");
   const error = searchParams.get("error");
 
   if (error || !code) {
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=error`
-    );
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
   }
 
   const clientId     = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const redirectUri  = `${process.env.NEXT_PUBLIC_APP_URL ?? "https://remax-advance-crm.vercel.app"}/api/integrations/google/callback`;
+  // redirect_uri must exactly match the one sent in the auth request
+  const redirectUri  = `${appOrigin}/api/integrations/google/callback`;
 
   if (!clientId || !clientSecret) {
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=not_configured`
-    );
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=not_configured`);
   }
 
   // Exchange code for tokens
@@ -32,18 +30,16 @@ export async function GET(request: NextRequest) {
   });
 
   if (!tokenRes.ok) {
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=error`
-    );
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
   }
 
   const tokens = await tokenRes.json();
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/login`);
+  if (!user) return NextResponse.redirect(`${appOrigin}/login`);
 
   const { data: agent } = await supabase.from("agents").select("id").eq("email", user.email!).maybeSingle();
-  if (!agent) return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=error`);
+  if (!agent) return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
 
   const { error: upsertError } = await supabase.from("agent_integrations").upsert({
     agent_id:      agent.id,
@@ -55,12 +51,8 @@ export async function GET(request: NextRequest) {
 
   if (upsertError) {
     console.error("[GCal callback] upsert error:", upsertError.message, upsertError.code);
-    return NextResponse.redirect(
-      `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=error`
-    );
+    return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=error`);
   }
 
-  return NextResponse.redirect(
-    `${process.env.NEXT_PUBLIC_APP_URL ?? ""}/dashboard/tasks?gcal=connected`
-  );
+  return NextResponse.redirect(`${appOrigin}/dashboard/tasks?gcal=connected`);
 }

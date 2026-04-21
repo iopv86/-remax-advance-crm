@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Bed, Bath, Square, Car, Home, Calendar, Tag, MessageSquare, FileText } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Bed, Bath, Square, Car, Home, Calendar, Tag, MessageSquare, FileText, Building2 } from "lucide-react";
 import type { PropertyType, CurrencyType } from "@/lib/types";
 import { STAGE_LABELS } from "@/lib/types";
+import { PropertyUnitsTab } from "./property-units-tab";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -231,6 +232,8 @@ function Spec({ icon, label, value }: { icon: React.ReactNode; label: string; va
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
+type DetailTab = "info" | "unidades";
+
 export function PropertyDetailClient({
   property,
   deals,
@@ -241,6 +244,7 @@ export function PropertyDetailClient({
   canEdit: boolean;
 }) {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<DetailTab>("info");
   const status = STATUS_MAP[property.status] ?? STATUS_MAP.inactive;
 
   return (
@@ -314,6 +318,56 @@ export function PropertyDetailClient({
       </header>
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 32px 64px" }}>
+
+        {/* ── Tab bar ── */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            marginBottom: 28,
+            borderBottom: `1px solid ${BORDER_DIM}`,
+            paddingBottom: 0,
+          }}
+        >
+          {(
+            [
+              { id: "info" as DetailTab, label: "Información", icon: <Home style={{ width: 13, height: 13 }} /> },
+              { id: "unidades" as DetailTab, label: "Unidades", icon: <Building2 style={{ width: 13, height: 13 }} /> },
+            ] as { id: DetailTab; label: string; icon: React.ReactNode }[]
+          ).map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "10px 16px",
+                fontSize: 13,
+                fontWeight: activeTab === tab.id ? 600 : 400,
+                color: activeTab === tab.id ? TEXT_PRIMARY : TEXT_MUTED,
+                background: "none",
+                border: "none",
+                borderBottom: activeTab === tab.id ? `2px solid ${GOLD}` : "2px solid transparent",
+                marginBottom: -1,
+                cursor: "pointer",
+                transition: "all 0.15s",
+              }}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* ── Unidades tab ── */}
+        {activeTab === "unidades" && (
+          <PropertyUnitsTab propertyId={property.id} canEdit={canEdit} />
+        )}
+
+        {/* ── Info tab ── */}
+        {activeTab === "info" && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 32, alignItems: "start" }}>
           {/* ── Left column ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
@@ -703,6 +757,7 @@ export function PropertyDetailClient({
             </div>
           </div>
         </div>
+        )} {/* end activeTab === "info" */}
       </div>
     </div>
   );
