@@ -135,6 +135,18 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
     toast.success("Stage actualizado");
     setEditingStage(false);
     setSaving(false);
+    // Fire Meta CAPI event — fire-and-forget, never blocks UI
+    fetch("/api/meta/capi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        stage:      stageValue,
+        email:      contact?.email,
+        phone:      contact?.phone,
+        deal_value: deal.deal_value,
+        currency:   deal.currency,
+      }),
+    }).catch(() => {});
     router.refresh();
   }
 
