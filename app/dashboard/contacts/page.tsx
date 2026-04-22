@@ -82,37 +82,32 @@ export default async function ContactsPage({
     <div style={{ minHeight: "100vh", background: "#0e0e0e" }}>
       {/* Sticky header */}
       <header
+        className="sticky top-0 z-40 flex justify-between items-center px-4 sm:px-8 border-b"
         style={{
-          position: "sticky", top: 0, zIndex: 40,
           background: "rgba(14,14,14,0.80)", backdropFilter: "blur(12px)",
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          padding: "0 32px", height: 96,
-          borderBottom: "1px solid rgba(79,69,55,0.08)",
+          minHeight: 72, borderColor: "rgba(79,69,55,0.08)",
         }}
       >
         <div>
           <h1
-            style={{
-              fontFamily: "Manrope, var(--font-manrope), sans-serif",
-              fontSize: 28, fontWeight: 700, color: "#e5e2e1", lineHeight: 1.2, margin: 0,
-            }}
+            className="text-2xl sm:text-3xl font-bold leading-tight"
+            style={{ color: "#e5e2e1", margin: 0 }}
           >
             Clientes
           </h1>
-          <p style={{ fontSize: 14, fontWeight: 500, color: "#d3c4b1", margin: "4px 0 0" }}>
+          <p className="text-sm font-medium mt-1" style={{ color: "#d3c4b1" }}>
             {total} contacto{total !== 1 ? "s" : ""} en total
           </p>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="flex items-center gap-2 sm:gap-3">
           <a
             href={exportHref}
             download
+            className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
             style={{
-              display: "flex", alignItems: "center", gap: 8,
-              padding: "8px 16px", background: "#2a2a2a", color: "#e5e2e1",
-              fontSize: 14, fontWeight: 500, borderRadius: 8,
-              border: "1px solid rgba(201,150,58,0.2)", cursor: "pointer", textDecoration: "none",
+              background: "#2a2a2a", color: "#e5e2e1",
+              border: "1px solid rgba(201,150,58,0.2)", textDecoration: "none",
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -126,7 +121,7 @@ export default async function ContactsPage({
         </div>
       </header>
 
-      <section style={{ padding: "32px 32px 48px" }}>
+      <section className="px-4 sm:px-8 py-6 sm:py-8 pb-12">
         <Suspense fallback={null}>
           <ContactsFilterBar
             currentClassification={params.classification}

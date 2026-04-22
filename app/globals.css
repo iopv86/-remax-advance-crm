@@ -60,9 +60,9 @@
    Inspired by Nordic Frost + editorial
 ═══════════════════════════════════════ */
 :root {
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-geist);
   --font-serif: var(--font-manrope);
-  --font-display: var(--font-manrope);
+  --font-display: var(--font-syne);
   --font-mono: var(--font-mono);
 
   /* Page bg — warm white (Attio Broker) */

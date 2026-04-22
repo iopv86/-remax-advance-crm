@@ -143,22 +143,19 @@ function InitialAvatar({ name, size = 36 }: { name: string; size?: number }) {
 
 function ContentHeader({ section, title }: { section: string; title: string }) {
   return (
-    <header className="flex justify-between items-end mb-10">
+    <header className="flex justify-between items-end mb-8">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#9899A8" }}>
           <span>Configuración</span>
           <ChevronRight className="w-3.5 h-3.5" />
           <span style={{ color: GOLD }}>{section}</span>
         </div>
-        <h1
-          className="text-2xl font-bold tracking-tight"
-          style={{ fontFamily: "Manrope, var(--font-manrope), sans-serif", color: "#e3e1ea" }}
-        >
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: "#e3e1ea" }}>
           {title}
         </h1>
       </div>
       <div
-        className="flex items-center gap-2 px-4 py-2 rounded-full"
+        className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full"
         style={{ background: "#292a30", border: "1px solid rgba(255,255,255,0.06)" }}
       >
         <Search className="w-4 h-4" style={{ color: "#9899A8" }} />
@@ -712,11 +709,13 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  const allNavItems = NAV_GROUPS.flatMap((g) => g.items);
+
   return (
     <div className="flex min-h-screen" style={{ background: "#0D0E12" }}>
-      {/* ── Settings sub-nav ── */}
+      {/* ── Desktop sidebar (md+) ── */}
       <nav
-        className="flex flex-col flex-shrink-0 py-8 px-6"
+        className="hidden md:flex flex-col flex-shrink-0 py-8 px-6"
         style={{
           width: 220,
           background: "#14151C",
@@ -725,10 +724,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
       >
         <h2
           className="text-base font-bold mb-8 uppercase tracking-wider"
-          style={{
-            fontFamily: "Manrope, var(--font-manrope), sans-serif",
-            color: "#F5F0E8",
-          }}
+          style={{ color: "#F5F0E8" }}
         >
           Configuración
         </h2>
@@ -739,10 +735,8 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
               <span
                 className="block mb-3"
                 style={{
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  letterSpacing: "0.2em",
-                  color: "rgba(211,196,177,0.4)",
+                  fontSize: "10px", fontWeight: 700,
+                  letterSpacing: "0.2em", color: "rgba(211,196,177,0.4)",
                   textTransform: "uppercase",
                 }}
               >
@@ -758,25 +752,11 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
                         className="w-full text-left text-sm py-1.5 pr-2 transition-colors font-medium"
                         style={
                           isActive
-                            ? {
-                                color: GOLD_LIGHT,
-                                fontWeight: 700,
-                                borderRight: `2px solid ${GOLD}`,
-                              }
-                            : {
-                                color: "#d3c4b1",
-                              }
+                            ? { color: GOLD_LIGHT, fontWeight: 700, borderRight: `2px solid ${GOLD}` }
+                            : { color: "#d3c4b1" }
                         }
-                        onMouseEnter={(e) => {
-                          if (!isActive) {
-                            (e.currentTarget as HTMLElement).style.color = GOLD_LIGHT;
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActive) {
-                            (e.currentTarget as HTMLElement).style.color = "#d3c4b1";
-                          }
-                        }}
+                        onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.color = GOLD_LIGHT; }}
+                        onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "#d3c4b1"; }}
                       >
                         {name}
                       </button>
@@ -789,17 +769,44 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
         </div>
       </nav>
 
-      {/* ── Main content ── */}
-      <main
-        className="flex-1 overflow-y-auto"
-        style={{ background: "#0D0E12", padding: "3rem" }}
-      >
-        <InviteAgentDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
-        {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} />}
-        {activeTab === "perfil" && <TabPerfil currentAgent={currentAgent} currentUser={currentUser} />}
-        {activeTab === "integraciones" && <TabIntegraciones />}
-        {activeTab === "notificaciones" && <TabNotificaciones userId={currentUser?.id ?? ""} />}
-      </main>
+      {/* ── Right: mobile tabs + content ── */}
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Mobile tab bar (< md) */}
+        <div
+          className="md:hidden sticky top-0 z-10 overflow-x-auto flex shrink-0"
+          style={{ background: "#14151C", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+        >
+          {allNavItems.map(({ key, name }) => {
+            const isActive = activeTab === key;
+            return (
+              <button
+                key={key}
+                onClick={() => navigate(key)}
+                className="flex-shrink-0 px-4 py-3 text-sm font-medium transition-colors border-b-2"
+                style={{
+                  color: isActive ? GOLD_LIGHT : "#9899A8",
+                  borderColor: isActive ? GOLD : "transparent",
+                  background: "transparent",
+                }}
+              >
+                {name}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Main content */}
+        <main
+          className="flex-1 overflow-y-auto px-4 py-6 md:px-12 md:py-12"
+          style={{ background: "#0D0E12" }}
+        >
+          <InviteAgentDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
+          {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} />}
+          {activeTab === "perfil" && <TabPerfil currentAgent={currentAgent} currentUser={currentUser} />}
+          {activeTab === "integraciones" && <TabIntegraciones />}
+          {activeTab === "notificaciones" && <TabNotificaciones userId={currentUser?.id ?? ""} />}
+        </main>
+      </div>
     </div>
   );
 }

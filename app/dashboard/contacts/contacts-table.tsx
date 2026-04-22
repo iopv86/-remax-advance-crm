@@ -203,8 +203,81 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
 
   return (
     <>
-      {/* Table card */}
+      {/* ── Mobile card list (< md) ─────────────────────────────────────── */}
       <div
+        className="block md:hidden"
+        style={{
+          background: T.surface,
+          borderRadius: 12,
+          overflow: "hidden",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+          border: `1px solid rgba(79,69,55,0.08)`,
+        }}
+      >
+        {initial.length === 0 ? (
+          <p style={{ padding: "48px 24px", textAlign: "center", color: T.onSurfaceVariant, fontSize: 14 }}>
+            No se encontraron contactos.
+          </p>
+        ) : (
+          initial.map((c) => {
+            const name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "Sin nombre";
+            const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join("").toUpperCase() || "?";
+            const { bg: avBg, color: avColor } = avatarPalette(initials);
+            const badge = getStatusBadge(c.lead_classification);
+            const lastContact = formatDistanceToNow(
+              new Date(c.last_activity_at ?? c.created_at),
+              { addSuffix: true, locale: es }
+            );
+            return (
+              <Link
+                key={c.id}
+                href={`/dashboard/contacts/${c.id}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  padding: "14px 16px",
+                  textDecoration: "none",
+                  borderTop: `1px solid rgba(79,69,55,0.08)`,
+                }}
+              >
+                <div style={{
+                  width: 40, height: 40, borderRadius: "50%",
+                  background: avBg, color: avColor,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontWeight: 700, fontSize: 14, flexShrink: 0,
+                }}>
+                  {initials}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: T.onSurface, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {name}
+                    </p>
+                    <span style={{
+                      flexShrink: 0, display: "inline-block",
+                      padding: "2px 6px", borderRadius: 4,
+                      fontSize: 9, fontWeight: 700,
+                      textTransform: "uppercase", letterSpacing: "0.06em",
+                      whiteSpace: "nowrap",
+                      background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`,
+                    }}>
+                      {badge.label}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: 12, color: T.onSurfaceVariant, margin: 0 }}>
+                    {c.phone ?? "—"} · {lastContact}
+                  </p>
+                </div>
+              </Link>
+            );
+          })
+        )}
+      </div>
+
+      {/* ── Desktop table (md+) ─────────────────────────────────────────── */}
+      <div
+        className="hidden md:block"
         style={{
           background: T.surface,
           borderRadius: 12,
@@ -555,20 +628,20 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
             </tbody>
           </table>
         </div>
-
-        {/* Pagination footer */}
-        {pagination && (
-          <div style={{ padding: "4px 32px 8px", borderTop: `1px solid rgba(79,69,55,0.10)` }}>
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalCount={pagination.totalCount}
-              pageSize={pagination.pageSize}
-              basePath={pagination.basePath}
-              filterParams={pagination.filterParams}
-            />
-          </div>
-        )}
       </div>
+
+      {/* Pagination — shown below both mobile/desktop views */}
+      {pagination && (
+        <div style={{ padding: "4px 8px 8px", borderTop: `1px solid rgba(79,69,55,0.10)` }}>
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalCount={pagination.totalCount}
+            pageSize={pagination.pageSize}
+            basePath={pagination.basePath}
+            filterParams={pagination.filterParams}
+          />
+        </div>
+      )}
 
       <ContactSheet
         open={sheetOpen}

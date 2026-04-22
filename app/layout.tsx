@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Cinzel, Inter, Manrope, JetBrains_Mono } from "next/font/google";
+import { Geist, Syne, Cinzel, Manrope, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -12,10 +12,16 @@ const cinzel = Cinzel({
   display: "swap",
 });
 
-const inter = Inter({
+const geist = Geist({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-inter",
+  variable: "--font-geist",
+  display: "swap",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-syne",
   display: "swap",
 });
 
@@ -62,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
         />
       </head>
-      <body className={`${cinzel.variable} ${inter.variable} ${manrope.variable} ${mono.variable} h-full`}>
+      <body className={`${cinzel.variable} ${geist.variable} ${syne.variable} ${manrope.variable} ${mono.variable} h-full`}>
         <PHProvider>
           <ThemeProvider>
             {children}
