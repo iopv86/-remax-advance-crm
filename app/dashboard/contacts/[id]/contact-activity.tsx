@@ -279,7 +279,7 @@ export function ContactActivity({
                         )}
                       </div>
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <p style={{ fontSize: 10, color: TEXT_MUTED, margin: 0 }}>
+                        <p style={{ fontSize: 10, color: TEXT_MUTED, margin: 0 }} suppressHydrationWarning>
                           {formatDistanceToNow(new Date(date), { addSuffix: true, locale: es })}
                         </p>
                         {act.duration_minutes && (

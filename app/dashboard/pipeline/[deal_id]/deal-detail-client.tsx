@@ -781,7 +781,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                             desde {STAGE_LABELS[entry.from_stage]}
                           </p>
                         )}
-                        <p className="text-[10px] mt-1" style={{ color: "var(--muted-foreground)" }}>
+                        <p className="text-[10px] mt-1" style={{ color: "var(--muted-foreground)" }} suppressHydrationWarning>
                           {entry.agent?.full_name ?? (entry.changed_by_system ? "Sistema" : "—")}
                           {" · "}
                           {formatDistanceToNow(parseISO(entry.created_at), { addSuffix: true, locale: es })}

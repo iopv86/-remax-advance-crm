@@ -459,7 +459,7 @@ export function AvaIAClient({
                           {msg.content.slice(0, 70)}{msg.content.length > 70 ? "…" : ""}
                         </p>
                       </div>
-                      <span style={{ fontSize: 10, color: "#9899A8", flexShrink: 0 }}>
+                      <span style={{ fontSize: 10, color: "#9899A8", flexShrink: 0 }} suppressHydrationWarning>
                         {formatDistanceToNow(new Date(msg.created_at), { locale: es, addSuffix: false })}
                       </span>
                     </div>

@@ -169,7 +169,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
                 fontFamily: "Inter, sans-serif",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
-              }}>
+              }} suppressHydrationWarning>
                 {elapsed}
               </span>
             </Link>

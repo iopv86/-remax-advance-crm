@@ -265,7 +265,7 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
                       {badge.label}
                     </span>
                   </div>
-                  <p style={{ fontSize: 12, color: T.onSurfaceVariant, margin: 0 }}>
+                  <p style={{ fontSize: 12, color: T.onSurfaceVariant, margin: 0 }} suppressHydrationWarning>
                     {c.phone ?? "—"} · {lastContact}
                   </p>
                 </div>
@@ -519,6 +519,7 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
                           color: T.onSurface,
                           margin: 0,
                         }}
+                        suppressHydrationWarning
                       >
                         {lastContact}
                       </p>

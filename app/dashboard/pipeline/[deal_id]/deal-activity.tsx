@@ -231,7 +231,7 @@ export function DealActivityPanel({
                       )}
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+                      <p className="text-[10px]" style={{ color: "var(--muted-foreground)" }} suppressHydrationWarning>
                         {formatDistanceToNow(new Date(ts), { addSuffix: true, locale: es })}
                       </p>
                       <p className="text-[10px] mt-0.5" style={{ color: "var(--muted-foreground)" }}>

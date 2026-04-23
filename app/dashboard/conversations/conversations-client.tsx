@@ -342,7 +342,7 @@ export function ConversationsClient({ initialConversations }: Props) {
                       <span className="text-sm font-medium truncate text-white">
                         {contactName(conv.contact)}
                       </span>
-                      <span className="text-[11px] flex-shrink-0 ml-2 text-[#545567]">
+                      <span className="text-[11px] flex-shrink-0 ml-2 text-[#545567]" suppressHydrationWarning>
                         {formatDistanceToNow(new Date(conv.created_at), { locale: es, addSuffix: false })}
                       </span>
                     </div>
@@ -665,6 +665,7 @@ export function ConversationsClient({ initialConversations }: Props) {
                     <span
                       className="text-[10px] px-2 py-1 rounded"
                       style={{ background: "#22242F", color: "#9899A8" }}
+                      suppressHydrationWarning
                     >
                       {formatDistanceToNow(new Date(selectedConv.created_at), { locale: es, addSuffix: true })}
                     </span>

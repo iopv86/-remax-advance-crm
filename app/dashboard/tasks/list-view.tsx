@@ -144,7 +144,7 @@ export function ListView({
                       >
                         {isDueToday ? "Hoy" : format(dueDate, "d MMM yyyy", { locale: es })}
                       </p>
-                      <p className="text-[10px] mt-0.5" style={{ color: isOverdue ? "rgba(239,68,68,0.7)" : "var(--muted-foreground)" }}>
+                      <p className="text-[10px] mt-0.5" style={{ color: isOverdue ? "rgba(239,68,68,0.7)" : "var(--muted-foreground)" }} suppressHydrationWarning>
                         {formatDistanceToNow(dueDate, { addSuffix: true, locale: es })}
                       </p>
                     </>
