@@ -170,15 +170,15 @@ export function ConversationsClient({ initialConversations }: Props) {
     (async () => {
       const { data: contact } = await supabase
         .from("contacts")
-        .select("assigned_agent_id")
+        .select("agent_id")
         .eq("id", selectedContactId)
         .single();
 
-      if (contact?.assigned_agent_id) {
+      if (contact?.agent_id) {
         const { data: agent } = await supabase
           .from("agents")
           .select("full_name")
-          .eq("id", contact.assigned_agent_id)
+          .eq("id", contact.agent_id)
           .single();
         setAssignedAgent(agent);
       } else {

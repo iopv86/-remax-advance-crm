@@ -20,10 +20,10 @@ export default async function ProfilePage() {
     { count: dealsWon },
     { count: pendingTasks },
   ] = await Promise.all([
-    supabase.from("contacts").select("*", { count: "exact", head: true }).eq("assigned_agent_id", agent?.id ?? ""),
-    supabase.from("deals").select("*", { count: "exact", head: true }).eq("assigned_agent_id", agent?.id ?? ""),
-    supabase.from("deals").select("*", { count: "exact", head: true }).eq("assigned_agent_id", agent?.id ?? "").eq("stage", "cerrado_ganado"),
-    supabase.from("tasks").select("*", { count: "exact", head: true }).eq("assigned_to", agent?.id ?? "").eq("status", "pending"),
+    supabase.from("contacts").select("*", { count: "exact", head: true }).eq("agent_id", agent?.id ?? ""),
+    supabase.from("deals").select("*", { count: "exact", head: true }).eq("agent_id", agent?.id ?? ""),
+    supabase.from("deals").select("*", { count: "exact", head: true }).eq("agent_id", agent?.id ?? "").eq("stage", "cerrado_ganado"),
+    supabase.from("tasks").select("*", { count: "exact", head: true }).eq("agent_id", agent?.id ?? "").eq("status", "pending"),
   ]);
 
   return (
