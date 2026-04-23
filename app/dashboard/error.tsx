@@ -83,9 +83,9 @@ export default function DashboardError({
           Esta página encontró un error inesperado. Puedes intentar recargarla o volver al inicio.
         </p>
 
-        {error.digest && (
-          <p style={{ fontSize: 10, color: "#545567", margin: "0 0 20px", fontFamily: "monospace" }}>
-            {error.digest}
+        {(error.message || error.digest) && (
+          <p style={{ fontSize: 10, color: "#545567", margin: "0 0 20px", fontFamily: "monospace", wordBreak: "break-all" }}>
+            {error.message || error.digest}
           </p>
         )}
 
