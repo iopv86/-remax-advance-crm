@@ -361,13 +361,42 @@ function TabPerfil({
 
 // ── TabIntegraciones ─────────────────────────────────
 
+type ImportResult = { imported: number; skipped: number; failed: number; total: number } | null;
+
 function TabIntegraciones() {
   const [copied, setCopied] = useState(false);
+  const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult>(null);
+  const [importError, setImportError] = useState<string | null>(null);
 
   function handleCopy() {
     void navigator.clipboard.writeText("ae_live_8832_placeholder");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function handleImport() {
+    if (!csvFile) return;
+    setImporting(true);
+    setImportResult(null);
+    setImportError(null);
+    try {
+      const form = new FormData();
+      form.append("file", csvFile);
+      const res = await fetch("/api/contacts/import", { method: "POST", body: form });
+      const json = await res.json();
+      if (!res.ok) {
+        setImportError(json.error ?? "Error desconocido");
+      } else {
+        setImportResult(json as ImportResult);
+        setCsvFile(null);
+      }
+    } catch {
+      setImportError("Error de red — revisá tu conexión");
+    } finally {
+      setImporting(false);
+    }
   }
 
   const integrations = [
@@ -541,6 +570,103 @@ function TabIntegraciones() {
       </section>
 
       {/* API access */}
+      {/* ── CSV Import ─────────────────────────────────── */}
+      <section className="mb-10">
+        <h3
+          className="font-bold text-lg mb-6"
+          style={{ fontFamily: "Manrope, sans-serif", color: "#e3e1ea" }}
+        >
+          Importar Contactos (CSV)
+        </h3>
+        <div className="rounded-2xl p-6 flex flex-col gap-5" style={GLASS_CARD}>
+          <p className="text-sm leading-relaxed" style={{ color: "#9899A8" }}>
+            Importá contactos desde AlterEstate u otro CRM. Columnas aceptadas:{" "}
+            <span style={{ color: "#e3e1ea" }}>
+              nombre, apellido, telefono, email, fuente, notas
+            </span>
+            . Los duplicados por teléfono se omiten automáticamente.
+          </p>
+
+          <div className="flex items-center gap-4">
+            <label
+              className="flex-1 flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer transition-all"
+              style={{
+                background: "#0d0e14",
+                border: `1px solid ${csvFile ? "rgba(201,150,58,0.4)" : "rgba(255,255,255,0.06)"}`,
+              }}
+            >
+              <input
+                type="file"
+                accept=".csv"
+                className="hidden"
+                onChange={(e) => {
+                  setImportResult(null);
+                  setImportError(null);
+                  setCsvFile(e.target.files?.[0] ?? null);
+                }}
+              />
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: csvFile ? "#C9963A" : "#545567" }}>
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              <span className="text-sm truncate" style={{ color: csvFile ? "#e3e1ea" : "#545567" }}>
+                {csvFile ? csvFile.name : "Seleccionar archivo CSV…"}
+              </span>
+            </label>
+
+            <button
+              onClick={() => void handleImport()}
+              disabled={!csvFile || importing}
+              className="px-5 py-3 rounded-xl font-bold text-sm transition-all shrink-0"
+              style={{
+                background: csvFile && !importing
+                  ? `linear-gradient(135deg, #d4a843 0%, #C9963A 100%)`
+                  : "rgba(255,255,255,0.06)",
+                color: csvFile && !importing ? "#1a1200" : "#545567",
+                cursor: csvFile && !importing ? "pointer" : "not-allowed",
+              }}
+            >
+              {importing ? "Importando…" : "Importar"}
+            </button>
+          </div>
+
+          {importResult && (
+            <div
+              className="rounded-xl p-4 flex gap-6"
+              style={{ background: "rgba(52,211,153,0.06)", border: "1px solid rgba(52,211,153,0.15)" }}
+            >
+              <div className="text-center">
+                <p className="text-2xl font-extrabold" style={{ color: "#34d399", fontFamily: "Manrope, sans-serif" }}>{importResult.imported}</p>
+                <p className="text-[10px] uppercase tracking-widest" style={{ color: "#9899A8" }}>Importados</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-extrabold" style={{ color: "#9899A8", fontFamily: "Manrope, sans-serif" }}>{importResult.skipped}</p>
+                <p className="text-[10px] uppercase tracking-widest" style={{ color: "#9899A8" }}>Duplicados</p>
+              </div>
+              {importResult.failed > 0 && (
+                <div className="text-center">
+                  <p className="text-2xl font-extrabold" style={{ color: "#f87171", fontFamily: "Manrope, sans-serif" }}>{importResult.failed}</p>
+                  <p className="text-[10px] uppercase tracking-widest" style={{ color: "#9899A8" }}>Fallidos</p>
+                </div>
+              )}
+              <div className="text-center">
+                <p className="text-2xl font-extrabold" style={{ color: "#e3e1ea", fontFamily: "Manrope, sans-serif" }}>{importResult.total}</p>
+                <p className="text-[10px] uppercase tracking-widest" style={{ color: "#9899A8" }}>Total</p>
+              </div>
+            </div>
+          )}
+
+          {importError && (
+            <div
+              className="rounded-xl p-4 text-sm"
+              style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", color: "#f87171" }}
+            >
+              {importError}
+            </div>
+          )}
+        </div>
+      </section>
+
       <section className="mb-10">
         <h3
           className="font-bold text-lg mb-6"
