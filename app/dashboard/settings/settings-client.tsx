@@ -553,16 +553,20 @@ function TabIntegraciones() {
         border: "1px solid rgba(255,255,255,0.08)",
       } as React.CSSProperties,
       detail: (
-        <button
+        <a
+          href="https://business.facebook.com/settings/ad-accounts"
+          target="_blank"
+          rel="noopener noreferrer"
           className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 flex items-center justify-center gap-2"
           style={{
             background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 100%)`,
             color: "#1a1200",
+            textDecoration: "none",
           }}
         >
           <Link2 className="w-4 h-4" />
-          CONECTAR CUENTA
-        </button>
+          CONECTAR EN META BUSINESS
+        </a>
       ),
     },
     {

@@ -157,13 +157,13 @@ export function RoundRobinClient({
 
       setEntries([...merged, ...newAgents]);
     } else {
-      // No config yet — bootstrap from all agents, all active
+      // No config yet — bootstrap from all agents, all inactive (admin must explicitly enable)
       setEntries(
         agents.map((a, i) => ({
           agent_id: a.id,
           full_name: a.full_name,
           email: a.email,
-          is_active: true,
+          is_active: false,
           position: i + 1,
         }))
       );
