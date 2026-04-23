@@ -162,15 +162,19 @@ interface PaginationProps {
 interface Props {
   contacts: Contact[];
   pagination?: PaginationProps;
+  currentAgentId?: string;
+  currentRole?: string;
 }
 
-export function ContactsTable({ contacts: initial, pagination }: Props) {
+export function ContactsTable({ contacts: initial, pagination, currentAgentId, currentRole }: Props) {
   const router = useRouter();
   const [editContact, setEditContact] = useState<Contact | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [relativeTimes, setRelativeTimes] = useState<Record<string, string>>({});
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [creatingDeals, setCreatingDeals] = useState(false);
 
   useEffect(() => {
     const times: Record<string, string> = {};
@@ -188,6 +192,51 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
     }
     setRelativeTimes(times);
   }, [initial]);
+
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAll() {
+    if (selectedIds.size === initial.length && initial.length > 0) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(initial.map((c) => c.id)));
+    }
+  }
+
+  async function handleCreateDeals() {
+    const contacts = initial.filter((c) => selectedIds.has(c.id));
+    if (contacts.length === 0) return;
+    setCreatingDeals(true);
+    const supabase = createClient();
+
+    const inserts = contacts
+      .map((c) => ({ contact_id: c.id, agent_id: c.agent_id ?? currentAgentId, stage: "lead_captured" as const }))
+      .filter((d) => Boolean(d.agent_id));
+
+    if (inserts.length === 0) {
+      toast.error("Los contactos seleccionados no tienen agente asignado");
+      setCreatingDeals(false);
+      return;
+    }
+
+    const { error } = await supabase.from("deals").insert(inserts);
+    setCreatingDeals(false);
+    if (error) {
+      toast.error("Error al crear oportunidades: " + error.message);
+      return;
+    }
+    const n = inserts.length;
+    toast.success(`${n} oportunidad${n !== 1 ? "es" : ""} creada${n !== 1 ? "s" : ""} en pipeline`);
+    setSelectedIds(new Set());
+    router.refresh();
+  }
 
   function openEdit(c: Contact, e: React.MouseEvent) {
     e.stopPropagation();
@@ -221,6 +270,61 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
 
   return (
     <>
+      {/* ── Bulk action bar ─────────────────────────────────────────────── */}
+      {selectedIds.size > 0 && (
+        <div
+          style={{
+            position: "sticky",
+            top: 72,
+            zIndex: 30,
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "10px 16px",
+            marginBottom: 16,
+            background: T.surfaceContainerHigh,
+            border: `1px solid ${T.primaryContainer}`,
+            borderRadius: 10,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.4)",
+          }}
+        >
+          <span style={{ fontSize: 13, fontWeight: 600, color: T.onSurface, flex: 1 }}>
+            {selectedIds.size} contacto{selectedIds.size !== 1 ? "s" : ""} seleccionado{selectedIds.size !== 1 ? "s" : ""}
+          </span>
+          <button
+            onClick={handleCreateDeals}
+            disabled={creatingDeals}
+            style={{
+              padding: "7px 18px",
+              borderRadius: 8,
+              border: "none",
+              background: creatingDeals ? T.surfaceContainerHighest : T.primaryContainer,
+              color: creatingDeals ? T.onSurfaceVariant : "#281900",
+              fontWeight: 700,
+              fontSize: 13,
+              cursor: creatingDeals ? "default" : "pointer",
+            }}
+          >
+            {creatingDeals ? "Creando..." : "Crear oportunidades"}
+          </button>
+          <button
+            onClick={() => setSelectedIds(new Set())}
+            style={{
+              padding: "7px 14px",
+              borderRadius: 8,
+              border: `1px solid rgba(79,69,55,0.30)`,
+              background: "transparent",
+              color: T.onSurfaceVariant,
+              fontWeight: 600,
+              fontSize: 13,
+              cursor: "pointer",
+            }}
+          >
+            Cancelar
+          </button>
+        </div>
+      )}
+
       {/* ── Mobile card list (< md) ─────────────────────────────────────── */}
       <div
         className="block md:hidden"
@@ -245,48 +349,71 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
             const mobileDateStr = c.last_activity_at ?? c.created_at;
             const lastContact = relativeTimes[c.id] ??
               (mobileDateStr ? new Date(mobileDateStr).toLocaleDateString("es-DO", { day: "numeric", month: "short" }) : "—");
+            const isChecked = selectedIds.has(c.id);
             return (
-              <Link
+              <div
                 key={c.id}
-                href={`/dashboard/contacts/${c.id}`}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "14px 16px",
-                  textDecoration: "none",
                   borderTop: `1px solid rgba(79,69,55,0.08)`,
+                  background: isChecked ? T.surfaceContainerHigh : "transparent",
                 }}
               >
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%",
-                  background: avBg, color: avColor,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontWeight: 700, fontSize: 14, flexShrink: 0,
-                }}>
-                  {initials}
+                <div
+                  style={{ padding: "0 0 0 14px", display: "flex", alignItems: "center" }}
+                  onClick={() => toggleSelect(c.id)}
+                >
+                  <input
+                    type="checkbox"
+                    checked={isChecked}
+                    onChange={() => toggleSelect(c.id)}
+                    style={{ width: 16, height: 16, accentColor: T.primaryContainer, cursor: "pointer" }}
+                    onClick={(e) => e.stopPropagation()}
+                  />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: T.onSurface, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {name}
-                    </p>
-                    <span style={{
-                      flexShrink: 0, display: "inline-block",
-                      padding: "2px 6px", borderRadius: 4,
-                      fontSize: 9, fontWeight: 700,
-                      textTransform: "uppercase", letterSpacing: "0.06em",
-                      whiteSpace: "nowrap",
-                      background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`,
-                    }}>
-                      {badge.label}
-                    </span>
+                <Link
+                  href={`/dashboard/contacts/${c.id}`}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "14px 16px",
+                    textDecoration: "none",
+                    flex: 1,
+                    minWidth: 0,
+                  }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: "50%",
+                    background: avBg, color: avColor,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontWeight: 700, fontSize: 14, flexShrink: 0,
+                  }}>
+                    {initials}
                   </div>
-                  <p style={{ fontSize: 12, color: T.onSurfaceVariant, margin: 0 }} suppressHydrationWarning>
-                    {c.phone ?? "—"} · {lastContact}
-                  </p>
-                </div>
-              </Link>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: T.onSurface, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {name}
+                      </p>
+                      <span style={{
+                        flexShrink: 0, display: "inline-block",
+                        padding: "2px 6px", borderRadius: 4,
+                        fontSize: 9, fontWeight: 700,
+                        textTransform: "uppercase", letterSpacing: "0.06em",
+                        whiteSpace: "nowrap",
+                        background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`,
+                      }}>
+                        {badge.label}
+                      </span>
+                    </div>
+                    <p style={{ fontSize: 12, color: T.onSurfaceVariant, margin: 0 }} suppressHydrationWarning>
+                      {c.phone ?? "—"} · {lastContact}
+                    </p>
+                  </div>
+                </Link>
+              </div>
             );
           })
         )}
@@ -314,6 +441,15 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
             {/* Head */}
             <thead>
               <tr style={{ background: T.surfaceContainerLow }}>
+                {/* Select-all checkbox */}
+                <th style={{ padding: "16px 8px 16px 24px", width: 40 }}>
+                  <input
+                    type="checkbox"
+                    checked={initial.length > 0 && selectedIds.size === initial.length}
+                    onChange={toggleAll}
+                    style={{ width: 16, height: 16, accentColor: T.primaryContainer, cursor: "pointer" }}
+                  />
+                </th>
                 {[
                   { label: "Nombre", align: "left" },
                   { label: "Teléfono", align: "left" },
@@ -348,7 +484,7 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
               {initial.length === 0 && (
                 <tr>
                   <td
-                    colSpan={7}
+                    colSpan={8}
                     style={{
                       padding: "48px 24px",
                       textAlign: "center",
@@ -389,6 +525,7 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
                   (desktopDateStr ? new Date(desktopDateStr).toLocaleDateString("es-DO", { day: "numeric", month: "short" }) : "—");
 
                 const isHovered = hoveredId === c.id;
+                const isChecked = selectedIds.has(c.id);
 
                 return (
                   <tr
@@ -397,14 +534,26 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
                     onMouseLeave={() => setHoveredId(null)}
                     style={{
                       borderTop: `1px solid rgba(79,69,55,0.08)`,
-                      background: isHovered ? T.surfaceContainerHigh : "transparent",
-                      borderLeft: isHovered
+                      background: isChecked ? T.surfaceContainerHigh : isHovered ? T.surfaceContainerHigh : "transparent",
+                      borderLeft: isChecked
+                        ? `3px solid ${T.primaryContainer}`
+                        : isHovered
                         ? `3px solid ${T.primaryContainer}`
                         : "3px solid transparent",
                       transition: "background 150ms ease, border-left-color 150ms ease",
                       cursor: "default",
                     }}
                   >
+                    {/* Checkbox */}
+                    <td style={{ padding: "16px 8px 16px 24px", width: 40 }}>
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleSelect(c.id)}
+                        style={{ width: 16, height: 16, accentColor: T.primaryContainer, cursor: "pointer" }}
+                      />
+                    </td>
+
                     {/* Nombre */}
                     <td style={{ padding: "16px 24px" }}>
                       <Link

@@ -29,7 +29,7 @@ export default async function ContactsPage({
   let dataQuery = supabase
     .from("contacts")
     .select(
-      "id, first_name, last_name, phone, email, lead_classification, lead_status, source, lead_score, budget_min, budget_max, budget_currency, property_type_interest, preferred_locations, last_activity_at, created_at, agent:agents!contacts_agent_id_fkey(full_name)"
+      "id, agent_id, first_name, last_name, phone, email, lead_classification, lead_status, source, lead_score, budget_min, budget_max, budget_currency, property_type_interest, preferred_locations, last_activity_at, created_at, agent:agents!contacts_agent_id_fkey(full_name)"
     )
     .order("created_at", { ascending: false })
     .range(offset, offset + PAGE_SIZE - 1);
@@ -132,6 +132,8 @@ export default async function ContactsPage({
         <ContactsTable
           contacts={(contacts as unknown as Contact[]) ?? []}
           pagination={{ currentPage, totalCount: total, pageSize: PAGE_SIZE, basePath: "/dashboard/contacts", filterParams: paginationFilterParams }}
+          currentAgentId={session.agentId}
+          currentRole={session.role}
         />
       </section>
     </div>

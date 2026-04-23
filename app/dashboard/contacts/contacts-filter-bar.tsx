@@ -27,6 +27,7 @@ const PILLS: { label: string; value: string }[] = [
   { label: "Leads Calientes", value: "hot" },
   { label: "Warm Leads", value: "warm" },
   { label: "Leads Fríos", value: "cold" },
+  { label: "Sin calificar", value: "unqualified" },
 ];
 
 export function ContactsFilterBar({
