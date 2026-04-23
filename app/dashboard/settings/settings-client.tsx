@@ -517,20 +517,10 @@ function TabIntegraciones() {
       } as React.CSSProperties,
       detail: (
         <div
-          className="flex items-center justify-between rounded-xl p-4"
-          style={{ background: "#1a1b22", border: "1px solid rgba(255,255,255,0.05)" }}
+          className="rounded-xl px-4 py-3 text-xs"
+          style={{ background: "#1a1b22", color: "#9899A8", border: "1px solid rgba(255,255,255,0.05)" }}
         >
-          <span className="font-mono text-sm" style={{ color: "#9899A8" }}>
-            +1 (809) 000-0000
-          </span>
-          <button
-            className="text-xs font-bold uppercase tracking-widest transition-colors"
-            style={{ color: "#545567" }}
-            onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "#ef4444")}
-            onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "#545567")}
-          >
-            Desconectar
-          </button>
+          Gestionado por Ava — agente Railway
         </div>
       ),
     },
