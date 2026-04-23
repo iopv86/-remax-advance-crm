@@ -84,6 +84,7 @@ export interface Property {
   area_m2?: number;
   images?: string[];
   status: "active" | "reserved" | "sold" | "rented" | "inactive";
+  is_project?: boolean;
   created_at: string;
 }
 

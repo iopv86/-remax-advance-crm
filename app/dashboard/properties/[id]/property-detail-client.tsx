@@ -238,13 +238,15 @@ export function PropertyDetailClient({
   property,
   deals,
   canEdit,
+  initialTab,
 }: {
   property: PropertyDetail;
   deals: DealEntry[];
   canEdit: boolean;
+  initialTab?: DetailTab;
 }) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<DetailTab>("info");
+  const [activeTab, setActiveTab] = useState<DetailTab>(initialTab ?? "info");
   const status = STATUS_MAP[property.status] ?? STATUS_MAP.inactive;
 
   return (

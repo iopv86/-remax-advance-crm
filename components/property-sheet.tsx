@@ -41,6 +41,7 @@ interface PropertyFormState {
   area_m2: string;
   status: string;
   description: string;
+  is_project: boolean;
 }
 
 const EMPTY_FORM: PropertyFormState = {
@@ -56,6 +57,7 @@ const EMPTY_FORM: PropertyFormState = {
   area_m2: "",
   status: "active",
   description: "",
+  is_project: false,
 };
 
 function propertyToForm(p: Property): PropertyFormState {
@@ -72,6 +74,7 @@ function propertyToForm(p: Property): PropertyFormState {
     area_m2: p.area_m2?.toString() ?? "",
     status: p.status,
     description: p.description ?? "",
+    is_project: p.is_project ?? false,
   };
 }
 
@@ -106,7 +109,7 @@ export function PropertySheet({
     onOpenChange(o);
   }
 
-  function set(field: keyof PropertyFormState, value: string) {
+  function set(field: keyof PropertyFormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
 
@@ -196,6 +199,7 @@ export function PropertySheet({
       description: form.description.trim() || null,
       images,
       agent_id: agent?.id ?? null,
+      is_project: form.is_project,
     };
 
     let error;
@@ -388,6 +392,55 @@ export function PropertySheet({
                 <SelectItem value="inactive">Inactivo</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Project toggle */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "12px 14px",
+              borderRadius: 8,
+              border: form.is_project ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
+              background: form.is_project ? "rgba(201,150,58,0.06)" : "transparent",
+              cursor: "pointer",
+            }}
+            onClick={() => set("is_project", !form.is_project)}
+          >
+            <div
+              style={{
+                width: 36,
+                height: 20,
+                borderRadius: 10,
+                background: form.is_project ? "#C9963A" : "rgba(255,255,255,0.12)",
+                position: "relative",
+                flexShrink: 0,
+                transition: "background 0.15s",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: 2,
+                  left: form.is_project ? 18 : 2,
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  background: "#fff",
+                  transition: "left 0.15s",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                }}
+              />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: form.is_project ? "#C9963A" : "#e5e2e1" }}>
+                Es un proyecto / desarrollo
+              </p>
+              <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
+                Con múltiples unidades (apartamentos, locales, etc.)
+              </p>
+            </div>
           </div>
 
           {/* Description */}

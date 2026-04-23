@@ -7,18 +7,25 @@ export default async function PropertiesPage() {
   const supabase = await createClient();
   const session = await getSessionAgent();
 
-  // All agents see all properties; write access is enforced per-row in the UI and by RLS
-  const { data: properties } = await supabase
-    .from("properties")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(200);
-
-  const list = (properties as unknown as Property[]) ?? [];
+  const [{ data: properties }, { data: projects }] = await Promise.all([
+    supabase
+      .from("properties")
+      .select("*")
+      .eq("is_project", false)
+      .order("created_at", { ascending: false })
+      .limit(200),
+    supabase
+      .from("properties")
+      .select("*")
+      .eq("is_project", true)
+      .order("created_at", { ascending: false })
+      .limit(100),
+  ]);
 
   return (
     <PropertiesClient
-      initialProperties={list}
+      initialProperties={(properties as unknown as Property[]) ?? []}
+      projects={(projects as unknown as Property[]) ?? []}
       currentAgentId={session.agentId}
       currentRole={session.role}
     />

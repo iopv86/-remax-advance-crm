@@ -129,17 +129,19 @@ function dormBtn(active: boolean): React.CSSProperties {
 
 interface Props {
   initialProperties: Property[];
+  projects: Property[];
   currentAgentId: string;
   currentRole: string;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function PropertiesClient({ initialProperties, currentAgentId, currentRole }: Props) {
+export function PropertiesClient({ initialProperties, projects, currentAgentId, currentRole }: Props) {
   function canWrite(property: Property): boolean {
     return property.agent_id === currentAgentId || currentRole === "admin" || currentRole === "manager";
   }
   const router = useRouter();
+  const [activeView, setActiveView] = useState<"propiedades" | "proyectos">("propiedades");
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editProperty, setEditProperty] = useState<Property | null>(null);
@@ -552,8 +554,8 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
             gap: 10,
           }}
         >
-          {/* Page title + count */}
-          <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
+          {/* Page title + view toggle */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <h2
               className="text-[22px] md:text-[28px]"
               style={{
@@ -564,11 +566,77 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
                 margin: 0,
               }}
             >
-              Propiedades
+              {activeView === "propiedades" ? "Propiedades" : "Proyectos"}
             </h2>
-            <span style={{ color: TEXT_MUTED, fontSize: 13, fontWeight: 500 }}>
-              {filtered.length} listing{filtered.length !== 1 ? "s" : ""}
-            </span>
+            <div
+              style={{
+                display: "flex",
+                background: BG_ELEVATED,
+                borderRadius: 8,
+                padding: 3,
+                gap: 2,
+              }}
+            >
+              <button
+                onClick={() => setActiveView("propiedades")}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  border: "none",
+                  cursor: "pointer",
+                  background: activeView === "propiedades" ? GOLD : "transparent",
+                  color: activeView === "propiedades" ? "#0D0E12" : TEXT_MUTED,
+                  transition: "all 0.15s",
+                }}
+              >
+                Listados
+              </button>
+              <button
+                onClick={() => setActiveView("proyectos")}
+                style={{
+                  padding: "5px 12px",
+                  borderRadius: 6,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  border: "none",
+                  cursor: "pointer",
+                  background: activeView === "proyectos" ? GOLD : "transparent",
+                  color: activeView === "proyectos" ? "#0D0E12" : TEXT_MUTED,
+                  transition: "all 0.15s",
+                  position: "relative",
+                }}
+              >
+                Proyectos
+                {projects.length > 0 && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      right: -4,
+                      width: 14,
+                      height: 14,
+                      borderRadius: "50%",
+                      background: activeView === "proyectos" ? "#0D0E12" : GOLD,
+                      color: activeView === "proyectos" ? GOLD : "#0D0E12",
+                      fontSize: 8,
+                      fontWeight: 700,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {projects.length}
+                  </span>
+                )}
+              </button>
+            </div>
+            {activeView === "propiedades" && (
+              <span style={{ color: TEXT_MUTED, fontSize: 13, fontWeight: 500 }}>
+                {filtered.length} listing{filtered.length !== 1 ? "s" : ""}
+              </span>
+            )}
           </div>
 
           {/* Search + actions */}
@@ -661,7 +729,200 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
           ))}
         </div>
 
+        {/* ── Proyectos view ─────────────────────────────────────────────── */}
+        {activeView === "proyectos" && (
+          <div className="px-4 py-6 pb-20 md:px-10 md:py-8 md:pb-20" style={{ flex: 1 }}>
+            {projects.length === 0 ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "80px 0",
+                  color: TEXT_DIM,
+                  gap: 12,
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1} style={{ width: 48, height: 48, opacity: 0.2 }}>
+                  <rect x="2" y="3" width="20" height="14" rx="2" />
+                  <path d="M8 21h8M12 17v4" />
+                </svg>
+                <p style={{ fontSize: 14 }}>No hay proyectos registrados.</p>
+                <button
+                  onClick={() => { setActiveView("propiedades"); openCreate(); }}
+                  style={{
+                    marginTop: 4,
+                    padding: "8px 16px",
+                    borderRadius: 8,
+                    border: `1px solid ${GOLD}`,
+                    color: GOLD,
+                    background: "transparent",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                  }}
+                >
+                  Crear primer proyecto
+                </button>
+              </div>
+            ) : (
+              <div
+                className="grid gap-5 md:gap-7"
+                style={{ gridTemplateColumns: "repeat(auto-fill, minmax(min(300px, 100%), 1fr))" }}
+              >
+                {projects.map((p) => {
+                  const CSV_TEMPLATE = "numero_unidad,tipo_unidad,area_m2,habitaciones,banos,precio,moneda,estado,notas\n";
+                  const csvHref = `data:text/csv;charset=utf-8,${encodeURIComponent(CSV_TEMPLATE)}`;
+                  return (
+                    <div
+                      key={p.id}
+                      style={{
+                        background: "rgba(28,29,39,0.7)",
+                        backdropFilter: "blur(12px)",
+                        border: `1px solid rgba(201,150,58,0.20)`,
+                        borderRadius: 12,
+                        overflow: "hidden",
+                        display: "flex",
+                        flexDirection: "column",
+                      }}
+                    >
+                      {/* Image zone */}
+                      <div style={{ height: 160, overflow: "hidden", position: "relative", background: BG_SURFACE, flexShrink: 0 }}>
+                        {p.images && p.images.length > 0 ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={p.images[0]} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        ) : (
+                          <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="rgba(201,150,58,0.2)" strokeWidth={1} style={{ width: 40, height: 40 }}>
+                              <rect x="2" y="3" width="20" height="14" rx="2" />
+                              <path d="M8 21h8M12 17v4" />
+                            </svg>
+                          </div>
+                        )}
+                        {/* Type badge */}
+                        <span
+                          style={{
+                            position: "absolute", top: 12, left: 12,
+                            background: GOLD, color: "#0D0E12",
+                            padding: "3px 10px", borderRadius: 4,
+                            fontSize: 9, fontWeight: 700,
+                            letterSpacing: "0.12em", textTransform: "uppercase",
+                          }}
+                        >
+                          PROYECTO
+                        </span>
+                      </div>
+
+                      {/* Card body */}
+                      <div style={{ padding: "18px 18px 14px", display: "flex", flexDirection: "column", gap: 10, flex: 1 }}>
+                        <div>
+                          <h3
+                            style={{
+                              fontFamily: "Manrope, sans-serif",
+                              fontWeight: 700, fontSize: 16,
+                              color: TEXT_PRIMARY, margin: "0 0 4px",
+                              letterSpacing: "-0.01em",
+                            }}
+                          >
+                            {p.title}
+                          </h3>
+                          {(p.city || p.sector) && (
+                            <p style={{ margin: 0, fontSize: 12, color: TEXT_MUTED }}>
+                              {[p.sector, p.city].filter(Boolean).join(", ")}
+                            </p>
+                          )}
+                          {p.price != null && (
+                            <p style={{ margin: "6px 0 0", fontSize: 13, fontWeight: 600, color: GOLD }}>
+                              Desde {formatPrice(p.price, p.currency)}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Actions */}
+                        <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                          <button
+                            onClick={() => router.push(`/dashboard/properties/${p.id}?tab=unidades`)}
+                            style={{
+                              flex: 1,
+                              padding: "8px 0",
+                              borderRadius: 8,
+                              background: "rgba(201,150,58,0.10)",
+                              border: `1px solid rgba(201,150,58,0.25)`,
+                              color: GOLD,
+                              fontSize: 11,
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              gap: 5,
+                            }}
+                          >
+                            <svg viewBox="0 0 16 16" fill="none" style={{ width: 12, height: 12 }}>
+                              <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                              <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                              <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                              <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5" />
+                            </svg>
+                            Ver unidades
+                          </button>
+                          <a
+                            href={csvHref}
+                            download={`${p.title.toLowerCase().replace(/\s+/g, "-")}-unidades-template.csv`}
+                            style={{
+                              padding: "8px 12px",
+                              borderRadius: 8,
+                              background: BG_SURFACE,
+                              border: "1px solid rgba(255,255,255,0.06)",
+                              color: TEXT_MUTED,
+                              fontSize: 11,
+                              fontWeight: 600,
+                              textDecoration: "none",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 5,
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            <svg viewBox="0 0 16 16" fill="none" style={{ width: 12, height: 12 }}>
+                              <path d="M3 12h10M8 2v8M5 7l3 3 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            CSV
+                          </a>
+                          {canWrite(p) && (
+                            <button
+                              onClick={() => openEdit(p)}
+                              style={{
+                                padding: "8px 12px",
+                                borderRadius: 8,
+                                background: BG_SURFACE,
+                                border: "1px solid rgba(255,255,255,0.06)",
+                                color: TEXT_MUTED,
+                                fontSize: 11,
+                                fontWeight: 600,
+                                cursor: "pointer",
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <svg viewBox="0 0 16 16" fill="none" style={{ width: 12, height: 12 }}>
+                                <path d="M11.5 2.5l2 2L5 13H3v-2L11.5 2.5z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Property grid */}
+        {activeView === "propiedades" && (
         <div
           className="px-4 py-6 pb-20 md:px-10 md:py-8 md:pb-20"
           style={{ flex: 1 }}
@@ -1112,6 +1373,7 @@ export function PropertiesClient({ initialProperties, currentAgentId, currentRol
             </>
           )}
         </div>
+        )} {/* end activeView === "propiedades" */}
       </div>
 
       {/* Property sheet */}

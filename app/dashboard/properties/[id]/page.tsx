@@ -5,10 +5,13 @@ import { PropertyDetailClient } from "./property-detail-client";
 
 export default async function PropertyDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ tab?: string }>;
 }) {
   const { id } = await params;
+  const { tab } = await searchParams;
   const supabase = await createClient();
   const session = await getSessionAgent();
 
@@ -41,6 +44,7 @@ export default async function PropertyDetailPage({
       property={property as any}
       deals={(deals as any[]) ?? []}
       canEdit={canEdit}
+      initialTab={tab === "unidades" ? "unidades" : "info"}
     />
   );
 }
