@@ -12,7 +12,7 @@ export default async function ReportsPage() {
     .from("agents")
     .select("role")
     .eq("email", user.email!)
-    .single();
+    .maybeSingle();
 
   if (!agent || !["admin", "manager"].includes(agent.role)) {
     redirect("/dashboard");

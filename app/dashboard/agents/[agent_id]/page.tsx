@@ -94,12 +94,12 @@ export default async function AgentDetailPage({
       .from("agent_monthly_kpis")
       .select("*")
       .eq("agent_id", agent_id)
-      .single(),
+      .maybeSingle(),
     supabase
       .from("agent_response_times")
       .select("*")
       .eq("agent_id", agent_id)
-      .single(),
+      .maybeSingle(),
     supabase
       .from("agent_historical_kpis")
       .select("month, year, deals_closed, total_revenue, total_deals")

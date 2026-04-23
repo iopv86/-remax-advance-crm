@@ -311,7 +311,7 @@ export default async function DashboardPage() {
   todayStart.setHours(0, 0, 0, 0);
 
   const [avaConfigRes, avaMsgsRes] = await Promise.all([
-    supabase.from("ava_config").select("is_active").single(),
+    supabase.from("ava_config").select("is_active").maybeSingle(),
     supabase
       .from("messages")
       .select("id", { count: "exact", head: true })

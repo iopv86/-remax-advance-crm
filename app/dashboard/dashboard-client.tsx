@@ -191,7 +191,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 color: T.surface,
                 margin: "0 0 4px",
                 lineHeight: 1.15,
-              }}>
+              }} suppressHydrationWarning>
                 {greeting(session.fullName)}
               </p>
               <p style={{
@@ -201,7 +201,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 textTransform: "capitalize",
                 fontFamily: "Inter, sans-serif",
                 letterSpacing: "0.01em",
-              }}>
+              }} suppressHydrationWarning>
                 {TODAY_LABEL}
               </p>
             </div>
