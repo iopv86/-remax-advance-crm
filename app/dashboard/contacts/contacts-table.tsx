@@ -58,8 +58,8 @@ const AVATAR_PALETTES = [
 ];
 
 function avatarPalette(initials: string) {
-  const code = (initials.charCodeAt(0) ?? 0) + (initials.charCodeAt(1) ?? 0);
-  return AVATAR_PALETTES[code % AVATAR_PALETTES.length];
+  const code = (initials.charCodeAt(0) || 0) + (initials.charCodeAt(1) || 0);
+  return AVATAR_PALETTES[code % AVATAR_PALETTES.length] ?? AVATAR_PALETTES[0];
 }
 
 // ── Status badge config ───────────────────────────────────────────────────────
