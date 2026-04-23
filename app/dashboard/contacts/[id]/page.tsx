@@ -14,6 +14,8 @@ import type { ContactDocument } from "./contact-documents";
 import { ContactActivity } from "./contact-activity";
 import type { ContactActivity as ContactActivityType } from "./contact-activity";
 import { ContactEditButton } from "./contact-edit-button";
+import { MatchedProperties } from "./matched-properties";
+import { getMatchedProperties } from "@/lib/properties/matching";
 
 type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
 
@@ -127,6 +129,9 @@ export default async function ContactDetailPage({
     .eq("channel", "whatsapp")
     .order("created_at", { ascending: true })
     .limit(100);
+
+  const matchedProperties = await getMatchedProperties(id);
+  const hasBudget = !!(contact.budget_min || contact.budget_max);
 
   const fullName =
     [contact.first_name, contact.last_name].filter(Boolean).join(" ") || "Sin nombre";
@@ -560,6 +565,8 @@ export default async function ContactDetailPage({
                   ))}
                 </div>
               )}
+
+              <MatchedProperties matches={matchedProperties} hasBudget={hasBudget} />
             </div>
           )}
 
