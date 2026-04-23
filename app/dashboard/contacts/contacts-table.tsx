@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -170,6 +170,24 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [relativeTimes, setRelativeTimes] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const times: Record<string, string> = {};
+    for (const c of initial) {
+      const dateStr = c.last_activity_at ?? c.created_at;
+      if (!dateStr) continue;
+      try {
+        const d = new Date(dateStr);
+        if (!isNaN(d.getTime())) {
+          times[c.id] = formatDistanceToNow(d, { addSuffix: true, locale: es });
+        }
+      } catch {
+        // ignore invalid dates
+      }
+    }
+    setRelativeTimes(times);
+  }, [initial]);
 
   function openEdit(c: Contact, e: React.MouseEvent) {
     e.stopPropagation();
@@ -224,10 +242,9 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
             const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join("").toUpperCase() || "?";
             const { bg: avBg, color: avColor } = avatarPalette(initials);
             const badge = getStatusBadge(c.lead_classification);
-            const lastContact = formatDistanceToNow(
-              new Date(c.last_activity_at ?? c.created_at),
-              { addSuffix: true, locale: es }
-            );
+            const mobileDateStr = c.last_activity_at ?? c.created_at;
+            const lastContact = relativeTimes[c.id] ??
+              (mobileDateStr ? new Date(mobileDateStr).toLocaleDateString("es-DO", { day: "numeric", month: "short" }) : "—");
             return (
               <Link
                 key={c.id}
@@ -367,10 +384,9 @@ export function ContactsTable({ contacts: initial, pagination }: Props) {
                 }
                 const interest = interestParts.join(" · ") || "—";
 
-                const lastContact = formatDistanceToNow(
-                  new Date(c.last_activity_at ?? c.created_at),
-                  { addSuffix: true, locale: es }
-                );
+                const desktopDateStr = c.last_activity_at ?? c.created_at;
+                const lastContact = relativeTimes[c.id] ??
+                  (desktopDateStr ? new Date(desktopDateStr).toLocaleDateString("es-DO", { day: "numeric", month: "short" }) : "—");
 
                 const isHovered = hoveredId === c.id;
 
