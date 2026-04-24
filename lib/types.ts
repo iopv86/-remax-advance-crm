@@ -76,6 +76,7 @@ export interface Property {
   property_type: PropertyType;
   transaction_type: "sale" | "rent";
   price?: number;
+  price_max?: number;
   currency?: CurrencyType;
   city?: string;
   sector?: string;

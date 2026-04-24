@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Upload, Download, Check, X, AlertCircle, Plus } from "lucide-react";
+import { Upload, Download, Check, X, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { ProjectUnit, UnitEstado } from "@/lib/types";
+import {
+  CSV_HEADERS,
+  CSV_EXAMPLE_ROWS,
+  CsvRowParsed,
+  parseCsv,
+  downloadCsv,
+} from "@/lib/project-units-csv";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -23,125 +30,6 @@ const STATUS_MAP: Record<UnitEstado, { label: string; color: string; bg: string 
   bloqueado:  { label: "Bloqueado",  color: "#6b7280", bg: "rgba(107,114,128,0.12)" },
 };
 
-// ─── CSV helpers ──────────────────────────────────────────────────────────────
-
-const CSV_HEADERS =
-  "nombre_unidad,seccion,nivel,habitaciones,banos,medios_banos,estacionamientos,m2_construido,m2_extra,precio_venta,moneda_venta,precio_mantenimiento,precio_separacion,estado,etapa,notas";
-
-const CSV_EXAMPLE_ROWS = [
-  "I6,,3,3,2,0,1,120.5,,185000,USD,2500,5000,disponible,Fase 1,Vista al mar",
-  "D3,Torre A,2,2,2,0,1,95.0,,145000,USD,2000,,reservado,,",
-  "PH-A,Penthouse,10,4,3,1,2,250.0,80.0,450000,USD,5000,10000,disponible,Fase 2,Terraza privada",
-].join("\n");
-
-interface CsvRowParsed {
-  nombre_unidad: string;
-  seccion?: string;
-  nivel?: number | null;
-  habitaciones?: number | null;
-  banos?: number | null;
-  medios_banos?: number | null;
-  estacionamientos?: number | null;
-  m2_construido?: number | null;
-  m2_extra?: number | null;
-  precio_venta?: number | null;
-  moneda_venta?: string;
-  precio_mantenimiento?: number | null;
-  precio_separacion?: number | null;
-  estado?: UnitEstado;
-  etapa?: string;
-  notas?: string;
-}
-
-function parseCsvLine(line: string): string[] {
-  const fields: string[] = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (ch === '"') {
-      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
-      else inQuotes = !inQuotes;
-    } else if (ch === "," && !inQuotes) {
-      fields.push(current.trim()); current = "";
-    } else {
-      current += ch;
-    }
-  }
-  fields.push(current.trim());
-  return fields;
-}
-
-const VALID_ESTADOS: UnitEstado[] = ["disponible", "vendido", "reservado", "bloqueado"];
-const VALID_CURRENCIES = ["USD", "DOP"];
-
-function parseCsv(text: string): CsvRowParsed[] {
-  const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter((l) => l.trim());
-  if (lines.length < 2) return [];
-
-  const headers = parseCsvLine(lines[0]).map((h) => h.toLowerCase().trim());
-  const col = (aliases: string[]) => aliases.map((a) => headers.indexOf(a)).find((i) => i >= 0) ?? -1;
-
-  const cNombre = col(["nombre_unidad", "nombre", "unidad", "unit_number", "numero"]);
-  const cSeccion = col(["seccion", "sección", "bloque", "torre"]);
-  const cNivel = col(["nivel", "piso", "floor"]);
-  const cHab = col(["habitaciones", "hab", "bedrooms", "cuartos"]);
-  const cBanos = col(["banos", "baños", "bathrooms", "bath"]);
-  const cMedios = col(["medios_banos", "medios", "half_baths"]);
-  const cEst = col(["estacionamientos", "est", "parking"]);
-  const cM2c = col(["m2_construido", "m2", "area_m2", "area", "metros"]);
-  const cM2e = col(["m2_extra", "terraza", "balcon"]);
-  const cPv = col(["precio_venta", "precio", "price"]);
-  const cMv = col(["moneda_venta", "moneda", "currency"]);
-  const cMant = col(["precio_mantenimiento", "mantenimiento", "maintenance"]);
-  const cSep = col(["precio_separacion", "separacion"]);
-  const cEstado = col(["estado", "status", "disponibilidad"]);
-  const cEtapa = col(["etapa", "stage", "fase"]);
-  const cNotas = col(["notas", "notes", "comentarios"]);
-
-  if (cNombre === -1) return [];
-
-  const rows: CsvRowParsed[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = parseCsvLine(lines[i]);
-    const get = (idx: number) => (idx >= 0 ? cols[idx] ?? "" : "");
-    const num = (idx: number): number | null => {
-      const v = parseFloat(get(idx).replace(/,/g, ""));
-      return isNaN(v) ? null : v;
-    };
-    const int = (idx: number): number | null => {
-      const v = parseInt(get(idx), 10);
-      return isNaN(v) ? null : v;
-    };
-
-    const nombre = get(cNombre);
-    if (!nombre) continue;
-
-    const rawEstado = get(cEstado).toLowerCase().trim();
-    const estado: UnitEstado = VALID_ESTADOS.includes(rawEstado as UnitEstado) ? rawEstado as UnitEstado : "disponible";
-
-    rows.push({
-      nombre_unidad: nombre,
-      seccion: get(cSeccion) || undefined,
-      nivel: int(cNivel),
-      habitaciones: int(cHab),
-      banos: int(cBanos),
-      medios_banos: int(cMedios),
-      estacionamientos: int(cEst),
-      m2_construido: num(cM2c),
-      m2_extra: num(cM2e),
-      precio_venta: num(cPv),
-      moneda_venta: VALID_CURRENCIES.includes((get(cMv) || "USD").toUpperCase()) ? (get(cMv) || "USD").toUpperCase() : "USD",
-      precio_mantenimiento: num(cMant),
-      precio_separacion: num(cSep),
-      estado,
-      etapa: get(cEtapa) || undefined,
-      notas: get(cNotas) || undefined,
-    });
-  }
-  return rows;
-}
-
 // ─── Price formatter ──────────────────────────────────────────────────────────
 
 function fmt(price: number, currency?: string | null): string {
@@ -149,6 +37,28 @@ function fmt(price: number, currency?: string | null): string {
   if (price >= 1_000_000)
     return `${cur} ${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
   return `${cur} ${price.toLocaleString()}`;
+}
+
+// ─── Price range recompute ─────────────────────────────────────────────────────
+
+async function recomputeProjectPriceRange(propertyId: string): Promise<void> {
+  const supabase = createClient();
+  const { data } = await supabase
+    .from("project_units")
+    .select("precio_venta")
+    .eq("property_id", propertyId)
+    .not("precio_venta", "is", null);
+
+  const prices = (data ?? []).map((r) => r.precio_venta as number).filter((v) => v > 0);
+  if (prices.length === 0) return;
+
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+
+  await supabase
+    .from("properties")
+    .update({ price: minPrice, price_max: maxPrice })
+    .eq("id", propertyId);
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -235,6 +145,7 @@ function AddUnitForm({ propertyId, onSaved, onCancel }: AddUnitFormProps) {
       setErr(msg);
       return;
     }
+    await recomputeProjectPriceRange(propertyId);
     onSaved();
   }
 
@@ -346,6 +257,7 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // CSV import state
   const [csvRows, setCsvRows] = useState<CsvRowParsed[] | null>(null);
@@ -397,25 +309,11 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
         u.notas ?? "",
       ].map(csvQ).join(",")
     );
-    const content = `${CSV_HEADERS}\n${rows.join("\n")}`;
-    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `unidades-proyecto-${propertyId.slice(0, 8)}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(`${CSV_HEADERS}\n${rows.join("\n")}`, `unidades-proyecto-${propertyId.slice(0, 8)}.csv`);
   }
 
   function handleDownloadTemplate() {
-    const content = `${CSV_HEADERS}\n${CSV_EXAMPLE_ROWS}`;
-    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "plantilla-unidades.csv";
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadCsv(`${CSV_HEADERS}\n${CSV_EXAMPLE_ROWS}`, "plantilla-unidades.csv");
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -478,7 +376,6 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
     const { error } = await supabase
       .from("project_units")
       .upsert(payload, { onConflict: "property_id,nombre_unidad", ignoreDuplicates: false });
-    setImporting(false);
     if (error) {
       const msg = error.code === "42501"
         ? "Sin permisos para importar unidades a esta propiedad."
@@ -488,8 +385,10 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
       setImportResult({ success: csvRows.length });
       setCsvRows(null);
       setCsvFileName(null);
+      await recomputeProjectPriceRange(propertyId);
       void loadUnits();
     }
+    setImporting(false);
   }
 
   function handleCancelImport() {
@@ -497,6 +396,18 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
     setCsvFileName(null);
     setImportResult(null);
     setCsvError(null);
+  }
+
+  async function handleDeleteUnit(unitId: string) {
+    if (!confirm("¿Eliminar esta unidad?")) return;
+    setDeletingId(unitId);
+    const supabase = createClient();
+    const { error } = await supabase.from("project_units").delete().eq("id", unitId);
+    if (!error) {
+      await recomputeProjectPriceRange(propertyId);
+      void loadUnits();
+    }
+    setDeletingId(null);
   }
 
   // ── Stats ───────────────────────────────────────────────────────────────────
@@ -670,8 +581,8 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
                 <tr style={{ background: BG_SURFACE }}>
-                  {["Unidad", "Sección", "Nivel", "Hab.", "Baños", "Est.", "m²", "Precio venta", "Estado", "Etapa"].map((h) => (
-                    <th key={h} style={{ padding: "10px 16px", textAlign: "left", fontSize: 10, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER_DIM}`, whiteSpace: "nowrap" }}>{h}</th>
+                  {["Unidad", "Sección", "Nivel", "Hab.", "Baños", "Est.", "m²", "Precio venta", "Estado", "Etapa", ...(canEdit ? [""] : [])].map((h, i) => (
+                    <th key={i} style={{ padding: "10px 16px", textAlign: "left", fontSize: 10, fontWeight: 600, color: TEXT_MUTED, textTransform: "uppercase", letterSpacing: "0.06em", borderBottom: `1px solid ${BORDER_DIM}`, whiteSpace: "nowrap" }}>{h}</th>
                   ))}
                 </tr>
               </thead>
@@ -690,6 +601,18 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
                     </td>
                     <td style={{ padding: "11px 16px" }}><StatusBadge estado={unit.estado} /></td>
                     <td style={{ padding: "11px 16px", color: TEXT_MUTED, fontSize: 12 }}>{unit.etapa ?? "—"}</td>
+                    {canEdit && (
+                      <td style={{ padding: "11px 16px" }}>
+                        <button
+                          onClick={() => void handleDeleteUnit(unit.id)}
+                          disabled={deletingId === unit.id}
+                          title="Eliminar unidad"
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 28, height: 28, borderRadius: 6, background: "rgba(244,63,94,0.08)", border: "1px solid rgba(244,63,94,0.2)", color: "#f43f5e", cursor: deletingId === unit.id ? "not-allowed" : "pointer", opacity: deletingId === unit.id ? 0.5 : 1 }}
+                        >
+                          <Trash2 style={{ width: 13, height: 13 }} />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

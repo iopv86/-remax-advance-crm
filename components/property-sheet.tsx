@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Download, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { Property } from "@/lib/types";
+import {
+  type CsvRowParsed,
+  CSV_HEADERS,
+  CSV_EXAMPLE_ROWS,
+  parseCsv,
+  downloadCsv,
+} from "@/lib/project-units-csv";
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
@@ -80,6 +87,7 @@ interface PropertyFormState {
   property_type: string;
   transaction_type: "sale" | "rent";
   price: string;
+  price_max: string;
   currency: "USD" | "DOP";
   location_city: string;
   location_sector: string;
@@ -101,6 +109,7 @@ const EMPTY_FORM: PropertyFormState = {
   property_type: "apartment",
   transaction_type: "sale",
   price: "",
+  price_max: "",
   currency: "USD",
   location_city: "",
   location_sector: "",
@@ -123,6 +132,7 @@ function propertyToForm(p: Property): PropertyFormState {
     property_type: p.property_type,
     transaction_type: p.transaction_type,
     price: p.price?.toString() ?? "",
+    price_max: p.price_max?.toString() ?? "",
     currency: p.currency ?? "USD",
     location_city: p.city ?? "",
     location_sector: p.sector ?? "",
@@ -162,7 +172,25 @@ export function PropertySheet({
   const [images, setImages] = useState<string[]>(property?.images ?? []);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [csvProgress, setCsvProgress] = useState<string | null>(null);
+  const [csvRows, setCsvRows] = useState<CsvRowParsed[] | null>(null);
+  const [csvFileName, setCsvFileName] = useState<string | null>(null);
+  const [csvError, setCsvError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const csvFileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (open) {
+      setForm(property ? propertyToForm(property) : { ...EMPTY_FORM, is_project: defaultIsProject });
+      setImages(property?.images ?? []);
+      setLoading(false);
+      setUploading(false);
+      setCsvRows(null);
+      setCsvFileName(null);
+      setCsvError(null);
+      setCsvProgress(null);
+    }
+  }, [open, property, defaultIsProject]);
 
   function set(field: keyof PropertyFormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -247,6 +275,7 @@ export function PropertySheet({
       property_type: form.property_type,
       transaction_type: isProject ? "sale" : form.transaction_type,
       price: form.price ? Number(form.price) : null,
+      price_max: isProject && form.price_max ? Number(form.price_max) : null,
       currency: form.currency,
       city: form.location_city.trim() || null,
       sector: form.location_sector.trim() || null,
@@ -266,10 +295,14 @@ export function PropertySheet({
     };
 
     let error;
+    let savedPropertyId: string | null = isEdit ? property!.id : null;
+
     if (isEdit) {
       ({ error } = await supabase.from("properties").update(payload).eq("id", property!.id));
     } else {
-      ({ error } = await supabase.from("properties").insert(payload));
+      const result = await supabase.from("properties").insert(payload).select("id").single();
+      error = result.error;
+      savedPropertyId = result.data?.id ?? null;
     }
 
     setLoading(false);
@@ -277,11 +310,85 @@ export function PropertySheet({
       toast.error("Error al guardar: " + error.message);
       return;
     }
+
+    // Upload units from CSV if provided (project only)
+    if (isProject && csvRows && csvRows.length > 0 && savedPropertyId) {
+      setCsvProgress(`Cargando ${csvRows.length} unidades…`);
+      const unitPayload = csvRows.map((row) => ({
+        property_id: savedPropertyId!,
+        nombre_unidad: row.nombre_unidad,
+        seccion: row.seccion ?? null,
+        nivel: row.nivel ?? null,
+        habitaciones: row.habitaciones ?? null,
+        banos: row.banos ?? null,
+        medios_banos: row.medios_banos ?? null,
+        estacionamientos: row.estacionamientos ?? null,
+        m2_construido: row.m2_construido ?? null,
+        m2_extra: row.m2_extra ?? null,
+        precio_venta: row.precio_venta ?? null,
+        moneda_venta: row.moneda_venta ?? "USD",
+        precio_mantenimiento: row.precio_mantenimiento ?? null,
+        precio_separacion: row.precio_separacion ?? null,
+        estado: row.estado ?? "disponible",
+        etapa: row.etapa ?? null,
+        notas: row.notas ?? null,
+      }));
+      const { error: unitError } = await supabase
+        .from("project_units")
+        .upsert(unitPayload, { onConflict: "property_id,nombre_unidad", ignoreDuplicates: false });
+
+      if (!unitError) {
+        // Recompute price range from uploaded units
+        const prices = csvRows
+          .filter((r) => r.precio_venta != null && r.precio_venta > 0)
+          .map((r) => r.precio_venta!);
+        if (prices.length > 0) {
+          await supabase
+            .from("properties")
+            .update({ price: Math.min(...prices), price_max: Math.max(...prices) })
+            .eq("id", savedPropertyId!);
+        }
+      } else {
+        // Project saved but CSV failed — notify and continue
+        toast.error("Proyecto guardado, pero hubo un error al cargar las unidades del CSV.");
+      }
+      setCsvProgress(null);
+    }
+
     toast.success(isEdit
       ? (isProject ? "Proyecto actualizado" : "Propiedad actualizada")
       : (isProject ? "Proyecto creado" : "Propiedad creada"));
     onOpenChange(false);
     onSaved();
+  }
+
+  function handleCsvFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setCsvError("El CSV no puede superar 2 MB.");
+      e.target.value = "";
+      return;
+    }
+    setCsvFileName(file.name);
+    setCsvError(null);
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result;
+      if (typeof text !== "string") { setCsvError("Error leyendo el archivo."); return; }
+      const rows = parseCsv(text);
+      if (rows.length === 0) {
+        setCsvError("Sin filas válidas. Descarga la plantilla para ver el formato.");
+        setCsvRows(null);
+      } else if (rows.length > 500) {
+        setCsvError(`Máximo 500 unidades por importación (${rows.length} filas detectadas).`);
+        setCsvRows(null);
+      } else {
+        setCsvRows(rows);
+      }
+    };
+    reader.readAsText(file, "utf-8");
+    e.target.value = "";
   }
 
   if (!open) return null;
@@ -398,22 +505,45 @@ export function PropertySheet({
             )}
 
             {/* Price + Currency */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>{isProject ? "Precio desde" : "Precio"}</Label>
-                <Input type="number" placeholder="250000" value={form.price} onChange={(e) => set("price", e.target.value)} />
+            {isProject ? (
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label>Precio mínimo</Label>
+                  <Input type="number" placeholder="150000" value={form.price} onChange={(e) => set("price", e.target.value)} />
+                </div>
+                <div>
+                  <Label>Precio máximo</Label>
+                  <Input type="number" placeholder="500000" value={form.price_max} onChange={(e) => set("price_max", e.target.value)} />
+                </div>
+                <div>
+                  <Label>Moneda</Label>
+                  <Select value={form.currency} onValueChange={(v) => v && set("currency", v as "USD" | "DOP")}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD</SelectItem>
+                      <SelectItem value="DOP">DOP</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <Label>Moneda</Label>
-                <Select value={form.currency} onValueChange={(v) => v && set("currency", v as "USD" | "DOP")}>
-                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="DOP">DOP</SelectItem>
-                  </SelectContent>
-                </Select>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Precio</Label>
+                  <Input type="number" placeholder="250000" value={form.price} onChange={(e) => set("price", e.target.value)} />
+                </div>
+                <div>
+                  <Label>Moneda</Label>
+                  <Select value={form.currency} onValueChange={(v) => v && set("currency", v as "USD" | "DOP")}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="USD">USD</SelectItem>
+                      <SelectItem value="DOP">DOP</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Location */}
             <div className="grid grid-cols-2 gap-3">
@@ -515,6 +645,65 @@ export function PropertySheet({
               />
             </div>
 
+            {/* CSV upload — projects only */}
+            {isProject && (
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                  <p className="font-sans text-xs font-medium text-slate-500">Unidades (opcional)</p>
+                  <button
+                    type="button"
+                    onClick={() => downloadCsv(`${CSV_HEADERS}\n${CSV_EXAMPLE_ROWS}`, "plantilla-unidades.csv")}
+                    style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 11, color: "#C9963A", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                  >
+                    <Download style={{ width: 12, height: 12 }} />
+                    Descargar plantilla
+                  </button>
+                </div>
+
+                {csvRows ? (
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "8px 12px", background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <FileText style={{ width: 13, height: 13, color: "#10b981" }} />
+                      <span style={{ fontSize: 12, color: "#10b981" }}>
+                        {csvFileName} — {csvRows.length} unidad{csvRows.length !== 1 ? "es" : ""}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => { setCsvRows(null); setCsvFileName(null); setCsvError(null); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "#10b981", display: "flex" }}
+                    >
+                      <X style={{ width: 14, height: 14 }} />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      ref={csvFileInputRef}
+                      type="file"
+                      accept=".csv"
+                      className="hidden"
+                      onChange={handleCsvFileChange}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => csvFileInputRef.current?.click()}
+                      className="gap-2 w-full"
+                    >
+                      <Upload className="h-3.5 w-3.5" />
+                      Adjuntar CSV de unidades
+                    </Button>
+                  </>
+                )}
+
+                {csvError && (
+                  <p style={{ fontSize: 11, color: "#f43f5e", marginTop: 6 }}>{csvError}</p>
+                )}
+              </div>
+            )}
+
             {/* Photos */}
             <div>
               <Label>Fotos</Label>
@@ -553,8 +742,8 @@ export function PropertySheet({
 
             {/* Submit */}
             <div className="pt-2">
-              <Button type="submit" disabled={loading || uploading} className="w-full">
-                {loading ? "Guardando…" : isEdit ? "Guardar cambios" : (isProject ? "Crear proyecto" : "Crear propiedad")}
+              <Button type="submit" disabled={loading || uploading || !!csvProgress} className="w-full">
+                {csvProgress ?? (loading ? "Guardando…" : isEdit ? "Guardar cambios" : (isProject ? "Crear proyecto" : "Crear propiedad"))}
               </Button>
             </div>
 

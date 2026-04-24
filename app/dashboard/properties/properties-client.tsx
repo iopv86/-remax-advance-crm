@@ -780,6 +780,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   return (
                     <div
                       key={p.id}
+                      onClick={() => router.push(`/dashboard/properties/${p.id}`)}
                       style={{
                         background: "rgba(28,29,39,0.7)",
                         backdropFilter: "blur(12px)",
@@ -788,6 +789,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         overflow: "hidden",
                         display: "flex",
                         flexDirection: "column",
+                        cursor: "pointer",
                       }}
                     >
                       {/* Image zone */}
@@ -838,6 +840,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           {p.price != null && (
                             <p style={{ margin: "6px 0 0", fontSize: 13, fontWeight: 600, color: GOLD }}>
                               Desde {formatPrice(p.price, p.currency)}
+                              {p.price_max != null && ` hasta ${formatPrice(p.price_max, p.currency)}`}
                             </p>
                           )}
                         </div>
@@ -845,7 +848,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         {/* Actions */}
                         <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
                           <button
-                            onClick={() => router.push(`/dashboard/properties/${p.id}?tab=unidades`)}
+                            onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/properties/${p.id}?tab=unidades`); }}
                             style={{
                               flex: 1,
                               padding: "8px 0",
@@ -873,6 +876,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           <a
                             href={csvHref}
                             download={`${p.title.toLowerCase().replace(/\s+/g, "-")}-unidades-template.csv`}
+                            onClick={(e) => e.stopPropagation()}
                             style={{
                               padding: "8px 12px",
                               borderRadius: 8,
@@ -895,7 +899,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           </a>
                           {canWrite(p) && (
                             <button
-                              onClick={() => openEdit(p)}
+                              onClick={(e) => { e.stopPropagation(); openEdit(p); }}
                               style={{
                                 padding: "8px 12px",
                                 borderRadius: 8,

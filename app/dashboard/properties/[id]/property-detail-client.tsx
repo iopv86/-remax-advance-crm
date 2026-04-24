@@ -19,6 +19,7 @@ export interface PropertyDetail {
   property_type: PropertyType;
   transaction_type: "sale" | "rent";
   price?: number;
+  price_max?: number;
   currency?: CurrencyType;
   city?: string;
   sector?: string;
@@ -424,10 +425,22 @@ export function PropertyDetailClient({
                 </div>
                 {property.price && (
                   <div style={{ textAlign: "right", flexShrink: 0 }}>
-                    <div style={{ fontSize: 28, fontWeight: 700, color: GOLD, fontFamily: "Manrope, sans-serif" }}>
-                      {formatPrice(property.price, property.currency)}
-                    </div>
-                    {property.price_per_m2 && (
+                    {property.is_project && property.price_max ? (
+                      <>
+                        <div style={{ fontSize: 12, color: TEXT_MUTED, marginBottom: 2 }}>Rango de precios</div>
+                        <div style={{ fontSize: 20, fontWeight: 700, color: GOLD, fontFamily: "Manrope, sans-serif" }}>
+                          {formatPrice(property.price, property.currency)}
+                        </div>
+                        <div style={{ fontSize: 13, color: TEXT_MUTED, marginTop: 2 }}>
+                          hasta {formatPrice(property.price_max, property.currency)}
+                        </div>
+                      </>
+                    ) : (
+                      <div style={{ fontSize: 28, fontWeight: 700, color: GOLD, fontFamily: "Manrope, sans-serif" }}>
+                        {formatPrice(property.price, property.currency)}
+                      </div>
+                    )}
+                    {property.price_per_m2 && !property.is_project && (
                       <div style={{ fontSize: 12, color: TEXT_MUTED, marginTop: 2 }}>
                         {formatPrice(property.price_per_m2, property.currency)}/m²
                       </div>

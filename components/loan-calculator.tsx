@@ -32,7 +32,7 @@ export function LoanCalculator({ initialPrice, currency = "USD" }: Props) {
   const [price, setPrice] = useState(String(initialPrice ?? ""));
   const [downPct, setDownPct] = useState("20");
   const [rate, setRate] = useState("9.5");
-  const [years, setYears] = useState("20");
+  const [years, setYears] = useState("30");
 
   const result = useMemo(() => {
     const p = parseFloat(price);
@@ -47,7 +47,7 @@ export function LoanCalculator({ initialPrice, currency = "USD" }: Props) {
     const principal = p - down;
     if (principal <= 0) return null;
     const monthly = pmt(principal, r, y);
-    return { monthly, principal, down, total: monthly * y * 12 };
+    return { monthly, principal, down };
   }, [price, downPct, rate, years]);
 
   return (
@@ -113,7 +113,6 @@ export function LoanCalculator({ initialPrice, currency = "USD" }: Props) {
               <div style={{ height: 1, background: BORDER_DIM }} />
               <Row label="Inicial / Enganche" value={`${currency} ${fmt(result.down)}`} />
               <Row label="Monto a financiar" value={`${currency} ${fmt(result.principal)}`} />
-              <Row label="Total pagado" value={`${currency} ${fmt(result.total)}`} muted />
             </div>
           ) : (
             <p style={{ fontSize: 12, color: TEXT_MUTED, margin: 0, textAlign: "center" }}>
@@ -122,7 +121,7 @@ export function LoanCalculator({ initialPrice, currency = "USD" }: Props) {
           )}
 
           <p style={{ fontSize: 11, color: TEXT_MUTED, margin: 0, opacity: 0.6 }}>
-            Cálculo referencial. No incluye impuestos ni seguros.
+            Cálculo referencial. No incluye seguros, impuestos ni otros cargos bancarios.
           </p>
         </div>
       )}
