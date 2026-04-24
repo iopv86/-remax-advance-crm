@@ -92,6 +92,26 @@ export interface Property {
   total_floors?: number;
   commission_pct?: number;
   separation_fee?: number;
+  guarantee_months?: number;
+  // Amenity booleans (migration 0006)
+  has_pool?: boolean;
+  has_gym?: boolean;
+  has_terrace?: boolean;
+  has_security?: boolean;
+  has_elevator?: boolean;
+  has_covered_parking?: boolean;
+  has_generator?: boolean;
+  has_storage?: boolean;
+  has_laundry?: boolean;
+  has_furnished?: boolean;
+  has_balcony?: boolean;
+  has_staff_quarters?: boolean;
+  has_solar_panels?: boolean;
+  has_jacuzzi?: boolean;
+  has_ocean_view?: boolean;
+  has_city_view?: boolean;
+  has_club_house?: boolean;
+  has_kids_area?: boolean;
   created_at: string;
 }
 

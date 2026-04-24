@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { FileText, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { PropertySheet } from "@/components/property-sheet";
 import { Button } from "@/components/ui/button";
 import type { Property } from "@/lib/types";
 
@@ -134,9 +133,6 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
   const router = useRouter();
   const [activeView, setActiveView] = useState<"propiedades" | "proyectos">("propiedades");
   const [properties, setProperties] = useState<Property[]>(initialProperties);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const [editProperty, setEditProperty] = useState<Property | null>(null);
-  const [sheetIsProject, setSheetIsProject] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [generatingPdf, setGeneratingPdf] = useState(false);
@@ -189,20 +185,12 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
   function resetPage() { setPropPage(1); }
 
   function openCreate(isProject = false) {
-    setEditProperty(null);
-    setSheetIsProject(isProject);
-    setSheetOpen(true);
+    router.push(`/dashboard/properties/new${isProject ? "?type=proyecto" : ""}`);
   }
 
   function openEdit(p: Property) {
-    setEditProperty(p);
-    setSheetIsProject(p.is_project ?? false);
-    setSheetOpen(true);
+    router.push(`/dashboard/properties/${p.id}/edit`);
   }
-
-  const onSaved = useCallback(() => {
-    router.refresh();
-  }, [router]);
 
   function toggleSelect(id: string) {
     setSelectedIds((prev) => {
@@ -1407,15 +1395,6 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
         </div>
         )} {/* end activeView === "propiedades" */}
       </div>
-
-      {/* Property sheet */}
-      <PropertySheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        property={editProperty}
-        defaultIsProject={sheetIsProject}
-        onSaved={onSaved}
-      />
 
       {/* Create proposal modal */}
       {proposalModalOpen && (
