@@ -145,6 +145,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editProperty, setEditProperty] = useState<Property | null>(null);
+  const [sheetIsProject, setSheetIsProject] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [generatingPdf, setGeneratingPdf] = useState(false);
@@ -196,13 +197,15 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
 
   function resetPage() { setPropPage(1); }
 
-  function openCreate() {
+  function openCreate(isProject = false) {
     setEditProperty(null);
+    setSheetIsProject(isProject);
     setSheetOpen(true);
   }
 
   function openEdit(p: Property) {
     setEditProperty(p);
+    setSheetIsProject(p.is_project ?? false);
     setSheetOpen(true);
   }
 
@@ -680,9 +683,9 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
               />
             </div>
 
-            {/* Nueva propiedad */}
+            {/* Create button — context-aware */}
             <button
-              onClick={openCreate}
+              onClick={() => openCreate(activeView === "proyectos")}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -707,7 +710,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
               }}
             >
               <Plus style={{ width: 14, height: 14 }} />
-              Nueva propiedad
+              {activeView === "proyectos" ? "Nuevo proyecto" : "Nueva propiedad"}
             </button>
           </div>
         </header>
@@ -750,7 +753,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 </svg>
                 <p style={{ fontSize: 14 }}>No hay proyectos registrados.</p>
                 <button
-                  onClick={() => { setActiveView("propiedades"); openCreate(); }}
+                  onClick={() => openCreate(true)}
                   style={{
                     marginTop: 4,
                     padding: "8px 16px",
@@ -951,7 +954,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
               </svg>
               <p style={{ fontSize: 14 }}>No hay propiedades en esta categoría.</p>
               <Button
-                onClick={openCreate}
+                onClick={() => openCreate(false)}
                 variant="outline"
                 size="sm"
                 style={{
@@ -1034,7 +1037,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         </div>
                       )}
 
-                      {/* Project tag(s) */}
+                      {/* Tags */}
                       <div
                         style={{
                           position: "absolute",
@@ -1042,6 +1045,8 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           left: 12,
                           display: "flex",
                           gap: 6,
+                          flexWrap: "wrap",
+                          maxWidth: "calc(100% - 48px)",
                         }}
                       >
                         {/* Type tag */}
@@ -1060,6 +1065,38 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         >
                           {TYPE_LABELS[p.property_type] ?? p.property_type}
                         </span>
+                        {p.is_exclusive && (
+                          <span
+                            style={{
+                              background: GOLD,
+                              color: "#0D0E12",
+                              padding: "3px 8px",
+                              borderRadius: 4,
+                              fontSize: 9,
+                              fontWeight: 700,
+                              letterSpacing: "0.12em",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            EXCLUSIVA
+                          </span>
+                        )}
+                        {p.is_featured && (
+                          <span
+                            style={{
+                              background: "rgba(99,102,241,0.85)",
+                              color: "#fff",
+                              padding: "3px 8px",
+                              borderRadius: 4,
+                              fontSize: 9,
+                              fontWeight: 700,
+                              letterSpacing: "0.12em",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            DESTACADA
+                          </span>
+                        )}
                       </div>
 
                       {/* Selection indicator */}
@@ -1381,6 +1418,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
         open={sheetOpen}
         onOpenChange={setSheetOpen}
         property={editProperty}
+        defaultIsProject={sheetIsProject}
         onSaved={onSaved}
       />
 

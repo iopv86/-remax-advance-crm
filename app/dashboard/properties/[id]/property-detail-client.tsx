@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Bed, Bath, Square, Car
 import type { PropertyType, CurrencyType } from "@/lib/types";
 import { STAGE_LABELS } from "@/lib/types";
 import { PropertyUnitsTab } from "./property-units-tab";
+import { LoanCalculator } from "@/components/loan-calculator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -40,6 +41,7 @@ interface PropertyDetail {
   mls_number?: string;
   external_url?: string;
   status: "active" | "reserved" | "sold" | "rented" | "inactive";
+  is_project?: boolean;
   created_at: string;
   updated_at?: string;
   agent?: {
@@ -334,10 +336,10 @@ export function PropertyDetailClient({
         >
           {(
             [
-              { id: "info" as DetailTab, label: "Información", icon: <Home style={{ width: 13, height: 13 }} /> },
-              { id: "unidades" as DetailTab, label: "Unidades", icon: <Building2 style={{ width: 13, height: 13 }} /> },
-            ] as { id: DetailTab; label: string; icon: React.ReactNode }[]
-          ).map((tab) => (
+              { id: "info" as DetailTab, label: "Información", icon: <Home style={{ width: 13, height: 13 }} />, show: true },
+              { id: "unidades" as DetailTab, label: "Unidades", icon: <Building2 style={{ width: 13, height: 13 }} />, show: !!property.is_project },
+            ] as { id: DetailTab; label: string; icon: React.ReactNode; show: boolean }[]
+          ).filter((tab) => tab.show).map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
@@ -639,6 +641,9 @@ export function PropertyDetailClient({
                 )}
               </div>
             )}
+
+            {/* Loan calculator */}
+            <LoanCalculator initialPrice={property.price} currency={property.currency} />
 
             {/* Quick actions */}
             <div

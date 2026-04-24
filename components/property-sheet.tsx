@@ -42,6 +42,8 @@ interface PropertyFormState {
   status: string;
   description: string;
   is_project: boolean;
+  is_exclusive: boolean;
+  is_featured: boolean;
 }
 
 const EMPTY_FORM: PropertyFormState = {
@@ -58,6 +60,8 @@ const EMPTY_FORM: PropertyFormState = {
   status: "active",
   description: "",
   is_project: false,
+  is_exclusive: false,
+  is_featured: false,
 };
 
 function propertyToForm(p: Property): PropertyFormState {
@@ -75,6 +79,8 @@ function propertyToForm(p: Property): PropertyFormState {
     status: p.status,
     description: p.description ?? "",
     is_project: p.is_project ?? false,
+    is_exclusive: p.is_exclusive ?? false,
+    is_featured: p.is_featured ?? false,
   };
 }
 
@@ -82,6 +88,7 @@ interface PropertySheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   property?: Property | null; // null = create mode
+  defaultIsProject?: boolean;
   onSaved: () => void;
 }
 
@@ -89,11 +96,12 @@ export function PropertySheet({
   open,
   onOpenChange,
   property,
+  defaultIsProject = false,
   onSaved,
 }: PropertySheetProps) {
   const isEdit = !!property;
   const [form, setForm] = useState<PropertyFormState>(
-    property ? propertyToForm(property) : EMPTY_FORM
+    property ? propertyToForm(property) : { ...EMPTY_FORM, is_project: defaultIsProject }
   );
   const [images, setImages] = useState<string[]>(property?.images ?? []);
   const [uploading, setUploading] = useState(false);
@@ -103,7 +111,7 @@ export function PropertySheet({
   // Reset form when sheet opens with new property data
   function handleOpenChange(o: boolean) {
     if (o) {
-      setForm(property ? propertyToForm(property) : EMPTY_FORM);
+      setForm(property ? propertyToForm(property) : { ...EMPTY_FORM, is_project: defaultIsProject });
       setImages(property?.images ?? []);
     }
     onOpenChange(o);
@@ -200,6 +208,8 @@ export function PropertySheet({
       images,
       agent_id: agent?.id ?? null,
       is_project: form.is_project,
+      is_exclusive: form.is_exclusive,
+      is_featured: form.is_featured,
     };
 
     let error;
@@ -240,7 +250,7 @@ export function PropertySheet({
               color: "var(--foreground)",
             }}
           >
-            {isEdit ? "Editar propiedad" : "Nueva propiedad"}
+            {isEdit ? (form.is_project ? "Editar proyecto" : "Editar propiedad") : (form.is_project ? "Nuevo proyecto" : "Nueva propiedad")}
           </SheetTitle>
         </SheetHeader>
 
@@ -439,6 +449,88 @@ export function PropertySheet({
               </p>
               <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
                 Con múltiples unidades (apartamentos, locales, etc.)
+              </p>
+            </div>
+          </div>
+
+          {/* Exclusive toggle */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "12px 14px",
+              borderRadius: 8,
+              border: form.is_exclusive ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
+              background: form.is_exclusive ? "rgba(201,150,58,0.06)" : "transparent",
+              cursor: "pointer",
+            }}
+            onClick={() => set("is_exclusive", !form.is_exclusive)}
+          >
+            <div
+              style={{
+                width: 36, height: 20, borderRadius: 10,
+                background: form.is_exclusive ? "#C9963A" : "rgba(255,255,255,0.12)",
+                position: "relative", flexShrink: 0, transition: "background 0.15s",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute", top: 2,
+                  left: form.is_exclusive ? 18 : 2,
+                  width: 16, height: 16, borderRadius: "50%",
+                  background: "#fff", transition: "left 0.15s",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                }}
+              />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: form.is_exclusive ? "#C9963A" : "#e5e2e1" }}>
+                Propiedad exclusiva
+              </p>
+              <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
+                Captación exclusiva de RE/MAX Advance
+              </p>
+            </div>
+          </div>
+
+          {/* Featured toggle */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "12px 14px",
+              borderRadius: 8,
+              border: form.is_featured ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
+              background: form.is_featured ? "rgba(201,150,58,0.06)" : "transparent",
+              cursor: "pointer",
+            }}
+            onClick={() => set("is_featured", !form.is_featured)}
+          >
+            <div
+              style={{
+                width: 36, height: 20, borderRadius: 10,
+                background: form.is_featured ? "#C9963A" : "rgba(255,255,255,0.12)",
+                position: "relative", flexShrink: 0, transition: "background 0.15s",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute", top: 2,
+                  left: form.is_featured ? 18 : 2,
+                  width: 16, height: 16, borderRadius: "50%",
+                  background: "#fff", transition: "left 0.15s",
+                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+                }}
+              />
+            </div>
+            <div>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: form.is_featured ? "#C9963A" : "#e5e2e1" }}>
+                Propiedad destacada
+              </p>
+              <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
+                Aparece en posición prioritaria en el portal
               </p>
             </div>
           </div>

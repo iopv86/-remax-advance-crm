@@ -85,7 +85,39 @@ export interface Property {
   images?: string[];
   status: "active" | "reserved" | "sold" | "rented" | "inactive";
   is_project?: boolean;
+  is_exclusive?: boolean;
+  is_featured?: boolean;
   created_at: string;
+}
+
+export type UnitEstado = "disponible" | "vendido" | "reservado" | "bloqueado";
+
+export interface ProjectUnit {
+  id: string;
+  property_id: string;
+  nombre_unidad: string;
+  seccion?: string | null;
+  nivel?: number | null;
+  habitaciones?: number | null;
+  banos?: number | null;
+  medios_banos?: number | null;
+  estacionamientos?: number | null;
+  m2_construido?: number | null;
+  m2_extra?: number | null;
+  m2_terreno?: number | null;
+  m2_parqueo?: number | null;
+  precio_venta?: number | null;
+  moneda_venta?: string | null;
+  precio_mantenimiento?: number | null;
+  moneda_mantenimiento?: string | null;
+  precio_separacion?: number | null;
+  moneda_separacion?: string | null;
+  precio_amueblado?: number | null;
+  estado: UnitEstado;
+  etapa?: string | null;
+  notas?: string | null;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Message {
