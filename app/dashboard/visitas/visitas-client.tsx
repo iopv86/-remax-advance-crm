@@ -86,12 +86,12 @@ const EMPTY_FORM: ScheduleForm = {
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 
-const GOLD = "#C9963A";
-const BG_BODY = "#0D0E12";
-const BG_SURFACE = "#181820";
-const BG_ELEVATED = "#1C1D27";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED = "#9899A8";
+const GOLD = "var(--primary)";
+const BG_BODY = "var(--background)";
+const BG_SURFACE = "var(--card)";
+const BG_ELEVATED = "var(--secondary)";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
 const BORDER_DIM = "rgba(255,255,255,0.06)";
 

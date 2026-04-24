@@ -39,9 +39,9 @@ function RoundRobinList({
   onToggle: (i: number) => void;
 }) {
   const BORDER_L = "rgba(201,150,58,0.15)";
-  const GOLD_L   = "#C9963A";
-  const MUTED_L  = "#9899A8";
-  const PRI_L    = "#E8E3DC";
+  const GOLD_L   = "var(--primary)";
+  const MUTED_L  = "var(--muted-foreground)";
+  const PRI_L    = "var(--foreground)";
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       {entries.map((entry, i) => (
@@ -106,12 +106,12 @@ function RoundRobinList({
   );
 }
 
-const GOLD = "#C9963A";
-const BG   = "#0D0E12";
+const GOLD = "var(--primary)";
+const BG   = "var(--background)";
 const CARD = "rgba(28,29,39,0.8)";
 const BORDER = "rgba(201,150,58,0.15)";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED   = "#9899A8";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED   = "var(--muted-foreground)";
 
 export function RoundRobinClient({
   agents,

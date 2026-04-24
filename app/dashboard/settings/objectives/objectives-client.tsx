@@ -14,12 +14,12 @@ interface AgentRow {
   facturacion_objetivo: number | null;
 }
 
-const GOLD = "#C9963A";
-const BG   = "#0D0E12";
+const GOLD = "var(--primary)";
+const BG   = "var(--background)";
 const CARD = "rgba(28,29,39,0.8)";
 const BORDER = "rgba(201,150,58,0.15)";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED   = "#9899A8";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED   = "var(--muted-foreground)";
 
 export function ObjectivesClient({ agents: initial, embedded = false }: { agents: AgentRow[]; embedded?: boolean }) {
   const [agents, setAgents] = useState<AgentRow[]>(initial);

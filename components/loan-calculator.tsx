@@ -3,11 +3,11 @@
 import { useState, useMemo } from "react";
 import { ChevronDown, ChevronUp, Calculator } from "lucide-react";
 
-const GOLD = "#C9963A";
-const BG_ELEVATED = "#1C1D27";
-const BG_SURFACE = "#181820";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED = "#9899A8";
+const GOLD = "var(--primary)";
+const BG_ELEVATED = "var(--secondary)";
+const BG_SURFACE = "var(--card)";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
 const BORDER_DIM = "rgba(255,255,255,0.06)";
 

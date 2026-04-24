@@ -4,13 +4,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { ProposalRow } from "./page";
 
-const GOLD = "#C9963A";
-const BG = "#0D0E12";
+const GOLD = "var(--primary)";
+const BG = "var(--background)";
 const CARD = "rgba(28,29,39,0.8)";
-const SURFACE = "#F5F0E8";
-const DIM = "#9A9088";
+const SURFACE = "var(--foreground)";
+const DIM = "var(--muted-foreground)";
 const BORDER = "rgba(201,150,58,0.15)";
-const BORDER_SUB = "rgba(255,255,255,0.06)";
+const BORDER_SUB = "var(--border)";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("es-DO", {

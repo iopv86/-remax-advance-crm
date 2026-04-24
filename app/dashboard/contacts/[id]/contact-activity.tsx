@@ -44,10 +44,10 @@ const ACTIVITY_CONFIG: Record<ActivityType, { label: string; icon: React.ReactNo
 
 const LOGGABLE: ActivityType[] = ["call", "whatsapp_message", "email", "meeting", "note"];
 
-const GOLD = "#C9963A";
-const BG_ELEVATED = "#1C1D27";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED = "#9899A8";
+const GOLD = "var(--primary)";
+const BG_ELEVATED = "var(--secondary)";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER_DIM = "rgba(255,255,255,0.06)";
 
 // ─── Component ────────────────────────────────────────────────────────────────

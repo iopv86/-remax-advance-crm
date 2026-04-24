@@ -16,13 +16,13 @@ interface Props {
   allLabel?: string;
 }
 
-const GOLD = "#C9963A";
-const BG_CARD = "rgba(28,29,39,0.95)";
+const GOLD = "var(--primary)";
+const BG_CARD = "var(--card)";
 const BG_HOVER = "rgba(201,150,58,0.08)";
 const BORDER = "rgba(201,150,58,0.2)";
 const BORDER_STRONG = "rgba(201,150,58,0.45)";
-const TEXT_PRIMARY = "#e5e2e1";
-const TEXT_MUTED = "#9A9088";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED = "var(--muted-foreground)";
 
 export function AgentFilter({
   agents,

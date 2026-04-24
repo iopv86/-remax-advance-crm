@@ -74,13 +74,13 @@ function formatPrice(price: number, currency?: string): string {
 
 // ─── Inline styles as constants ───────────────────────────────────────────────
 
-const GOLD = "#C9963A";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED = "#9899A8";
-const TEXT_DIM = "#6B7280";
-const BG_SURFACE = "#201f1f";
-const BG_ELEVATED = "#1C1D27";
-const BG_BODY = "#0D0E12";
+const GOLD = "var(--primary)";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED = "var(--muted-foreground)";
+const TEXT_DIM = "var(--muted-foreground)";
+const BG_SURFACE = "var(--card)";
+const BG_ELEVATED = "var(--secondary)";
+const BG_BODY = "var(--background)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
 
 const glassCard: React.CSSProperties = {

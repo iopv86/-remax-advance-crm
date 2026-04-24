@@ -4,11 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import type { ProposalData } from "./page";
 import type { Property } from "@/lib/types";
 
-const GOLD = "#C9963A";
-const BG = "#0D0E12";
+const GOLD = "var(--primary)";
+const BG = "var(--background)";
 const CARD = "rgba(28,29,39,0.95)";
-const SURFACE = "#F5F0E8";
-const DIM = "#9A9088";
+const SURFACE = "var(--foreground)";
+const DIM = "var(--muted-foreground)";
 
 function formatMoney(v: number | undefined, currency = "USD"): string {
   if (!v) return "—";

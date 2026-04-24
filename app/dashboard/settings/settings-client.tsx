@@ -39,8 +39,8 @@ const GLASS_CARD: React.CSSProperties = {
   border: "1px solid rgba(201, 150, 58, 0.15)",
 };
 
-const GOLD = "#C9963A";
-const GOLD_LIGHT = "#f5bd5d";
+const GOLD = "var(--primary)";
+const GOLD_LIGHT = "var(--gold-light)";
 
 // ── Nav config ──────────────────────────────────────
 

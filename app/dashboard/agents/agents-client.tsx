@@ -37,9 +37,9 @@ const AgentSparkline = dynamic(
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
-const GOLD = "#C9963A";
-const TEXT_MUTED = "#9899A8";
-const TEXT_DIM = "#545567";
+const GOLD = "var(--primary)";
+const TEXT_MUTED = "var(--muted-foreground)";
+const TEXT_DIM = "var(--muted-foreground)";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 

@@ -17,13 +17,13 @@ import type { DealRow, AgentRow } from "./page";
 
 // ─── Tokens ────────────────────────────────────────────────────────────────────
 
-const GOLD = "#C9963A";
-const BG_BODY = "#0D0E12";
-const BG_CARD = "rgba(28,29,39,0.7)";
-const BG_ELEVATED = "#1C1D27";
-const TEXT_PRIMARY = "#E8E3DC";
-const TEXT_MUTED = "#9899A8";
-const TEXT_DIM = "#6B7280";
+const GOLD = "var(--primary)";
+const BG_BODY = "var(--background)";
+const BG_CARD = "var(--card)";
+const BG_ELEVATED = "var(--secondary)";
+const TEXT_PRIMARY = "var(--foreground)";
+const TEXT_MUTED = "var(--muted-foreground)";
+const TEXT_DIM = "var(--muted-foreground)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
 
 // ─── Stage definitions ─────────────────────────────────────────────────────────
