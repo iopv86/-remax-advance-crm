@@ -73,15 +73,6 @@ function formatPrice(price: number, currency?: string): string {
   return `${cur} ${price.toLocaleString()}`;
 }
 
-// ─── Project tag helper ───────────────────────────────────────────────────────
-
-function projectTagStyle(name: string): React.CSSProperties {
-  const gold = ["COL", "BCR"];
-  return gold.includes(name)
-    ? { background: "#C9963A", color: "#0D0E12" }
-    : { background: "rgba(13,14,18,0.80)", backdropFilter: "blur(6px)", color: "#E8E3DC" };
-}
-
 // ─── Inline styles as constants ───────────────────────────────────────────────
 
 const GOLD = "#C9963A";

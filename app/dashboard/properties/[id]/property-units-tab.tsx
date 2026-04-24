@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { toast } from "sonner";
 import { Upload, Download, Check, X, AlertCircle, Plus, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { ProjectUnit, UnitEstado } from "@/lib/types";
 import {
+  type CsvRowParsed,
   CSV_HEADERS,
   CSV_EXAMPLE_ROWS,
-  CsvRowParsed,
   parseCsv,
   downloadCsv,
 } from "@/lib/project-units-csv";
@@ -43,22 +44,33 @@ function fmt(price: number, currency?: string | null): string {
 
 async function recomputeProjectPriceRange(propertyId: string): Promise<void> {
   const supabase = createClient();
-  const { data } = await supabase
+  const { data, error: selectError } = await supabase
     .from("project_units")
     .select("precio_venta")
     .eq("property_id", propertyId)
     .not("precio_venta", "is", null);
 
-  const prices = (data ?? []).map((r) => r.precio_venta as number).filter((v) => v > 0);
-  if (prices.length === 0) return;
+  if (selectError) {
+    console.error("recomputeProjectPriceRange: select failed", selectError);
+    return;
+  }
 
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
+  const prices = (data ?? [])
+    .filter((r): r is { precio_venta: number } => r.precio_venta != null)
+    .map((r) => r.precio_venta)
+    .filter((v) => v > 0);
 
-  await supabase
+  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+
+  const { error: updateError } = await supabase
     .from("properties")
     .update({ price: minPrice, price_max: maxPrice })
     .eq("id", propertyId);
+
+  if (updateError) {
+    console.error("recomputeProjectPriceRange: update failed", updateError);
+  }
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -319,6 +331,11 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.name.endsWith(".csv") && file.type !== "text/csv" && file.type !== "text/plain") {
+      setCsvError("Solo se aceptan archivos CSV.");
+      e.target.value = "";
+      return;
+    }
     if (file.size > 2 * 1024 * 1024) {
       setCsvError("El archivo CSV no puede superar 2 MB.");
       e.target.value = "";
@@ -403,7 +420,9 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
     setDeletingId(unitId);
     const supabase = createClient();
     const { error } = await supabase.from("project_units").delete().eq("id", unitId);
-    if (!error) {
+    if (error) {
+      toast.error("Error al eliminar la unidad");
+    } else {
       await recomputeProjectPriceRange(propertyId);
       void loadUnits();
     }

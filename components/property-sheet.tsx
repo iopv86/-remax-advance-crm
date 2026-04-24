@@ -4,6 +4,37 @@ import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { Upload, X, Download, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+
+async function recomputeProjectPriceRange(propertyId: string): Promise<void> {
+  const supabase = createClient();
+  const { data, error: selectError } = await supabase
+    .from("project_units")
+    .select("precio_venta")
+    .eq("property_id", propertyId)
+    .not("precio_venta", "is", null);
+
+  if (selectError) {
+    console.error("recomputeProjectPriceRange: select failed", selectError);
+    return;
+  }
+
+  const prices = (data ?? [])
+    .filter((r): r is { precio_venta: number } => r.precio_venta != null)
+    .map((r) => r.precio_venta)
+    .filter((v) => v > 0);
+
+  const minPrice = prices.length > 0 ? Math.min(...prices) : null;
+  const maxPrice = prices.length > 0 ? Math.max(...prices) : null;
+
+  const { error: updateError } = await supabase
+    .from("properties")
+    .update({ price: minPrice, price_max: maxPrice })
+    .eq("id", propertyId);
+
+  if (updateError) {
+    console.error("recomputeProjectPriceRange: update failed", updateError);
+  }
+}
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -338,16 +369,7 @@ export function PropertySheet({
         .upsert(unitPayload, { onConflict: "property_id,nombre_unidad", ignoreDuplicates: false });
 
       if (!unitError) {
-        // Recompute price range from uploaded units
-        const prices = csvRows
-          .filter((r) => r.precio_venta != null && r.precio_venta > 0)
-          .map((r) => r.precio_venta!);
-        if (prices.length > 0) {
-          await supabase
-            .from("properties")
-            .update({ price: Math.min(...prices), price_max: Math.max(...prices) })
-            .eq("id", savedPropertyId!);
-        }
+        await recomputeProjectPriceRange(savedPropertyId!);
       } else {
         // Project saved but CSV failed — notify and continue
         toast.error("Proyecto guardado, pero hubo un error al cargar las unidades del CSV.");
@@ -365,6 +387,11 @@ export function PropertySheet({
   function handleCsvFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.name.endsWith(".csv") && file.type !== "text/csv" && file.type !== "text/plain") {
+      toast.error("Solo se aceptan archivos CSV.");
+      e.target.value = "";
+      return;
+    }
     if (file.size > 2 * 1024 * 1024) {
       setCsvError("El CSV no puede superar 2 MB.");
       e.target.value = "";
