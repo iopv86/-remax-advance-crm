@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Bed, Bath, Square, Car, Home, Calendar, Tag, MessageSquare, FileText, Building2 } from "lucide-react";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 import type { PropertyType, CurrencyType } from "@/lib/types";
 import { STAGE_LABELS } from "@/lib/types";
 import { PropertyUnitsTab } from "./property-units-tab";
@@ -252,7 +254,31 @@ export function PropertyDetailClient({
 }) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<DetailTab>(initialTab ?? "info");
-  const status = STATUS_MAP[property.status] ?? STATUS_MAP.inactive;
+  const [localStatus, setLocalStatus] = useState(property.status);
+  const [saving, setSaving] = useState(false);
+  const status = STATUS_MAP[localStatus] ?? STATUS_MAP.inactive;
+
+  async function handleSetInactive() {
+    if (!confirm("¿Marcar esta propiedad como Inactiva?")) return;
+    setSaving(true);
+    const supabase = createClient();
+    const { error } = await supabase.from("properties").update({ status: "inactive" }).eq("id", property.id);
+    setSaving(false);
+    if (error) { toast.error("Error al dar de baja: " + error.message); return; }
+    setLocalStatus("inactive");
+    toast.success("Propiedad marcada como Inactiva");
+  }
+
+  async function handleDelete() {
+    if (!confirm(`¿Eliminar "${property.title}"? Esta acción no se puede deshacer.`)) return;
+    setSaving(true);
+    const supabase = createClient();
+    const { error } = await supabase.from("properties").delete().eq("id", property.id);
+    setSaving(false);
+    if (error) { toast.error("Error al eliminar: " + error.message); return; }
+    toast.success("Propiedad eliminada");
+    router.push("/dashboard/properties");
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: BG_BODY }}>
@@ -308,6 +334,35 @@ export function PropertyDetailClient({
               <ExternalLink style={{ width: 13, height: 13 }} />
               Ver portal
             </a>
+          )}
+          {canEdit && localStatus !== "inactive" && (
+            <button
+              onClick={() => void handleSetInactive()}
+              disabled={saving}
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "6px 14px", background: "rgba(107,114,128,0.12)", color: "#9CA3AF",
+                fontSize: 13, fontWeight: 500, borderRadius: 8,
+                border: "1px solid rgba(107,114,128,0.2)", cursor: saving ? "not-allowed" : "pointer",
+              }}
+            >
+              Dar de baja
+            </button>
+          )}
+          {canEdit && (
+            <button
+              onClick={() => void handleDelete()}
+              disabled={saving}
+              title="Eliminar propiedad"
+              style={{
+                display: "flex", alignItems: "center", gap: 6,
+                padding: "6px 14px", background: "rgba(239,68,68,0.08)", color: "#ef4444",
+                fontSize: 13, fontWeight: 500, borderRadius: 8,
+                border: "1px solid rgba(239,68,68,0.2)", cursor: saving ? "not-allowed" : "pointer",
+              }}
+            >
+              Eliminar
+            </button>
           )}
           {canEdit && (
             <Link
