@@ -30,7 +30,7 @@ export function TasksDue({
       {/* Header */}
       <div style={{
         padding: "18px 24px 12px",
-        borderBottom: `1px solid rgba(255,255,255,0.05)`,
+        borderBottom: `1px solid var(--glass-bg)`,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",

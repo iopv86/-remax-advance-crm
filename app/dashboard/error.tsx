@@ -108,13 +108,13 @@ export default function DashboardError({
           <a
             href="/dashboard"
             style={{
-              background: "rgba(255,255,255,0.06)",
+              background: "var(--glass-bg-md)",
               color: "#E8E3DC",
               fontWeight: 600,
               fontSize: 13,
               padding: "10px 24px",
               borderRadius: 10,
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: "1px solid var(--glass-border)",
               cursor: "pointer",
               textDecoration: "none",
             }}

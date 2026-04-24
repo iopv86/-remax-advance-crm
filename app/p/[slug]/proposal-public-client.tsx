@@ -102,7 +102,7 @@ function PropertyCard({
                       width: i === imgIdx ? 20 : 6,
                       height: 6,
                       borderRadius: 3,
-                      background: i === imgIdx ? GOLD : "rgba(255,255,255,0.4)",
+                      background: i === imgIdx ? GOLD : "var(--glass-dim)",
                       border: "none",
                       cursor: "pointer",
                       padding: 0,
@@ -121,7 +121,7 @@ function PropertyCard({
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              color: "rgba(255,255,255,0.1)",
+              color: "var(--glass-border-md)",
               fontSize: 48,
             }}
           >
@@ -340,7 +340,7 @@ export function ProposalPublicClient({ data }: { data: ProposalData }) {
         zIndex: 40,
         background: "rgba(13,14,18,0.92)",
         backdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        borderBottom: "1px solid var(--glass-bg-md)",
         padding: "0 24px",
         height: 52,
         display: "flex",
@@ -433,7 +433,7 @@ export function ProposalPublicClient({ data }: { data: ProposalData }) {
             alignItems: "center",
             gap: 12,
             paddingTop: 20,
-            borderTop: "1px solid rgba(255,255,255,0.06)",
+            borderTop: "1px solid var(--glass-bg-md)",
           }}>
             {agent.avatar_url ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -519,7 +519,7 @@ export function ProposalPublicClient({ data }: { data: ProposalData }) {
             </svg>
             Correo
           </ShareButton>
-          <ShareButton onClick={copyLink} color={copied ? "#10b981" : DIM} bg={copied ? "rgba(16,185,129,0.08)" : "rgba(255,255,255,0.04)"} border={copied ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.08)"}>
+          <ShareButton onClick={copyLink} color={copied ? "#10b981" : DIM} bg={copied ? "rgba(16,185,129,0.08)" : "var(--glass-bg)"} border={copied ? "rgba(16,185,129,0.2)" : "var(--glass-border)"}>
             {copied ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <polyline points="20 6 9 17 4 12"/>
@@ -553,7 +553,7 @@ export function ProposalPublicClient({ data }: { data: ProposalData }) {
         <div style={{
           marginTop: 48,
           paddingTop: 24,
-          borderTop: "1px solid rgba(255,255,255,0.06)",
+          borderTop: "1px solid var(--glass-bg-md)",
           textAlign: "center",
         }}>
           <p style={{ fontSize: 11, color: "rgba(154,144,136,0.5)", fontFamily: "Inter, sans-serif" }}>

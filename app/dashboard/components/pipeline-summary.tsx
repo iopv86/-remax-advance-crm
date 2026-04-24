@@ -109,7 +109,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
                   borderRadius: 6,
                   position: "relative",
                   overflow: "hidden",
-                  border: isWon ? "1px solid rgba(34,197,94,0.3)" : `1px solid rgba(255,255,255,0.05)`,
+                  border: isWon ? "1px solid rgba(34,197,94,0.3)" : `1px solid var(--glass-bg)`,
                   boxShadow: isWon ? "0 0 12px rgba(34,197,94,0.15)" : undefined,
                   display: "flex",
                   alignItems: "center",

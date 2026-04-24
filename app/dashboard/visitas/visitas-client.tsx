@@ -93,7 +93,7 @@ const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
-const BORDER_DIM = "rgba(255,255,255,0.06)";
+const BORDER_DIM = "var(--glass-bg-md)";
 
 const STATUS_MAP: Record<ShowingStatus, { label: string; color: string; bg: string }> = {
   scheduled: { label: "Agendada", color: "#6366f1", bg: "rgba(99,102,241,0.12)" },

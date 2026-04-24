@@ -204,7 +204,7 @@ export function NotificationBell() {
               alignItems: "center",
               justifyContent: "space-between",
               padding: "12px 16px",
-              borderBottom: "1px solid rgba(255,255,255,0.06)",
+              borderBottom: "1px solid var(--glass-bg-md)",
             }}
           >
             <span
@@ -264,13 +264,13 @@ export function NotificationBell() {
                     padding: "12px 16px",
                     background: n.read ? "transparent" : "rgba(201,150,58,0.04)",
                     border: "none",
-                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid var(--glass-bg)",
                     cursor: "pointer",
                     textAlign: "left",
                     transition: "background 0.1s",
                   }}
                   onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.04)";
+                    (e.currentTarget as HTMLButtonElement).style.background = "var(--glass-bg)";
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLButtonElement).style.background = n.read
@@ -342,7 +342,7 @@ export function NotificationBell() {
             <div
               style={{
                 padding: "8px 16px",
-                borderTop: "1px solid rgba(255,255,255,0.06)",
+                borderTop: "1px solid var(--glass-bg-md)",
                 textAlign: "center",
               }}
             >

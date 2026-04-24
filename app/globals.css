@@ -122,6 +122,15 @@
   --gold: var(--amber);
   --gold-light: #fbbf24;
   --gold-muted: var(--amber-muted);
+
+  /* Adaptive glass/overlay tokens (light: dark-on-light; dark: white-on-dark) */
+  --glass-bg:            rgba(0, 0, 0, 0.03);
+  --glass-bg-md:         rgba(0, 0, 0, 0.05);
+  --glass-border:        rgba(0, 0, 0, 0.07);
+  --glass-border-md:     rgba(0, 0, 0, 0.12);
+  --glass-border-lg:     rgba(0, 0, 0, 0.18);
+  --glass-dim:           rgba(0, 0, 0, 0.25);
+  --glass-disabled:      rgba(0, 0, 0, 0.15);
 }
 
 /* ═══════════════════════════════════════
@@ -183,6 +192,15 @@
   --violet-muted: rgba(139, 92, 246, 0.1);
   --teal: #14b8a6;
   --teal-muted: rgba(20, 184, 166, 0.1);
+
+  /* Adaptive glass/overlay tokens (dark: white-on-dark) */
+  --glass-bg:            rgba(255,255,255,0.04);
+  --glass-bg-md:         rgba(255,255,255,0.06);
+  --glass-border:        rgba(255,255,255,0.08);
+  --glass-border-md:     rgba(255,255,255,0.12);
+  --glass-border-lg:     rgba(255,255,255,0.18);
+  --glass-dim:           rgba(255,255,255,0.35);
+  --glass-disabled:      rgba(255,255,255,0.15);
 }
 
 /* Dark mode component overrides — Obsidian Edge */

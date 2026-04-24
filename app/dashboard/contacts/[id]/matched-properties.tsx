@@ -89,14 +89,14 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
               <div className="flex flex-wrap gap-1.5">
                 <span
                   className="text-[10px] px-1.5 py-0.5 rounded"
-                  style={{ background: "rgba(255,255,255,0.06)", color: "#9A9088" }}
+                  style={{ background: "var(--glass-bg-md)", color: "#9A9088" }}
                 >
                   {TYPE_LABELS[p.property_type] ?? p.property_type}
                 </span>
                 {p.city && (
                   <span
                     className="text-[10px] px-1.5 py-0.5 rounded"
-                    style={{ background: "rgba(255,255,255,0.06)", color: "#9A9088" }}
+                    style={{ background: "var(--glass-bg-md)", color: "#9A9088" }}
                   >
                     {p.city}
                   </span>
@@ -104,7 +104,7 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
                 {(p.bedrooms != null || p.bathrooms != null) && (
                   <span
                     className="text-[10px] px-1.5 py-0.5 rounded"
-                    style={{ background: "rgba(255,255,255,0.06)", color: "#9A9088" }}
+                    style={{ background: "var(--glass-bg-md)", color: "#9A9088" }}
                   >
                     {[
                       p.bedrooms != null ? `${p.bedrooms} hab` : null,

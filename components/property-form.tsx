@@ -31,7 +31,7 @@ const TEXT_MUTED = "var(--muted-foreground)";
 const BG_BODY = "var(--background)";
 const BG_ELEVATED = "var(--secondary)";
 const BG_SURFACE = "var(--card)";
-const BORDER = "rgba(255,255,255,0.06)";
+const BORDER = "var(--glass-bg-md)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
 
 // ─── Business type (UI concept) ───────────────────────────────────────────────
@@ -260,7 +260,7 @@ function AmenityCheckbox({ label, checked, onChange }: { label: string; checked:
     >
       <div style={{
         width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-        border: `1.5px solid ${checked ? GOLD : "rgba(255,255,255,0.2)"}`,
+        border: `1.5px solid ${checked ? GOLD : "var(--glass-border-lg)"}`,
         background: checked ? GOLD : "transparent",
         display: "flex", alignItems: "center", justifyContent: "center",
       }}>

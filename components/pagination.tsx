@@ -48,11 +48,11 @@ export function Pagination({ currentPage, totalCount, pageSize, basePath, filter
 
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
         {currentPage > 1 ? (
-          <Link href={buildHref(currentPage - 1)} style={{ ...btnBase, color: "#9A9088", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link href={buildHref(currentPage - 1)} style={{ ...btnBase, color: "#9A9088", border: "1px solid var(--glass-border)" }}>
             <ChevronLeft className="w-4 h-4" />
           </Link>
         ) : (
-          <span style={{ ...btnBase, color: "rgba(154,144,136,0.3)", border: "1px solid rgba(255,255,255,0.04)", cursor: "default" }}>
+          <span style={{ ...btnBase, color: "rgba(154,144,136,0.3)", border: "1px solid var(--glass-bg)", cursor: "default" }}>
             <ChevronLeft className="w-4 h-4" />
           </span>
         )}
@@ -68,7 +68,7 @@ export function Pagination({ currentPage, totalCount, pageSize, basePath, filter
                 ...btnBase,
                 background: p === currentPage ? "#C9963A" : "transparent",
                 color: p === currentPage ? "#0D0E12" : "#9A9088",
-                border: p === currentPage ? "1px solid #C9963A" : "1px solid rgba(255,255,255,0.08)",
+                border: p === currentPage ? "1px solid #C9963A" : "1px solid var(--glass-border)",
               }}
             >
               {p}
@@ -77,11 +77,11 @@ export function Pagination({ currentPage, totalCount, pageSize, basePath, filter
         )}
 
         {currentPage < totalPages ? (
-          <Link href={buildHref(currentPage + 1)} style={{ ...btnBase, color: "#9A9088", border: "1px solid rgba(255,255,255,0.08)" }}>
+          <Link href={buildHref(currentPage + 1)} style={{ ...btnBase, color: "#9A9088", border: "1px solid var(--glass-border)" }}>
             <ChevronRight className="w-4 h-4" />
           </Link>
         ) : (
-          <span style={{ ...btnBase, color: "rgba(154,144,136,0.3)", border: "1px solid rgba(255,255,255,0.04)", cursor: "default" }}>
+          <span style={{ ...btnBase, color: "rgba(154,144,136,0.3)", border: "1px solid var(--glass-bg)", cursor: "default" }}>
             <ChevronRight className="w-4 h-4" />
           </span>
         )}

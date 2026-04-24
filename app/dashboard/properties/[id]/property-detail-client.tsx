@@ -82,7 +82,7 @@ const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
-const BORDER_DIM = "rgba(255,255,255,0.06)";
+const BORDER_DIM = "var(--glass-bg-md)";
 
 const TYPE_LABELS: Record<string, string> = {
   apartment: "Apartamento",
@@ -195,7 +195,7 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
                 onClick={() => setIdx(i)}
                 style={{
                   width: i === idx ? 20 : 6, height: 6, borderRadius: 3, border: "none",
-                  background: i === idx ? GOLD : "rgba(255,255,255,0.35)",
+                  background: i === idx ? GOLD : "var(--glass-dim)",
                   cursor: "pointer", transition: "all 0.2s",
                   padding: 0,
                 }}

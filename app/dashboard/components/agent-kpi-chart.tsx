@@ -240,7 +240,7 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
             margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
             barCategoryGap="22%"
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-bg)" vertical={false} />
             <XAxis
               dataKey="agent"
               tick={{ fill: T.surfaceDim, fontSize: 10, fontFamily: "Inter, sans-serif" }}

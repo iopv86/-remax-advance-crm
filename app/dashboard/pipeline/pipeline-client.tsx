@@ -130,7 +130,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
       ref={setNodeRef}
       style={{
         ...style,
-        background: "rgba(255,255,255,0.04)",
+        background: "var(--glass-bg)",
         backdropFilter: "blur(10px)",
         border: "1px solid rgba(201,150,58,0.15)",
         borderRadius: "0.25rem",
@@ -271,7 +271,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
           style={{
             padding: "3px 6px",
             borderRadius: "0.125rem",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
             color: "#9899A8",
             fontSize: 11,
@@ -289,7 +289,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
           style={{
             padding: "3px 6px",
             borderRadius: "0.125rem",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
             color: "#9899A8",
             fontSize: 11,
@@ -314,7 +314,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
           style={{
             padding: "3px 6px",
             borderRadius: "0.125rem",
-            background: "rgba(255,255,255,0.06)",
+            background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
             color: "#9899A8",
             fontSize: 11,

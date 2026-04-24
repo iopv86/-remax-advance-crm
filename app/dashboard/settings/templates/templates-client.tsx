@@ -23,7 +23,7 @@ const BG_CARD = "var(--card)";
 const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
-const BORDER = "rgba(255,255,255,0.06)";
+const BORDER = "var(--glass-bg-md)";
 
 const CATEGORIES = ["MARKETING", "UTILITY", "AUTHENTICATION"];
 const LANGUAGES = [
@@ -54,7 +54,7 @@ const INPUT = {
   padding: "8px 12px",
   borderRadius: 8,
   fontSize: 13,
-  background: "rgba(255,255,255,0.04)",
+  background: "var(--glass-bg)",
   border: `1px solid ${BORDER}`,
   color: TEXT_PRIMARY,
   outline: "none",
@@ -194,7 +194,7 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: WaTemp
                       <span style={{ fontSize: 10, fontWeight: 700, padding: "2px 7px", borderRadius: 4, background: "rgba(201,150,58,0.1)", color: GOLD }}>
                         {t.category}
                       </span>
-                      <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 4, background: "rgba(255,255,255,0.05)", color: TEXT_MUTED }}>
+                      <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 7px", borderRadius: 4, background: "var(--glass-bg)", color: TEXT_MUTED }}>
                         {LANGUAGES.find((l) => l.value === t.language)?.label ?? t.language}
                       </span>
                       {t.is_approved ? (
@@ -320,7 +320,7 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: WaTemp
 
             {/* Footer */}
             <div style={{ padding: "14px 26px 26px", borderTop: `1px solid ${BORDER}`, display: "flex", gap: 10 }}>
-              <button onClick={() => !saving && closeForm()} style={{ flex: 1, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", color: TEXT_MUTED, border: `1px solid ${BORDER}` }}>
+              <button onClick={() => !saving && closeForm()} style={{ flex: 1, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "var(--glass-bg)", color: TEXT_MUTED, border: `1px solid ${BORDER}` }}>
                 Cancelar
               </button>
               <button onClick={handleSave} disabled={saving} style={{ flex: 2, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", background: GOLD, color: "var(--primary-foreground)", border: "none", opacity: saving ? 0.7 : 1 }}>

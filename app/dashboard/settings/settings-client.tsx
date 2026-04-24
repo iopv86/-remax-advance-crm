@@ -34,7 +34,7 @@ interface Props {
 // ── Design tokens ───────────────────────────────────
 
 const GLASS_CARD: React.CSSProperties = {
-  background: "rgba(255, 255, 255, 0.04)",
+  background: "var(--glass-bg)",
   backdropFilter: "blur(12px)",
   border: "1px solid rgba(201, 150, 58, 0.15)",
 };
@@ -97,7 +97,7 @@ function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, React.CSSProperties> = {
     admin: { ...base, background: "rgba(201,150,58,0.12)", color: GOLD, border: "1px solid rgba(201,150,58,0.25)" },
     manager: { ...base, background: "rgba(59,130,246,0.1)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.2)" },
-    agent: { ...base, background: "rgba(255,255,255,0.06)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.08)" },
+    agent: { ...base, background: "var(--glass-bg-md)", color: "var(--muted-foreground)", border: "1px solid var(--glass-border)" },
   };
   return <span style={styles[role] ?? styles.agent}>{ROLE_LABELS[role] ?? role}</span>;
 }
@@ -113,7 +113,7 @@ function StatusBadge({ active }: { active: boolean }) {
         letterSpacing: "0.08em",
         ...(active
           ? { background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }
-          : { background: "rgba(255,255,255,0.05)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.08)" }),
+          : { background: "var(--glass-bg)", color: "var(--muted-foreground)", border: "1px solid var(--glass-border)" }),
       }}
     >
       {active ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
@@ -157,7 +157,7 @@ function ContentHeader({ section, title }: { section: string; title: string }) {
       </div>
       <div
         className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full"
-        style={{ background: "#292a30", border: "1px solid rgba(255,255,255,0.06)" }}
+        style={{ background: "#292a30", border: "1px solid var(--glass-bg-md)" }}
       >
         <Search className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
         <input
@@ -230,8 +230,8 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                 <tr
                   key={a.id}
                   className="transition-colors"
-                  style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.03)")}
+                  style={{ borderTop: "1px solid var(--glass-bg)" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--glass-bg)")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
                   <td className="px-6 py-4">
@@ -313,12 +313,12 @@ function TabPerfil({
 
           <div
             className="space-y-3"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.5rem" }}
+            style={{ borderTop: "1px solid var(--glass-bg-md)", paddingTop: "1.5rem" }}
           >
             {currentAgent?.phone && (
               <div
                 className="flex justify-between text-sm py-2"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                style={{ borderBottom: "1px solid var(--glass-bg-md)" }}
               >
                 <span style={{ color: "var(--muted-foreground)" }}>Teléfono</span>
                 <span className="font-mono" style={{ color: "var(--foreground)" }}>{currentAgent.phone}</span>
@@ -326,14 +326,14 @@ function TabPerfil({
             )}
             <div
               className="flex justify-between text-sm py-2"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ borderBottom: "1px solid var(--glass-bg-md)" }}
             >
               <span style={{ color: "var(--muted-foreground)" }}>Estado</span>
               <StatusBadge active={currentAgent?.is_active ?? true} />
             </div>
             <div
               className="flex justify-between text-sm py-2"
-              style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+              style={{ borderBottom: "1px solid var(--glass-bg-md)" }}
             >
               <span style={{ color: "var(--muted-foreground)" }}>ID de usuario</span>
               <span className="font-mono text-xs" style={{ color: "var(--muted-foreground)" }}>
@@ -342,7 +342,7 @@ function TabPerfil({
             </div>
           </div>
 
-          <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.5rem" }}>
+          <div style={{ borderTop: "1px solid var(--glass-bg-md)", paddingTop: "1.5rem" }}>
             <p
               className="text-xs font-semibold uppercase tracking-wider mb-3"
               style={{ color: "var(--muted-foreground)" }}
@@ -414,7 +414,7 @@ function TabImportar() {
               className="flex-1 flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer transition-all"
               style={{
                 background: "var(--background)",
-                border: `1px solid ${csvFile ? "rgba(201,150,58,0.4)" : "rgba(255,255,255,0.06)"}`,
+                border: `1px solid ${csvFile ? "rgba(201,150,58,0.4)" : "var(--glass-bg-md)"}`,
               }}
             >
               <input
@@ -443,7 +443,7 @@ function TabImportar() {
               style={{
                 background: csvFile && !importing
                   ? `linear-gradient(135deg, #d4a843 0%, #C9963A 100%)`
-                  : "rgba(255,255,255,0.06)",
+                  : "var(--glass-bg-md)",
                 color: csvFile && !importing ? "#1a1200" : "#545567",
                 cursor: csvFile && !importing ? "pointer" : "not-allowed",
               }}
@@ -518,7 +518,7 @@ function TabIntegraciones() {
       detail: (
         <div
           className="rounded-xl px-4 py-3 text-xs"
-          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid var(--glass-bg)" }}
         >
           Gestionado por Ava — agente Railway
         </div>
@@ -534,13 +534,13 @@ function TabIntegraciones() {
         </svg>
       ),
       iconBg: "#34343b",
-      iconBorder: "rgba(255,255,255,0.06)",
+      iconBorder: "var(--glass-bg-md)",
       iconColor: "#9899A8",
       badge: "INACTIVO",
       badgeStyle: {
-        background: "rgba(255,255,255,0.04)",
+        background: "var(--glass-bg)",
         color: "var(--muted-foreground)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        border: "1px solid var(--glass-border)",
       } as React.CSSProperties,
       detail: (
         <a
@@ -576,7 +576,7 @@ function TabIntegraciones() {
       detail: (
         <div
           className="rounded-xl px-4 py-3 font-mono text-xs truncate"
-          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid var(--glass-bg)" }}
         >
           https://remax-advance-ava-production.up.railway.app
         </div>
@@ -603,7 +603,7 @@ function TabIntegraciones() {
       detail: (
         <div
           className="rounded-xl px-4 py-3 text-xs"
-          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid var(--glass-bg)" }}
         >
           Siempre activo — managed cloud
         </div>
@@ -684,7 +684,7 @@ function TabIntegraciones() {
             className="flex items-center gap-4 rounded-xl p-4 font-mono text-sm"
             style={{
               background: "var(--background)",
-              border: "1px solid rgba(255,255,255,0.06)",
+              border: "1px solid var(--glass-bg-md)",
             }}
           >
             <span style={{ color: "var(--muted-foreground)" }}>ae_live_8832_</span>
@@ -775,7 +775,7 @@ function TabNotificaciones({ userId }: { userId: string }) {
               <div
                 key={t.key}
                 className="flex items-center justify-between px-6 py-5"
-                style={idx > 0 ? { borderTop: "1px solid rgba(255,255,255,0.05)" } : {}}
+                style={idx > 0 ? { borderTop: "1px solid var(--glass-bg)" } : {}}
               >
                 <div>
                   <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--foreground)" }}>
@@ -791,8 +791,8 @@ function TabNotificaciones({ userId }: { userId: string }) {
                   style={{
                     width: 44,
                     height: 24,
-                    background: value ? GOLD : "rgba(255,255,255,0.08)",
-                    border: `1px solid ${value ? "rgba(201,150,58,0.4)" : "rgba(255,255,255,0.1)"}`,
+                    background: value ? GOLD : "var(--glass-border)",
+                    border: `1px solid ${value ? "rgba(201,150,58,0.4)" : "var(--glass-border-md)"}`,
                   }}
                 >
                   <span
@@ -839,7 +839,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
         style={{
           width: 220,
           background: "var(--card)",
-          borderRight: "1px solid rgba(255,255,255,0.05)",
+          borderRight: "1px solid var(--glass-bg)",
         }}
       >
         <h2
@@ -894,7 +894,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
         {/* Mobile tab bar (< md) */}
         <div
           className="md:hidden sticky top-0 z-10 overflow-x-auto flex shrink-0"
-          style={{ background: "var(--card)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--card)", borderBottom: "1px solid var(--glass-bg)" }}
         >
           {allNavItems.map(({ key, name }) => {
             const isActive = activeTab === key;

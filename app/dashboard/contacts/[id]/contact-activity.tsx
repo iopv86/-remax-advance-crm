@@ -48,7 +48,7 @@ const GOLD = "var(--primary)";
 const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
-const BORDER_DIM = "rgba(255,255,255,0.06)";
+const BORDER_DIM = "var(--glass-bg-md)";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -170,7 +170,7 @@ export function ContactActivity({
             placeholder="Título (ej. Llamada de seguimiento)"
             style={{
               width: "100%", padding: "8px 12px", borderRadius: 8, fontSize: 13,
-              background: "rgba(255,255,255,0.04)", border: `1px solid ${BORDER_DIM}`,
+              background: "var(--glass-bg)", border: `1px solid ${BORDER_DIM}`,
               color: TEXT_PRIMARY, outline: "none", boxSizing: "border-box", marginBottom: 10,
             }}
           />
@@ -183,7 +183,7 @@ export function ContactActivity({
             rows={2}
             style={{
               width: "100%", padding: "8px 12px", borderRadius: 8, fontSize: 13, resize: "none",
-              background: "rgba(255,255,255,0.04)", border: `1px solid ${BORDER_DIM}`,
+              background: "var(--glass-bg)", border: `1px solid ${BORDER_DIM}`,
               color: TEXT_PRIMARY, outline: "none", boxSizing: "border-box", marginBottom: 10,
             }}
           />
@@ -198,7 +198,7 @@ export function ContactActivity({
               placeholder="Duración (min)"
               style={{
                 width: 140, padding: "7px 12px", borderRadius: 8, fontSize: 12,
-                background: "rgba(255,255,255,0.04)", border: `1px solid ${BORDER_DIM}`,
+                background: "var(--glass-bg)", border: `1px solid ${BORDER_DIM}`,
                 color: TEXT_PRIMARY, outline: "none",
               }}
             />
@@ -264,7 +264,7 @@ export function ContactActivity({
                             {cfg.icon} {cfg.label}
                           </span>
                           {act.is_automated && (
-                            <span style={{ fontSize: 9, fontWeight: 600, color: TEXT_MUTED, padding: "1px 5px", borderRadius: 4, background: "rgba(255,255,255,0.04)" }}>
+                            <span style={{ fontSize: 9, fontWeight: 600, color: TEXT_MUTED, padding: "1px 5px", borderRadius: 4, background: "var(--glass-bg)" }}>
                               Auto
                             </span>
                           )}

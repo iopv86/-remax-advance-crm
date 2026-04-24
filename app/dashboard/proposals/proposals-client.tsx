@@ -78,7 +78,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
 
           {/* Open count badge */}
           <div style={{
-            background: opens > 0 ? "rgba(16,185,129,0.1)" : "rgba(255,255,255,0.04)",
+            background: opens > 0 ? "rgba(16,185,129,0.1)" : "var(--glass-bg)",
             border: `1px solid ${opens > 0 ? "rgba(16,185,129,0.2)" : BORDER_SUB}`,
             borderRadius: 20,
             padding: "4px 10px",
@@ -165,7 +165,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
 
 const iconBtnStyle: React.CSSProperties = {
   width: 32, height: 32, borderRadius: 6, display: "flex", alignItems: "center", justifyContent: "center",
-  background: "rgba(255,255,255,0.04)", border: `1px solid ${BORDER_SUB}`, color: DIM,
+  background: "var(--glass-bg)", border: `1px solid ${BORDER_SUB}`, color: DIM,
   cursor: "pointer", flexShrink: 0,
 };
 

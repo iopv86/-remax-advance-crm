@@ -280,7 +280,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
             </h2>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={funnelData} layout="vertical" margin={{ left: 0, right: 24 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" horizontal={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-bg)" horizontal={false} />
                 <XAxis type="number" tick={{ fontSize: 10, fill: TEXT_DIM }} axisLine={false} tickLine={false} />
                 <YAxis dataKey="label" type="category" tick={{ fontSize: 10, fill: TEXT_MUTED }} axisLine={false} tickLine={false} width={80} />
                 <Tooltip
@@ -310,7 +310,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={monthlyData} margin={{ left: 8, right: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-bg)" vertical={false} />
                   <XAxis dataKey="month" tick={{ fontSize: 10, fill: TEXT_DIM }} axisLine={false} tickLine={false} />
                   <YAxis tickFormatter={(v) => formatMoney(v)} tick={{ fontSize: 10, fill: TEXT_DIM }} axisLine={false} tickLine={false} width={60} />
                   <Tooltip
@@ -342,7 +342,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
           ) : (
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
-                <tr style={{ borderBottom: `1px solid rgba(255,255,255,0.04)` }}>
+                <tr style={{ borderBottom: `1px solid var(--glass-bg)` }}>
                   {["Agente", "Deals", "Ganados", "Conv. %", "Ingresos", "Comisiones"].map((h) => (
                     <th key={h} style={{ padding: "12px 16px", textAlign: h === "Agente" ? "left" : "right", fontSize: 10, fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "Manrope, sans-serif" }}>
                       {h}
@@ -355,7 +355,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
                   <tr
                     key={a.id}
                     style={{
-                      borderBottom: idx < agentStats.length - 1 ? `1px solid rgba(255,255,255,0.03)` : "none",
+                      borderBottom: idx < agentStats.length - 1 ? `1px solid var(--glass-bg)` : "none",
                       background: idx === 0 ? "rgba(201,150,58,0.04)" : "transparent",
                     }}
                   >

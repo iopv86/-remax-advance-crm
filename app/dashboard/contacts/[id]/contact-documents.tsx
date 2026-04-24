@@ -55,7 +55,7 @@ const BG_SURFACE = "var(--card)";
 const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
-const BORDER_DIM = "rgba(255,255,255,0.06)";
+const BORDER_DIM = "var(--glass-bg-md)";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

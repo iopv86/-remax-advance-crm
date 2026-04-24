@@ -187,7 +187,7 @@ function InfoRow({ icon: Icon, label, value, href, iconColor }: {
       alignItems: "center",
       gap: 14,
       padding: "14px 0",
-      borderBottom: "1px solid rgba(255,255,255,0.05)",
+      borderBottom: "1px solid var(--glass-bg)",
     }}>
       <div style={{
         width: 36,
@@ -233,8 +233,8 @@ function InfoRow({ icon: Icon, label, value, href, iconColor }: {
 function inputStyle(focused: boolean = false) {
   return {
     width: "100%",
-    background: "rgba(255,255,255,0.04)",
-    border: `1px solid ${focused ? "rgba(201,150,58,0.5)" : "rgba(255,255,255,0.1)"}`,
+    background: "var(--glass-bg)",
+    border: `1px solid ${focused ? "rgba(201,150,58,0.5)" : "var(--glass-border-md)"}`,
     borderRadius: 10,
     padding: "10px 14px",
     fontSize: 14,
@@ -377,7 +377,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
       {/* Header strip */}
       <div style={{
         background: "linear-gradient(135deg, rgba(201,150,58,0.06) 0%, rgba(14,14,14,0) 60%)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: "1px solid var(--glass-bg)",
         padding: "32px 40px 0",
       }}>
         <p style={{ fontSize: 11, fontWeight: 600, color: T.stone500, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 24 }}>
@@ -552,8 +552,8 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                     gap: 6,
                     padding: "10px 16px",
                     borderRadius: 12,
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
+                    background: "var(--glass-bg)",
+                    border: "1px solid var(--glass-border)",
                     color: T.stone500,
                     fontSize: 13,
                     fontWeight: 600,
@@ -673,7 +673,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       onChange={(e) => setFullName(e.target.value)}
                       style={inputStyle()}
                       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                      onBlur={(e) => { e.target.style.borderColor = "var(--glass-border-md)"; }}
                     />
                   </div>
 
@@ -688,7 +688,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       placeholder="+1 809 000 0000"
                       style={inputStyle()}
                       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                      onBlur={(e) => { e.target.style.borderColor = "var(--glass-border-md)"; }}
                     />
                   </div>
 
@@ -703,12 +703,12 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       placeholder="+1 809 000 0000"
                       style={inputStyle()}
                       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
-                      onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                      onBlur={(e) => { e.target.style.borderColor = "var(--glass-border-md)"; }}
                     />
                   </div>
 
                   {/* Divider */}
-                  <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 18 }}>
+                  <div style={{ borderTop: "1px solid var(--glass-border)", paddingTop: 18 }}>
                     <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: T.stone500, marginBottom: 16 }}>
                       Redes sociales
                     </p>
@@ -719,8 +719,8 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                             <Icon size={12} color={color} />
                             {label}
                           </label>
-                          <div style={{ display: "flex", alignItems: "center", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 8, overflow: "hidden", background: "rgba(255,255,255,0.04)" }}>
-                            <span style={{ padding: "10px 10px 10px 14px", fontSize: 12, color: T.stone500, whiteSpace: "nowrap", borderRight: "1px solid rgba(255,255,255,0.07)", flexShrink: 0 }}>
+                          <div style={{ display: "flex", alignItems: "center", border: "1px solid var(--glass-border-md)", borderRadius: 8, overflow: "hidden", background: "var(--glass-bg)" }}>
+                            <span style={{ padding: "10px 10px 10px 14px", fontSize: 12, color: T.stone500, whiteSpace: "nowrap", borderRight: "1px solid var(--glass-border)", flexShrink: 0 }}>
                               {prefix}
                             </span>
                             <input
@@ -735,7 +735,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                               style={{ ...inputStyle(), border: "none", borderRadius: 0, background: "transparent", flex: 1 }}
                               onFocus={(e) => { (e.target.closest("div") as HTMLElement).style.borderColor = `${color}80`; }}
                               onBlur={(e) => {
-                                (e.target.closest("div") as HTMLElement).style.borderColor = "rgba(255,255,255,0.1)";
+                                (e.target.closest("div") as HTMLElement).style.borderColor = "var(--glass-border-md)";
                                 const v = toUsername(e.target.value);
                                 if (key === "instagram_url") setInstagram(v);
                                 else if (key === "facebook_url") setFacebook(v);
@@ -811,16 +811,16 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       gap: 10,
                       padding: "12px 16px",
                       borderRadius: 12,
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(255,255,255,0.07)",
+                      background: "var(--glass-bg)",
+                      border: "1px solid var(--glass-border)",
                       textDecoration: "none",
                       color: T.onSurfaceVariant,
                       fontSize: 13,
                       fontWeight: 500,
                       transition: "all 0.15s",
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.03)"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--glass-bg-md)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--glass-bg)"; }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 18, color: T.primary, fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
                       calendar_today
@@ -838,16 +838,16 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                       gap: 10,
                       padding: "12px 16px",
                       borderRadius: 12,
-                      background: "rgba(255,255,255,0.03)",
-                      border: "1px solid rgba(255,255,255,0.07)",
+                      background: "var(--glass-bg)",
+                      border: "1px solid var(--glass-border)",
                       textDecoration: "none",
                       color: T.onSurfaceVariant,
                       fontSize: 13,
                       fontWeight: 500,
                       transition: "all 0.15s",
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.06)"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.03)"; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--glass-bg-md)"; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.background = "var(--glass-bg)"; }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: 18, color: T.primary, fontVariationSettings: "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24" }}>
                       mail

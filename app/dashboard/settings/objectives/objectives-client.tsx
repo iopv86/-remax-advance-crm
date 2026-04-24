@@ -106,8 +106,8 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
                     onChange={(e) => update(agent.id, "captaciones_objetivo", e.target.value)}
                     style={{
                       width: "100%",
-                      background: "rgba(255,255,255,0.04)",
-                      border: `1px solid rgba(255,255,255,0.08)`,
+                      background: "var(--glass-bg)",
+                      border: `1px solid var(--glass-border)`,
                       borderRadius: 8,
                       padding: "8px 10px 8px 30px",
                       fontSize: 13,
@@ -116,7 +116,7 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
                       boxSizing: "border-box",
                     }}
                     onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = GOLD; }}
-                    onBlur={(e)  => { (e.target as HTMLInputElement).style.borderColor = "rgba(255,255,255,0.08)"; }}
+                    onBlur={(e)  => { (e.target as HTMLInputElement).style.borderColor = "var(--glass-border)"; }}
                   />
                 </div>
               </div>
@@ -136,8 +136,8 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
                     onChange={(e) => update(agent.id, "facturacion_objetivo", e.target.value)}
                     style={{
                       width: "100%",
-                      background: "rgba(255,255,255,0.04)",
-                      border: `1px solid rgba(255,255,255,0.08)`,
+                      background: "var(--glass-bg)",
+                      border: `1px solid var(--glass-border)`,
                       borderRadius: 8,
                       padding: "8px 10px 8px 30px",
                       fontSize: 13,
@@ -146,7 +146,7 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
                       boxSizing: "border-box",
                     }}
                     onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "#22c55e"; }}
-                    onBlur={(e)  => { (e.target as HTMLInputElement).style.borderColor = "rgba(255,255,255,0.08)"; }}
+                    onBlur={(e)  => { (e.target as HTMLInputElement).style.borderColor = "var(--glass-border)"; }}
                   />
                 </div>
               </div>

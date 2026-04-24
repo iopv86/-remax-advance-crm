@@ -67,7 +67,7 @@ function getClassificationStyle(c?: string) {
     case "cold":
       return { bg: "rgba(129,140,248,0.12)", color: "#818cf8", border: "rgba(129,140,248,0.25)", label: "Lead Frío" };
     default:
-      return { bg: "rgba(255,255,255,0.05)", color: "#9A9088", border: "rgba(255,255,255,0.1)", label: "Sin clasificar" };
+      return { bg: "var(--glass-bg)", color: "#9A9088", border: "var(--glass-border-md)", label: "Sin clasificar" };
   }
 }
 
@@ -205,7 +205,7 @@ export default async function ContactDetailPage({
         <div className="flex items-center gap-3">
           <button
             className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.1)", color: "#d3c4b1" }}
+            style={{ border: "1px solid var(--glass-border-md)", color: "#d3c4b1" }}
           >
             Exportar
           </button>
@@ -351,7 +351,7 @@ export default async function ContactDetailPage({
             {/* Accordions */}
             <div className="space-y-4">
               {/* Personal Info */}
-              <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", paddingBottom: 16 }}>
+              <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
                 <p
                   className="font-bold text-sm mb-3"
                   style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#e5e2e1" }}
@@ -390,7 +390,7 @@ export default async function ContactDetailPage({
 
               {/* Budget */}
               {(contact.budget_min || contact.budget_max) && (
-                <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", paddingBottom: 16 }}>
+                <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
                   <p
                     className="font-bold text-sm mb-3"
                     style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#e5e2e1" }}
@@ -408,7 +408,7 @@ export default async function ContactDetailPage({
 
               {/* Tasks */}
               {(tasks?.length ?? 0) > 0 && (
-                <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", paddingBottom: 16 }}>
+                <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
                   <p
                     className="font-bold text-sm mb-3"
                     style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "#e5e2e1" }}
@@ -437,7 +437,7 @@ export default async function ContactDetailPage({
                         <span
                           className="text-[10px] font-bold uppercase shrink-0 px-1.5 py-0.5 rounded"
                           style={{
-                            background: task.priority === "urgent" ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.06)",
+                            background: task.priority === "urgent" ? "rgba(239,68,68,0.15)" : "var(--glass-bg-md)",
                             color: task.priority === "urgent" ? "#f87171" : "#9A9088",
                           }}
                         >

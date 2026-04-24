@@ -50,7 +50,7 @@ function RoundRobinList({
           style={{
             background: entry.is_active ? "rgba(28,29,39,0.8)" : "rgba(14,15,20,0.6)",
             backdropFilter: "blur(12px)",
-            border: `1px solid ${entry.is_active ? BORDER_L : "rgba(255,255,255,0.05)"}`,
+            border: `1px solid ${entry.is_active ? BORDER_L : "var(--glass-bg)"}`,
             borderRadius: 14,
             padding: "14px 20px",
             display: "flex",
@@ -62,8 +62,8 @@ function RoundRobinList({
         >
           <div style={{
             width: 28, height: 28, borderRadius: "50%",
-            background: entry.is_active ? "rgba(201,150,58,0.12)" : "rgba(255,255,255,0.04)",
-            border: `1px solid ${entry.is_active ? "rgba(201,150,58,0.25)" : "rgba(255,255,255,0.06)"}`,
+            background: entry.is_active ? "rgba(201,150,58,0.12)" : "var(--glass-bg)",
+            border: `1px solid ${entry.is_active ? "rgba(201,150,58,0.25)" : "var(--glass-bg-md)"}`,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 11, fontWeight: 700,
             color: entry.is_active ? GOLD_L : MUTED_L,
@@ -71,11 +71,11 @@ function RoundRobinList({
           }}>{i + 1}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 2, flexShrink: 0 }}>
             <button onClick={() => onMove(i, -1)} disabled={i === 0}
-              style={{ background: "none", border: "none", padding: "2px 4px", cursor: i === 0 ? "not-allowed" : "pointer", color: i === 0 ? "rgba(255,255,255,0.1)" : MUTED_L, lineHeight: 1 }}>
+              style={{ background: "none", border: "none", padding: "2px 4px", cursor: i === 0 ? "not-allowed" : "pointer", color: i === 0 ? "var(--glass-border-md)" : MUTED_L, lineHeight: 1 }}>
               <ChevronUp size={14} />
             </button>
             <button onClick={() => onMove(i, 1)} disabled={i === entries.length - 1}
-              style={{ background: "none", border: "none", padding: "2px 4px", cursor: i === entries.length - 1 ? "not-allowed" : "pointer", color: i === entries.length - 1 ? "rgba(255,255,255,0.1)" : MUTED_L, lineHeight: 1 }}>
+              style={{ background: "none", border: "none", padding: "2px 4px", cursor: i === entries.length - 1 ? "not-allowed" : "pointer", color: i === entries.length - 1 ? "var(--glass-border-md)" : MUTED_L, lineHeight: 1 }}>
               <ChevronDown size={14} />
             </button>
           </div>
@@ -85,11 +85,11 @@ function RoundRobinList({
           </div>
           <button onClick={() => onToggle(i)} style={{
             display: "flex", alignItems: "center", gap: 8,
-            background: entry.is_active ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.04)",
-            border: `1px solid ${entry.is_active ? "rgba(34,197,94,0.25)" : "rgba(255,255,255,0.08)"}`,
+            background: entry.is_active ? "rgba(34,197,94,0.1)" : "var(--glass-bg)",
+            border: `1px solid ${entry.is_active ? "rgba(34,197,94,0.25)" : "var(--glass-border)"}`,
             borderRadius: 20, padding: "6px 14px", cursor: "pointer", transition: "all 0.15s",
           }}>
-            <span style={{ width: 8, height: 8, borderRadius: "50%", background: entry.is_active ? "#22c55e" : "rgba(255,255,255,0.2)", flexShrink: 0 }} />
+            <span style={{ width: 8, height: 8, borderRadius: "50%", background: entry.is_active ? "#22c55e" : "var(--glass-border-lg)", flexShrink: 0 }} />
             <span style={{ fontSize: 11, fontWeight: 700, color: entry.is_active ? "#22c55e" : MUTED_L, whiteSpace: "nowrap" }}>
               {entry.is_active ? "En rotación" : "Excluido"}
             </span>

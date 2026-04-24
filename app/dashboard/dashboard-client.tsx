@@ -27,7 +27,7 @@ export const T = {
   emerald:           "#10b981",
   rose:              "#f43f5e",
   border:            "rgba(201,150,58,0.15)",
-  borderSubtle:      "rgba(255,255,255,0.06)",
+  borderSubtle:      "var(--glass-bg-md)",
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -229,7 +229,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                     flexDirection: "column",
                     alignItems: "center",
                     gap: 4,
-                    background: "rgba(255,255,255,0.02)",
+                    background: "var(--glass-bg)",
                     minWidth: 100,
                   }}
                 >

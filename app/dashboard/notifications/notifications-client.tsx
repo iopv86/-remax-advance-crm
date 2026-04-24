@@ -436,7 +436,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
                         border: "none",
                         borderBottom:
                           idx < items.length - 1
-                            ? "1px solid rgba(255,255,255,0.04)"
+                            ? "1px solid var(--glass-bg)"
                             : "none",
                         cursor: "pointer",
                         textAlign: "left",
@@ -444,7 +444,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
                       }}
                       onMouseEnter={(e) => {
                         (e.currentTarget as HTMLButtonElement).style.background =
-                          "rgba(255,255,255,0.04)";
+                          "var(--glass-bg)";
                       }}
                       onMouseLeave={(e) => {
                         (e.currentTarget as HTMLButtonElement).style.background = n.read

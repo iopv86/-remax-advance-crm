@@ -9,7 +9,7 @@ const BG_SURFACE = "var(--card)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER_GOLD = "rgba(201,150,58,0.15)";
-const BORDER_DIM = "rgba(255,255,255,0.06)";
+const BORDER_DIM = "var(--glass-bg-md)";
 
 function pmt(principal: number, annualRate: number, years: number): number {
   const r = annualRate / 100 / 12;

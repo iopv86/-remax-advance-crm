@@ -557,7 +557,7 @@ export function QuickActionSheets() {
             key={key}
             onClick={() => setOpenSheet(key)}
             className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm text-white/90 transition-all hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.05)" }}
+            style={{ background: "var(--glass-bg)" }}
           >
             {label}
             <Plus className="h-4 w-4 text-white/50" />

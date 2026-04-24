@@ -230,7 +230,7 @@ function StalledDealsSheet({
                   className="rounded-xl p-4 space-y-2"
                   style={{
                     background: "rgba(28,29,39,0.6)",
-                    border: "1px solid rgba(255,255,255,0.06)",
+                    border: "1px solid var(--glass-bg-md)",
                   }}
                 >
                   <div className="flex items-start justify-between gap-3">

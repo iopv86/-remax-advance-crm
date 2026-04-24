@@ -825,7 +825,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         </div>
 
                         {/* Actions */}
-                        <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
+                        <div style={{ display: "flex", gap: 8, marginTop: "auto", paddingTop: 10, borderTop: "1px solid var(--glass-bg-md)" }}>
                           <button
                             onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/properties/${p.id}?tab=unidades`); }}
                             style={{
@@ -860,7 +860,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                               padding: "8px 12px",
                               borderRadius: 8,
                               background: BG_SURFACE,
-                              border: "1px solid rgba(255,255,255,0.06)",
+                              border: "1px solid var(--glass-bg-md)",
                               color: TEXT_MUTED,
                               fontSize: 11,
                               fontWeight: 600,
@@ -883,7 +883,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                                 padding: "8px 12px",
                                 borderRadius: 8,
                                 background: BG_SURFACE,
-                                border: "1px solid rgba(255,255,255,0.06)",
+                                border: "1px solid var(--glass-bg-md)",
                                 color: TEXT_MUTED,
                                 fontSize: 11,
                                 fontWeight: 600,
@@ -1092,7 +1092,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           width: 20,
                           height: 20,
                           borderRadius: 4,
-                          border: `2px solid ${isSelected ? GOLD : "rgba(255,255,255,0.5)"}`,
+                          border: `2px solid ${isSelected ? GOLD : "var(--glass-dim)"}`,
                           background: isSelected ? GOLD : "rgba(255,255,255,0.85)",
                           display: "flex",
                           alignItems: "center",
@@ -1344,7 +1344,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   onClick={() => setPropPage((p) => Math.max(1, p - 1))}
                   disabled={propPage === 1}
                   style={{
-                    width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
+                    width: 32, height: 32, borderRadius: 8, border: "1px solid var(--glass-border)",
                     background: "transparent", color: propPage === 1 ? "rgba(154,144,136,0.3)" : "#9A9088",
                     cursor: propPage === 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   }}
@@ -1368,7 +1368,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         style={{
                           width: 32, height: 32, borderRadius: 8, fontSize: 13, fontWeight: 600,
                           cursor: "pointer", border: "1px solid",
-                          borderColor: p === propPage ? "#C9963A" : "rgba(255,255,255,0.08)",
+                          borderColor: p === propPage ? "#C9963A" : "var(--glass-border)",
                           background: p === propPage ? "#C9963A" : "transparent",
                           color: p === propPage ? "#0D0E12" : "#9A9088",
                         }}
@@ -1381,7 +1381,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   onClick={() => setPropPage((p) => Math.min(totalPages, p + 1))}
                   disabled={propPage === totalPages}
                   style={{
-                    width: 32, height: 32, borderRadius: 8, border: "1px solid rgba(255,255,255,0.08)",
+                    width: 32, height: 32, borderRadius: 8, border: "1px solid var(--glass-border)",
                     background: "transparent", color: propPage === totalPages ? "rgba(154,144,136,0.3)" : "#9A9088",
                     cursor: propPage === totalPages ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   }}
@@ -1432,7 +1432,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   value={proposalForm.contactName}
                   onChange={(e) => setProposalForm((f) => ({ ...f, contactName: e.target.value }))}
                   style={{
-                    width: "100%", background: "var(--background)", border: "1px solid rgba(255,255,255,0.1)",
+                    width: "100%", background: "var(--background)", border: "1px solid var(--glass-border-md)",
                     borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
                     fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
                   }}
@@ -1448,7 +1448,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   value={proposalForm.title}
                   onChange={(e) => setProposalForm((f) => ({ ...f, title: e.target.value }))}
                   style={{
-                    width: "100%", background: "var(--background)", border: "1px solid rgba(255,255,255,0.1)",
+                    width: "100%", background: "var(--background)", border: "1px solid var(--glass-border-md)",
                     borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
                     fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
                   }}
@@ -1464,7 +1464,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   value={proposalForm.message}
                   onChange={(e) => setProposalForm((f) => ({ ...f, message: e.target.value }))}
                   style={{
-                    width: "100%", background: "var(--background)", border: "1px solid rgba(255,255,255,0.1)",
+                    width: "100%", background: "var(--background)", border: "1px solid var(--glass-border-md)",
                     borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
                     fontFamily: "Inter, sans-serif", outline: "none", resize: "none", boxSizing: "border-box",
                   }}
@@ -1477,7 +1477,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 onClick={() => setProposalModalOpen(false)}
                 style={{
                   flex: 1, padding: "10px 0", borderRadius: 8, background: "var(--background)",
-                  border: "1px solid rgba(255,255,255,0.1)", color: "var(--muted-foreground)",
+                  border: "1px solid var(--glass-border-md)", color: "var(--muted-foreground)",
                   fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
                 }}
               >
@@ -1541,7 +1541,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
 
             {/* URL display */}
             <div style={{
-              background: "var(--background)", border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--background)", border: "1px solid var(--glass-border)",
               borderRadius: 8, padding: "10px 14px", marginBottom: 16,
               display: "flex", alignItems: "center", gap: 8,
             }}>
@@ -1611,7 +1611,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 }}
                 style={{
                   flex: 1, padding: "9px 0", borderRadius: 8, background: "var(--background)",
-                  border: "1px solid rgba(255,255,255,0.1)", color: "var(--muted-foreground)",
+                  border: "1px solid var(--glass-border-md)", color: "var(--muted-foreground)",
                   fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
                 }}
               >

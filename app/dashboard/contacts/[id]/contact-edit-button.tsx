@@ -26,8 +26,8 @@ const FIELD_STYLE = {
   padding: "8px 12px",
   borderRadius: 8,
   fontSize: 13,
-  background: "rgba(255,255,255,0.04)",
-  border: "1px solid rgba(255,255,255,0.07)",
+  background: "var(--glass-bg)",
+  border: "1px solid var(--glass-border)",
   color: "#E8E3DC",
   outline: "none",
   boxSizing: "border-box" as const,
@@ -123,12 +123,12 @@ export function ContactEditButton({ contact }: { contact: EditableContact }) {
             style={{
               position: "relative", zIndex: 1,
               width: 480, maxWidth: "92vw", height: "100vh",
-              background: "#0D0E12", borderLeft: "1px solid rgba(255,255,255,0.06)",
+              background: "#0D0E12", borderLeft: "1px solid var(--glass-bg-md)",
               display: "flex", flexDirection: "column",
             }}
           >
             {/* Header */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 28px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 28px 20px", borderBottom: "1px solid var(--glass-bg-md)" }}>
               <h2 style={{ fontSize: 17, fontWeight: 700, color: "#E8E3DC", margin: 0, fontFamily: "Manrope, sans-serif" }}>
                 Editar contacto
               </h2>
@@ -229,10 +229,10 @@ export function ContactEditButton({ contact }: { contact: EditableContact }) {
             </div>
 
             {/* Footer */}
-            <div style={{ padding: "16px 28px 28px", borderTop: "1px solid rgba(255,255,255,0.06)", display: "flex", gap: 10 }}>
+            <div style={{ padding: "16px 28px 28px", borderTop: "1px solid var(--glass-bg-md)", display: "flex", gap: 10 }}>
               <button
                 onClick={() => !saving && setOpen(false)}
-                style={{ flex: 1, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", color: "#9899A8", border: "1px solid rgba(255,255,255,0.07)" }}
+                style={{ flex: 1, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "var(--glass-bg)", color: "#9899A8", border: "1px solid var(--glass-border)" }}
               >
                 Cancelar
               </button>

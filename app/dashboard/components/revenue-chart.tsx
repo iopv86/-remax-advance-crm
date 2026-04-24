@@ -84,7 +84,7 @@ export function RevenueChart({ data }: { data: RevenuePoint[] }) {
           <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }} barCategoryGap="28%">
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="rgba(255,255,255,0.04)"
+              stroke="var(--glass-bg)"
               vertical={false}
             />
             <XAxis

@@ -93,7 +93,7 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
             gap: 6,
             padding: "4px 10px",
             borderRadius: 999,
-            background: isActive ? "rgba(16,185,129,0.10)" : "rgba(255,255,255,0.04)",
+            background: isActive ? "rgba(16,185,129,0.10)" : "var(--glass-bg)",
             border: `1px solid ${isActive ? "rgba(16,185,129,0.25)" : T.borderSubtle}`,
           }}
         >
@@ -155,7 +155,7 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
           justifyContent: "space-between",
           padding: "9px 12px",
           borderRadius: 8,
-          background: "rgba(255,255,255,0.02)",
+          background: "var(--glass-bg)",
           border: `1px solid ${T.borderSubtle}`,
           color: T.surfaceMuted,
           fontSize: 12,
@@ -173,7 +173,7 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
         onMouseLeave={(e) => {
           (e.currentTarget as HTMLAnchorElement).style.borderColor = T.borderSubtle;
           (e.currentTarget as HTMLAnchorElement).style.color = T.surfaceMuted;
-          (e.currentTarget as HTMLAnchorElement).style.background = "rgba(255,255,255,0.02)";
+          (e.currentTarget as HTMLAnchorElement).style.background = "var(--glass-bg)";
         }}
       >
         Ver conversaciones

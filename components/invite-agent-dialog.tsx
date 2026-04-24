@@ -21,8 +21,8 @@ const ROLES: { value: AgentRole; label: string; description: string; color: stri
 const T = {
   bg: "#141418",
   border: "rgba(201,150,58,0.15)",
-  muted: "rgba(255,255,255,0.3)",
-  surface: "rgba(255,255,255,0.04)",
+  muted: "var(--glass-dim)",
+  surface: "var(--glass-bg)",
   gold: "#C9963A",
   goldLight: "#f5bd5d",
   onSurface: "#e5e2e1",
@@ -71,7 +71,7 @@ function TextInput({
       style={{
         width: "100%",
         background: T.surface,
-        border: `1px solid rgba(255,255,255,0.08)`,
+        border: `1px solid var(--glass-border)`,
         borderRadius: 10,
         padding: "10px 14px",
         fontSize: 14,
@@ -81,7 +81,7 @@ function TextInput({
         transition: "border 0.15s",
       }}
       onFocus={(e) => { e.target.style.borderColor = "rgba(201,150,58,0.5)"; }}
-      onBlur={(e) => { e.target.style.borderColor = "rgba(255,255,255,0.08)"; }}
+      onBlur={(e) => { e.target.style.borderColor = "var(--glass-border)"; }}
     />
   );
 }
@@ -164,7 +164,7 @@ export function InviteAgentDialog({ open, onClose }: Props) {
             width: 32,
             height: 32,
             borderRadius: 8,
-            background: "rgba(255,255,255,0.05)",
+            background: "var(--glass-bg)",
             border: "none",
             color: T.muted,
             display: "flex",
@@ -251,7 +251,7 @@ export function InviteAgentDialog({ open, onClose }: Props) {
                       padding: "10px 14px",
                       borderRadius: 10,
                       background: role === r.value ? `${r.color}14` : T.surface,
-                      border: `1px solid ${role === r.value ? `${r.color}40` : "rgba(255,255,255,0.07)"}`,
+                      border: `1px solid ${role === r.value ? `${r.color}40` : "var(--glass-border)"}`,
                       cursor: "pointer",
                       transition: "all 0.15s",
                     }}
