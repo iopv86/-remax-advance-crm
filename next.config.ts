@@ -27,6 +27,14 @@ const securityHeaders = [
     value: "camera=(), microphone=(), geolocation=(), payment=()",
   },
   {
+    key: "Cross-Origin-Opener-Policy",
+    value: "same-origin",
+  },
+  {
+    key: "Cross-Origin-Resource-Policy",
+    value: "same-origin",
+  },
+  {
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
