@@ -11,7 +11,7 @@ import { LoanCalculator } from "@/components/loan-calculator";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-interface PropertyDetail {
+export interface PropertyDetail {
   id: string;
   agent_id: string;
   title: string;
@@ -42,6 +42,8 @@ interface PropertyDetail {
   external_url?: string;
   status: "active" | "reserved" | "sold" | "rented" | "inactive";
   is_project?: boolean;
+  is_exclusive?: boolean;
+  is_featured?: boolean;
   created_at: string;
   updated_at?: string;
   agent?: {

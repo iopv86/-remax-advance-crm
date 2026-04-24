@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
-import { PropertyDetailClient } from "./property-detail-client";
+import { PropertyDetailClient, type PropertyDetail } from "./property-detail-client";
 
 export default async function PropertyDetailPage({
   params,
@@ -19,10 +19,10 @@ export default async function PropertyDetailPage({
   const { data: property, error } = await supabase
     .from("properties")
     .select(
-      "id, agent_id, title, description, property_type, transaction_type, price, currency, city, sector, province, address, bedrooms, bathrooms, area_m2, lot_area_m2, parking_spots, floor_number, total_floors, year_built, price_per_m2, amenities, features, images, video_url, virtual_tour_url, mls_number, external_url, status, is_project, created_at, updated_at, agent:agents!properties_agent_id_fkey(id, full_name, email, phone, avatar_url)"
+      "id, agent_id, title, description, property_type, transaction_type, price, currency, city, sector, province, address, bedrooms, bathrooms, area_m2, lot_area_m2, parking_spots, floor_number, total_floors, year_built, price_per_m2, amenities, features, images, video_url, virtual_tour_url, mls_number, external_url, status, is_project, is_exclusive, is_featured, created_at, updated_at, agent:agents!properties_agent_id_fkey(id, full_name, email, phone, avatar_url)"
     )
     .eq("id", id)
-    .single();
+    .single<PropertyDetail>();
 
   if (error || !property) return notFound();
 
@@ -41,7 +41,7 @@ export default async function PropertyDetailPage({
 
   return (
     <PropertyDetailClient
-      property={property as any}
+      property={property}
       deals={(deals as any[]) ?? []}
       canEdit={canEdit}
       initialTab={tab === "unidades" ? "unidades" : "info"}

@@ -40,6 +40,9 @@ export function LoanCalculator({ initialPrice, currency = "USD" }: Props) {
     const r = parseFloat(rate);
     const y = parseFloat(years);
     if (!p || isNaN(p) || !r || isNaN(r) || !y || isNaN(y) || isNaN(d)) return null;
+    if (r < 0.1 || r > 30) return null;
+    if (y < 1 || y > 40) return null;
+    if (d < 0 || d > 95) return null;
     const down = p * (d / 100);
     const principal = p - down;
     if (principal <= 0) return null;

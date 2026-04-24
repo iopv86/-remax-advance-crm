@@ -152,8 +152,9 @@ export function PropertySheet({
     const supabase = createClient();
     const uploaded: string[] = [];
 
+    const EXT_MAP: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
     for (const file of files) {
-      const ext = file.name.split(".").pop();
+      const ext = EXT_MAP[file.type] ?? "jpg";
       const path = `properties/${crypto.randomUUID()}.${ext}`;
       const { error } = await supabase.storage
         .from("property-images")
@@ -186,10 +187,15 @@ export function PropertySheet({
     setLoading(true);
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Sesión expirada. Recarga la página.");
+      setLoading(false);
+      return;
+    }
     const { data: agent } = await supabase
       .from("agents")
       .select("id")
-      .eq("email", user?.email ?? "")
+      .eq("email", user.email ?? "")
       .single();
 
     const payload = {

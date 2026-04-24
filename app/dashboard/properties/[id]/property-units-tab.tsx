@@ -73,6 +73,7 @@ function parseCsvLine(line: string): string[] {
 }
 
 const VALID_ESTADOS: UnitEstado[] = ["disponible", "vendido", "reservado", "bloqueado"];
+const VALID_CURRENCIES = ["USD", "DOP"];
 
 function parseCsv(text: string): CsvRowParsed[] {
   const lines = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n").filter((l) => l.trim());
@@ -116,8 +117,8 @@ function parseCsv(text: string): CsvRowParsed[] {
     const nombre = get(cNombre);
     if (!nombre) continue;
 
-    const rawEstado = get(cEstado).toLowerCase().trim() as UnitEstado;
-    const estado: UnitEstado = VALID_ESTADOS.includes(rawEstado) ? rawEstado : "disponible";
+    const rawEstado = get(cEstado).toLowerCase().trim();
+    const estado: UnitEstado = VALID_ESTADOS.includes(rawEstado as UnitEstado) ? rawEstado as UnitEstado : "disponible";
 
     rows.push({
       nombre_unidad: nombre,
@@ -130,7 +131,7 @@ function parseCsv(text: string): CsvRowParsed[] {
       m2_construido: num(cM2c),
       m2_extra: num(cM2e),
       precio_venta: num(cPv),
-      moneda_venta: get(cMv) || "USD",
+      moneda_venta: VALID_CURRENCIES.includes((get(cMv) || "USD").toUpperCase()) ? (get(cMv) || "USD").toUpperCase() : "USD",
       precio_mantenimiento: num(cMant),
       precio_separacion: num(cSep),
       estado,
@@ -225,7 +226,15 @@ function AddUnitForm({ propertyId, onSaved, onCancel }: AddUnitFormProps) {
       notas: form.notas.trim() || null,
     });
     setSaving(false);
-    if (error) { setErr(error.message); return; }
+    if (error) {
+      const msg = error.code === "42501"
+        ? "Sin permisos para agregar unidades a esta propiedad."
+        : error.code === "23505"
+        ? "Ya existe una unidad con ese nombre en este proyecto."
+        : "Error al guardar la unidad. Intenta de nuevo.";
+      setErr(msg);
+      return;
+    }
     onSaved();
   }
 
@@ -353,14 +362,19 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
       .select("*")
       .eq("property_id", propertyId)
       .order("nombre_unidad");
-    if (error) setFetchError(error.message);
-    else setUnits((data as ProjectUnit[]) ?? []);
+    if (error) setFetchError("No se pudieron cargar las unidades.");
+    else setUnits((data ?? []) as ProjectUnit[]);
     setLoading(false);
   }, [propertyId]);
 
   useEffect(() => { loadUnits(); }, [loadUnits]);
 
   // ── CSV export ──────────────────────────────────────────────────────────────
+
+  function csvQ(v: unknown): string {
+    const s = v == null ? "" : String(v);
+    return `"${s.replace(/"/g, '""')}"`;
+  }
 
   function handleExportCsv() {
     const rows = units.map((u) =>
@@ -381,7 +395,7 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
         u.estado,
         u.etapa ?? "",
         u.notas ?? "",
-      ].join(",")
+      ].map(csvQ).join(",")
     );
     const content = `${CSV_HEADERS}\n${rows.join("\n")}`;
     const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
@@ -407,15 +421,27 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      setCsvError("El archivo CSV no puede superar 2 MB.");
+      e.target.value = "";
+      return;
+    }
     setCsvFileName(file.name);
     setImportResult(null);
     setCsvError(null);
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const text = ev.target?.result as string;
+      const text = ev.target?.result;
+      if (typeof text !== "string") {
+        setCsvError("Error leyendo el archivo. Intenta de nuevo.");
+        return;
+      }
       const rows = parseCsv(text);
       if (rows.length === 0) {
         setCsvError("El CSV no tiene filas válidas o el encabezado no coincide. Descarga la plantilla para ver el formato correcto.");
+        setCsvRows(null);
+      } else if (rows.length > 500) {
+        setCsvError(`El archivo tiene ${rows.length} filas. Máximo 500 unidades por importación. Divide el archivo y vuelve a intentar.`);
         setCsvRows(null);
       } else {
         setCsvRows(rows);
@@ -454,12 +480,15 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
       .upsert(payload, { onConflict: "property_id,nombre_unidad", ignoreDuplicates: false });
     setImporting(false);
     if (error) {
-      setImportResult({ success: 0, error: error.message });
+      const msg = error.code === "42501"
+        ? "Sin permisos para importar unidades a esta propiedad."
+        : "Error al importar. Verifica que los datos sean correctos y vuelve a intentar.";
+      setImportResult({ success: 0, error: msg });
     } else {
       setImportResult({ success: csvRows.length });
       setCsvRows(null);
       setCsvFileName(null);
-      loadUnits();
+      void loadUnits();
     }
   }
 
@@ -544,7 +573,7 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
       {showAddForm && (
         <AddUnitForm
           propertyId={propertyId}
-          onSaved={() => { setShowAddForm(false); loadUnits(); }}
+          onSaved={() => { setShowAddForm(false); void loadUnits(); }}
           onCancel={() => setShowAddForm(false)}
         />
       )}

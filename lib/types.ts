@@ -107,11 +107,11 @@ export interface ProjectUnit {
   m2_terreno?: number | null;
   m2_parqueo?: number | null;
   precio_venta?: number | null;
-  moneda_venta?: string | null;
+  moneda_venta?: CurrencyType | null;
   precio_mantenimiento?: number | null;
-  moneda_mantenimiento?: string | null;
+  moneda_mantenimiento?: CurrencyType | null;
   precio_separacion?: number | null;
-  moneda_separacion?: string | null;
+  moneda_separacion?: CurrencyType | null;
   precio_amueblado?: number | null;
   estado: UnitEstado;
   etapa?: string | null;
