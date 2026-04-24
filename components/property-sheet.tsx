@@ -4,13 +4,6 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { Upload, X } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,6 +21,60 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+function Toggle({
+  checked,
+  onChange,
+  label,
+  description,
+}: {
+  checked: boolean;
+  onChange: () => void;
+  label: string;
+  description: string;
+}) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "12px 14px",
+        borderRadius: 8,
+        border: checked ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
+        background: checked ? "rgba(201,150,58,0.06)" : "transparent",
+        cursor: "pointer",
+      }}
+      onClick={onChange}
+    >
+      <div
+        style={{
+          width: 36, height: 20, borderRadius: 10,
+          background: checked ? "#C9963A" : "rgba(255,255,255,0.12)",
+          position: "relative", flexShrink: 0, transition: "background 0.15s",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute", top: 2,
+            left: checked ? 18 : 2,
+            width: 16, height: 16, borderRadius: "50%",
+            background: "#fff", transition: "left 0.15s",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
+          }}
+        />
+      </div>
+      <div>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: checked ? "#C9963A" : "#e5e2e1" }}>
+          {label}
+        </p>
+        <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 interface PropertyFormState {
   title: string;
   property_type: string;
@@ -39,11 +86,14 @@ interface PropertyFormState {
   bedrooms: string;
   bathrooms: string;
   area_m2: string;
+  lot_area_m2: string;
+  total_floors: string;
+  commission_pct: string;
+  separation_fee: string;
   status: string;
   description: string;
   is_project: boolean;
   is_exclusive: boolean;
-  is_featured: boolean;
 }
 
 const EMPTY_FORM: PropertyFormState = {
@@ -57,11 +107,14 @@ const EMPTY_FORM: PropertyFormState = {
   bedrooms: "",
   bathrooms: "",
   area_m2: "",
+  lot_area_m2: "",
+  total_floors: "",
+  commission_pct: "",
+  separation_fee: "",
   status: "active",
   description: "",
   is_project: false,
   is_exclusive: false,
-  is_featured: false,
 };
 
 function propertyToForm(p: Property): PropertyFormState {
@@ -76,18 +129,21 @@ function propertyToForm(p: Property): PropertyFormState {
     bedrooms: p.bedrooms?.toString() ?? "",
     bathrooms: p.bathrooms?.toString() ?? "",
     area_m2: p.area_m2?.toString() ?? "",
+    lot_area_m2: p.lot_area_m2?.toString() ?? "",
+    total_floors: p.total_floors?.toString() ?? "",
+    commission_pct: p.commission_pct?.toString() ?? "",
+    separation_fee: p.separation_fee?.toString() ?? "",
     status: p.status,
     description: p.description ?? "",
     is_project: p.is_project ?? false,
     is_exclusive: p.is_exclusive ?? false,
-    is_featured: p.is_featured ?? false,
   };
 }
 
 interface PropertySheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  property?: Property | null; // null = create mode
+  property?: Property | null;
   defaultIsProject?: boolean;
   onSaved: () => void;
 }
@@ -108,15 +164,6 @@ export function PropertySheet({
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Reset form when sheet opens with new property data
-  function handleOpenChange(o: boolean) {
-    if (o) {
-      setForm(property ? propertyToForm(property) : { ...EMPTY_FORM, is_project: defaultIsProject });
-      setImages(property?.images ?? []);
-    }
-    onOpenChange(o);
-  }
-
   function set(field: keyof PropertyFormState, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
   }
@@ -125,14 +172,12 @@ export function PropertySheet({
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
 
-    // Validate total count
     if (images.length + files.length > 10) {
       toast.error("Máximo 10 fotos por propiedad");
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    // Validate each file
     const ALLOWED = ["image/jpeg", "image/png", "image/webp"];
     const MAX_MB = 5;
     for (const file of files) {
@@ -163,9 +208,7 @@ export function PropertySheet({
         toast.error(`Error subiendo ${file.name}: ${error.message}`);
         continue;
       }
-      const { data } = supabase.storage
-        .from("property-images")
-        .getPublicUrl(path);
+      const { data } = supabase.storage.from("property-images").getPublicUrl(path);
       uploaded.push(data.publicUrl);
     }
 
@@ -198,32 +241,33 @@ export function PropertySheet({
       .eq("email", user.email ?? "")
       .single();
 
+    const isProject = form.is_project;
     const payload = {
       title: form.title.trim(),
       property_type: form.property_type,
-      transaction_type: form.transaction_type,
+      transaction_type: isProject ? "sale" : form.transaction_type,
       price: form.price ? Number(form.price) : null,
       currency: form.currency,
       city: form.location_city.trim() || null,
       sector: form.location_sector.trim() || null,
-      bedrooms: form.bedrooms ? Number(form.bedrooms) : null,
-      bathrooms: form.bathrooms ? Number(form.bathrooms) : null,
+      bedrooms: isProject ? null : (form.bedrooms ? Number(form.bedrooms) : null),
+      bathrooms: isProject ? null : (form.bathrooms ? Number(form.bathrooms) : null),
       area_m2: form.area_m2 ? Number(form.area_m2) : null,
+      lot_area_m2: isProject ? (form.lot_area_m2 ? Number(form.lot_area_m2) : null) : null,
+      total_floors: isProject ? (form.total_floors ? Number(form.total_floors) : null) : null,
+      commission_pct: isProject ? (form.commission_pct ? Number(form.commission_pct) : null) : null,
+      separation_fee: isProject ? (form.separation_fee ? Number(form.separation_fee) : null) : null,
       status: form.status,
       description: form.description.trim() || null,
       images,
       agent_id: agent?.id ?? null,
-      is_project: form.is_project,
+      is_project: isProject,
       is_exclusive: form.is_exclusive,
-      is_featured: form.is_featured,
     };
 
     let error;
     if (isEdit) {
-      ({ error } = await supabase
-        .from("properties")
-        .update(payload)
-        .eq("id", property!.id));
+      ({ error } = await supabase.from("properties").update(payload).eq("id", property!.id));
     } else {
       ({ error } = await supabase.from("properties").insert(payload));
     }
@@ -233,376 +277,290 @@ export function PropertySheet({
       toast.error("Error al guardar: " + error.message);
       return;
     }
-    toast.success(isEdit ? "Propiedad actualizada" : "Propiedad creada");
+    toast.success(isEdit
+      ? (isProject ? "Proyecto actualizado" : "Propiedad actualizada")
+      : (isProject ? "Proyecto creado" : "Propiedad creada"));
     onOpenChange(false);
     onSaved();
   }
 
+  if (!open) return null;
+
+  const isProject = form.is_project;
+  const title = isEdit
+    ? (isProject ? "Editar proyecto" : "Editar propiedad")
+    : (isProject ? "Nuevo proyecto" : "Nueva propiedad");
+
   return (
-    <Sheet open={open} onOpenChange={handleOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full sm:max-w-lg overflow-y-auto p-0"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.65)", backdropFilter: "blur(4px)" }}
+      onClick={(e) => { if (e.target === e.currentTarget) onOpenChange(false); }}
+    >
+      <div
+        className="relative w-full mx-4 flex flex-col rounded-xl overflow-hidden"
+        style={{
+          maxWidth: 520,
+          maxHeight: "90vh",
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.5)",
+        }}
       >
-        <SheetHeader
-          className="p-6 pb-4 sticky top-0 z-10"
-          style={{ borderBottom: "1px solid var(--border)", background: "var(--card)" }}
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 py-4 shrink-0"
+          style={{ borderBottom: "1px solid var(--border)" }}
         >
-          <SheetTitle
+          <h2
             style={{
               fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
               fontWeight: 700,
-              fontSize: 20,
+              fontSize: 18,
               color: "var(--foreground)",
+              margin: 0,
             }}
           >
-            {isEdit ? (form.is_project ? "Editar proyecto" : "Editar propiedad") : (form.is_project ? "Nuevo proyecto" : "Nueva propiedad")}
-          </SheetTitle>
-        </SheetHeader>
-
-        <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
-          {/* Title */}
-          <div>
-            <Label>Título *</Label>
-            <Input
-              placeholder="Apto 2hab en Piantini"
-              value={form.title}
-              onChange={(e) => set("title", e.target.value)}
-            />
-          </div>
-
-          {/* Type + Transaction */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Tipo</Label>
-              <Select
-                value={form.property_type}
-                onValueChange={(v) => v && set("property_type", v)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="apartment">Apartamento</SelectItem>
-                  <SelectItem value="penthouse">Penthouse</SelectItem>
-                  <SelectItem value="villa">Villa</SelectItem>
-                  <SelectItem value="house">Casa</SelectItem>
-                  <SelectItem value="land">Solar</SelectItem>
-                  <SelectItem value="commercial">Local Comercial</SelectItem>
-                  <SelectItem value="apart_hotel">Apart-Hotel</SelectItem>
-                  <SelectItem value="farm">Finca</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Operación</Label>
-              <Select
-                value={form.transaction_type}
-                onValueChange={(v) => v && set("transaction_type", v as "sale" | "rent")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="sale">Venta</SelectItem>
-                  <SelectItem value="rent">Alquiler</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Price + Currency */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Precio</Label>
-              <Input
-                type="number"
-                placeholder="250000"
-                value={form.price}
-                onChange={(e) => set("price", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Moneda</Label>
-              <Select
-                value={form.currency}
-                onValueChange={(v) => v && set("currency", v as "USD" | "DOP")}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="DOP">DOP</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          {/* Location */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label>Ciudad</Label>
-              <Input
-                placeholder="Santo Domingo"
-                value={form.location_city}
-                onChange={(e) => set("location_city", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Sector</Label>
-              <Input
-                placeholder="Piantini"
-                value={form.location_sector}
-                onChange={(e) => set("location_sector", e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Specs */}
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <Label>Hab.</Label>
-              <Input
-                type="number"
-                placeholder="2"
-                value={form.bedrooms}
-                onChange={(e) => set("bedrooms", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>Baños</Label>
-              <Input
-                type="number"
-                placeholder="2"
-                value={form.bathrooms}
-                onChange={(e) => set("bathrooms", e.target.value)}
-              />
-            </div>
-            <div>
-              <Label>m²</Label>
-              <Input
-                type="number"
-                placeholder="120"
-                value={form.area_m2}
-                onChange={(e) => set("area_m2", e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* Status */}
-          <div>
-            <Label>Estado</Label>
-            <Select
-              value={form.status}
-              onValueChange={(v) => v && set("status", v)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Activo</SelectItem>
-                <SelectItem value="reserved">Reservado</SelectItem>
-                <SelectItem value="sold">Vendido</SelectItem>
-                <SelectItem value="rented">Rentado</SelectItem>
-                <SelectItem value="inactive">Inactivo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Project toggle */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "12px 14px",
-              borderRadius: 8,
-              border: form.is_project ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
-              background: form.is_project ? "rgba(201,150,58,0.06)" : "transparent",
-              cursor: "pointer",
-            }}
-            onClick={() => set("is_project", !form.is_project)}
+            {title}
+          </h2>
+          <button
+            type="button"
+            onClick={() => onOpenChange(false)}
+            className="flex items-center justify-center w-8 h-8 rounded-lg transition-colors"
+            style={{ color: "var(--muted-foreground)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(255,255,255,0.08)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
-            <div
-              style={{
-                width: 36,
-                height: 20,
-                borderRadius: 10,
-                background: form.is_project ? "#C9963A" : "rgba(255,255,255,0.12)",
-                position: "relative",
-                flexShrink: 0,
-                transition: "background 0.15s",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: 2,
-                  left: form.is_project ? 18 : 2,
-                  width: 16,
-                  height: 16,
-                  borderRadius: "50%",
-                  background: "#fff",
-                  transition: "left 0.15s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
-                }}
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div className="overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-6 flex flex-col gap-4">
+
+            {/* Title */}
+            <div>
+              <Label>Título *</Label>
+              <Input
+                placeholder={isProject ? "Proyecto Vista Mar — Piantini" : "Apto 2hab en Piantini"}
+                value={form.title}
+                onChange={(e) => set("title", e.target.value)}
               />
             </div>
-            <div>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: form.is_project ? "#C9963A" : "#e5e2e1" }}>
-                Es un proyecto / desarrollo
-              </p>
-              <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
-                Con múltiples unidades (apartamentos, locales, etc.)
-              </p>
-            </div>
-          </div>
 
-          {/* Exclusive toggle */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "12px 14px",
-              borderRadius: 8,
-              border: form.is_exclusive ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
-              background: form.is_exclusive ? "rgba(201,150,58,0.06)" : "transparent",
-              cursor: "pointer",
-            }}
-            onClick={() => set("is_exclusive", !form.is_exclusive)}
-          >
-            <div
-              style={{
-                width: 36, height: 20, borderRadius: 10,
-                background: form.is_exclusive ? "#C9963A" : "rgba(255,255,255,0.12)",
-                position: "relative", flexShrink: 0, transition: "background 0.15s",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute", top: 2,
-                  left: form.is_exclusive ? 18 : 2,
-                  width: 16, height: 16, borderRadius: "50%",
-                  background: "#fff", transition: "left 0.15s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
-                }}
-              />
-            </div>
-            <div>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: form.is_exclusive ? "#C9963A" : "#e5e2e1" }}>
-                Propiedad exclusiva
-              </p>
-              <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
-                Captación exclusiva de RE/MAX Advance
-              </p>
-            </div>
-          </div>
-
-          {/* Featured toggle */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "12px 14px",
-              borderRadius: 8,
-              border: form.is_featured ? "1px solid rgba(201,150,58,0.4)" : "1px solid rgba(255,255,255,0.08)",
-              background: form.is_featured ? "rgba(201,150,58,0.06)" : "transparent",
-              cursor: "pointer",
-            }}
-            onClick={() => set("is_featured", !form.is_featured)}
-          >
-            <div
-              style={{
-                width: 36, height: 20, borderRadius: 10,
-                background: form.is_featured ? "#C9963A" : "rgba(255,255,255,0.12)",
-                position: "relative", flexShrink: 0, transition: "background 0.15s",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute", top: 2,
-                  left: form.is_featured ? 18 : 2,
-                  width: 16, height: 16, borderRadius: "50%",
-                  background: "#fff", transition: "left 0.15s",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.3)",
-                }}
-              />
-            </div>
-            <div>
-              <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: form.is_featured ? "#C9963A" : "#e5e2e1" }}>
-                Propiedad destacada
-              </p>
-              <p style={{ margin: 0, fontSize: 11, color: "#9899A8" }}>
-                Aparece en posición prioritaria en el portal
-              </p>
-            </div>
-          </div>
-
-          {/* Description */}
-          <div>
-            <Label>Descripción</Label>
-            <textarea
-              rows={3}
-              placeholder="Descripción de la propiedad…"
-              value={form.description}
-              onChange={(e) => set("description", e.target.value)}
-              className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 resize-none"
-            />
-          </div>
-
-          {/* Photos */}
-          <div>
-            <Label>Fotos</Label>
-            <div className="space-y-2">
-              {images.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {images.map((url) => (
-                    <div key={url} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt="" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(url)}
-                        className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
-                      >
-                        <X className="w-3 h-3 text-white" />
-                      </button>
-                    </div>
-                  ))}
+            {/* Type + Transaction — transaction hidden for projects */}
+            {isProject ? (
+              <div>
+                <Label>Tipo de unidades</Label>
+                <Select value={form.property_type} onValueChange={(v) => v && set("property_type", v)}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="apartment">Apartamentos</SelectItem>
+                    <SelectItem value="penthouse">Penthouses</SelectItem>
+                    <SelectItem value="villa">Villas</SelectItem>
+                    <SelectItem value="house">Casas</SelectItem>
+                    <SelectItem value="commercial">Comercial</SelectItem>
+                    <SelectItem value="apart_hotel">Apart-Hotel</SelectItem>
+                    <SelectItem value="land">Solares</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Tipo</Label>
+                  <Select value={form.property_type} onValueChange={(v) => v && set("property_type", v)}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="apartment">Apartamento</SelectItem>
+                      <SelectItem value="penthouse">Penthouse</SelectItem>
+                      <SelectItem value="villa">Villa</SelectItem>
+                      <SelectItem value="house">Casa</SelectItem>
+                      <SelectItem value="land">Solar</SelectItem>
+                      <SelectItem value="commercial">Local Comercial</SelectItem>
+                      <SelectItem value="apart_hotel">Apart-Hotel</SelectItem>
+                      <SelectItem value="farm">Finca</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                className="hidden"
-                onChange={handleFileChange}
+                <div>
+                  <Label>Operación</Label>
+                  <Select value={form.transaction_type} onValueChange={(v) => v && set("transaction_type", v as "sale" | "rent")}>
+                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sale">Venta</SelectItem>
+                      <SelectItem value="rent">Alquiler</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
+            {/* Price + Currency */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>{isProject ? "Precio desde" : "Precio"}</Label>
+                <Input type="number" placeholder="250000" value={form.price} onChange={(e) => set("price", e.target.value)} />
+              </div>
+              <div>
+                <Label>Moneda</Label>
+                <Select value={form.currency} onValueChange={(v) => v && set("currency", v as "USD" | "DOP")}>
+                  <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="USD">USD</SelectItem>
+                    <SelectItem value="DOP">DOP</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {/* Location */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Ciudad</Label>
+                <Input placeholder="Santo Domingo" value={form.location_city} onChange={(e) => set("location_city", e.target.value)} />
+              </div>
+              <div>
+                <Label>Sector</Label>
+                <Input placeholder="Piantini" value={form.location_sector} onChange={(e) => set("location_sector", e.target.value)} />
+              </div>
+            </div>
+
+            {/* Project-specific fields */}
+            {isProject ? (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Área construida (m²)</Label>
+                    <Input type="number" placeholder="5000" value={form.area_m2} onChange={(e) => set("area_m2", e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Terreno (m²)</Label>
+                    <Input type="number" placeholder="2000" value={form.lot_area_m2} onChange={(e) => set("lot_area_m2", e.target.value)} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label>Niveles</Label>
+                    <Input type="number" placeholder="12" value={form.total_floors} onChange={(e) => set("total_floors", e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Comisión %</Label>
+                    <Input type="number" placeholder="3" value={form.commission_pct} onChange={(e) => set("commission_pct", e.target.value)} />
+                  </div>
+                  <div>
+                    <Label>Separación (USD)</Label>
+                    <Input type="number" placeholder="5000" value={form.separation_fee} onChange={(e) => set("separation_fee", e.target.value)} />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label>Hab.</Label>
+                  <Input type="number" placeholder="2" value={form.bedrooms} onChange={(e) => set("bedrooms", e.target.value)} />
+                </div>
+                <div>
+                  <Label>Baños</Label>
+                  <Input type="number" placeholder="2" value={form.bathrooms} onChange={(e) => set("bathrooms", e.target.value)} />
+                </div>
+                <div>
+                  <Label>m²</Label>
+                  <Input type="number" placeholder="120" value={form.area_m2} onChange={(e) => set("area_m2", e.target.value)} />
+                </div>
+              </div>
+            )}
+
+            {/* Status */}
+            <div>
+              <Label>Estado</Label>
+              <Select value={form.status} onValueChange={(v) => v && set("status", v)}>
+                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Activo</SelectItem>
+                  <SelectItem value="reserved">Reservado</SelectItem>
+                  <SelectItem value="sold">Vendido</SelectItem>
+                  <SelectItem value="rented">Rentado</SelectItem>
+                  <SelectItem value="inactive">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Project toggle */}
+            <Toggle
+              checked={form.is_project}
+              onChange={() => set("is_project", !form.is_project)}
+              label="Es un proyecto / desarrollo"
+              description="Con múltiples unidades (apartamentos, locales, etc.)"
+            />
+
+            {/* Exclusive toggle */}
+            <Toggle
+              checked={form.is_exclusive}
+              onChange={() => set("is_exclusive", !form.is_exclusive)}
+              label="Propiedad exclusiva"
+              description="Captación exclusiva de RE/MAX Advance"
+            />
+
+            {/* Description */}
+            <div>
+              <Label>Descripción</Label>
+              <textarea
+                rows={3}
+                placeholder="Descripción de la propiedad…"
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+                className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 resize-none"
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={uploading}
-                onClick={() => fileInputRef.current?.click()}
-                className="gap-2"
-              >
-                <Upload className="h-3.5 w-3.5" />
-                {uploading ? "Subiendo…" : "Agregar fotos"}
+            </div>
+
+            {/* Photos */}
+            <div>
+              <Label>Fotos</Label>
+              <div className="space-y-2">
+                {images.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {images.map((url) => (
+                      <div key={url} className="relative w-20 h-20 rounded-lg overflow-hidden border border-border">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(url)}
+                          className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={handleFileChange} />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={uploading}
+                  onClick={() => fileInputRef.current?.click()}
+                  className="gap-2"
+                >
+                  <Upload className="h-3.5 w-3.5" />
+                  {uploading ? "Subiendo…" : "Agregar fotos"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <div className="pt-2">
+              <Button type="submit" disabled={loading || uploading} className="w-full">
+                {loading ? "Guardando…" : isEdit ? "Guardar cambios" : (isProject ? "Crear proyecto" : "Crear propiedad")}
               </Button>
             </div>
-          </div>
 
-          <SheetFooter className="pt-2">
-            <Button type="submit" disabled={loading || uploading} className="w-full">
-              {loading ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear propiedad"}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetContent>
-    </Sheet>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }

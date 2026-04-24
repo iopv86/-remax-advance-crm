@@ -87,6 +87,10 @@ export interface Property {
   is_project?: boolean;
   is_exclusive?: boolean;
   is_featured?: boolean;
+  lot_area_m2?: number;
+  total_floors?: number;
+  commission_pct?: number;
+  separation_fee?: number;
   created_at: string;
 }
 
