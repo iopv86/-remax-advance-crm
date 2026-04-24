@@ -175,7 +175,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
                   fontWeight: dateRange === t.value ? 700 : 500,
                   border: "none", cursor: "pointer", transition: "all 0.15s",
                   background: dateRange === t.value ? GOLD : "transparent",
-                  color: dateRange === t.value ? "#0D0E12" : TEXT_MUTED,
+                  color: dateRange === t.value ? "var(--primary-foreground)" : TEXT_MUTED,
                 }}
               >
                 {t.label}

@@ -125,7 +125,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
         {/* URL + actions */}
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <div style={{
-            flex: 1, background: "#0D0E12", border: `1px solid ${BORDER_SUB}`, borderRadius: 6,
+            flex: 1, background: "var(--background)", border: `1px solid ${BORDER_SUB}`, borderRadius: 6,
             padding: "6px 10px", fontSize: 11, color: DIM, fontFamily: "Inter, sans-serif",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>

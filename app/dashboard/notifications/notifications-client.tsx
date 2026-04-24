@@ -353,7 +353,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
                   cursor: "pointer",
                   transition: "all 0.15s",
                   background: isActive ? GOLD : BG_ELEVATED,
-                  color: isActive ? "#0D0E12" : TEXT_MUTED,
+                  color: isActive ? "var(--primary-foreground)" : TEXT_MUTED,
                   whiteSpace: "nowrap",
                   flexShrink: 0,
                 }}

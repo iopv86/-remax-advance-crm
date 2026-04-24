@@ -257,7 +257,7 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: WaTemp
       {showForm && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "flex-end" }}>
           <div onClick={() => !saving && closeForm()} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)" }} />
-          <div style={{ position: "relative", zIndex: 1, width: 480, maxWidth: "92vw", height: "100vh", background: "#0D0E12", borderLeft: `1px solid ${BORDER}`, display: "flex", flexDirection: "column" }}>
+          <div style={{ position: "relative", zIndex: 1, width: 480, maxWidth: "92vw", height: "100vh", background: "var(--background)", borderLeft: `1px solid ${BORDER}`, display: "flex", flexDirection: "column" }}>
             {/* Header */}
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "22px 26px 18px", borderBottom: `1px solid ${BORDER}` }}>
               <h2 style={{ fontSize: 16, fontWeight: 700, color: TEXT_PRIMARY, margin: 0, fontFamily: "Manrope, sans-serif" }}>
@@ -323,7 +323,7 @@ export function TemplatesClient({ initialTemplates }: { initialTemplates: WaTemp
               <button onClick={() => !saving && closeForm()} style={{ flex: 1, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", background: "rgba(255,255,255,0.05)", color: TEXT_MUTED, border: `1px solid ${BORDER}` }}>
                 Cancelar
               </button>
-              <button onClick={handleSave} disabled={saving} style={{ flex: 2, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", background: GOLD, color: "#0D0E12", border: "none", opacity: saving ? 0.7 : 1 }}>
+              <button onClick={handleSave} disabled={saving} style={{ flex: 2, padding: 10, borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: saving ? "wait" : "pointer", background: GOLD, color: "var(--primary-foreground)", border: "none", opacity: saving ? 0.7 : 1 }}>
                 {saving ? "Guardando…" : editing ? "Guardar cambios" : "Crear plantilla"}
               </button>
             </div>

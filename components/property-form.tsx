@@ -561,7 +561,7 @@ export function PropertyForm({ mode, initialData }: PropertyFormProps) {
         {csvProgress && (
           <span style={{ fontSize: 12, color: GOLD }}>{csvProgress}</span>
         )}
-        <Button type="submit" disabled={saving || uploading} style={{ background: GOLD, color: "#0D0E12", fontWeight: 700, minWidth: 100 }}>
+        <Button type="submit" disabled={saving || uploading} style={{ background: GOLD, color: "var(--primary-foreground)", fontWeight: 700, minWidth: 100 }}>
           {saving ? "Guardando…" : isEdit ? "Guardar" : "Crear"}
         </Button>
       </div>

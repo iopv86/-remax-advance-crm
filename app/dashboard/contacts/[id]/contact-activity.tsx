@@ -207,7 +207,7 @@ export function ContactActivity({
               disabled={saving}
               style={{
                 padding: "7px 18px", borderRadius: 8, fontSize: 12, fontWeight: 700, cursor: saving ? "wait" : "pointer",
-                background: GOLD, color: "#0D0E12", border: "none", opacity: saving ? 0.7 : 1,
+                background: GOLD, color: "var(--primary-foreground)", border: "none", opacity: saving ? 0.7 : 1,
               }}
             >
               {saving ? "Guardando…" : "Guardar"}

@@ -28,7 +28,7 @@ const STATUS_MAP: Record<UnitEstado, { label: string; color: string; bg: string 
   disponible: { label: "Disponible", color: "#10b981", bg: "rgba(16,185,129,0.12)" },
   reservado:  { label: "Reservado",  color: "#C9963A", bg: "rgba(201,150,58,0.12)" },
   vendido:    { label: "Vendido",    color: "#f43f5e", bg: "rgba(244,63,94,0.12)"  },
-  bloqueado:  { label: "Bloqueado",  color: "#6b7280", bg: "rgba(107,114,128,0.12)" },
+  bloqueado:  { label: "Bloqueado",  color: "var(--muted-foreground)", bg: "rgba(107,114,128,0.12)" },
 };
 
 // ─── Price formatter ──────────────────────────────────────────────────────────

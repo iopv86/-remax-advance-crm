@@ -97,7 +97,7 @@ function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, React.CSSProperties> = {
     admin: { ...base, background: "rgba(201,150,58,0.12)", color: GOLD, border: "1px solid rgba(201,150,58,0.25)" },
     manager: { ...base, background: "rgba(59,130,246,0.1)", color: "#60a5fa", border: "1px solid rgba(59,130,246,0.2)" },
-    agent: { ...base, background: "rgba(255,255,255,0.06)", color: "#9899A8", border: "1px solid rgba(255,255,255,0.08)" },
+    agent: { ...base, background: "rgba(255,255,255,0.06)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.08)" },
   };
   return <span style={styles[role] ?? styles.agent}>{ROLE_LABELS[role] ?? role}</span>;
 }
@@ -113,7 +113,7 @@ function StatusBadge({ active }: { active: boolean }) {
         letterSpacing: "0.08em",
         ...(active
           ? { background: "rgba(52,211,153,0.1)", color: "#34d399", border: "1px solid rgba(52,211,153,0.2)" }
-          : { background: "rgba(255,255,255,0.05)", color: "#545567", border: "1px solid rgba(255,255,255,0.08)" }),
+          : { background: "rgba(255,255,255,0.05)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.08)" }),
       }}
     >
       {active ? <CheckCircle2 className="w-2.5 h-2.5" /> : <XCircle className="w-2.5 h-2.5" />}
@@ -146,12 +146,12 @@ function ContentHeader({ section, title }: { section: string; title: string }) {
   return (
     <header className="flex justify-between items-end mb-8">
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "#9899A8" }}>
+        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: "var(--muted-foreground)" }}>
           <span>Configuración</span>
           <ChevronRight className="w-3.5 h-3.5" />
           <span style={{ color: GOLD }}>{section}</span>
         </div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: "#e3e1ea" }}>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight" style={{ color: "var(--foreground)" }}>
           {title}
         </h1>
       </div>
@@ -159,11 +159,11 @@ function ContentHeader({ section, title }: { section: string; title: string }) {
         className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full"
         style={{ background: "#292a30", border: "1px solid rgba(255,255,255,0.06)" }}
       >
-        <Search className="w-4 h-4" style={{ color: "#9899A8" }} />
+        <Search className="w-4 h-4" style={{ color: "var(--muted-foreground)" }} />
         <input
           className="bg-transparent border-none focus:outline-none text-sm w-44"
           placeholder="Buscar ajustes..."
-          style={{ color: "#e3e1ea" }}
+          style={{ color: "var(--foreground)" }}
         />
       </div>
     </header>
@@ -178,7 +178,7 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
       <ContentHeader section="Equipo" title="Agentes y Accesos" />
 
       <div className="flex justify-between items-center mb-6">
-        <h3 className="font-bold text-lg" style={{ color: "#e3e1ea", fontFamily: "Manrope, sans-serif" }}>
+        <h3 className="font-bold text-lg" style={{ color: "var(--foreground)", fontFamily: "Manrope, sans-serif" }}>
           Equipo activo
         </h3>
         <button
@@ -201,7 +201,7 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                 background: "rgba(41,42,48,0.5)",
                 fontSize: "10px",
                 fontWeight: 700,
-                color: "#9899A8",
+                color: "var(--muted-foreground)",
                 letterSpacing: "0.2em",
                 textTransform: "uppercase",
               }}
@@ -220,7 +220,7 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                 <td
                   colSpan={6}
                   className="px-6 py-10 text-center text-sm"
-                  style={{ color: "#545567" }}
+                  style={{ color: "var(--muted-foreground)" }}
                 >
                   Sin agentes registrados.
                 </td>
@@ -238,10 +238,10 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                     <div className="flex items-center gap-3">
                       <InitialAvatar name={a.full_name} size={36} />
                       <div>
-                        <p className="text-sm font-bold" style={{ color: "#e3e1ea" }}>
+                        <p className="text-sm font-bold" style={{ color: "var(--foreground)" }}>
                           {a.full_name}
                         </p>
-                        <p style={{ fontSize: "11px", color: "#9899A8" }}>{a.email}</p>
+                        <p style={{ fontSize: "11px", color: "var(--muted-foreground)" }}>{a.email}</p>
                       </div>
                     </div>
                   </td>
@@ -249,7 +249,7 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                     <RoleBadge role={a.role} />
                   </td>
                   <td className="px-6 py-4">
-                    <span className="font-mono text-xs" style={{ color: "#e3e1ea" }}>
+                    <span className="font-mono text-xs" style={{ color: "var(--foreground)" }}>
                       {a.phone ?? "—"}
                     </span>
                   </td>
@@ -257,14 +257,14 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                     <StatusBadge active={a.is_active} />
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-xs" style={{ color: "#9899A8" }}>
+                    <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                       {new Date(a.created_at).toLocaleDateString("es-DO")}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button
                       className="text-xs font-medium transition-colors"
-                      style={{ color: "#545567" }}
+                      style={{ color: "var(--muted-foreground)" }}
                       onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = GOLD_LIGHT)}
                       onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "#545567")}
                     >
@@ -299,10 +299,10 @@ function TabPerfil({
           <div className="flex items-center gap-5">
             <InitialAvatar name={currentAgent?.full_name ?? currentUser?.email ?? "?"} size={56} />
             <div>
-              <p className="font-semibold text-base" style={{ color: "#e3e1ea" }}>
+              <p className="font-semibold text-base" style={{ color: "var(--foreground)" }}>
                 {currentAgent?.full_name ?? "—"}
               </p>
-              <p className="text-sm" style={{ color: "#9899A8" }}>{currentUser?.email}</p>
+              <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>{currentUser?.email}</p>
               {currentAgent?.role && (
                 <div className="mt-1.5">
                   <RoleBadge role={currentAgent.role} />
@@ -320,23 +320,23 @@ function TabPerfil({
                 className="flex justify-between text-sm py-2"
                 style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
               >
-                <span style={{ color: "#9899A8" }}>Teléfono</span>
-                <span className="font-mono" style={{ color: "#e3e1ea" }}>{currentAgent.phone}</span>
+                <span style={{ color: "var(--muted-foreground)" }}>Teléfono</span>
+                <span className="font-mono" style={{ color: "var(--foreground)" }}>{currentAgent.phone}</span>
               </div>
             )}
             <div
               className="flex justify-between text-sm py-2"
               style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <span style={{ color: "#9899A8" }}>Estado</span>
+              <span style={{ color: "var(--muted-foreground)" }}>Estado</span>
               <StatusBadge active={currentAgent?.is_active ?? true} />
             </div>
             <div
               className="flex justify-between text-sm py-2"
               style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
             >
-              <span style={{ color: "#9899A8" }}>ID de usuario</span>
-              <span className="font-mono text-xs" style={{ color: "#545567" }}>
+              <span style={{ color: "var(--muted-foreground)" }}>ID de usuario</span>
+              <span className="font-mono text-xs" style={{ color: "var(--muted-foreground)" }}>
                 {currentUser?.id?.slice(0, 8)}…
               </span>
             </div>
@@ -345,11 +345,11 @@ function TabPerfil({
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "1.5rem" }}>
             <p
               className="text-xs font-semibold uppercase tracking-wider mb-3"
-              style={{ color: "#9899A8" }}
+              style={{ color: "var(--muted-foreground)" }}
             >
               Apariencia
             </p>
-            <p className="text-xs mb-3" style={{ color: "#545567" }}>
+            <p className="text-xs mb-3" style={{ color: "var(--muted-foreground)" }}>
               Elige entre el tema luminoso editorial o el premium oscuro.
             </p>
             <ThemeToggle />
@@ -401,9 +401,9 @@ function TabImportar() {
 
       <div className="max-w-2xl">
         <div className="rounded-2xl p-6 flex flex-col gap-5" style={GLASS_CARD}>
-          <p className="text-sm leading-relaxed" style={{ color: "#9899A8" }}>
+          <p className="text-sm leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
             Importá contactos desde AlterEstate u otro CRM. Columnas aceptadas:{" "}
-            <span style={{ color: "#e3e1ea" }}>
+            <span style={{ color: "var(--foreground)" }}>
               nombre, apellido, telefono, email, fuente, notas
             </span>
             . Los duplicados por teléfono se omiten automáticamente.
@@ -413,7 +413,7 @@ function TabImportar() {
             <label
               className="flex-1 flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer transition-all"
               style={{
-                background: "#0d0e14",
+                background: "var(--background)",
                 border: `1px solid ${csvFile ? "rgba(201,150,58,0.4)" : "rgba(255,255,255,0.06)"}`,
               }}
             >
@@ -459,13 +459,13 @@ function TabImportar() {
             >
               {[
                 { label: "Importados", value: importResult.imported, color: "#34d399" },
-                { label: "Duplicados", value: importResult.skipped, color: "#9899A8" },
+                { label: "Duplicados", value: importResult.skipped, color: "var(--muted-foreground)" },
                 ...(importResult.failed > 0 ? [{ label: "Fallidos", value: importResult.failed, color: "#f87171" }] : []),
-                { label: "Total", value: importResult.total, color: "#e3e1ea" },
+                { label: "Total", value: importResult.total, color: "var(--foreground)" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-center">
                   <p className="text-2xl font-extrabold" style={{ color, fontFamily: "Manrope, sans-serif" }}>{value}</p>
-                  <p className="text-[10px] uppercase tracking-widest" style={{ color: "#9899A8" }}>{label}</p>
+                  <p className="text-[10px] uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>{label}</p>
                 </div>
               ))}
             </div>
@@ -518,7 +518,7 @@ function TabIntegraciones() {
       detail: (
         <div
           className="rounded-xl px-4 py-3 text-xs"
-          style={{ background: "#1a1b22", color: "#9899A8", border: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.05)" }}
         >
           Gestionado por Ava — agente Railway
         </div>
@@ -539,7 +539,7 @@ function TabIntegraciones() {
       badge: "INACTIVO",
       badgeStyle: {
         background: "rgba(255,255,255,0.04)",
-        color: "#545567",
+        color: "var(--muted-foreground)",
         border: "1px solid rgba(255,255,255,0.08)",
       } as React.CSSProperties,
       detail: (
@@ -576,7 +576,7 @@ function TabIntegraciones() {
       detail: (
         <div
           className="rounded-xl px-4 py-3 font-mono text-xs truncate"
-          style={{ background: "#1a1b22", color: "#9899A8", border: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.05)" }}
         >
           https://remax-advance-ava-production.up.railway.app
         </div>
@@ -603,7 +603,7 @@ function TabIntegraciones() {
       detail: (
         <div
           className="rounded-xl px-4 py-3 text-xs"
-          style={{ background: "#1a1b22", color: "#9899A8", border: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--secondary)", color: "var(--muted-foreground)", border: "1px solid rgba(255,255,255,0.05)" }}
         >
           Siempre activo — managed cloud
         </div>
@@ -644,8 +644,8 @@ function TabIntegraciones() {
                   {intg.icon}
                 </div>
                 <div>
-                  <h3 className="font-bold text-base" style={{ color: "#e3e1ea" }}>{intg.name}</h3>
-                  <p className="text-sm" style={{ color: "#9899A8" }}>{intg.description}</p>
+                  <h3 className="font-bold text-base" style={{ color: "var(--foreground)" }}>{intg.name}</h3>
+                  <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>{intg.description}</p>
                 </div>
               </div>
               <span
@@ -664,7 +664,7 @@ function TabIntegraciones() {
       <section className="mb-10">
         <h3
           className="font-bold text-lg mb-6"
-          style={{ fontFamily: "Manrope, sans-serif", color: "#e3e1ea" }}
+          style={{ fontFamily: "Manrope, sans-serif", color: "var(--foreground)" }}
         >
           API &amp; Acceso para Desarrolladores
         </h3>
@@ -672,7 +672,7 @@ function TabIntegraciones() {
           <div className="flex justify-between items-center">
             <label
               className="font-bold uppercase tracking-widest"
-              style={{ fontSize: "10px", color: "#9899A8" }}
+              style={{ fontSize: "10px", color: "var(--muted-foreground)" }}
             >
               Production API Key
             </label>
@@ -683,12 +683,12 @@ function TabIntegraciones() {
           <div
             className="flex items-center gap-4 rounded-xl p-4 font-mono text-sm"
             style={{
-              background: "#0d0e14",
+              background: "var(--background)",
               border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
-            <span style={{ color: "#9899A8" }}>ae_live_8832_</span>
-            <span className="flex-1 tracking-[0.3em]" style={{ color: "#e3e1ea" }}>
+            <span style={{ color: "var(--muted-foreground)" }}>ae_live_8832_</span>
+            <span className="flex-1 tracking-[0.3em]" style={{ color: "var(--foreground)" }}>
               ••••••••••••••••••••••••
             </span>
             <button
@@ -705,7 +705,7 @@ function TabIntegraciones() {
               <Copy className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-xs leading-relaxed" style={{ color: "#545567" }}>
+          <p className="text-xs leading-relaxed" style={{ color: "var(--muted-foreground)" }}>
             Use esta clave para integrar el CRM con sistemas externos o portales inmobiliarios de
             terceros. No comparta esta clave en entornos no seguros.
           </p>
@@ -778,10 +778,10 @@ function TabNotificaciones({ userId }: { userId: string }) {
                 style={idx > 0 ? { borderTop: "1px solid rgba(255,255,255,0.05)" } : {}}
               >
                 <div>
-                  <p className="text-sm font-semibold mb-0.5" style={{ color: "#e3e1ea" }}>
+                  <p className="text-sm font-semibold mb-0.5" style={{ color: "var(--foreground)" }}>
                     {t.label}
                   </p>
-                  <p className="text-xs" style={{ color: "#9899A8" }}>
+                  <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>
                     {t.description}
                   </p>
                 </div>
@@ -832,19 +832,19 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
   const allNavItems = NAV_GROUPS.flatMap((g) => g.items);
 
   return (
-    <div className="flex min-h-screen" style={{ background: "#0D0E12" }}>
+    <div className="flex min-h-screen" style={{ background: "var(--background)" }}>
       {/* ── Desktop sidebar (md+) ── */}
       <nav
         className="hidden md:flex flex-col flex-shrink-0 py-8 px-6"
         style={{
           width: 220,
-          background: "#14151C",
+          background: "var(--card)",
           borderRight: "1px solid rgba(255,255,255,0.05)",
         }}
       >
         <h2
           className="text-base font-bold mb-8 uppercase tracking-wider"
-          style={{ color: "#F5F0E8" }}
+          style={{ color: "var(--foreground)" }}
         >
           Configuración
         </h2>
@@ -873,7 +873,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
                         style={
                           isActive
                             ? { color: GOLD_LIGHT, fontWeight: 700, borderRight: `2px solid ${GOLD}` }
-                            : { color: "#d3c4b1" }
+                            : { color: "var(--muted-foreground)" }
                         }
                         onMouseEnter={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.color = GOLD_LIGHT; }}
                         onMouseLeave={(e) => { if (!isActive) (e.currentTarget as HTMLElement).style.color = "#d3c4b1"; }}
@@ -894,7 +894,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
         {/* Mobile tab bar (< md) */}
         <div
           className="md:hidden sticky top-0 z-10 overflow-x-auto flex shrink-0"
-          style={{ background: "#14151C", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+          style={{ background: "var(--card)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
         >
           {allNavItems.map(({ key, name }) => {
             const isActive = activeTab === key;
@@ -918,7 +918,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
         {/* Main content */}
         <main
           className="flex-1 overflow-y-auto px-4 py-6 md:px-12 md:py-12"
-          style={{ background: "#0D0E12" }}
+          style={{ background: "var(--background)" }}
         >
           <InviteAgentDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
           {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} />}

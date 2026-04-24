@@ -97,7 +97,7 @@ function RoundRobinList({
         </div>
       ))}
       {entries.length === 0 && (
-        <div style={{ textAlign: "center", padding: "64px 0", color: "#9899A8" }}>
+        <div style={{ textAlign: "center", padding: "64px 0", color: "var(--muted-foreground)" }}>
           <Users size={40} color="rgba(201,150,58,0.15)" style={{ margin: "0 auto 16px" }} />
           <p style={{ fontSize: 13 }}>No hay agentes activos configurados.</p>
         </div>

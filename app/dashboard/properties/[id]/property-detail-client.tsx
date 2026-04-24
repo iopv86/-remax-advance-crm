@@ -100,14 +100,14 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   reserved: { label: "Reservado", color: "#F59E0B", bg: "rgba(245,158,11,0.12)" },
   sold: { label: "Vendido", color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
   rented: { label: "Rentado", color: "#6366f1", bg: "rgba(99,102,241,0.12)" },
-  inactive: { label: "Inactivo", color: "#6B7280", bg: "rgba(107,114,128,0.12)" },
+  inactive: { label: "Inactivo", color: "var(--muted-foreground)", bg: "rgba(107,114,128,0.12)" },
 };
 
 const PRIORITY_MAP: Record<string, { color: string }> = {
   urgent: { color: "#ef4444" },
   high: { color: "#F59E0B" },
   medium: { color: "#6366f1" },
-  low: { color: "#6B7280" },
+  low: { color: "var(--muted-foreground)" },
 };
 
 function formatPrice(price: number, currency?: string): string {

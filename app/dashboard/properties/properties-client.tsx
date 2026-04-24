@@ -58,7 +58,7 @@ function statusBadge(status: Property["status"]): { label: string; bg: string; c
     case "rented":
       return { label: "Rentado", bg: "rgba(99,102,241,0.10)", color: "#6366f1" };
     default:
-      return { label: STATUS_LABELS[status] ?? status, bg: "rgba(107,114,128,0.10)", color: "#6B7280" };
+      return { label: STATUS_LABELS[status] ?? status, bg: "rgba(107,114,128,0.10)", color: "var(--muted-foreground)" };
   }
 }
 
@@ -105,13 +105,13 @@ const filterLabel: React.CSSProperties = {
 
 function pillBtn(active: boolean): React.CSSProperties {
   return active
-    ? { background: GOLD, color: "#0D0E12", fontWeight: 700, border: "none", cursor: "pointer", borderRadius: 9999, padding: "6px 12px", fontSize: 11, transition: "all 0.15s" }
+    ? { background: GOLD, color: "var(--primary-foreground)", fontWeight: 700, border: "none", cursor: "pointer", borderRadius: 9999, padding: "6px 12px", fontSize: 11, transition: "all 0.15s" }
     : { background: BG_SURFACE, color: TEXT_PRIMARY, fontWeight: 500, border: "none", cursor: "pointer", borderRadius: 9999, padding: "6px 12px", fontSize: 11, transition: "all 0.15s" };
 }
 
 function dormBtn(active: boolean): React.CSSProperties {
   return active
-    ? { background: GOLD, color: "#0D0E12", fontWeight: 700, border: "none", cursor: "pointer", borderRadius: 4, height: 32, fontSize: 11, transition: "colors 0.15s" }
+    ? { background: GOLD, color: "var(--primary-foreground)", fontWeight: 700, border: "none", cursor: "pointer", borderRadius: 4, height: 32, fontSize: 11, transition: "colors 0.15s" }
     : { background: BG_SURFACE, color: TEXT_PRIMARY, fontWeight: 400, border: "none", cursor: "pointer", borderRadius: 4, height: 32, fontSize: 11, transition: "colors 0.15s" };
 }
 
@@ -294,7 +294,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
         style={{
           width: 220,
           flexShrink: 0,
-          background: "#0E0E0E",
+          background: "var(--background)",
           borderRight: `1px solid ${BG_SURFACE}`,
           flexDirection: "column",
           padding: "28px 20px",
@@ -454,7 +454,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
               style={{
                 width: "100%",
                 background: GOLD,
-                color: "#0D0E12",
+                color: "var(--primary-foreground)",
                 padding: "10px 0",
                 borderRadius: 10,
                 fontWeight: 700,
@@ -788,7 +788,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                         <span
                           style={{
                             position: "absolute", top: 12, left: 12,
-                            background: GOLD, color: "#0D0E12",
+                            background: GOLD, color: "var(--primary-foreground)",
                             padding: "3px 10px", borderRadius: 4,
                             fontSize: 9, fontWeight: 700,
                             letterSpacing: "0.12em", textTransform: "uppercase",
@@ -1052,7 +1052,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           <span
                             style={{
                               background: GOLD,
-                              color: "#0D0E12",
+                              color: "var(--primary-foreground)",
                               padding: "3px 8px",
                               borderRadius: 4,
                               fontSize: 9,
@@ -1360,7 +1360,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   }, [])
                   .map((p, i) =>
                     p === "…" ? (
-                      <span key={`e${i}`} style={{ width: 32, textAlign: "center", color: "#9A9088", fontSize: 13 }}>…</span>
+                      <span key={`e${i}`} style={{ width: 32, textAlign: "center", color: "var(--muted-foreground)", fontSize: 13 }}>…</span>
                     ) : (
                       <button
                         key={p}
@@ -1409,21 +1409,21 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "#1C1D27", border: `1px solid rgba(201,150,58,0.2)`,
+              background: "var(--secondary)", border: `1px solid rgba(201,150,58,0.2)`,
               borderRadius: 16, padding: 28, width: "100%", maxWidth: 480,
               boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
             }}
           >
-            <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "#F5F0E8", margin: "0 0 6px" }}>
+            <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", margin: "0 0 6px" }}>
               Crear propuesta
             </h2>
-            <p style={{ fontSize: 12, color: "#6B7280", fontFamily: "Inter, sans-serif", margin: "0 0 20px" }}>
+            <p style={{ fontSize: 12, color: "var(--muted-foreground)", fontFamily: "Inter, sans-serif", margin: "0 0 20px" }}>
               {selectedIds.size} {selectedIds.size === 1 ? "propiedad seleccionada" : "propiedades seleccionadas"}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "#9A9088", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Nombre del cliente (opcional)
                 </label>
                 <input
@@ -1432,14 +1432,14 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   value={proposalForm.contactName}
                   onChange={(e) => setProposalForm((f) => ({ ...f, contactName: e.target.value }))}
                   style={{
-                    width: "100%", background: "#0D0E12", border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 8, padding: "9px 12px", color: "#F5F0E8", fontSize: 14,
+                    width: "100%", background: "var(--background)", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
                     fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
                   }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "#9A9088", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Título (opcional)
                 </label>
                 <input
@@ -1448,14 +1448,14 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   value={proposalForm.title}
                   onChange={(e) => setProposalForm((f) => ({ ...f, title: e.target.value }))}
                   style={{
-                    width: "100%", background: "#0D0E12", border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 8, padding: "9px 12px", color: "#F5F0E8", fontSize: 14,
+                    width: "100%", background: "var(--background)", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
                     fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
                   }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "#9A9088", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Mensaje de presentación (opcional)
                 </label>
                 <textarea
@@ -1464,8 +1464,8 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   value={proposalForm.message}
                   onChange={(e) => setProposalForm((f) => ({ ...f, message: e.target.value }))}
                   style={{
-                    width: "100%", background: "#0D0E12", border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 8, padding: "9px 12px", color: "#F5F0E8", fontSize: 14,
+                    width: "100%", background: "var(--background)", border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
                     fontFamily: "Inter, sans-serif", outline: "none", resize: "none", boxSizing: "border-box",
                   }}
                 />
@@ -1476,8 +1476,8 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
               <button
                 onClick={() => setProposalModalOpen(false)}
                 style={{
-                  flex: 1, padding: "10px 0", borderRadius: 8, background: "#0D0E12",
-                  border: "1px solid rgba(255,255,255,0.1)", color: "#9A9088",
+                  flex: 1, padding: "10px 0", borderRadius: 8, background: "var(--background)",
+                  border: "1px solid rgba(255,255,255,0.1)", color: "var(--muted-foreground)",
                   fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
                 }}
               >
@@ -1513,7 +1513,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "#1C1D27", border: `1px solid rgba(201,150,58,0.3)`,
+              background: "var(--secondary)", border: `1px solid rgba(201,150,58,0.3)`,
               borderRadius: 16, padding: 28, width: "100%", maxWidth: 480,
               boxShadow: "0 20px 60px rgba(0,0,0,0.6)",
             }}
@@ -1530,10 +1530,10 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 </svg>
               </div>
               <div>
-                <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 16, color: "#F5F0E8", margin: 0 }}>
+                <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 16, color: "var(--foreground)", margin: 0 }}>
                   ¡Propuesta lista!
                 </p>
-                <p style={{ fontSize: 12, color: "#6B7280", margin: 0, fontFamily: "Inter, sans-serif" }}>
+                <p style={{ fontSize: 12, color: "var(--muted-foreground)", margin: 0, fontFamily: "Inter, sans-serif" }}>
                   Compártela con tu cliente
                 </p>
               </div>
@@ -1541,11 +1541,11 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
 
             {/* URL display */}
             <div style={{
-              background: "#0D0E12", border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--background)", border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: 8, padding: "10px 14px", marginBottom: 16,
               display: "flex", alignItems: "center", gap: 8,
             }}>
-              <span style={{ flex: 1, fontSize: 12, color: "#9A9088", fontFamily: "Inter, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{ flex: 1, fontSize: 12, color: "var(--muted-foreground)", fontFamily: "Inter, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {typeof window !== "undefined" ? `${window.location.origin}/p/${proposalShareSlug}` : `/p/${proposalShareSlug}`}
               </span>
               <button
@@ -1610,8 +1610,8 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   window.open(`/p/${proposalShareSlug}`, "_blank");
                 }}
                 style={{
-                  flex: 1, padding: "9px 0", borderRadius: 8, background: "#0D0E12",
-                  border: "1px solid rgba(255,255,255,0.1)", color: "#9A9088",
+                  flex: 1, padding: "9px 0", borderRadius: 8, background: "var(--background)",
+                  border: "1px solid rgba(255,255,255,0.1)", color: "var(--muted-foreground)",
                   fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
                 }}
               >

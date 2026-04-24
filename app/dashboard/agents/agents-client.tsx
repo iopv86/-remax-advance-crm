@@ -176,7 +176,7 @@ function StalledDealsSheet({
       <div
         className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-lg flex flex-col"
         style={{
-          background: "#14151C",
+          background: "var(--card)",
           borderLeft: "1px solid rgba(201,150,58,0.15)",
         }}
       >

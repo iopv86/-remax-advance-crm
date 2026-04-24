@@ -100,7 +100,7 @@ const STATUS_MAP: Record<ShowingStatus, { label: string; color: string; bg: stri
   confirmed: { label: "Confirmada", color: "#10B981", bg: "rgba(16,185,129,0.12)" },
   completed: { label: "Realizada", color: "#C9963A", bg: "rgba(201,150,58,0.12)" },
   cancelled: { label: "Cancelada", color: "#ef4444", bg: "rgba(239,68,68,0.12)" },
-  no_show: { label: "No se presentó", color: "#6B7280", bg: "rgba(107,114,128,0.12)" },
+  no_show: { label: "No se presentó", color: "var(--muted-foreground)", bg: "rgba(107,114,128,0.12)" },
 };
 
 const TYPE_LABELS: Record<string, string> = {
