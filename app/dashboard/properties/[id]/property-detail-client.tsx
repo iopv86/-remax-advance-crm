@@ -311,7 +311,7 @@ export function PropertyDetailClient({
           )}
           {canEdit && (
             <Link
-              href={`/dashboard/properties?edit=${property.id}`}
+              href={`/dashboard/properties/${property.id}/edit`}
               style={{
                 display: "flex", alignItems: "center", gap: 6,
                 padding: "6px 14px", background: GOLD, color: BG_BODY,
