@@ -79,15 +79,15 @@ interface Stats {
 }
 
 const T = {
-  bg: "#0e0e0e",
-  card: "#1c1b1b",
+  bg: "var(--background)",
+  card: "var(--card)",
   cardBorder: "rgba(201,150,58,0.12)",
-  primary: "#f5bd5d",
-  primaryContainer: "#c9963a",
-  onSurface: "#e5e2e1",
-  onSurfaceVariant: "#d3c4b1",
-  stone500: "#78716c",
-  gold: "#C9963A",
+  primary: "var(--primary)",
+  primaryContainer: "var(--primary)",
+  onSurface: "var(--foreground)",
+  onSurfaceVariant: "var(--muted-foreground)",
+  stone500: "var(--muted-foreground)",
+  gold: "var(--primary)",
 };
 
 const ROLE_LABELS: Record<string, string> = {
@@ -416,7 +416,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                 justifyContent: "center",
                 fontSize: 32,
                 fontWeight: 800,
-                color: "#281900",
+                color: "var(--primary-foreground)",
                 fontFamily: "Manrope, sans-serif",
                 boxShadow: "0 0 0 3px rgba(201,150,58,0.2), 0 20px 40px rgba(0,0,0,0.4)",
               }}>
@@ -456,7 +456,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
               height: 14,
               borderRadius: "50%",
               background: agent?.is_active ? "#10b981" : "#78716c",
-              border: "2px solid #0e0e0e",
+              border: "2px solid var(--card)",
               zIndex: 1,
             }} />
           </div>
@@ -534,7 +534,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
                     borderRadius: 12,
                     background: T.primaryContainer,
                     border: "none",
-                    color: "#281900",
+                    color: "var(--primary-foreground)",
                     fontSize: 13,
                     fontWeight: 700,
                     cursor: saving ? "not-allowed" : "pointer",

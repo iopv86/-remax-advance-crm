@@ -131,6 +131,9 @@
   --glass-border-lg:     rgba(0, 0, 0, 0.18);
   --glass-dim:           rgba(0, 0, 0, 0.25);
   --glass-disabled:      rgba(0, 0, 0, 0.15);
+
+  /* Frosted-glass sticky header */
+  --bg-header:           rgba(247, 245, 240, 0.85);
 }
 
 /* ═══════════════════════════════════════
@@ -201,6 +204,9 @@
   --glass-border-lg:     rgba(255,255,255,0.18);
   --glass-dim:           rgba(255,255,255,0.35);
   --glass-disabled:      rgba(255,255,255,0.15);
+
+  /* Frosted-glass sticky header */
+  --bg-header:           rgba(13, 14, 20, 0.80);
 }
 
 /* Dark mode component overrides — Obsidian Edge */

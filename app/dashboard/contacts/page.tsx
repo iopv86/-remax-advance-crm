@@ -79,23 +79,23 @@ export default async function ContactsPage({
   if (params.status)         paginationFilterParams.status = params.status;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#0e0e0e" }}>
+    <div style={{ minHeight: "100vh", background: "var(--background)" }}>
       {/* Sticky header */}
       <header
         className="sticky top-0 z-40 flex justify-between items-center px-4 sm:px-8 border-b"
         style={{
-          background: "rgba(14,14,14,0.80)", backdropFilter: "blur(12px)",
-          minHeight: 72, borderColor: "rgba(79,69,55,0.08)",
+          background: "var(--bg-header)", backdropFilter: "blur(12px)",
+          minHeight: 72, borderColor: "var(--border)",
         }}
       >
         <div>
           <h1
             className="text-2xl sm:text-3xl font-bold leading-tight"
-            style={{ color: "#e5e2e1", margin: 0 }}
+            style={{ color: "var(--foreground)", margin: 0 }}
           >
             Clientes
           </h1>
-          <p className="text-sm font-medium mt-1" style={{ color: "#d3c4b1" }}>
+          <p className="text-sm font-medium mt-1" style={{ color: "var(--muted-foreground)" }}>
             {total} contacto{total !== 1 ? "s" : ""} en total
           </p>
         </div>
@@ -106,8 +106,8 @@ export default async function ContactsPage({
             download
             className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
             style={{
-              background: "#2a2a2a", color: "#e5e2e1",
-              border: "1px solid rgba(201,150,58,0.2)", textDecoration: "none",
+              background: "var(--secondary)", color: "var(--foreground)",
+              border: "1px solid var(--border)", textDecoration: "none",
             }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

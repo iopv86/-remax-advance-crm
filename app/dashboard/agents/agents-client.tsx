@@ -30,7 +30,7 @@ const AgentSparkline = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-8 w-24 rounded animate-pulse bg-[#353534]" />
+      <div className="h-8 w-24 rounded animate-pulse bg-secondary" />
     ),
   }
 );
@@ -72,7 +72,7 @@ interface Props {
 
 function ResponseBadge({ minutes }: { minutes: number | null }) {
   if (minutes === null)
-    return <span className="font-mono text-xs text-[#545567]">—</span>;
+    return <span className="font-mono text-xs text-muted-foreground">—</span>;
 
   const label =
     minutes < 60 ? "<1h" : `${Math.round(minutes / 60)}h`;
@@ -112,7 +112,7 @@ function PipelineStageChart({ data }: { data: PipelineStageBreakdown[] }) {
 
   if (top.length === 0) {
     return (
-      <div className="flex items-center justify-center h-40 text-[#545567] text-sm">
+      <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
         Sin datos de pipeline.
       </div>
     );
@@ -129,16 +129,16 @@ function PipelineStageChart({ data }: { data: PipelineStageBreakdown[] }) {
             : `RD$ ${item.stage_value.toLocaleString()}`;
         return (
           <div key={item.stage} className="space-y-1">
-            <div className="flex justify-between text-[11px] text-[#9899A8] uppercase tracking-wider">
+            <div className="flex justify-between text-[11px] text-muted-foreground uppercase tracking-wider">
               <span>
                 {label}{" "}
-                <span className="text-[#545567] normal-case tracking-normal">
+                <span className="text-muted-foreground normal-case tracking-normal">
                   ({item.deal_count})
                 </span>
               </span>
               <span>{valLabel}</span>
             </div>
-            <div className="h-3 bg-[#353534] rounded-full overflow-hidden">
+            <div className="h-3 bg-secondary rounded-full overflow-hidden">
               <Link href={`/dashboard/pipeline?stage=${item.stage}`}>
                 <div
                   className="h-full rounded-full transition-all duration-700 hover:opacity-80 cursor-pointer"
@@ -190,18 +190,18 @@ function StalledDealsSheet({
               Atención requerida
             </p>
             <h2
-              className="text-xl font-bold text-white"
+              className="text-xl font-bold text-foreground"
               style={{ fontFamily: "Manrope, sans-serif" }}
             >
               Deals Estancados
             </h2>
-            <p className="text-xs text-[#9899A8] mt-0.5">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {deals.length} deal{deals.length !== 1 ? "s" : ""} sin actividad en +7 días
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#9899A8] hover:text-white hover:bg-[#353534] transition-colors"
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -210,7 +210,7 @@ function StalledDealsSheet({
         {/* List */}
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3">
           {deals.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-40 text-[#545567]">
+            <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
               <AlertTriangle className="w-8 h-8 mb-3 opacity-30" />
               <p className="text-sm">No hay deals estancados.</p>
             </div>
@@ -235,11 +235,11 @@ function StalledDealsSheet({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm text-white truncate">
+                      <p className="font-semibold text-sm text-foreground truncate">
                         {deal.contact_name}
                       </p>
                       {deal.contact_phone && (
-                        <p className="text-[11px] text-[#9899A8]">
+                        <p className="text-[11px] text-muted-foreground">
                           {deal.contact_phone}
                         </p>
                       )}
@@ -262,7 +262,7 @@ function StalledDealsSheet({
                     >
                       {stageLabel}
                     </span>
-                    <span className="text-[11px] font-medium text-white">
+                    <span className="text-[11px] font-medium text-foreground">
                       {valueLabel}
                     </span>
                     <span className="text-[11px] text-red-400 font-medium">
@@ -271,7 +271,7 @@ function StalledDealsSheet({
                   </div>
 
                   {deal.notes && (
-                    <p className="text-[11px] text-[#9899A8] leading-relaxed line-clamp-2">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
                       {deal.notes}
                     </p>
                   )}
@@ -302,14 +302,14 @@ function ScatterPlot({ agents }: { agents: AgentKPISummary[] }) {
   });
 
   return (
-    <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-4 md:p-8 space-y-6 relative overflow-hidden">
+    <div className="bg-card backdrop-blur-xl border rounded-xl p-4 md:p-8 space-y-6 relative overflow-hidden">
       <h3
-        className="font-bold text-lg text-white"
+        className="font-bold text-lg text-foreground"
         style={{ fontFamily: "Manrope, sans-serif" }}
       >
         Resp. vs Conversión
       </h3>
-      <div className="relative h-[220px] border-l border-b border-[#4f4537]/30 ml-6 mb-6">
+      <div className="relative h-[220px] border-l border-b border-border ml-6 mb-6">
         {dots.map((dot) => (
           <div
             key={dot.id}
@@ -321,10 +321,10 @@ function ScatterPlot({ agents }: { agents: AgentKPISummary[] }) {
             }}
           />
         ))}
-        <span className="absolute -left-12 top-1/2 -rotate-90 text-[10px] text-[#545567] uppercase tracking-widest font-bold">
+        <span className="absolute -left-12 top-1/2 -rotate-90 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
           Conversión (%)
         </span>
-        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-[#545567] uppercase tracking-widest font-bold">
+        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">
           Resp. (min)
         </span>
       </div>
@@ -461,19 +461,19 @@ export function AgentsClient({
       <header className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1
-            className="text-[28px] font-bold text-white tracking-tight"
+            className="text-[28px] font-bold text-foreground tracking-tight"
             style={{ fontFamily: "Manrope, sans-serif" }}
           >
             Rendimiento de Agentes
           </h1>
-          <p className="text-sm text-[#9899A8]">
+          <p className="text-sm text-muted-foreground">
             Analíticas de performance y conversión en tiempo real
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           {/* Tabs */}
-          <div className="bg-[#353534]/20 p-1 rounded-lg flex items-center gap-0.5">
+          <div className="bg-secondary/20 p-1 rounded-lg flex items-center gap-0.5">
             {TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -481,7 +481,7 @@ export function AgentsClient({
                 className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   activeTab === tab.id
                     ? "bg-[#C9963A] text-[#4a3100] shadow-lg"
-                    : "text-[#9899A8] hover:text-white"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 {tab.icon}
@@ -492,7 +492,7 @@ export function AgentsClient({
 
           {/* Period toggle — only visible on KPIs tab */}
           {activeTab === "kpis" && (
-            <div className="bg-[#353534]/20 p-1 rounded-lg flex items-center">
+            <div className="bg-secondary/20 p-1 rounded-lg flex items-center">
               {(["Semanal", "Mensual", "Trimestral"] as const).map((p) => {
                 const map: Record<string, string> = {
                   Semanal: "7",
@@ -506,8 +506,8 @@ export function AgentsClient({
                     onClick={() => setPeriod(p)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                       isActive
-                        ? "bg-[#1C1D27] text-white shadow"
-                        : "text-[#9899A8] hover:text-white"
+                        ? "bg-card text-foreground shadow"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {p}
@@ -518,7 +518,7 @@ export function AgentsClient({
           )}
 
           {/* Export */}
-          <button className="flex items-center gap-2 px-4 py-2 border border-[#4f4537]/30 rounded-lg text-xs font-medium text-[#9899A8] hover:bg-[#353534] transition-colors">
+          <button className="flex items-center gap-2 px-4 py-2 border border-border rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary transition-colors">
             <Download className="w-3.5 h-3.5" />
             Exportar
           </button>
@@ -570,11 +570,11 @@ export function AgentsClient({
               }}
             >
               <div className="flex flex-col gap-1">
-                <span className="text-[#9899A8] text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
                   <Clock className="w-3 h-3" /> Tiempo Resp.
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+                  <span className="text-3xl font-semibold text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                     {respLabel}
                   </span>
                   <span className="flex items-center text-xs font-medium text-green-500">
@@ -595,11 +595,11 @@ export function AgentsClient({
               }}
             >
               <div className="flex flex-col gap-1">
-                <span className="text-[#9899A8] text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
                   <Target className="w-3 h-3" /> Tasa Conversión
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+                  <span className="text-3xl font-semibold text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                     {avgConversion !== null ? `${avgConversion.toFixed(1)}%` : "—"}
                   </span>
                   <span className="flex items-center text-xs font-medium text-green-500">
@@ -624,7 +624,7 @@ export function AgentsClient({
               }}
             >
               <div className="flex flex-col gap-1">
-                <span className="text-[#9899A8] text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
                   <AlertTriangle className="w-3 h-3" /> Estancados
                   {totalStalled > 0 && (
                     <span className="ml-auto text-[10px] font-bold text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded">
@@ -633,10 +633,10 @@ export function AgentsClient({
                   )}
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+                  <span className="text-3xl font-semibold text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                     {totalStalled}
                   </span>
-                  <span className="text-xs text-[#9899A8]">deals</span>
+                  <span className="text-xs text-muted-foreground">deals</span>
                   {totalStalled > 0 && (
                     <span className="flex items-center text-xs font-medium text-red-500">
                       <TrendingDown className="w-3 h-3 mr-0.5" />
@@ -660,14 +660,14 @@ export function AgentsClient({
               }}
             >
               <div className="flex flex-col gap-1">
-                <span className="text-[#9899A8] text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase flex items-center gap-1.5">
                   <DollarSign className="w-3 h-3" /> Pipeline Total
                   <span className="ml-auto text-[10px] font-bold text-[#C9963A]/70 bg-[#C9963A]/10 px-1.5 py-0.5 rounded">
                     ver →
                   </span>
                 </span>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-semibold text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+                  <span className="text-3xl font-semibold text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                     {pipelineLabel}
                   </span>
                   <span className="flex items-center text-xs font-medium text-green-500">
@@ -690,22 +690,22 @@ export function AgentsClient({
               }}
             >
               <div className="flex items-start justify-between mb-3">
-                <span className="text-[#9899A8] text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
                   <Zap className="w-3 h-3 text-[#C9963A]" /> Resp. &lt;10 min
                 </span>
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span
-                  className="text-2xl font-bold text-white"
+                  className="text-2xl font-bold text-foreground"
                   style={{ fontFamily: "Manrope, sans-serif" }}
                 >
                   {avgFastResponse !== null ? `${avgFastResponse.toFixed(1)}%` : "—"}
                 </span>
                 {avgFastResponse !== null && (
-                  <span className="text-[10px] text-[#9899A8]">de leads respondidos</span>
+                  <span className="text-[10px] text-muted-foreground">de leads respondidos</span>
                 )}
               </div>
-              <p className="text-[10px] text-[#545567] mt-1">
+              <p className="text-[10px] text-muted-foreground mt-1">
                 Estándar RE/MAX: &gt;50%
               </p>
             </div>
@@ -719,22 +719,22 @@ export function AgentsClient({
               }}
             >
               <div className="flex items-start justify-between mb-3">
-                <span className="text-[#9899A8] text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
                   <CheckSquare className="w-3 h-3 text-[#C9963A]" /> Tareas Completadas
                 </span>
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span
-                  className="text-2xl font-bold text-white"
+                  className="text-2xl font-bold text-foreground"
                   style={{ fontFamily: "Manrope, sans-serif" }}
                 >
                   {avgTaskCompletion !== null ? `${avgTaskCompletion.toFixed(1)}%` : "—"}
                 </span>
                 {avgTaskCompletion !== null && (
-                  <span className="text-[10px] text-[#9899A8]">promedio equipo</span>
+                  <span className="text-[10px] text-muted-foreground">promedio equipo</span>
                 )}
               </div>
-              <p className="text-[10px] text-[#545567] mt-1">
+              <p className="text-[10px] text-muted-foreground mt-1">
                 {avgTaskCompletion === null ? "Sin tareas registradas" : "Objetivo: >80%"}
               </p>
             </div>
@@ -748,33 +748,33 @@ export function AgentsClient({
               }}
             >
               <div className="flex items-start justify-between mb-3">
-                <span className="text-[#9899A8] text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
+                <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase flex items-center gap-1.5">
                   <Repeat className="w-3 h-3 text-[#C9963A]" /> Cadencia Seguimiento
                 </span>
               </div>
               <div className="flex items-baseline gap-1.5">
                 <span
-                  className="text-2xl font-bold text-white"
+                  className="text-2xl font-bold text-foreground"
                   style={{ fontFamily: "Manrope, sans-serif" }}
                 >
                   {avgFollowupDays !== null ? `${avgFollowupDays.toFixed(1)}d` : "—"}
                 </span>
                 {avgFollowupDays !== null && (
-                  <span className="text-[10px] text-[#9899A8]">entre mensajes</span>
+                  <span className="text-[10px] text-muted-foreground">entre mensajes</span>
                 )}
               </div>
-              <p className="text-[10px] text-[#545567] mt-1">
+              <p className="text-[10px] text-muted-foreground mt-1">
                 {avgFollowupDays === null ? "Sin datos suficientes" : "Objetivo: <3 días"}
               </p>
             </div>
           </div>
 
           {/* Agent table */}
-          <section className="bg-[#14151C] rounded-xl overflow-hidden shadow-2xl">
+          <section className="bg-card rounded-xl overflow-hidden shadow-2xl">
             <div className="overflow-x-auto">
               <table className="w-full min-w-max text-left border-collapse">
                 <thead>
-                  <tr className="bg-[#1c1b1b]/50">
+                  <tr className="bg-secondary/50">
                     {[
                       "Agente",
                       "Leads",
@@ -788,7 +788,7 @@ export function AgentsClient({
                     ].map((col, i) => (
                       <th
                         key={col}
-                        className={`px-6 py-4 text-[11px] uppercase tracking-widest text-[#545567] font-semibold${i === 4 ? " text-right" : ""}`}
+                        className={`px-6 py-4 text-[11px] uppercase tracking-widest text-muted-foreground font-semibold${i === 4 ? " text-right" : ""}`}
                         style={{ fontFamily: "Manrope, sans-serif" }}
                       >
                         {col}
@@ -824,7 +824,7 @@ export function AgentsClient({
                     return (
                       <tr
                         key={agent.id}
-                        className={`hover:bg-[#353534]/20 transition-colors${isTop ? " border-l-[3px] border-[#C9963A]" : ""}`}
+                        className={`hover:bg-secondary/20 transition-colors${isTop ? " border-l-[3px] border-[#C9963A]" : ""}`}
                       >
                         {/* Agente */}
                         <td className="px-6 py-4">
@@ -833,17 +833,17 @@ export function AgentsClient({
                             className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                             style={{ textDecoration: "none" }}
                           >
-                            <div className="w-7 h-7 rounded-full bg-[#353534] flex items-center justify-center text-[10px] text-[#9899A8] shrink-0">
+                            <div className="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-[10px] text-muted-foreground shrink-0">
                               {initials}
                             </div>
-                            <span className="font-medium text-sm text-white">
+                            <span className="font-medium text-sm text-foreground">
                               {agent.name}
                             </span>
                           </Link>
                         </td>
 
                         {/* Leads */}
-                        <td className="px-6 py-4 text-sm text-[#e5e2e1]">{leadsCount}</td>
+                        <td className="px-6 py-4 text-sm text-foreground">{leadsCount}</td>
 
                         {/* Resp. */}
                         <td className="px-6 py-4">
@@ -853,13 +853,13 @@ export function AgentsClient({
                         {/* Conversión */}
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="flex-1 h-1.5 bg-[#353534] rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-[#C9963A] transition-all duration-700"
                                 style={{ width: `${convPct}%` }}
                               />
                             </div>
-                            <span className="text-xs text-[#9899A8] font-medium w-9 text-right">
+                            <span className="text-xs text-muted-foreground font-medium w-9 text-right">
                               {agent.conversionRate !== null
                                 ? `${agent.conversionRate}%`
                                 : "—"}
@@ -868,7 +868,7 @@ export function AgentsClient({
                         </td>
 
                         {/* Pipeline */}
-                        <td className="px-6 py-4 text-right font-semibold text-sm text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+                        <td className="px-6 py-4 text-right font-semibold text-sm text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                           {pipelineLabel}
                         </td>
 
@@ -876,7 +876,7 @@ export function AgentsClient({
                         <td className="px-6 py-4">
                           {captPct !== null ? (
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-1.5 bg-[#353534] rounded-full overflow-hidden">
+                              <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
                                 <div
                                   className="h-full rounded-full transition-all duration-700"
                                   style={{
@@ -890,12 +890,12 @@ export function AgentsClient({
                                   }}
                                 />
                               </div>
-                              <span className="text-xs text-[#9899A8] font-medium w-9 text-right">
+                              <span className="text-xs text-muted-foreground font-medium w-9 text-right">
                                 {captPct}%
                               </span>
                             </div>
                           ) : (
-                            <span className="font-mono text-xs text-[#545567]">—</span>
+                            <span className="font-mono text-xs text-muted-foreground">—</span>
                           )}
                         </td>
 
@@ -903,7 +903,7 @@ export function AgentsClient({
                         <td className="px-6 py-4">
                           {factPct !== null ? (
                             <div className="flex items-center gap-2">
-                              <div className="flex-1 h-1.5 bg-[#353534] rounded-full overflow-hidden">
+                              <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
                                 <div
                                   className="h-full rounded-full transition-all duration-700"
                                   style={{
@@ -917,12 +917,12 @@ export function AgentsClient({
                                   }}
                                 />
                               </div>
-                              <span className="text-xs text-[#9899A8] font-medium w-9 text-right">
+                              <span className="text-xs text-muted-foreground font-medium w-9 text-right">
                                 {factPct}%
                               </span>
                             </div>
                           ) : (
-                            <span className="font-mono text-xs text-[#545567]">—</span>
+                            <span className="font-mono text-xs text-muted-foreground">—</span>
                           )}
                         </td>
 
@@ -933,7 +933,7 @@ export function AgentsClient({
                               {agent.stalledDeals}
                             </span>
                           ) : (
-                            <span className="font-mono text-xs text-[#545567]">—</span>
+                            <span className="font-mono text-xs text-muted-foreground">—</span>
                           )}
                         </td>
 
@@ -952,8 +952,8 @@ export function AgentsClient({
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
             {/* Pipeline by agent */}
-            <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-4 md:p-8 space-y-5">
-              <h3 className="font-bold text-lg text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+            <div className="bg-card backdrop-blur-xl border rounded-xl p-4 md:p-8 space-y-5">
+              <h3 className="font-bold text-lg text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                 Pipeline por Agente
               </h3>
               <div className="space-y-4">
@@ -970,11 +970,11 @@ export function AgentsClient({
                       : `RD$ ${agent.pipelineValue.toLocaleString()}`;
                   return (
                     <div key={agent.id} className="space-y-2">
-                      <div className="flex justify-between text-xs text-[#9899A8] uppercase tracking-wider">
+                      <div className="flex justify-between text-xs text-muted-foreground uppercase tracking-wider">
                         <span>{shortName}</span>
                         <span>{valLabel}</span>
                       </div>
-                      <div className="h-4 bg-[#353534] rounded-full overflow-hidden">
+                      <div className="h-4 bg-secondary rounded-full overflow-hidden">
                         <div
                           className="h-full bg-[#C9963A] rounded-full transition-all duration-700"
                           style={{ width: `${pct}%` }}
@@ -987,8 +987,8 @@ export function AgentsClient({
             </div>
 
             {/* Pipeline by stage */}
-            <div className="bg-[#1C1D27]/80 backdrop-blur-xl border border-[#4f4537]/10 rounded-xl p-4 md:p-8 space-y-5">
-              <h3 className="font-bold text-lg text-white" style={{ fontFamily: "Manrope, sans-serif" }}>
+            <div className="bg-card backdrop-blur-xl border rounded-xl p-4 md:p-8 space-y-5">
+              <h3 className="font-bold text-lg text-foreground" style={{ fontFamily: "Manrope, sans-serif" }}>
                 Pipeline por Etapa
               </h3>
               <PipelineStageChart data={pipelineByStage} />
@@ -1013,12 +1013,12 @@ export function AgentsClient({
         >
           <div className="mb-6">
             <h2
-              className="text-xl font-bold text-white"
+              className="text-xl font-bold text-foreground"
               style={{ fontFamily: "Manrope, sans-serif" }}
             >
               Objetivos por Agente
             </h2>
-            <p className="text-sm text-[#9899A8] mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Metas mensuales de captaciones y facturación. El progreso se
               refleja en la columna de KPIs.
             </p>
@@ -1038,12 +1038,12 @@ export function AgentsClient({
         >
           <div className="mb-6">
             <h2
-              className="text-xl font-bold text-white"
+              className="text-xl font-bold text-foreground"
               style={{ fontFamily: "Manrope, sans-serif" }}
             >
               Asignación Round Robin
             </h2>
-            <p className="text-sm text-[#9899A8] mt-1">
+            <p className="text-sm text-muted-foreground mt-1">
               Los leads nuevos se asignan en rotación a los agentes activos
               según el orden definido aquí.
             </p>

@@ -3,17 +3,17 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useCallback, useRef } from "react";
 
-// ── Design tokens (Obsidian Edge) ─────────────────────────────────────────────
+// ── Design tokens (adaptive — CSS vars) ───────────────────────────────────────
 const T = {
-  surfaceContainerLow: "#1c1b1b",
-  surfaceContainerHigh: "#2a2a2a",
-  surfaceContainerHighest: "#353534",
-  outlineVariantFaint: "rgba(79,69,55,0.30)",
-  onSurface: "#e5e2e1",
-  onSurfaceVariant: "#d3c4b1",
-  primary: "#f5bd5d",
-  primaryContainer: "#c9963a",
-  onPrimaryFixed: "#281900",
+  surfaceContainerLow: "var(--secondary)",
+  surfaceContainerHigh: "var(--secondary)",
+  surfaceContainerHighest: "var(--secondary)",
+  outlineVariantFaint: "var(--border)",
+  onSurface: "var(--foreground)",
+  onSurfaceVariant: "var(--muted-foreground)",
+  primary: "var(--primary)",
+  primaryContainer: "var(--primary)",
+  onPrimaryFixed: "var(--primary-foreground)",
 } as const;
 
 interface Props {

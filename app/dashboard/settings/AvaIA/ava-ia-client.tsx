@@ -113,14 +113,14 @@ export function AvaIAClient({
   ];
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "#0E0E0E", color: "#E8E3DC" }}>
+    <div className="flex flex-col h-full" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* ── Hero Panel ── */}
       <section
         className="w-full flex items-center justify-between px-8"
         style={{
           height: 88,
-          background: "#14151C",
-          borderBottom: "1px solid rgba(79,69,55,0.1)",
+          background: "var(--card)",
+          borderBottom: "1px solid var(--border)",
           flexShrink: 0,
         }}
       >
@@ -139,10 +139,10 @@ export function AvaIAClient({
             </span>
           </div>
           <div>
-            <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 20, color: "#ffffff", lineHeight: 1.2 }}>
+            <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 20, color: "var(--foreground)", lineHeight: 1.2 }}>
               Ava — Asistente IA
             </h1>
-            <p style={{ fontSize: 13, color: "#9899A8", marginTop: 2 }}>
+            <p style={{ fontSize: 13, color: "var(--muted-foreground)", marginTop: 2 }}>
               Responde leads en WhatsApp automáticamente
             </p>
           </div>
@@ -159,7 +159,7 @@ export function AvaIAClient({
               key={label}
               className="flex items-center"
               style={{
-                background: "#22242F",
+                background: "var(--secondary)",
                 border: "1px solid rgba(255,255,255,0.05)",
                 borderRadius: 9999,
                 padding: "8px 16px",
@@ -167,14 +167,14 @@ export function AvaIAClient({
               }}
             >
               <span className="rounded-full" style={{ width: 8, height: 8, background: dot, flexShrink: 0 }} />
-              <span style={{ fontSize: 13, fontWeight: 500, color: "#ffffff" }}>{label}</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: "var(--foreground)" }}>{label}</span>
             </div>
           ))}
         </div>
 
         {/* Right: toggle */}
         <div className="flex items-center" style={{ gap: 16 }}>
-          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9899A8" }}>
+          <span style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "var(--muted-foreground)" }}>
             Estado de IA
           </span>
           {initialConfig ? (
@@ -185,7 +185,7 @@ export function AvaIAClient({
               style={{
                 width: 128,
                 height: 40,
-                background: "#0D0E12",
+                background: "var(--secondary)",
                 borderRadius: 9999,
                 padding: 4,
                 display: "flex",
@@ -233,7 +233,7 @@ export function AvaIAClient({
               </div>
             </button>
           ) : (
-            <span style={{ fontSize: 12, color: "#9899A8" }}>No disponible</span>
+            <span style={{ fontSize: 12, color: "var(--muted-foreground)" }}>No disponible</span>
           )}
         </div>
       </section>
@@ -246,10 +246,10 @@ export function AvaIAClient({
           style={{ width: "60%", padding: 32, display: "flex", flexDirection: "column", gap: 24 }}
         >
           {/* Card 1: Personalidad + Tono */}
-          <div style={{ background: "#1C1D27", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)", position: "relative", overflow: "hidden" }}>
+          <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -64, right: -64, width: 128, height: 128, background: "rgba(245,189,93,0.05)", filter: "blur(48px)", borderRadius: "50%", pointerEvents: "none" }} />
             <div className="flex items-center justify-between" style={{ marginBottom: 24 }}>
-              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "#ffffff", gap: 8, margin: 0 }}>
+              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", gap: 8, margin: 0 }}>
                 <span className="material-symbols-outlined" style={{ color: "#f5bd5d", fontSize: 20 }}>person_outline</span>
                 Personalidad
               </h2>
@@ -260,17 +260,17 @@ export function AvaIAClient({
 
             <div className="grid grid-cols-1 md:grid-cols-2" style={{ gap: 24 }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <label style={{ fontSize: 12, color: "#9899A8", textTransform: "uppercase", letterSpacing: "0.1em", marginLeft: 4 }}>
+                <label style={{ fontSize: 12, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.1em", marginLeft: 4 }}>
                   Nombre de Asistente
                 </label>
-                <div className="flex items-center justify-between" style={{ background: "#0D0E12", border: "1px solid rgba(79,69,55,0.3)", borderRadius: 8, padding: "12px 16px" }}>
-                  <span style={{ fontWeight: 500, color: "#ffffff" }}>Ava</span>
-                  <span className="material-symbols-outlined" style={{ color: "#9899A8", fontSize: 18 }}>lock</span>
+                <div className="flex items-center justify-between" style={{ background: "var(--secondary)", border: "1px solid rgba(79,69,55,0.3)", borderRadius: 8, padding: "12px 16px" }}>
+                  <span style={{ fontWeight: 500, color: "var(--foreground)" }}>Ava</span>
+                  <span className="material-symbols-outlined" style={{ color: "var(--muted-foreground)", fontSize: 18 }}>lock</span>
                 </div>
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <label style={{ fontSize: 12, color: "#9899A8", textTransform: "uppercase", letterSpacing: "0.1em", marginLeft: 4 }}>
+                <label style={{ fontSize: 12, color: "var(--muted-foreground)", textTransform: "uppercase", letterSpacing: "0.1em", marginLeft: 4 }}>
                   Tono de Voz
                 </label>
                 <div className="flex" style={{ gap: 8 }}>
@@ -304,9 +304,9 @@ export function AvaIAClient({
           </div>
 
           {/* Card 2: Identidad de Agencia */}
-          <div style={{ background: "#1C1D27", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
+          <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
             <div className="flex items-center justify-between" style={{ marginBottom: 24 }}>
-              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "#ffffff", gap: 8, margin: 0 }}>
+              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", gap: 8, margin: 0 }}>
                 <span className="material-symbols-outlined" style={{ color: "#f5bd5d", fontSize: 20 }}>domain</span>
                 Identidad de Agencia
               </h2>
@@ -318,9 +318,9 @@ export function AvaIAClient({
           </div>
 
           {/* Card 3: Instrucciones personalizadas (runtime) */}
-          <div style={{ background: "#1C1D27", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
+          <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
             <div className="flex items-center justify-between" style={{ marginBottom: 24 }}>
-              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "#ffffff", gap: 8, margin: 0 }}>
+              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", gap: 8, margin: 0 }}>
                 <span className="material-symbols-outlined" style={{ color: "#f5bd5d", fontSize: 20 }}>terminal</span>
                 Instrucciones de comportamiento
               </h2>
@@ -334,13 +334,13 @@ export function AvaIAClient({
                 rows={7}
                 style={{
                   width: "100%",
-                  background: "#0D0E12",
+                  background: "var(--secondary)",
                   border: "1px solid rgba(245,189,93,0.3)",
                   borderRadius: 8,
                   padding: 16,
                   fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
                   fontSize: 13,
-                  color: "#d3c4b1",
+                  color: "var(--muted-foreground)",
                   lineHeight: 1.7,
                   resize: "none",
                   outline: "none",
@@ -349,7 +349,7 @@ export function AvaIAClient({
                 onFocus={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1px #f5bd5d"; e.currentTarget.style.borderColor = "#f5bd5d"; }}
                 onBlur={(e) => { e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.borderColor = "rgba(245,189,93,0.3)"; }}
               />
-              <div style={{ position: "absolute", bottom: 16, right: 16, fontSize: 10, color: "#9899A8", background: "#2a2a2a", padding: "2px 8px", borderRadius: 4 }}>
+              <div style={{ position: "absolute", bottom: 16, right: 16, fontSize: 10, color: "var(--muted-foreground)", background: "var(--secondary)", padding: "2px 8px", borderRadius: 4 }}>
                 {instructions.length} / 2000 tokens
               </div>
             </div>
@@ -384,9 +384,9 @@ export function AvaIAClient({
           </div>
 
           {/* Card 4: Seguimiento automático */}
-          <div style={{ background: "#1C1D27", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
+          <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
             <div className="flex items-center justify-between" style={{ marginBottom: 24 }}>
-              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "#ffffff", gap: 8, margin: 0 }}>
+              <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", gap: 8, margin: 0 }}>
                 <span className="material-symbols-outlined" style={{ color: "#f5bd5d", fontSize: 20 }}>history_toggle_off</span>
                 Seguimiento automático
               </h2>
@@ -401,15 +401,15 @@ export function AvaIAClient({
                 <div
                   key={day}
                   className="flex items-center justify-between"
-                  style={{ background: "#0D0E12", borderRadius: 8, padding: 16, border: "1px solid rgba(79,69,55,0.1)", opacity: active ? 1 : 0.6 }}
+                  style={{ background: "var(--secondary)", borderRadius: 8, padding: 16, border: "1px solid rgba(79,69,55,0.1)", opacity: active ? 1 : 0.6 }}
                 >
                   <div className="flex items-center" style={{ gap: 16 }}>
-                    <div className="flex items-center justify-center" style={{ width: 40, height: 40, background: active ? "rgba(245,189,93,0.05)" : "#2a2a2a", border: active ? "1px solid rgba(245,189,93,0.1)" : "none", borderRadius: 6 }}>
+                    <div className="flex items-center justify-center" style={{ width: 40, height: 40, background: active ? "rgba(245,189,93,0.05)" : "var(--secondary)", border: active ? "1px solid rgba(245,189,93,0.1)" : "none", borderRadius: 6 }}>
                       <span style={{ color: active ? "#f5bd5d" : "#9899A8", fontWeight: 700 }}>{day}</span>
                     </div>
                     <div>
-                      <p style={{ fontSize: 14, fontWeight: 600, color: "#ffffff", margin: 0 }}>{label}</p>
-                      <p style={{ fontSize: 12, color: "#9899A8", margin: "2px 0 0" }}>{desc}</p>
+                      <p style={{ fontSize: 14, fontWeight: 600, color: "var(--foreground)", margin: 0 }}>{label}</p>
+                      <p style={{ fontSize: 12, color: "var(--muted-foreground)", margin: "2px 0 0" }}>{desc}</p>
                     </div>
                   </div>
                   <div className="flex items-center" style={{ gap: 24 }}>
@@ -417,7 +417,7 @@ export function AvaIAClient({
                       type="time"
                       defaultValue={time}
                       disabled={!active}
-                      style={{ background: "#2a2a2a", border: "none", borderRadius: 4, color: active ? "#ffffff" : "#6B7280", fontSize: 13, padding: "4px 8px", outline: "none" }}
+                      style={{ background: "var(--secondary)", border: "none", borderRadius: 4, color: active ? "var(--foreground)" : "#6B7280", fontSize: 13, padding: "4px 8px", outline: "none" }}
                     />
                     <div style={{ width: 48, height: 24, background: active ? "linear-gradient(135deg, #f5bd5d 0%, #c9963a 100%)" : "#353534", borderRadius: 9999, position: "relative", cursor: "pointer" }}>
                       <div style={{ position: "absolute", top: 4, [active ? "right" : "left"]: 4, width: 16, height: 16, background: active ? "#ffffff" : "#6B7280", borderRadius: "50%" }} />
@@ -429,37 +429,37 @@ export function AvaIAClient({
           </div>
 
           {/* Card 5: Actividad reciente */}
-          <div style={{ background: "#1C1D27", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
+          <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
             <div className="flex items-center" style={{ gap: 8, marginBottom: 20 }}>
               <MessageSquare size={16} style={{ color: "#f5bd5d" }} />
-              <h3 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 14, color: "#ffffff", margin: 0 }}>
+              <h3 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 14, color: "var(--foreground)", margin: 0 }}>
                 Actividad reciente
               </h3>
             </div>
 
             {recentMessages.length === 0 ? (
-              <p style={{ fontSize: 12, color: "#9899A8" }}>Sin actividad reciente.</p>
+              <p style={{ fontSize: 12, color: "var(--muted-foreground)" }}>Sin actividad reciente.</p>
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {recentMessages.map((msg) => {
                   const initials = contactName(msg.contact)[0]?.toUpperCase() ?? "?";
                   return (
                     <div key={msg.id} className="flex items-start" style={{ gap: 12 }}>
-                      <div className="flex items-center justify-center flex-shrink-0" style={{ width: 28, height: 28, borderRadius: "50%", background: msg.is_automated ? "rgba(245,189,93,0.15)" : "#2a2a2a", color: msg.is_automated ? "#f5bd5d" : "#9899A8", fontSize: 10, fontWeight: 700, marginTop: 2 }}>
+                      <div className="flex items-center justify-center flex-shrink-0" style={{ width: 28, height: 28, borderRadius: "50%", background: msg.is_automated ? "rgba(245,189,93,0.15)" : "var(--secondary)", color: msg.is_automated ? "#f5bd5d" : "var(--muted-foreground)", fontSize: 10, fontWeight: 700, marginTop: 2 }}>
                         {initials}
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="flex items-center flex-wrap" style={{ gap: 8, marginBottom: 2 }}>
-                          <span style={{ fontSize: 12, fontWeight: 600, color: "#E8E3DC" }}>{contactName(msg.contact)}</span>
+                          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--foreground)" }}>{contactName(msg.contact)}</span>
                           {msg.is_automated && (
                             <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", padding: "1px 6px", borderRadius: 4, background: "rgba(245,189,93,0.15)", color: "#f5bd5d" }}>Ava</span>
                           )}
                         </div>
-                        <p style={{ fontSize: 12, color: "#9899A8", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        <p style={{ fontSize: 12, color: "var(--muted-foreground)", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                           {msg.content.slice(0, 70)}{msg.content.length > 70 ? "…" : ""}
                         </p>
                       </div>
-                      <span style={{ fontSize: 10, color: "#9899A8", flexShrink: 0 }} suppressHydrationWarning>
+                      <span style={{ fontSize: 10, color: "var(--muted-foreground)", flexShrink: 0 }} suppressHydrationWarning>
                         {formatDistanceToNow(new Date(msg.created_at), { locale: es, addSuffix: false })}
                       </span>
                     </div>
@@ -471,26 +471,26 @@ export function AvaIAClient({
         </div>
 
         {/* ── Right 40%: Chat preview ── */}
-        <div className="hidden md:flex flex-col" style={{ width: "40%", background: "#14151C", borderLeft: "1px solid rgba(79,69,55,0.1)", flexShrink: 0 }}>
-          <div style={{ padding: 24, borderBottom: "1px solid rgba(79,69,55,0.1)" }}>
+        <div className="hidden md:flex flex-col" style={{ width: "40%", background: "var(--card)", borderLeft: "1px solid var(--border)", flexShrink: 0 }}>
+          <div style={{ padding: 24, borderBottom: "1px solid var(--border)" }}>
             <h3 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 14, color: "#f5bd5d", textTransform: "uppercase", letterSpacing: "0.15em", margin: 0 }}>
               Así responde Ava
             </h3>
-            <p style={{ fontSize: 12, color: "#9899A8", marginTop: 4, fontStyle: "italic" }}>
+            <p style={{ fontSize: 12, color: "var(--muted-foreground)", marginTop: 4, fontStyle: "italic" }}>
               Vista previa en tiempo real del simulador
             </p>
           </div>
 
           <div className="flex-1 overflow-y-auto" style={{ padding: 24, display: "flex", flexDirection: "column", gap: 16 }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", maxWidth: "85%" }}>
-              <div style={{ background: "#2A2B36", padding: 12, borderRadius: "16px 16px 16px 2px", fontSize: 13, color: "#ffffff" }}>
+              <div style={{ background: "var(--secondary)", padding: 12, borderRadius: "16px 16px 16px 2px", fontSize: 13, color: "var(--foreground)" }}>
                 Hola, vi la propiedad en La Moraleja que publicaron hoy. Sigue disponible?
               </div>
-              <span style={{ fontSize: 10, color: "#9899A8", marginTop: 4, marginLeft: 4 }}>Cliente · 10:05 AM</span>
+              <span style={{ fontSize: 10, color: "var(--muted-foreground)", marginTop: 4, marginLeft: 4 }}>Cliente · 10:05 AM</span>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginLeft: "auto", maxWidth: "85%" }}>
-              <div style={{ background: "#1F1F29", border: "1px solid rgba(245,189,93,0.2)", padding: 12, borderRadius: "16px 16px 2px 16px", fontSize: 13, color: "#E8E3DC", position: "relative" }}>
+              <div style={{ background: "var(--card)", border: "1px solid rgba(245,189,93,0.2)", padding: 12, borderRadius: "16px 16px 2px 16px", fontSize: 13, color: "var(--foreground)", position: "relative" }}>
                 <div style={{ position: "absolute", top: -8, right: -8, background: "linear-gradient(135deg, #f5bd5d 0%, #c9963a 100%)", color: "#432c00", fontSize: 9, fontWeight: 700, padding: "2px 6px", borderRadius: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                   Ava IA
                 </div>
@@ -498,23 +498,23 @@ export function AvaIAClient({
                 <br /><br />
                 ¿Le gustaría que coordinemos una cita para este jueves por la tarde?
               </div>
-              <span style={{ fontSize: 10, color: "#9899A8", marginTop: 4, marginRight: 4 }}>Enviado · 10:05 AM</span>
+              <span style={{ fontSize: 10, color: "var(--muted-foreground)", marginTop: 4, marginRight: 4 }}>Enviado · 10:05 AM</span>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", maxWidth: "85%" }}>
-              <div style={{ background: "#2A2B36", padding: 12, borderRadius: "16px 16px 16px 2px", fontSize: 13, color: "#ffffff" }}>
+              <div style={{ background: "var(--secondary)", padding: 12, borderRadius: "16px 16px 16px 2px", fontSize: 13, color: "var(--foreground)" }}>
                 Si, el dossier por favor. Busco algo de al menos 5 habitaciones.
               </div>
-              <span style={{ fontSize: 10, color: "#9899A8", marginTop: 4, marginLeft: 4 }}>Cliente · 10:06 AM</span>
+              <span style={{ fontSize: 10, color: "var(--muted-foreground)", marginTop: 4, marginLeft: 4 }}>Cliente · 10:06 AM</span>
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginLeft: "auto", maxWidth: "85%" }}>
-              <div style={{ background: "#1F1F29", border: "1px solid rgba(245,189,93,0.2)", padding: 12, borderRadius: "16px 16px 2px 16px", fontSize: 13, color: "#E8E3DC" }}>
+              <div style={{ background: "var(--card)", border: "1px solid rgba(245,189,93,0.2)", padding: 12, borderRadius: "16px 16px 2px 16px", fontSize: 13, color: "var(--foreground)" }}>
                 Perfecto. Con ese presupuesto contamos con dos opciones adicionales en la misma zona.
                 <br /><br />
                 Le acabo de adjuntar el PDF con la información solicitada.
               </div>
-              <span style={{ fontSize: 10, color: "#9899A8", marginTop: 4, marginRight: 4 }}>Enviado · 10:07 AM</span>
+              <span style={{ fontSize: 10, color: "var(--muted-foreground)", marginTop: 4, marginRight: 4 }}>Enviado · 10:07 AM</span>
             </div>
 
             <div style={{ display: "flex", justifyContent: "center", padding: "8px 0" }}>
@@ -525,12 +525,12 @@ export function AvaIAClient({
             </div>
           </div>
 
-          <div style={{ padding: 24, background: "#0D0E12", borderTop: "1px solid rgba(79,69,55,0.1)" }}>
+          <div style={{ padding: 24, background: "var(--secondary)", borderTop: "1px solid var(--border)" }}>
             <button
               className="w-full flex items-center justify-center"
-              style={{ background: "#201f1f", color: "#E8E3DC", border: "1px solid rgba(79,69,55,0.2)", borderRadius: 8, padding: "12px 0", fontWeight: 600, fontSize: 14, cursor: "pointer", gap: 8 }}
-              onMouseEnter={(e) => { e.currentTarget.style.background = "#2a2a2a"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = "#201f1f"; }}
+              style={{ background: "var(--secondary)", color: "var(--foreground)", border: "1px solid var(--border)", borderRadius: 8, padding: "12px 0", fontWeight: 600, fontSize: 14, cursor: "pointer", gap: 8 }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.8"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>rocket_launch</span>
               Ejecutar Prueba de Estrés

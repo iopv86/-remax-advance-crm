@@ -48,7 +48,7 @@ function RoundRobinList({
         <div
           key={entry.agent_id}
           style={{
-            background: entry.is_active ? "rgba(28,29,39,0.8)" : "rgba(14,15,20,0.6)",
+            background: entry.is_active ? "var(--card)" : "var(--secondary)",
             backdropFilter: "blur(12px)",
             border: `1px solid ${entry.is_active ? BORDER_L : "var(--glass-bg)"}`,
             borderRadius: 14,
@@ -108,7 +108,7 @@ function RoundRobinList({
 
 const GOLD = "var(--primary)";
 const BG   = "var(--background)";
-const CARD = "rgba(28,29,39,0.8)";
+const CARD = "var(--card)";
 const BORDER = "rgba(201,150,58,0.15)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED   = "var(--muted-foreground)";
@@ -239,7 +239,7 @@ export function RoundRobinClient({
             style={{
               display: "flex", alignItems: "center", gap: 6,
               background: saving ? "rgba(201,150,58,0.3)" : GOLD,
-              color: "#281900", fontWeight: 700, fontSize: 12,
+              color: "var(--primary-foreground)", fontWeight: 700, fontSize: 12,
               padding: "8px 16px", borderRadius: 8, border: "none",
               cursor: saving ? "not-allowed" : "pointer",
             }}
@@ -267,7 +267,7 @@ export function RoundRobinClient({
       {/* Header */}
       <header style={{
         position: "sticky", top: 0, zIndex: 40,
-        background: "rgba(13,14,18,0.92)", backdropFilter: "blur(16px)",
+        background: "var(--bg-header)", backdropFilter: "blur(16px)",
         borderBottom: `1px solid ${BORDER}`,
         padding: "20px 40px",
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -286,7 +286,7 @@ export function RoundRobinClient({
           style={{
             display: "flex", alignItems: "center", gap: 8,
             background: saving ? "rgba(201,150,58,0.3)" : GOLD,
-            color: "#281900",
+            color: "var(--primary-foreground)",
             fontWeight: 700, fontSize: 13,
             padding: "10px 20px", borderRadius: 10, border: "none",
             cursor: saving ? "not-allowed" : "pointer",

@@ -569,7 +569,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   border: "none",
                   cursor: "pointer",
                   background: activeView === "propiedades" ? GOLD : "transparent",
-                  color: activeView === "propiedades" ? "#0D0E12" : TEXT_MUTED,
+                  color: activeView === "propiedades" ? "var(--primary-foreground)" : TEXT_MUTED,
                   transition: "all 0.15s",
                 }}
               >
@@ -585,7 +585,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   border: "none",
                   cursor: "pointer",
                   background: activeView === "proyectos" ? GOLD : "transparent",
-                  color: activeView === "proyectos" ? "#0D0E12" : TEXT_MUTED,
+                  color: activeView === "proyectos" ? "var(--primary-foreground)" : TEXT_MUTED,
                   transition: "all 0.15s",
                   position: "relative",
                 }}
@@ -600,8 +600,8 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                       width: 14,
                       height: 14,
                       borderRadius: "50%",
-                      background: activeView === "proyectos" ? "#0D0E12" : GOLD,
-                      color: activeView === "proyectos" ? GOLD : "#0D0E12",
+                      background: activeView === "proyectos" ? "var(--primary-foreground)" : GOLD,
+                      color: activeView === "proyectos" ? GOLD : "var(--primary-foreground)",
                       fontSize: 8,
                       fontWeight: 700,
                       display: "flex",
@@ -1103,7 +1103,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                       >
                         {isSelected && (
                           <svg viewBox="0 0 12 12" style={{ width: 10, height: 10, fill: "none" }}>
-                            <path d="M1 6l3.5 3.5L11 2" stroke="#0D0E12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M1 6l3.5 3.5L11 2" stroke="var(--primary-foreground)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         )}
                       </div>
@@ -1345,7 +1345,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   disabled={propPage === 1}
                   style={{
                     width: 32, height: 32, borderRadius: 8, border: "1px solid var(--glass-border)",
-                    background: "transparent", color: propPage === 1 ? "rgba(154,144,136,0.3)" : "#9A9088",
+                    background: "transparent", color: propPage === 1 ? "var(--muted-foreground)" : "var(--muted-foreground)",
                     cursor: propPage === 1 ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   }}
                 >
@@ -1370,7 +1370,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                           cursor: "pointer", border: "1px solid",
                           borderColor: p === propPage ? "#C9963A" : "var(--glass-border)",
                           background: p === propPage ? "#C9963A" : "transparent",
-                          color: p === propPage ? "#0D0E12" : "#9A9088",
+                          color: p === propPage ? "var(--primary-foreground)" : "var(--muted-foreground)",
                         }}
                       >
                         {p}
@@ -1382,7 +1382,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   disabled={propPage === totalPages}
                   style={{
                     width: 32, height: 32, borderRadius: 8, border: "1px solid var(--glass-border)",
-                    background: "transparent", color: propPage === totalPages ? "rgba(154,144,136,0.3)" : "#9A9088",
+                    background: "transparent", color: propPage === totalPages ? "var(--muted-foreground)" : "var(--muted-foreground)",
                     cursor: propPage === totalPages ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
                   }}
                 >
@@ -1488,7 +1488,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 disabled={proposalCreatingSlug}
                 style={{
                   flex: 2, padding: "10px 0", borderRadius: 8, background: GOLD,
-                  border: "none", color: "#1A0E00",
+                  border: "none", color: "var(--primary-foreground)",
                   fontSize: 13, fontWeight: 700, cursor: proposalCreatingSlug ? "not-allowed" : "pointer",
                   fontFamily: "Inter, sans-serif", opacity: proposalCreatingSlug ? 0.7 : 1,
                 }}
@@ -1621,7 +1621,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 onClick={() => { setProposalShareSlug(null); setSelectedIds(new Set()); }}
                 style={{
                   flex: 1, padding: "9px 0", borderRadius: 8, background: GOLD,
-                  border: "none", color: "#1A0E00",
+                  border: "none", color: "var(--primary-foreground)",
                   fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "Inter, sans-serif",
                 }}
               >

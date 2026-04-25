@@ -24,7 +24,7 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
       <div className="flex items-center gap-2 mb-4">
         <h3
           className="text-sm font-bold uppercase tracking-widest"
-          style={{ color: "#94a3b8" }}
+          style={{ color: "var(--muted-foreground)" }}
         >
           Propiedades Recomendadas
         </h3>
@@ -39,7 +39,7 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
       </div>
 
       {matches.length === 0 ? (
-        <div className="flex flex-col items-center py-10" style={{ color: "#94a3b8" }}>
+        <div className="flex flex-col items-center py-10" style={{ color: "var(--muted-foreground)" }}>
           <svg
             className="w-8 h-8 mb-2 opacity-30"
             viewBox="0 0 24 24"
@@ -71,7 +71,7 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
 
               <p
                 className="text-xs font-bold leading-snug mb-1 line-clamp-2"
-                style={{ color: "#e5e2e1" }}
+                style={{ color: "var(--foreground)" }}
               >
                 {p.title}
               </p>
@@ -79,7 +79,7 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
               <p
                 className="text-sm font-extrabold mb-2"
                 style={{
-                  color: "#e5e2e1",
+                  color: "var(--foreground)",
                   fontFamily: "var(--font-manrope), Manrope, sans-serif",
                 }}
               >
@@ -89,14 +89,14 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
               <div className="flex flex-wrap gap-1.5">
                 <span
                   className="text-[10px] px-1.5 py-0.5 rounded"
-                  style={{ background: "var(--glass-bg-md)", color: "#9A9088" }}
+                  style={{ background: "var(--glass-bg-md)", color: "var(--muted-foreground)" }}
                 >
                   {TYPE_LABELS[p.property_type] ?? p.property_type}
                 </span>
                 {p.city && (
                   <span
                     className="text-[10px] px-1.5 py-0.5 rounded"
-                    style={{ background: "var(--glass-bg-md)", color: "#9A9088" }}
+                    style={{ background: "var(--glass-bg-md)", color: "var(--muted-foreground)" }}
                   >
                     {p.city}
                   </span>
@@ -104,7 +104,7 @@ export function MatchedProperties({ matches, hasBudget }: Props) {
                 {(p.bedrooms != null || p.bathrooms != null) && (
                   <span
                     className="text-[10px] px-1.5 py-0.5 rounded"
-                    style={{ background: "var(--glass-bg-md)", color: "#9A9088" }}
+                    style={{ background: "var(--glass-bg-md)", color: "var(--muted-foreground)" }}
                   >
                     {[
                       p.bedrooms != null ? `${p.bedrooms} hab` : null,

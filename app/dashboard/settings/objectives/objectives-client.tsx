@@ -16,7 +16,7 @@ interface AgentRow {
 
 const GOLD = "var(--primary)";
 const BG   = "var(--background)";
-const CARD = "rgba(28,29,39,0.8)";
+const CARD = "var(--card)";
 const BORDER = "rgba(201,150,58,0.15)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED   = "var(--muted-foreground)";
@@ -158,7 +158,7 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
                 style={{
                   display: "flex", alignItems: "center", gap: 6,
                   background: saving === agent.id ? "rgba(201,150,58,0.3)" : GOLD,
-                  color: "#281900",
+                  color: "var(--primary-foreground)",
                   fontWeight: 700, fontSize: 12,
                   padding: "10px 16px", borderRadius: 8, border: "none",
                   cursor: saving === agent.id ? "not-allowed" : "pointer",
@@ -190,7 +190,7 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
     <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
       <header style={{
         position: "sticky", top: 0, zIndex: 40,
-        background: "rgba(13,14,18,0.92)", backdropFilter: "blur(16px)",
+        background: "var(--bg-header)", backdropFilter: "blur(16px)",
         borderBottom: `1px solid ${BORDER}`,
         padding: "20px 40px",
         display: "flex", alignItems: "center", justifyContent: "space-between",

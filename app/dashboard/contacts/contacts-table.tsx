@@ -11,17 +11,17 @@ import { ContactSheet } from "@/components/contact-sheet";
 import { Pagination } from "@/components/pagination";
 import type { Contact } from "@/lib/types";
 
-// ── Design tokens (Obsidian Edge) ────────────────────────────────────────────
+// ── Design tokens (adaptive — CSS vars) ───────────────────────────────────────
 const T = {
-  surface: "#131313",
-  surfaceContainerLow: "#1c1b1b",
-  surfaceContainerHigh: "#2a2a2a",
-  surfaceContainerHighest: "#353534",
-  outlineVariant: "#4f4537",
-  onSurface: "#e5e2e1",
-  onSurfaceVariant: "#d3c4b1",
-  primary: "#f5bd5d",
-  primaryContainer: "#c9963a",
+  surface: "var(--background)",
+  surfaceContainerLow: "var(--secondary)",
+  surfaceContainerHigh: "var(--secondary)",
+  surfaceContainerHighest: "var(--secondary)",
+  outlineVariant: "var(--border)",
+  onSurface: "var(--foreground)",
+  onSurfaceVariant: "var(--muted-foreground)",
+  primary: "var(--primary)",
+  primaryContainer: "var(--primary)",
 } as const;
 
 // ── Label maps ────────────────────────────────────────────────────────────────
@@ -299,7 +299,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
               borderRadius: 8,
               border: "none",
               background: creatingDeals ? T.surfaceContainerHighest : T.primaryContainer,
-              color: creatingDeals ? T.onSurfaceVariant : "#281900",
+              color: creatingDeals ? T.onSurfaceVariant : "var(--primary-foreground)",
               fontWeight: 700,
               fontSize: 13,
               cursor: creatingDeals ? "default" : "pointer",

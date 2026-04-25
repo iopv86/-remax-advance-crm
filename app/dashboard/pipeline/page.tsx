@@ -52,11 +52,11 @@ export default async function PipelinePage() {
         display: "flex",
         flexDirection: "column",
         minHeight: "100vh",
-        background: "#121319",
+        background: "var(--background)",
       }}
     >
       {/* Page Header */}
-      <div className="px-4 pt-6 pb-0 md:px-12 md:pt-8" style={{ flexShrink: 0, background: "#121319" }}>
+      <div className="px-4 pt-6 pb-0 md:px-12 md:pt-8" style={{ flexShrink: 0, background: "var(--background)" }}>
         {/* Breadcrumb + title row */}
         <div className="flex flex-col gap-3 mb-6 md:flex-row md:justify-between md:items-end md:mb-10">
           <div>
@@ -65,7 +65,7 @@ export default async function PipelinePage() {
                 display: "flex",
                 alignItems: "center",
                 gap: 6,
-                color: "#9899A8",
+                color: "var(--muted-foreground)",
                 fontSize: 11,
                 marginBottom: 8,
                 textTransform: "uppercase",
@@ -74,14 +74,14 @@ export default async function PipelinePage() {
             >
               <span>Dashboard</span>
               <span style={{ fontSize: 10 }}>›</span>
-              <span style={{ color: "#f5bd5d" }}>Pipeline</span>
+              <span style={{ color: "var(--primary)" }}>Pipeline</span>
             </nav>
             <h1
               className="text-[26px] md:text-[36px]"
               style={{
                 fontFamily: "Manrope, var(--font-manrope), sans-serif",
                 fontWeight: 800,
-                color: "#e3e1ea",
+                color: "var(--foreground)",
                 letterSpacing: "-0.02em",
                 lineHeight: 1,
               }}
@@ -93,7 +93,7 @@ export default async function PipelinePage() {
           <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }} className="md:items-end">
             <span
               style={{
-                color: "#9899A8",
+                color: "var(--muted-foreground)",
                 fontSize: 11,
                 textTransform: "uppercase",
                 letterSpacing: "0.2em",
@@ -106,7 +106,7 @@ export default async function PipelinePage() {
               style={{
                 fontFamily: "Manrope, var(--font-manrope), sans-serif",
                 fontWeight: 700,
-                color: "#f5bd5d",
+                color: "var(--primary)",
               }}
             >
               RD$ {totalPipeline.toLocaleString()}
@@ -158,7 +158,7 @@ function MetricPill({
   return (
     <div
       style={{
-        background: "#1a1b22",
+        background: "var(--card)",
         borderLeft: `4px solid ${accentColor}40`,
         padding: "10px 24px",
         display: "flex",
@@ -168,7 +168,7 @@ function MetricPill({
     >
       <span
         style={{
-          color: "#9899A8",
+          color: "var(--muted-foreground)",
           fontSize: 11,
           fontWeight: 600,
           textTransform: "uppercase",
@@ -182,7 +182,7 @@ function MetricPill({
           fontFamily: "Manrope, var(--font-manrope), sans-serif",
           fontWeight: 700,
           fontSize: 20,
-          color: "#e3e1ea",
+          color: "var(--foreground)",
         }}
       >
         {value}
