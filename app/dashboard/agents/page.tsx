@@ -290,7 +290,7 @@ export default async function AgentsPage({
   return (
     <div
       className="flex flex-col min-h-screen"
-      style={{ background: "#0E0E0E" }}
+      style={{ background: "var(--background)" }}
     >
       <div className="p-4 md:p-8">
         <AgentsClient

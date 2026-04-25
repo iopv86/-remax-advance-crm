@@ -27,7 +27,7 @@ function CustomTooltip({ active, payload, label }: {
   if (!active || !payload?.length) return null;
   return (
     <div style={{
-      background: "#1C1D27",
+      background: "var(--card)",
       border: `1px solid ${T.border}`,
       borderRadius: 8,
       padding: "8px 14px",

@@ -23,12 +23,15 @@ import {
   X,
   ChevronDown,
   ListChecks,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { Logo } from "@/components/logo";
 import { QuickActionSheets } from "@/components/quick-action-sheets";
 import { createClient } from "@/lib/supabase/client";
+import { useTheme } from "next-themes";
 
 const ALL_PRIMARY_NAV_ITEMS = [
   { href: "/dashboard",                 label: "Dashboard",       icon: LayoutGrid,   roles: ["admin","manager","agent","viewer"] },
@@ -68,8 +71,12 @@ export function Sidebar({
 }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [unreadCount, setUnreadCount] = useState(0);
   const [activitiesOpen, setActivitiesOpen] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const supabase = createClient();
@@ -354,6 +361,17 @@ export function Sidebar({
           <LogOut className="h-4 w-4" />
           Cerrar sesión
         </button>
+        {mounted && (
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-2xl text-sm font-medium transition-all hover:bg-white/5"
+            style={{ color: "rgba(255,255,255,0.3)" }}
+            aria-label={theme === "dark" ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === "dark" ? "Modo claro" : "Modo oscuro"}
+          </button>
+        )}
       </div>
       </aside>
     </>

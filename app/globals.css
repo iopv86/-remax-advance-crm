@@ -56,8 +56,8 @@
 }
 
 /* ═══════════════════════════════════════
-   DESIGN SYSTEM — Light Luminous
-   Inspired by Nordic Frost + editorial
+   DESIGN SYSTEM — Day Mode Premium
+   Ivory parchment + Estate Gold + Obsidian ink
 ═══════════════════════════════════════ */
 :root {
   --font-sans: var(--font-geist);
@@ -65,29 +65,29 @@
   --font-display: var(--font-syne);
   --font-mono: var(--font-mono);
 
-  /* Page bg — warm white (Attio Broker) */
-  --background: #FAFAF9;
-  --foreground: #0f172a;
+  /* Page bg — warm ivory parchment */
+  --background: #F7F5F0;
+  --foreground: #161622;
 
-  /* Cards — pure white */
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --popover: #ffffff;
-  --popover-foreground: #0f172a;
+  /* Cards — warm white */
+  --card: #FEFCF9;
+  --card-foreground: #161622;
+  --popover: #FEFCF9;
+  --popover-foreground: #161622;
 
   /* Primary — Estate Gold (brand signature color) */
   --primary: #C9963A;
   --primary-foreground: #0D0E14;
 
-  --secondary: #f1f5f9;
-  --secondary-foreground: #1e293b;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+  --secondary: #EAE6DF;
+  --secondary-foreground: #2A2A3A;
+  --muted: #EAE6DF;
+  --muted-foreground: #5E6272;
   --accent: rgba(201, 150, 58, 0.08);
   --accent-foreground: #C9963A;
   --destructive: #e11d48;
-  --border: rgba(203, 213, 225, 0.8);
-  --input: #f1f5f9;
+  --border: rgba(201, 150, 58, 0.15);
+  --input: #EAE6DF;
   --ring: rgba(201, 150, 58, 0.3);
   --radius: 1rem;
 
@@ -256,8 +256,8 @@
 ═══════════════════════════════════════ */
 .page-bg {
   background:
-    radial-gradient(circle at top left, rgba(255, 241, 242, 0.5), transparent 28%),
-    linear-gradient(180deg, #FAFAF9 0%, #F5F5F3 45%, #EFEFED 100%);
+    radial-gradient(circle at top left, rgba(201, 150, 58, 0.04), transparent 28%),
+    linear-gradient(180deg, #F7F5F0 0%, #EDE9E2 45%, #E8E4DC 100%);
 }
 
 .bg-grid {
@@ -293,14 +293,14 @@
 ═══════════════════════════════════════ */
 .card-base {
   background: var(--card);
-  border: 1px solid rgba(203, 213, 225, 0.8);
+  border: 1px solid var(--border);
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 
 .card-glow {
   background: var(--card);
-  border: 1px solid rgba(203, 213, 225, 0.8);
+  border: 1px solid var(--border);
   border-radius: 24px;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
   transition: transform 0.2s ease, box-shadow 0.2s ease;

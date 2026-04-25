@@ -67,7 +67,7 @@ function CustomTooltip({
   return (
     <div
       style={{
-        background: "#1C1D27",
+        background: "var(--card)",
         border: `1px solid ${T.border}`,
         borderRadius: 8,
         padding: "8px 14px",
@@ -187,7 +187,7 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
                     ? `1px solid rgba(201,150,58,0.5)`
                     : `1px solid ${T.borderSubtle}`,
                   background: isActive ? T.gold : "transparent",
-                  color: isActive ? "#1A0E00" : T.surfaceMuted,
+                  color: isActive ? "var(--primary-foreground)" : T.surfaceMuted,
                   fontSize: 11,
                   fontWeight: 600,
                   fontFamily: "Inter, sans-serif",

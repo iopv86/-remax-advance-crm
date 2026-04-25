@@ -17,7 +17,7 @@ export default function DashboardError({
     <div
       style={{
         minHeight: "100vh",
-        background: "#0D0E12",
+        background: "var(--background)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -27,7 +27,7 @@ export default function DashboardError({
     >
       <div
         style={{
-          background: "rgba(28,29,39,0.8)",
+          background: "var(--glass-bg-md)",
           border: "1px solid rgba(201,150,58,0.15)",
           borderRadius: 20,
           padding: "48px 40px",
@@ -72,19 +72,19 @@ export default function DashboardError({
             fontWeight: 800,
             fontSize: 22,
             letterSpacing: "-0.02em",
-            color: "#E8E3DC",
+            color: "var(--foreground)",
             margin: "0 0 12px",
           }}
         >
           Algo salió mal
         </h2>
 
-        <p style={{ fontSize: 13, color: "#9899A8", margin: "0 0 28px", lineHeight: 1.6 }}>
+        <p style={{ fontSize: 13, color: "var(--muted-foreground)", margin: "0 0 28px", lineHeight: 1.6 }}>
           Esta página encontró un error inesperado. Puedes intentar recargarla o volver al inicio.
         </p>
 
         {(error.message || error.digest) && (
-          <p style={{ fontSize: 10, color: "#545567", margin: "0 0 20px", fontFamily: "monospace", wordBreak: "break-all" }}>
+          <p style={{ fontSize: 10, color: "var(--muted-foreground)", margin: "0 0 20px", fontFamily: "monospace", wordBreak: "break-all" }}>
             {error.message || error.digest}
           </p>
         )}
@@ -94,7 +94,7 @@ export default function DashboardError({
             onClick={reset}
             style={{
               background: "#C9963A",
-              color: "#281900",
+              color: "var(--primary-foreground)",
               fontWeight: 700,
               fontSize: 13,
               padding: "10px 24px",
@@ -109,7 +109,7 @@ export default function DashboardError({
             href="/dashboard"
             style={{
               background: "var(--glass-bg-md)",
-              color: "#E8E3DC",
+              color: "var(--foreground)",
               fontWeight: 600,
               fontSize: 13,
               padding: "10px 24px",

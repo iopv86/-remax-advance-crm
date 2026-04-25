@@ -195,7 +195,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
         {/* Property / deal name — contact name as headline */}
         <h4
           style={{
-            color: "#e3e1ea",
+            color: "var(--foreground)",
             fontFamily: "Manrope, var(--font-manrope), sans-serif",
             fontWeight: 700,
             fontSize: "15px",
@@ -210,7 +210,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
         {deal.notes && (
           <p
             style={{
-              color: "#9899A8",
+              color: "var(--muted-foreground)",
               fontSize: "12px",
               marginBottom: 16,
               overflow: "hidden",
@@ -230,7 +230,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
               width: 28,
               height: 28,
               borderRadius: "50%",
-              background: "#292a30",
+              background: "var(--secondary)",
               border: "1px solid rgba(245,189,93,0.2)",
               display: "flex",
               alignItems: "center",
@@ -273,7 +273,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             borderRadius: "0.125rem",
             background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
-            color: "#9899A8",
+            color: "var(--muted-foreground)",
             fontSize: 11,
             cursor: "pointer",
             textDecoration: "none",
@@ -291,7 +291,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             borderRadius: "0.125rem",
             background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
-            color: "#9899A8",
+            color: "var(--muted-foreground)",
             fontSize: 11,
             cursor: "pointer",
             transition: "color 0.15s, border-color 0.15s",
@@ -301,7 +301,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(245,189,93,0.5)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "#9899A8";
+            (e.currentTarget as HTMLButtonElement).style.color = "var(--muted-foreground)";
             (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(201,150,58,0.2)";
           }}
         >
@@ -316,7 +316,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             borderRadius: "0.125rem",
             background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
-            color: "#9899A8",
+            color: "var(--muted-foreground)",
             fontSize: 11,
             cursor: "pointer",
             opacity: deletingId === deal.id ? 0.4 : 1,
@@ -329,7 +329,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             }
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "#9899A8";
+            (e.currentTarget as HTMLButtonElement).style.color = "var(--muted-foreground)";
             (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(201,150,58,0.2)";
           }}
         >
@@ -533,7 +533,7 @@ export function PipelineClient({
             <span
               style={{
                 fontSize: 12,
-                color: "#9A9088",
+                color: "var(--muted-foreground)",
                 fontFamily: "Inter, sans-serif",
               }}
             >
@@ -599,7 +599,7 @@ export function PipelineClient({
                           fontSize: 11,
                           textTransform: "uppercase",
                           letterSpacing: "0.12em",
-                          color: "#e3e1ea",
+                          color: "var(--foreground)",
                         }}
                       >
                         {STAGE_SHORT[stage]}
@@ -612,7 +612,7 @@ export function PipelineClient({
                           style={{
                             fontSize: 11,
                             fontWeight: 700,
-                            color: "#9899A8",
+                            color: "var(--muted-foreground)",
                             fontFamily: "Manrope, var(--font-manrope), sans-serif",
                           }}
                         >
@@ -621,8 +621,8 @@ export function PipelineClient({
                       )}
                       <span
                         style={{
-                          background: "#292a30",
-                          color: "#9899A8",
+                          background: "var(--secondary)",
+                          color: "var(--muted-foreground)",
                           fontSize: 10,
                           padding: "2px 7px",
                           borderRadius: "999px",
@@ -645,7 +645,7 @@ export function PipelineClient({
                           minHeight: 80,
                           border: "2px dashed rgba(201,150,58,0.12)",
                           borderRadius: "0.25rem",
-                          color: "#9899A8",
+                          color: "var(--muted-foreground)",
                           fontSize: 12,
                           fontFamily: "Inter, sans-serif",
                         }}
@@ -705,7 +705,7 @@ export function PipelineClient({
                         width: 32,
                         height: 32,
                         borderRadius: "50%",
-                        background: "#292a30",
+                        background: "var(--secondary)",
                         border: "1px solid rgba(245,189,93,0.3)",
                         display: "flex",
                         alignItems: "center",
@@ -724,7 +724,7 @@ export function PipelineClient({
                           fontFamily: "Manrope, sans-serif",
                           fontWeight: 700,
                           fontSize: 14,
-                          color: "#e3e1ea",
+                          color: "var(--foreground)",
                         }}
                       >
                         {name}

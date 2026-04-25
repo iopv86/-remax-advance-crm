@@ -242,7 +242,7 @@ export function ConversationsClient({ initialConversations }: Props) {
   ];
 
   return (
-    <div className="flex overflow-hidden" style={{ height: "100vh" }}>
+    <div className="dark flex overflow-hidden" style={{ height: "100vh" }}>
       {/* ── LEFT PANEL: Conversation list ── */}
       <section
         className={`flex-col flex-shrink-0 border-r w-full md:w-[280px] ${mobilePanel === "list" ? "flex" : "hidden"} md:flex`}
