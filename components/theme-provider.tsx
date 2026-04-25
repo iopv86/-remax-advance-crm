@@ -2,13 +2,19 @@
 
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+interface ThemeProviderProps {
+  children: React.ReactNode;
+  nonce?: string;
+}
+
+export function ThemeProvider({ children, nonce }: ThemeProviderProps) {
   return (
     <NextThemesProvider
       attribute="class"
       defaultTheme="dark"
       enableSystem={false}
       storageKey="advance-crm-theme"
+      nonce={nonce}
     >
       {children}
     </NextThemesProvider>

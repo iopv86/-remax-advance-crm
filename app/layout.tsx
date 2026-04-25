@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Syne, Cinzel, Manrope, JetBrains_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -59,7 +60,10 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = await headers();
+  const nonce = headersList.get("x-nonce") ?? undefined;
+
   return (
     <html lang="es" className="h-full" suppressHydrationWarning>
       <head>
@@ -70,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${cinzel.variable} ${geist.variable} ${syne.variable} ${manrope.variable} ${mono.variable} h-full`}>
         <PHProvider>
-          <ThemeProvider>
+          <ThemeProvider nonce={nonce}>
             {children}
             <Toaster richColors position="top-right" />
           </ThemeProvider>
