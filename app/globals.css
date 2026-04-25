@@ -292,6 +292,15 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 99px; }
   ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.7); }
+
+  /* Login panel — always dark regardless of theme toggle */
+  .login-panel input:-webkit-autofill,
+  .login-panel input:-webkit-autofill:hover,
+  .login-panel input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #14151C inset !important;
+    -webkit-text-fill-color: #e5e2e1 !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
 /* ═══════════════════════════════════════

@@ -99,7 +99,7 @@ export default function LoginPage() {
 
       {/* ── RIGHT: Auth form panel ── */}
       <section
-        className="w-full lg:w-[45%] flex flex-col items-center justify-center px-8 lg:px-24"
+        className="login-panel w-full lg:w-[45%] flex flex-col items-center justify-center px-8 lg:px-24"
         style={{ background: "#14151C" }}
       >
         <div className="w-full" style={{ maxWidth: 400 }}>

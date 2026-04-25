@@ -229,7 +229,7 @@ function StalledDealsSheet({
                   key={deal.id}
                   className="rounded-xl p-4 space-y-2"
                   style={{
-                    background: "rgba(28,29,39,0.6)",
+                    background: "var(--card)",
                     border: "1px solid var(--glass-bg-md)",
                   }}
                 >
@@ -564,7 +564,7 @@ export function AgentsClient({
             <div
               className="relative overflow-hidden rounded-xl p-6 cursor-default group"
               style={{
-                background: "rgba(28,29,39,0.8)",
+                background: "var(--card)",
                 backdropFilter: "blur(24px)",
                 border: "1px solid rgba(201,150,58,0.15)",
               }}
@@ -589,7 +589,7 @@ export function AgentsClient({
             <div
               className="relative overflow-hidden rounded-xl p-6 cursor-default group"
               style={{
-                background: "rgba(28,29,39,0.8)",
+                background: "var(--card)",
                 backdropFilter: "blur(24px)",
                 border: "1px solid rgba(201,150,58,0.15)",
               }}
@@ -615,7 +615,7 @@ export function AgentsClient({
               onClick={() => setStalledOpen(true)}
               className="relative overflow-hidden rounded-xl p-6 text-left group transition-all hover:border-red-500/30"
               style={{
-                background: "rgba(28,29,39,0.8)",
+                background: "var(--card)",
                 backdropFilter: "blur(24px)",
                 border:
                   totalStalled > 0
@@ -653,7 +653,7 @@ export function AgentsClient({
               href="/dashboard/pipeline"
               className="relative overflow-hidden rounded-xl p-6 block group transition-all hover:border-[#C9963A]/30"
               style={{
-                background: "rgba(28,29,39,0.8)",
+                background: "var(--card)",
                 backdropFilter: "blur(24px)",
                 border: "1px solid rgba(201,150,58,0.15)",
                 textDecoration: "none",
@@ -685,7 +685,7 @@ export function AgentsClient({
             <div
               className="relative overflow-hidden rounded-xl p-5"
               style={{
-                background: "rgba(28,29,39,0.6)",
+                background: "var(--card)",
                 border: "1px solid rgba(201,150,58,0.1)",
               }}
             >
@@ -714,7 +714,7 @@ export function AgentsClient({
             <div
               className="relative overflow-hidden rounded-xl p-5"
               style={{
-                background: "rgba(28,29,39,0.6)",
+                background: "var(--card)",
                 border: "1px solid rgba(201,150,58,0.1)",
               }}
             >
@@ -743,7 +743,7 @@ export function AgentsClient({
             <div
               className="relative overflow-hidden rounded-xl p-5"
               style={{
-                background: "rgba(28,29,39,0.6)",
+                background: "var(--card)",
                 border: "1px solid rgba(201,150,58,0.1)",
               }}
             >
@@ -1007,7 +1007,7 @@ export function AgentsClient({
         <div
           className="rounded-xl p-4 md:p-8"
           style={{
-            background: "rgba(14,15,20,0.8)",
+            background: "var(--card)",
             border: "1px solid rgba(201,150,58,0.12)",
           }}
         >
@@ -1032,7 +1032,7 @@ export function AgentsClient({
         <div
           className="rounded-xl p-4 md:p-8"
           style={{
-            background: "rgba(14,15,20,0.8)",
+            background: "var(--card)",
             border: "1px solid rgba(201,150,58,0.12)",
           }}
         >
