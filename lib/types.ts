@@ -39,6 +39,8 @@ export interface Contact {
   timeline?: string;
   last_activity_at?: string;
   created_at: string;
+  meta_campaign_id?: string | null;
+  meta_lead_id?: string | null;
   // Joined
   agent?: Agent;
 }
