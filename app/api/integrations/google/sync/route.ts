@@ -117,14 +117,14 @@ export async function POST(request: Request) {
         body:    JSON.stringify(eventPayload),
       });
       if (!create.ok) {
-        const err = await create.text();
-        return NextResponse.json({ error: "GCal create failed", detail: err }, { status: 502 });
+        console.error("[GCal] create failed:", (await create.text()).slice(0, 500));
+        return NextResponse.json({ error: "GCal create failed" }, { status: 502 });
       }
       const created = await create.json();
       gcalEventId = created.id;
     } else if (!res.ok) {
-      const err = await res.text();
-      return NextResponse.json({ error: "GCal update failed", detail: err }, { status: 502 });
+      console.error("[GCal] update failed:", (await res.text()).slice(0, 500));
+      return NextResponse.json({ error: "GCal update failed" }, { status: 502 });
     } else {
       gcalEventId = task.gcal_event_id;
     }
@@ -136,8 +136,8 @@ export async function POST(request: Request) {
       body:    JSON.stringify(eventPayload),
     });
     if (!res.ok) {
-      const err = await res.text();
-      return NextResponse.json({ error: "GCal create failed", detail: err }, { status: 502 });
+      console.error("[GCal] create failed:", (await res.text()).slice(0, 500));
+      return NextResponse.json({ error: "GCal create failed" }, { status: 502 });
     }
     const created = await res.json();
     gcalEventId = created.id;

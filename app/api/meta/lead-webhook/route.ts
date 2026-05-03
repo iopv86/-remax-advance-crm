@@ -104,7 +104,10 @@ function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string |
 
   fetch(webhookUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "X-Notify-Secret": process.env.NOTIFY_SECRET ?? "",
+    },
     body: JSON.stringify({ phone, message }),
   }).catch(() => {});
 }

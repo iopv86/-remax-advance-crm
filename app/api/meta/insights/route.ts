@@ -30,7 +30,10 @@ export async function GET() {
     .order("date", { ascending: false })
     .limit(200);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    console.error("[meta/insights]", error.message);
+    return NextResponse.json({ error: "Error fetching insights" }, { status: 500 });
+  }
 
   const totalSpend   = (insights ?? []).reduce((s, r) => s + Number(r.spend ?? 0), 0);
   const totalLeads   = (insights ?? []).reduce((s, r) => s + (r.leads ?? 0), 0);
