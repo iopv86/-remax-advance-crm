@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
+import { isPrivileged, type AgentRole } from "@/lib/supabase/get-session-agent";
 
 const HEADERS_ES: Record<string, string> = {
   first_name:             "Nombre",
@@ -58,7 +58,24 @@ function formatValue(key: string, value: unknown): string {
 
 export async function GET(req: NextRequest) {
   const supabase = await createClient();
-  const session = await getSessionAgent();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  const { data: agentRow } = await supabase
+    .from("agents")
+    .select("id, role, email, full_name")
+    .eq("email", user.email!)
+    .maybeSingle();
+  if (!agentRow) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+
+  const session = {
+    userId: user.id,
+    agentId: agentRow.id as string,
+    role: agentRow.role as AgentRole,
+    email: agentRow.email as string,
+    fullName: agentRow.full_name as string,
+  };
 
   const { searchParams } = req.nextUrl;
   const q              = searchParams.get("q") ?? "";
@@ -82,7 +99,7 @@ export async function GET(req: NextRequest) {
     query = query.eq("agent_id", session.agentId);
   }
   if (q) {
-    const safeQ = q.replace(/[(),]/g, "").slice(0, 100);
+    const safeQ = q.replace(/[^\w@\-. ]/g, "").slice(0, 100);
     query = query.or(
       `first_name.ilike.%${safeQ}%,last_name.ilike.%${safeQ}%,phone.ilike.%${safeQ}%,email.ilike.%${safeQ}%`
     );

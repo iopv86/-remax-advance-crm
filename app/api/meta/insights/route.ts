@@ -46,6 +46,5 @@ export async function GET() {
   return NextResponse.json({
     summary: { totalSpend, totalLeads, totalClicks, totalImpressions, cpl, ctr, roas },
     rows: insights ?? [],
-    connected: !!process.env.META_ACCESS_TOKEN,
   });
 }
