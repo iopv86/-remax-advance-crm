@@ -48,18 +48,24 @@ async function fetchLeadData(leadgenId: string): Promise<LeadFormData | null> {
   return res.json() as Promise<LeadFormData>;
 }
 
-async function roundRobinAgentId(db: ReturnType<typeof adminClient>): Promise<string | null> {
+interface AssignedAgent {
+  id: string;
+  phone: string | null;
+  full_name: string | null;
+}
+
+async function roundRobinAgent(db: ReturnType<typeof adminClient>): Promise<AssignedAgent | null> {
   // Pick the active agent with the fewest contacts assigned in the last 30 days
   const { data } = await db
     .from("agents")
-    .select("id")
+    .select("id, phone, full_name")
     .eq("is_active", true)
     .in("role", ["agent", "admin"])
     .order("created_at")
     .limit(20);
 
   if (!data || data.length === 0) return null;
-  if (data.length === 1) return data[0].id;
+  if (data.length === 1) return data[0] as AssignedAgent;
 
   // Simple count-based round-robin: pick agent with fewest contacts in last 30d
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -76,7 +82,31 @@ async function roundRobinAgentId(db: ReturnType<typeof adminClient>): Promise<st
     if (c.agent_id in counts) counts[c.agent_id]++;
   }
 
-  return data.sort((a: { id: string }, b: { id: string }) => (counts[a.id] ?? 0) - (counts[b.id] ?? 0))[0].id;
+  const sorted = [...data].sort(
+    (a: { id: string }, b: { id: string }) => (counts[a.id] ?? 0) - (counts[b.id] ?? 0)
+  );
+  return sorted[0] as AssignedAgent;
+}
+
+function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string | null): void {
+  const webhookUrl = process.env.AVA_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const phone = agent.phone ?? process.env.AVA_NOTIFY_PHONE;
+  if (!phone) return;
+
+  const agentLabel = agent.full_name ?? "Agente";
+  const message =
+    `🏠 *Nuevo lead Meta Ads asignado a ${agentLabel}*\n` +
+    `Nombre: ${leadName || "Sin nombre"}\n` +
+    `Teléfono: ${leadPhone || "No provisto"}\n` +
+    `Fuente: Lead Form — revisa el CRM`;
+
+  fetch(webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ phone, message }),
+  }).catch(() => {});
 }
 
 // ── GET — Meta challenge verification ────────────────────────────────────────
@@ -156,11 +186,12 @@ export async function POST(req: NextRequest) {
       const lastName = rest.join(" ") || null;
 
       // 4. Insert contact — ON CONFLICT (meta_lead_id) DO NOTHING
-      const agentId = await roundRobinAgentId(db);
-      if (!agentId) {
+      const agent = await roundRobinAgent(db);
+      if (!agent) {
         console.error("[lead-webhook] No active agents found for assignment");
         continue;
       }
+      const agentId = agent.id;
 
       const { data: inserted, error: insertErr } = await db
         .from("contacts")
@@ -207,6 +238,9 @@ export async function POST(req: NextRequest) {
       }).catch((err) =>
         console.error("[lead-webhook] CAPI error:", (err as Error).message)
       );
+
+      // 7. Notify assigned agent via Ava/WhatsApp (fire-and-forget)
+      notifyAgent(agent, rawName, phone);
     }
   }
 
