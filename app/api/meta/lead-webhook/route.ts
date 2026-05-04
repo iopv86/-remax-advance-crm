@@ -96,11 +96,14 @@ function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string |
   if (!phone) return;
 
   const agentLabel = agent.full_name ?? "Agente";
+  const digits = leadPhone?.replace(/\D/g, "") ?? "";
+  const waLink = digits ? `\n📲 WhatsApp: https://wa.me/${digits}` : "";
   const message =
-    `🏠 *Nuevo lead Meta Ads asignado a ${agentLabel}*\n` +
-    `Nombre: ${leadName || "Sin nombre"}\n` +
-    `Teléfono: ${leadPhone || "No provisto"}\n` +
-    `Fuente: Lead Form — revisa el CRM`;
+    `🔥 *LEAD NUEVO — ${leadName || "Sin nombre"}*\n` +
+    `Asignado a: ${agentLabel}\n` +
+    `📱 Teléfono: ${leadPhone || "No provisto"}${waLink}\n` +
+    `\n⚡ Contacta en los próximos 5 minutos — las probabilidades de cierre caen 80% después de 30 min.\n` +
+    `📋 CRM: https://remax-advance-crm.vercel.app/dashboard/contacts`;
 
   fetch(webhookUrl, {
     method: "POST",
@@ -110,6 +113,45 @@ function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string |
     },
     body: JSON.stringify({ phone, message }),
   }).catch(() => {});
+}
+
+// Sends a WhatsApp template message directly to the lead on first contact.
+// Requires: META_PHONE_NUMBER_ID in env + META_LEAD_TEMPLATE_NAME set after
+// the template is approved in Meta Business Manager (24-48h review).
+// Template should follow: "Hola {{1}}, soy Ava de RE/MAX Advance. Vi que te
+// interesaste en nuestras propiedades. ¿Tienes un momento para contarme qué
+// estás buscando?" — language: es, category: UTILITY
+async function notifyLead(leadPhone: string | null, leadFirstName: string): Promise<void> {
+  const templateName = process.env.META_LEAD_TEMPLATE_NAME;
+  const accessToken  = process.env.META_ACCESS_TOKEN;
+  const phoneNumberId = process.env.META_PHONE_NUMBER_ID;
+  if (!templateName || !leadPhone || !accessToken || !phoneNumberId) return;
+
+  const digits = leadPhone.replace(/\D/g, "");
+  if (!digits) return;
+
+  await fetch(`https://graph.facebook.com/v19.0/${phoneNumberId}/messages`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to: digits,
+      type: "template",
+      template: {
+        name: templateName,
+        language: { code: "es" },
+        components: [
+          {
+            type: "body",
+            parameters: [{ type: "text", text: leadFirstName || "hola" }],
+          },
+        ],
+      },
+    }),
+  }).catch((err) => console.error("[lead-webhook] notifyLead error:", (err as Error).message));
 }
 
 // ── GET — Meta challenge verification ────────────────────────────────────────
@@ -242,8 +284,9 @@ export async function POST(req: NextRequest) {
         console.error("[lead-webhook] CAPI error:", (err as Error).message)
       );
 
-      // 7. Notify assigned agent via Ava/WhatsApp (fire-and-forget)
+      // 7. Notify assigned agent + attempt first-contact to lead (fire-and-forget)
       notifyAgent(agent, rawName, phone);
+      notifyLead(phone, firstName).catch(() => {});
     }
   }
 
