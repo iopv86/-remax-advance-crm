@@ -21,8 +21,8 @@ const ROLES: { value: AgentRole; label: string; description: string; color: stri
 const T = {
   bg: "#141418",
   border: "rgba(201,150,58,0.15)",
-  muted: "var(--glass-dim)",
-  surface: "var(--glass-bg)",
+  muted: "rgba(255,255,255,0.45)",
+  surface: "rgba(255,255,255,0.05)",
   gold: "#C9963A",
   goldLight: "#f5bd5d",
   onSurface: "#e5e2e1",
