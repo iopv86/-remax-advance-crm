@@ -51,19 +51,18 @@ interface InviteAgentParams {
   phone?: string;
   whatsappNumber?: string;
   maxLeadsPerWeek?: number;
-  password: string;
 }
 
 export async function inviteAgent(
   params: InviteAgentParams
 ): Promise<{ ok: true } | { ok: false; error: string }> {
-  const { email, fullName, role, phone, whatsappNumber, maxLeadsPerWeek, password } = params;
+  const { email, fullName, role, phone, whatsappNumber, maxLeadsPerWeek } = params;
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "No autorizado" };
 
-  // Role guard — only admin can create agents
+  // Role guard — only admin can invite agents
   const { data: callerRole } = await supabase.from("agents").select("role").eq("email", user.email!).single();
   if (!callerRole || callerRole.role !== "admin") {
     return { ok: false, error: "No autorizado" };
@@ -73,7 +72,6 @@ export async function inviteAgent(
   if (!emailRe.test(email)) return { ok: false, error: "Correo inválido" };
   if (!fullName || fullName.trim().length < 2) return { ok: false, error: "Nombre requerido" };
   if (fullName.length > 100) return { ok: false, error: "Nombre muy largo" };
-  if (!password || password.length < 8) return { ok: false, error: "La contraseña debe tener al menos 8 caracteres" };
 
   const validRoles: AgentRole[] = ["admin", "manager", "agent", "viewer"];
   if (!validRoles.includes(role)) return { ok: false, error: "Rol inválido" };
@@ -92,26 +90,24 @@ export async function inviteAgent(
 
   if (existing) return { ok: false, error: "Este agente ya existe en el sistema" };
 
-  // Create user with password — agent can log in immediately, no email link required
-  const { data: userData, error: createError } = await serviceSupabase.auth.admin.createUser({
-    email: email.toLowerCase(),
-    password,
-    email_confirm: true,
-    user_metadata: { full_name: fullName.trim() },
+  // Invite via email — redirectTo sends agent to /auth/confirm which routes them to /auth/set-password
+  const { data: inviteData, error: inviteError } = await serviceSupabase.auth.admin.inviteUserByEmail(email, {
+    data: { full_name: fullName.trim() },
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://remax-advance-crm.vercel.app"}/auth/confirm`,
   });
 
-  if (createError) return { ok: false, error: createError.message };
+  if (inviteError) return { ok: false, error: inviteError.message };
 
-  // Insert agent record — is_active: true since account is ready immediately
+  // Insert agent record immediately so role/phone are set before acceptance
   await serviceSupabase.from("agents").insert({
-    id: userData.user.id,
+    id: inviteData.user.id,
     email: email.toLowerCase(),
     full_name: fullName.trim(),
     role,
     phone: phone?.trim() || null,
     whatsapp_number: whatsappNumber?.trim() || null,
     max_leads_per_week: maxLeadsPerWeek ?? null,
-    is_active: true,
+    is_active: false, // activated on first login via set-password
   });
 
   return { ok: true };

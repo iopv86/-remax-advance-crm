@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { X, UserPlus, Phone, MessageCircle, Mail, User, Shield, Lock } from "lucide-react";
+import { X, UserPlus, Phone, MessageCircle, Mail, User, Shield } from "lucide-react";
 import { inviteAgent } from "@/app/dashboard/settings/actions";
 
 interface Props {
@@ -93,8 +93,6 @@ export function InviteAgentDialog({ open, onClose }: Props) {
   const [phone, setPhone]           = useState("");
   const [whatsapp, setWhatsapp]     = useState("");
   const [maxLeads, setMaxLeads]     = useState("");
-  const [password, setPassword]     = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
   const [error, setError]           = useState<string | null>(null);
   const [success, setSuccess]       = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -102,7 +100,6 @@ export function InviteAgentDialog({ open, onClose }: Props) {
   function reset() {
     setEmail(""); setFullName(""); setRole("agent");
     setPhone(""); setWhatsapp(""); setMaxLeads("");
-    setPassword(""); setConfirmPass("");
     setError(null); setSuccess(false);
   }
 
@@ -111,8 +108,6 @@ export function InviteAgentDialog({ open, onClose }: Props) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
-    if (password !== confirmPass) { setError("Las contraseñas no coinciden."); return; }
     startTransition(async () => {
       const result = await inviteAgent({
         email,
@@ -121,7 +116,6 @@ export function InviteAgentDialog({ open, onClose }: Props) {
         phone: phone || undefined,
         whatsappNumber: whatsapp || undefined,
         maxLeadsPerWeek: maxLeads ? parseInt(maxLeads, 10) : undefined,
-        password,
       });
       if (result.ok) {
         setSuccess(true);
@@ -201,7 +195,7 @@ export function InviteAgentDialog({ open, onClose }: Props) {
               Invitar agente
             </h2>
             <p style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>
-              El agente podrá iniciar sesión de inmediato
+              Se enviará un correo de activación
             </p>
           </div>
         </div>
@@ -228,9 +222,9 @@ export function InviteAgentDialog({ open, onClose }: Props) {
             }}>
               ✓
             </div>
-            <p style={{ fontSize: 15, fontWeight: 600, color: "#34d399" }}>Agente creado</p>
+            <p style={{ fontSize: 15, fontWeight: 600, color: "#34d399" }}>Invitación enviada</p>
             <p style={{ fontSize: 12, color: T.muted }}>{email}</p>
-            <p style={{ fontSize: 11, color: T.muted }}>Ya puede iniciar sesión con la contraseña asignada.</p>
+            <p style={{ fontSize: 11, color: T.muted }}>El agente recibirá un correo para activar su cuenta.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -284,16 +278,6 @@ export function InviteAgentDialog({ open, onClose }: Props) {
               </Field>
             </div>
 
-            {/* Password */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-              <Field label="Contraseña inicial" icon={Lock}>
-                <TextInput value={password} onChange={setPassword} placeholder="Mín. 8 caracteres" type="password" required />
-              </Field>
-              <Field label="Confirmar contraseña" icon={Lock}>
-                <TextInput value={confirmPass} onChange={setConfirmPass} placeholder="Repetir contraseña" type="password" required />
-              </Field>
-            </div>
-
             {/* Max leads */}
             <Field label="Máx. leads por semana (opcional)" icon={UserPlus}>
               <TextInput
@@ -331,7 +315,7 @@ export function InviteAgentDialog({ open, onClose }: Props) {
               }}
             >
               <UserPlus size={16} />
-              {isPending ? "Creando agente..." : "Crear agente"}
+              {isPending ? "Enviando invitación..." : "Enviar invitación"}
             </button>
           </form>
         )}
