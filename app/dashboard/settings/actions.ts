@@ -134,7 +134,9 @@ export async function resendInvitation(
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { error } = await serviceSupabase.auth.admin.inviteUserByEmail(email);
+  const { error } = await serviceSupabase.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://remax-advance-crm.vercel.app"}/auth/confirm`,
+  });
   if (error) return { ok: false, error: error.message };
 
   return { ok: true };
