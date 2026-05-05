@@ -138,6 +138,39 @@ export async function resendInvitation(
   return { ok: true };
 }
 
+export async function updateAgent(params: {
+  agentId: string;
+  fullName: string;
+  role: AgentRole;
+  phone?: string;
+}): Promise<{ ok: true } | { ok: false; error: string }> {
+  const { agentId, fullName, role, phone } = params;
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autorizado" };
+
+  const { data: callerRole } = await supabase.from("agents").select("role").eq("email", user.email!).single();
+  if (!callerRole || callerRole.role !== "admin") {
+    return { ok: false, error: "No autorizado" };
+  }
+
+  if (!fullName || fullName.trim().length < 2) return { ok: false, error: "Nombre requerido" };
+  if (fullName.length > 100) return { ok: false, error: "Nombre muy largo" };
+
+  const validRoles: AgentRole[] = ["admin", "manager", "agent", "viewer"];
+  if (!validRoles.includes(role)) return { ok: false, error: "Rol inválido" };
+
+  const { error } = await supabase
+    .from("agents")
+    .update({ full_name: fullName.trim(), role, phone: phone?.trim() || null })
+    .eq("id", agentId);
+
+  if (error) return { ok: false, error: error.message };
+
+  return { ok: true };
+}
+
 export async function deleteAgent(
   agentId: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {

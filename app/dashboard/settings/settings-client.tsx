@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useTransition } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InviteAgentDialog } from "@/components/invite-agent-dialog";
-import { resendInvitation, deleteAgent } from "./actions";
+import { resendInvitation, deleteAgent, updateAgent } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import type { Agent } from "@/lib/types";
 import {
@@ -42,6 +42,55 @@ const GLASS_CARD: React.CSSProperties = {
 
 const GOLD = "var(--primary)";
 const GOLD_LIGHT = "var(--gold-light)";
+
+type AgentRole = "admin" | "manager" | "agent" | "viewer";
+
+const FIELD_LABEL: React.CSSProperties = {
+  display: "block",
+  fontSize: 10,
+  letterSpacing: "0.15em",
+  textTransform: "uppercase",
+  color: "var(--muted-foreground)",
+  marginBottom: 6,
+  fontFamily: "Inter, sans-serif",
+  fontWeight: 700,
+};
+
+const FIELD_INPUT: React.CSSProperties = {
+  width: "100%",
+  background: "var(--secondary)",
+  border: "1px solid var(--glass-bg-md)",
+  borderRadius: 8,
+  padding: "10px 14px",
+  color: "var(--foreground)",
+  fontSize: 14,
+  outline: "none",
+  fontFamily: "Inter, sans-serif",
+  boxSizing: "border-box",
+};
+
+const BTN_PRIMARY: React.CSSProperties = {
+  padding: "10px 20px",
+  borderRadius: 8,
+  background: GOLD,
+  color: "var(--primary-foreground)",
+  border: "none",
+  cursor: "pointer",
+  fontSize: 14,
+  fontWeight: 600,
+  fontFamily: "Inter, sans-serif",
+};
+
+const BTN_SECONDARY: React.CSSProperties = {
+  padding: "10px 20px",
+  borderRadius: 8,
+  background: "transparent",
+  color: "var(--muted-foreground)",
+  border: "1px solid var(--glass-bg-md)",
+  cursor: "pointer",
+  fontSize: 14,
+  fontFamily: "Inter, sans-serif",
+};
 
 // ── Nav config ──────────────────────────────────────
 
@@ -171,6 +220,85 @@ function ContentHeader({ section, title }: { section: string; title: string }) {
   );
 }
 
+// ── EditAgentDialog ─────────────────────────────────
+
+function EditAgentDialog({ agent, onClose, onSaved }: { agent: Agent; onClose: () => void; onSaved: () => void }) {
+  const [fullName, setFullName] = useState(agent.full_name);
+  const [role, setRole] = useState<AgentRole>(agent.role as AgentRole);
+  const [phone, setPhone] = useState(agent.phone ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+    startTransition(async () => {
+      const result = await updateAgent({ agentId: agent.id, fullName, role, phone: phone || undefined });
+      setSaving(false);
+      if (result.ok) { onSaved(); onClose(); }
+      else setError(result.error);
+    });
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      style={{ background: "rgba(0,0,0,0.72)", backdropFilter: "blur(4px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="rounded-2xl p-6 w-full max-w-md mx-4"
+        style={GLASS_CARD}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="font-bold text-lg" style={{ color: "var(--foreground)", fontFamily: "Manrope, sans-serif" }}>
+            Editar agente
+          </h3>
+          <button onClick={onClose} style={{ color: "var(--muted-foreground)", background: "none", border: "none", cursor: "pointer", fontSize: 22, lineHeight: 1 }}>
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSave} className="flex flex-col gap-5">
+          <div>
+            <label style={FIELD_LABEL}>Nombre completo</label>
+            <input value={fullName} onChange={(e) => setFullName(e.target.value)} required style={FIELD_INPUT} />
+          </div>
+          <div>
+            <label style={FIELD_LABEL}>Rol</label>
+            <select value={role} onChange={(e) => setRole(e.target.value as AgentRole)} style={{ ...FIELD_INPUT, cursor: "pointer" }}>
+              <option value="admin">Admin</option>
+              <option value="manager">Manager</option>
+              <option value="agent">Agente</option>
+              <option value="viewer">Viewer</option>
+            </select>
+          </div>
+          <div>
+            <label style={FIELD_LABEL}>Teléfono</label>
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Opcional" style={FIELD_INPUT} />
+          </div>
+
+          {error && (
+            <div style={{ color: "#f87171", fontSize: 13, padding: "8px 12px", background: "rgba(239,68,68,0.08)", borderRadius: 6, border: "1px solid rgba(239,68,68,0.2)" }}>
+              {error}
+            </div>
+          )}
+
+          <div className="flex gap-3 justify-end pt-2">
+            <button type="button" onClick={onClose} style={BTN_SECONDARY}>Cancelar</button>
+            <button type="submit" disabled={saving || isPending} style={{ ...BTN_PRIMARY, opacity: saving || isPending ? 0.7 : 1, cursor: saving || isPending ? "not-allowed" : "pointer" }}>
+              {saving || isPending ? "Guardando…" : "Guardar cambios"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 // ── TabEquipo ───────────────────────────────────────
 
 function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Agent[]; onInvite: () => void; currentUserId?: string; onRefresh?: () => void }) {
@@ -178,6 +306,7 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
   const [resendingEmail, setResendingEmail] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ id: string; message: string; ok: boolean } | null>(null);
+  const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
 
   function handleResend(email: string) {
     setResendingEmail(email);
@@ -295,6 +424,18 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
+                      <button
+                        onClick={() => setEditingAgent(a)}
+                        className="text-xs font-medium transition-colors px-3 py-1 rounded-lg"
+                        style={{
+                          color: "var(--muted-foreground)",
+                          border: "1px solid var(--glass-bg-md)",
+                          background: "var(--glass-bg)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Editar
+                      </button>
                       {!a.is_active && (
                         feedback?.id === a.email ? (
                           <span
@@ -350,6 +491,14 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
           </tbody>
         </table>
       </div>
+
+      {editingAgent && (
+        <EditAgentDialog
+          agent={editingAgent}
+          onClose={() => setEditingAgent(null)}
+          onSaved={() => { setEditingAgent(null); onRefresh?.(); }}
+        />
+      )}
     </div>
   );
 }
@@ -363,6 +512,26 @@ function TabPerfil({
   currentAgent: Agent | null;
   currentUser: Props["currentUser"];
 }) {
+  const supabase = useMemo(() => createClient(), []);
+  const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [passLoading, setPassLoading] = useState(false);
+  const [passError, setPassError] = useState<string | null>(null);
+  const [passSaved, setPassSaved] = useState(false);
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPassError(null);
+    setPassSaved(false);
+    if (newPass.length < 8) { setPassError("Mínimo 8 caracteres."); return; }
+    if (newPass !== confirmPass) { setPassError("Las contraseñas no coinciden."); return; }
+    setPassLoading(true);
+    const { error } = await supabase.auth.updateUser({ password: newPass });
+    setPassLoading(false);
+    if (error) { setPassError(error.message); }
+    else { setPassSaved(true); setNewPass(""); setConfirmPass(""); setTimeout(() => setPassSaved(false), 4000); }
+  }
+
   return (
     <div>
       <ContentHeader section="Cuenta" title="Perfil" />
@@ -413,6 +582,51 @@ function TabPerfil({
                 {currentUser?.id?.slice(0, 8)}…
               </span>
             </div>
+          </div>
+
+          <div style={{ borderTop: "1px solid var(--glass-bg-md)", paddingTop: "1.5rem" }}>
+            <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: "var(--muted-foreground)" }}>
+              Cambiar contraseña
+            </p>
+            <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
+              <div>
+                <label style={FIELD_LABEL}>Nueva contraseña</label>
+                <input
+                  type="password"
+                  value={newPass}
+                  onChange={(e) => setNewPass(e.target.value)}
+                  placeholder="Mínimo 8 caracteres"
+                  autoComplete="new-password"
+                  style={FIELD_INPUT}
+                />
+              </div>
+              <div>
+                <label style={FIELD_LABEL}>Confirmar contraseña</label>
+                <input
+                  type="password"
+                  value={confirmPass}
+                  onChange={(e) => setConfirmPass(e.target.value)}
+                  placeholder="Repite la contraseña"
+                  autoComplete="new-password"
+                  style={FIELD_INPUT}
+                />
+              </div>
+              {passError && (
+                <p style={{ fontSize: 12, color: "#f87171" }}>{passError}</p>
+              )}
+              {passSaved && (
+                <p style={{ fontSize: 12, color: "#34d399" }}>Contraseña actualizada correctamente.</p>
+              )}
+              <div>
+                <button
+                  type="submit"
+                  disabled={passLoading}
+                  style={{ ...BTN_PRIMARY, opacity: passLoading ? 0.7 : 1, cursor: passLoading ? "not-allowed" : "pointer" }}
+                >
+                  {passLoading ? "Guardando…" : "Actualizar contraseña"}
+                </button>
+              </div>
+            </form>
           </div>
 
           <div style={{ borderTop: "1px solid var(--glass-bg-md)", paddingTop: "1.5rem" }}>

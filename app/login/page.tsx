@@ -13,6 +13,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotError, setForgotError] = useState<string | null>(null);
 
   async function handleGoogleLogin() {
     const supabase = createClient();
@@ -20,6 +25,22 @@ export default function LoginPage() {
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
+  }
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setForgotLoading(true);
+    setForgotError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/auth/confirm?type=recovery`,
+    });
+    setForgotLoading(false);
+    if (error) {
+      setForgotError(error.message);
+    } else {
+      setForgotSent(true);
+    }
   }
 
   async function handleLogin(e: React.FormEvent) {
@@ -109,6 +130,136 @@ export default function LoginPage() {
             <Logo size="sm" />
           </div>
 
+          {forgotMode ? (
+            /* ── Forgot password view ── */
+            <div>
+              <header style={{ marginBottom: 40 }}>
+                <h2
+                  style={{
+                    fontFamily: "Manrope, var(--font-manrope), sans-serif",
+                    fontWeight: 700,
+                    fontSize: 24,
+                    color: "#ffffff",
+                    marginBottom: 8,
+                    letterSpacing: "-0.01em",
+                  }}
+                >
+                  Recuperar contraseña
+                </h2>
+                <p style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 14, color: "#9899A8" }}>
+                  Ingresa tu correo y te enviaremos un enlace de acceso.
+                </p>
+              </header>
+
+              {forgotSent ? (
+                <div>
+                  <p style={{ fontSize: 14, color: "#34d399", fontFamily: "Inter, var(--font-inter), sans-serif", marginBottom: 24, lineHeight: 1.6 }}>
+                    Enlace enviado a <strong style={{ color: "#e5e2e1" }}>{forgotEmail}</strong>. Revisa tu bandeja de entrada.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setForgotMode(false)}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: 13,
+                      color: "#C9963A",
+                      fontFamily: "Inter, var(--font-inter), sans-serif",
+                      padding: 0,
+                    }}
+                  >
+                    ← Volver al inicio de sesión
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleForgotPassword}>
+                  <div style={{ marginBottom: 28 }}>
+                    <label
+                      style={{
+                        display: "block",
+                        fontSize: 10,
+                        letterSpacing: "0.2em",
+                        textTransform: "uppercase",
+                        color: "#9899A8",
+                        marginBottom: 8,
+                        fontFamily: "Inter, var(--font-inter), sans-serif",
+                      }}
+                    >
+                      Correo Electrónico
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="usuario@advanceestate.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                      style={{
+                        width: "100%",
+                        background: "transparent",
+                        border: "none",
+                        borderBottom: "1px solid #22242F",
+                        padding: "12px 0",
+                        color: "#e5e2e1",
+                        fontSize: 14,
+                        outline: "none",
+                        transition: "border-color 0.3s",
+                        fontFamily: "Inter, var(--font-inter), sans-serif",
+                      }}
+                      onFocus={(e) => (e.target.style.borderBottomColor = "#C9963A")}
+                      onBlur={(e) => (e.target.style.borderBottomColor = "#22242F")}
+                    />
+                  </div>
+                  {forgotError && (
+                    <p style={{ fontSize: 13, color: "#f87171", marginBottom: 16, fontFamily: "Inter, var(--font-inter), sans-serif" }}>
+                      {forgotError}
+                    </p>
+                  )}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                    <button
+                      type="submit"
+                      disabled={forgotLoading}
+                      style={{
+                        width: "100%",
+                        height: 48,
+                        background: "#C9963A",
+                        color: "#0e0e0e",
+                        border: "none",
+                        cursor: forgotLoading ? "not-allowed" : "pointer",
+                        fontSize: 15,
+                        fontWeight: 500,
+                        fontFamily: "Inter, var(--font-inter), sans-serif",
+                        opacity: forgotLoading ? 0.7 : 1,
+                      }}
+                    >
+                      {forgotLoading ? "Enviando…" : "Enviar enlace"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setForgotMode(false)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: 13,
+                        color: "#9899A8",
+                        fontFamily: "Inter, var(--font-inter), sans-serif",
+                        padding: 0,
+                        textAlign: "center",
+                      }}
+                      onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#C9963A")}
+                      onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#9899A8")}
+                    >
+                      ← Volver al inicio de sesión
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          ) : (
+            /* ── Login view ── */
+            <>
           {/* Heading */}
           <header style={{ marginBottom: 40 }}>
             <h2
@@ -198,14 +349,19 @@ export default function LoginPage() {
                   >
                     Contraseña
                   </label>
-                  <a
-                    href="#"
+                  <button
+                    type="button"
+                    onClick={() => { setForgotMode(true); setForgotEmail(email); setForgotSent(false); setForgotError(null); }}
                     style={{
                       fontSize: 11,
                       color: "#9899A8",
                       textDecoration: "none",
                       fontFamily: "Inter, var(--font-inter), sans-serif",
                       transition: "color 0.2s",
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: 0,
                     }}
                     onMouseEnter={(e) =>
                       ((e.target as HTMLElement).style.color = "#C9963A")
@@ -215,7 +371,7 @@ export default function LoginPage() {
                     }
                   >
                     ¿Olvidaste tu contraseña?
-                  </a>
+                  </button>
                 </div>
                 <div style={{ position: "relative" }}>
                   <input
@@ -376,6 +532,8 @@ export default function LoginPage() {
               </button>
             </div>
           </form>
+          </>
+          )}
 
           {/* Footer */}
           <footer

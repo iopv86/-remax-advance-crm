@@ -111,7 +111,7 @@ export default function SetPasswordPage() {
               Crear contraseña
             </h2>
             <p style={{ fontFamily: "Inter, var(--font-inter), sans-serif", fontSize: 14, color: "#9899A8" }}>
-              Elige una contraseña segura para activar tu cuenta.
+              Elige una contraseña segura para tu cuenta.
             </p>
           </header>
 
@@ -206,7 +206,7 @@ export default function SetPasswordPage() {
               onMouseEnter={(e) => { if (!loading) (e.currentTarget.style.filter = "brightness(1.1)"); }}
               onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
             >
-              {loading ? "Activando cuenta…" : "Activar cuenta →"}
+              {loading ? "Guardando…" : "Guardar contraseña →"}
             </button>
           </form>
 

@@ -20,8 +20,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Invited users have no password — send them to set one before the dashboard
-  if (type === "invite") {
+  // Invited and recovering users need to set/reset their password
+  if (type === "invite" || type === "recovery") {
     return NextResponse.redirect(`${origin}/auth/set-password`);
   }
 
