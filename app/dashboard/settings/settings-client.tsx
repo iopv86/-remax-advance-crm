@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useTransition } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InviteAgentDialog } from "@/components/invite-agent-dialog";
+import { resendInvitation, deleteAgent } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import type { Agent } from "@/lib/types";
 import {
@@ -172,7 +173,38 @@ function ContentHeader({ section, title }: { section: string; title: string }) {
 
 // ── TabEquipo ───────────────────────────────────────
 
-function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void }) {
+function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Agent[]; onInvite: () => void; currentUserId?: string; onRefresh?: () => void }) {
+  const [isPending, startTransition] = useTransition();
+  const [resendingEmail, setResendingEmail] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<{ id: string; message: string; ok: boolean } | null>(null);
+
+  function handleResend(email: string) {
+    setResendingEmail(email);
+    setFeedback(null);
+    startTransition(async () => {
+      const result = await resendInvitation(email);
+      setResendingEmail(null);
+      setFeedback({ id: email, message: result.ok ? "Enviado ✓" : result.error, ok: result.ok });
+      if (result.ok) setTimeout(() => setFeedback(null), 3000);
+    });
+  }
+
+  function handleDelete(agentId: string, name: string) {
+    if (!confirm(`¿Eliminar a ${name}? Esta acción no se puede deshacer.`)) return;
+    setDeletingId(agentId);
+    setFeedback(null);
+    startTransition(async () => {
+      const result = await deleteAgent(agentId);
+      setDeletingId(null);
+      if (result.ok) {
+        onRefresh?.();
+      } else {
+        setFeedback({ id: agentId, message: result.error, ok: false });
+      }
+    });
+  }
+
   return (
     <div>
       <ContentHeader section="Equipo" title="Agentes y Accesos" />
@@ -262,14 +294,55 @@ function TabEquipo({ agents, onInvite }: { agents: Agent[]; onInvite: () => void
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button
-                      className="text-xs font-medium transition-colors"
-                      style={{ color: "var(--muted-foreground)" }}
-                      onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = GOLD_LIGHT)}
-                      onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--muted-foreground)")}
-                    >
-                      ···
-                    </button>
+                    <div className="flex items-center justify-end gap-2">
+                      {!a.is_active && (
+                        feedback?.id === a.email ? (
+                          <span
+                            className="text-xs font-medium"
+                            style={{ color: feedback.ok ? "#34d399" : "#f87171" }}
+                          >
+                            {feedback.message}
+                          </span>
+                        ) : (
+                          <button
+                            disabled={isPending && resendingEmail === a.email}
+                            onClick={() => handleResend(a.email)}
+                            className="text-xs font-medium transition-colors px-3 py-1 rounded-lg"
+                            style={{
+                              color: GOLD_LIGHT,
+                              border: "1px solid rgba(201,150,58,0.25)",
+                              background: "rgba(201,150,58,0.05)",
+                              opacity: isPending && resendingEmail === a.email ? 0.5 : 1,
+                              cursor: isPending && resendingEmail === a.email ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            {isPending && resendingEmail === a.email ? "Enviando…" : "Reenviar invite"}
+                          </button>
+                        )
+                      )}
+                      {a.id !== currentUserId && (
+                        feedback?.id === a.id && !feedback.ok ? (
+                          <span className="text-xs font-medium" style={{ color: "#f87171" }}>
+                            {feedback.message}
+                          </span>
+                        ) : (
+                          <button
+                            disabled={isPending && deletingId === a.id}
+                            onClick={() => handleDelete(a.id, a.full_name)}
+                            className="text-xs font-medium transition-colors px-3 py-1 rounded-lg"
+                            style={{
+                              color: "#f87171",
+                              border: "1px solid rgba(239,68,68,0.2)",
+                              background: "rgba(239,68,68,0.05)",
+                              opacity: isPending && deletingId === a.id ? 0.5 : 1,
+                              cursor: isPending && deletingId === a.id ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            {isPending && deletingId === a.id ? "Eliminando…" : "Eliminar"}
+                          </button>
+                        )
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -921,7 +994,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
           style={{ background: "var(--background)" }}
         >
           <InviteAgentDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
-          {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} />}
+          {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} currentUserId={currentUser?.id} onRefresh={() => router.refresh()} />}
           {activeTab === "perfil" && <TabPerfil currentAgent={currentAgent} currentUser={currentUser} />}
           {activeTab === "integraciones" && <TabIntegraciones />}
           {activeTab === "notificaciones" && <TabNotificaciones userId={currentUser?.id ?? ""} />}

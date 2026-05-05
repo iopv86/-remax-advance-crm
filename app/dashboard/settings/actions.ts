@@ -110,3 +110,63 @@ export async function inviteAgent(
 
   return { ok: true };
 }
+
+export async function resendInvitation(
+  email: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autorizado" };
+
+  const { data: callerRole } = await supabase
+    .from("agents")
+    .select("role")
+    .eq("email", user.email!)
+    .single();
+  if (!callerRole || callerRole.role !== "admin") {
+    return { ok: false, error: "No autorizado" };
+  }
+
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error } = await serviceSupabase.auth.admin.inviteUserByEmail(email);
+  if (error) return { ok: false, error: error.message };
+
+  return { ok: true };
+}
+
+export async function deleteAgent(
+  agentId: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autorizado" };
+
+  const { data: callerRole } = await supabase
+    .from("agents")
+    .select("role")
+    .eq("email", user.email!)
+    .single();
+  if (!callerRole || callerRole.role !== "admin") {
+    return { ok: false, error: "No autorizado" };
+  }
+
+  // Prevent self-deletion
+  if (agentId === user.id) return { ok: false, error: "No puedes eliminarte a ti mismo" };
+
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error: authError } = await serviceSupabase.auth.admin.deleteUser(agentId);
+  if (authError) return { ok: false, error: authError.message };
+
+  // agents row cascades on auth delete, but delete explicitly as fallback
+  await serviceSupabase.from("agents").delete().eq("id", agentId);
+
+  return { ok: true };
+}
