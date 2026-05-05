@@ -116,9 +116,9 @@ export function AvaIAClient({
     <div className="flex flex-col h-full" style={{ background: "var(--background)", color: "var(--foreground)" }}>
       {/* ── Hero Panel ── */}
       <section
-        className="w-full flex items-center justify-between px-8"
+        className="w-full flex flex-wrap items-center justify-between gap-3 px-4 md:px-8 py-4 md:py-0"
         style={{
-          height: 88,
+          minHeight: 72,
           background: "var(--card)",
           borderBottom: "1px solid var(--border)",
           flexShrink: 0,
@@ -148,8 +148,8 @@ export function AvaIAClient({
           </div>
         </div>
 
-        {/* Center: stat pills */}
-        <div className="flex items-center" style={{ gap: 12 }}>
+        {/* Center: stat pills — hidden on mobile */}
+        <div className="hidden md:flex items-center" style={{ gap: 12 }}>
           {[
             { dot: "#f5bd5d", label: `${convToday} conv. hoy` },
             { dot: "#10b981", label: `${responseRate}% respuesta` },
@@ -239,21 +239,21 @@ export function AvaIAClient({
       </section>
 
       {/* ── Main content ── */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* ── Left 60%: Config cards ── */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-y-auto md:overflow-hidden">
+        {/* ── Left (full on mobile, 60% on desktop): Config cards ── */}
         <div
-          className="overflow-y-auto"
-          style={{ width: "60%", padding: 32, display: "flex", flexDirection: "column", gap: 24 }}
+          className="md:overflow-y-auto flex-1"
+          style={{ padding: 24, display: "flex", flexDirection: "column", gap: 24 }}
         >
           {/* Card 1: Personalidad + Tono */}
           <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)", position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: -64, right: -64, width: 128, height: 128, background: "rgba(245,189,93,0.05)", filter: "blur(48px)", borderRadius: "50%", pointerEvents: "none" }} />
-            <div className="flex items-center justify-between" style={{ marginBottom: 24 }}>
+            <div className="flex items-center justify-between flex-wrap gap-2" style={{ marginBottom: 24 }}>
               <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", gap: 8, margin: 0 }}>
                 <span className="material-symbols-outlined" style={{ color: "#f5bd5d", fontSize: 20 }}>person_outline</span>
                 Personalidad
               </h2>
-              <span style={{ fontSize: 11, color: "rgba(245,189,93,0.6)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              <span className="hidden sm:block" style={{ fontSize: 11, color: "rgba(245,189,93,0.6)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                 Configuración de Identidad
               </span>
             </div>
@@ -305,12 +305,12 @@ export function AvaIAClient({
 
           {/* Card 2: Identidad de Agencia */}
           <div style={{ background: "var(--card)", borderRadius: 12, padding: 24, border: "1px solid rgba(245,189,93,0.2)" }}>
-            <div className="flex items-center justify-between" style={{ marginBottom: 24 }}>
+            <div className="flex items-center justify-between flex-wrap gap-2" style={{ marginBottom: 24 }}>
               <h2 className="flex items-center" style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", gap: 8, margin: 0 }}>
                 <span className="material-symbols-outlined" style={{ color: "#f5bd5d", fontSize: 20 }}>domain</span>
                 Identidad de Agencia
               </h2>
-              <span style={{ fontSize: 11, color: "rgba(245,189,93,0.6)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
+              <span className="hidden sm:block" style={{ fontSize: 11, color: "rgba(245,189,93,0.6)", textTransform: "uppercase", letterSpacing: "0.1em" }}>
                 Datos que usa Ava
               </span>
             </div>

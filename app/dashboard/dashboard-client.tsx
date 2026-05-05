@@ -188,7 +188,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 fontWeight: 800,
                 fontSize: 26,
                 letterSpacing: "-0.03em",
-                color: T.surface,
+                color: "#e5e2e1",
                 margin: "0 0 4px",
                 lineHeight: 1.15,
               }} suppressHydrationWarning>
@@ -196,7 +196,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
               </p>
               <p style={{
                 fontSize: 12,
-                color: T.surfaceDim,
+                color: "rgba(229,226,225,0.55)",
                 margin: 0,
                 textTransform: "capitalize",
                 fontFamily: "Inter, sans-serif",

@@ -152,12 +152,10 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
     <div style={{ minHeight: "100vh", background: BG_BODY, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <header style={{
+      <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 md:px-10" style={{
         position: "sticky", top: 0, zIndex: 40,
         background: "rgba(13,14,18,0.9)", backdropFilter: "blur(16px)",
         borderBottom: `1px solid rgba(201,150,58,0.1)`,
-        padding: "20px 40px",
-        display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 28, letterSpacing: "-0.02em", margin: 0 }}>
           Reportes
@@ -249,7 +247,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
         </div>
 
         {/* ── KPI Cards ─────────────────────────────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 40 }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
           {[
             { icon: <TrendingUp style={{ width: 18, height: 18, color: GOLD }} />, label: "Ingresos ganados", value: formatMoney(totalRevenue), sub: `Comisiones: ${formatMoney(totalCommission)}` },
             { icon: <Award style={{ width: 18, height: 18, color: "#22c55e" }} />, label: "Deals ganados", value: closedWon.length, sub: `Perdidos: ${closedLost.length}` },

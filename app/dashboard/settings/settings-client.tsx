@@ -401,8 +401,8 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
         </button>
       </div>
 
-      <div className="rounded-2xl overflow-hidden" style={GLASS_CARD}>
-        <table className="w-full text-left border-collapse">
+      <div className="rounded-2xl overflow-x-auto" style={GLASS_CARD}>
+        <table className="w-full min-w-[640px] text-left border-collapse">
           <thead>
             <tr
               style={{

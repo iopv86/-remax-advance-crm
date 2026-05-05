@@ -375,17 +375,17 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
       />
 
       {/* Header strip */}
-      <div style={{
+      <div className="px-5 md:px-10" style={{
         background: "linear-gradient(135deg, rgba(201,150,58,0.06) 0%, rgba(14,14,14,0) 60%)",
         borderBottom: "1px solid var(--glass-bg)",
-        padding: "32px 40px 0",
+        paddingTop: 32,
       }}>
         <p style={{ fontSize: 11, fontWeight: 600, color: T.stone500, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 24 }}>
           Mi Perfil
         </p>
 
         {/* Avatar + name + role */}
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 28, paddingBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "flex-end", gap: 20, paddingBottom: 32, flexWrap: "wrap" }}>
           {/* Avatar with upload overlay */}
           <div
             style={{ position: "relative", flexShrink: 0, cursor: "pointer" }}
