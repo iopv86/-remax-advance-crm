@@ -138,6 +138,27 @@ export async function resendInvitation(
   return { ok: true };
 }
 
+export async function sendAgentPasswordReset(
+  email: string,
+  siteUrl: string
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autorizado" };
+
+  const { data: callerRole } = await supabase.from("agents").select("role").eq("email", user.email!).single();
+  if (!callerRole || callerRole.role !== "admin") {
+    return { ok: false, error: "No autorizado" };
+  }
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/confirm?type=recovery`,
+  });
+
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 export async function updateAgent(params: {
   agentId: string;
   fullName: string;

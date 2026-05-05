@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useTransition } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InviteAgentDialog } from "@/components/invite-agent-dialog";
-import { resendInvitation, deleteAgent, updateAgent } from "./actions";
+import { resendInvitation, deleteAgent, updateAgent, sendAgentPasswordReset } from "./actions";
 import { createClient } from "@/lib/supabase/client";
 import type { Agent } from "@/lib/types";
 import {
@@ -229,6 +229,19 @@ function EditAgentDialog({ agent, onClose, onSaved }: { agent: Agent; onClose: (
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+
+  async function handleResetPassword() {
+    setResetLoading(true);
+    setResetError(null);
+    setResetSent(false);
+    const result = await sendAgentPasswordReset(agent.email, window.location.origin);
+    setResetLoading(false);
+    if (result.ok) setResetSent(true);
+    else setResetError(result.error);
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -294,6 +307,40 @@ function EditAgentDialog({ agent, onClose, onSaved }: { agent: Agent; onClose: (
             </button>
           </div>
         </form>
+
+        {/* Password reset section */}
+        <div style={{ borderTop: "1px solid var(--glass-bg-md)", marginTop: 20, paddingTop: 16 }}>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "var(--muted-foreground)" }}>
+            Acceso
+          </p>
+          {resetSent ? (
+            <p style={{ fontSize: 13, color: "#34d399" }}>
+              Correo de recuperación enviado a <strong>{agent.email}</strong> ✓
+            </p>
+          ) : (
+            <>
+              {resetError && (
+                <p style={{ fontSize: 13, color: "#f87171", marginBottom: 8 }}>{resetError}</p>
+              )}
+              <button
+                type="button"
+                onClick={() => void handleResetPassword()}
+                disabled={resetLoading}
+                style={{
+                  ...BTN_SECONDARY,
+                  opacity: resetLoading ? 0.7 : 1,
+                  cursor: resetLoading ? "not-allowed" : "pointer",
+                  fontSize: 13,
+                }}
+              >
+                {resetLoading ? "Enviando…" : "Enviar reset de contraseña →"}
+              </button>
+              <p style={{ fontSize: 11, color: "var(--muted-foreground)", marginTop: 6 }}>
+                El agente recibirá un correo para crear una nueva contraseña.
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
