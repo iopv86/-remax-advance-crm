@@ -46,12 +46,13 @@ export async function updateProperty(
   payload: Partial<PropertyFormPayload>,
 ): Promise<ActionResult> {
   const supabase = await createClient();
-  await getAgentId(); // auth check
+  const agentId = await getAgentId();
 
   const { error } = await supabase
     .from("properties")
     .update(payload)
-    .eq("id", id);
+    .eq("id", id)
+    .eq("agent_id", agentId);
 
   if (error) return { success: false, error: error.message };
   return { success: true, id };

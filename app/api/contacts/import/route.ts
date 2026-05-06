@@ -101,6 +101,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing CSV file in 'file' field" }, { status: 400 });
   }
 
+  if ((file as File).size > 5_000_000) {
+    return NextResponse.json({ error: "File too large (max 5 MB)" }, { status: 413 });
+  }
   const csvText = await (file as File).text();
 
   const { data: rows, errors } = Papa.parse<Record<string, string>>(csvText, {

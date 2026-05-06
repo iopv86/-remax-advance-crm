@@ -237,7 +237,7 @@ function EditAgentDialog({ agent, onClose, onSaved }: { agent: Agent; onClose: (
     setResetLoading(true);
     setResetError(null);
     setResetSent(false);
-    const result = await sendAgentPasswordReset(agent.email, window.location.origin);
+    const result = await sendAgentPasswordReset(agent.email);
     setResetLoading(false);
     if (result.ok) setResetSent(true);
     else setResetError(result.error);
@@ -362,7 +362,7 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
       const result = await resendInvitation(email);
       setResendingEmail(null);
       setFeedback({ id: email, message: result.ok ? "Enviado ✓" : result.error, ok: result.ok });
-      if (result.ok) setTimeout(() => setFeedback(null), 3000);
+      setTimeout(() => setFeedback(null), result.ok ? 3000 : 5000);
     });
   }
 

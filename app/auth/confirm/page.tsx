@@ -13,13 +13,15 @@ function AuthConfirmInner() {
 
     // PKCE flow: token arrives as query params
     const token_hash = searchParams.get("token_hash");
+    const code = searchParams.get("code");
     const type = searchParams.get("type") as
       | "invite"
       | "recovery"
       | "signup"
       | "email"
       | null;
-    const next = searchParams.get("next") ?? "/dashboard";
+    const rawNext = searchParams.get("next");
+    const next = (!rawNext || !rawNext.startsWith("/") || rawNext.startsWith("//")) ? "/dashboard" : rawNext;
 
     // Implicit flow: token arrives in the hash fragment (#access_token=...)
     // Hash is browser-only — a server route handler never sees it.
@@ -32,7 +34,7 @@ function AuthConfirmInner() {
 
     async function processAuth() {
       if (token_hash && type) {
-        // ── PKCE path ──────────────────────────────────────────────
+        // ── PKCE OTP path (token_hash in query params) ─────────────
         const { error } = await supabase.auth.verifyOtp({ token_hash, type });
         if (error) {
           router.replace(
@@ -45,6 +47,29 @@ function AuthConfirmInner() {
         } else {
           router.replace(next);
         }
+      } else if (code) {
+        // ── PKCE code-exchange path (used by inviteUserByEmail with @supabase/ssr) ─
+        const { data: sessionData, error: codeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (codeError) {
+          router.replace(
+            `/login?error=${encodeURIComponent(codeError.message)}`
+          );
+          return;
+        }
+        // Determine if this is a new invite (agent not yet active) or a regular auth
+        const userId = sessionData.session?.user?.id;
+        if (userId) {
+          const { data: agentRow } = await supabase
+            .from("agents")
+            .select("is_active")
+            .eq("id", userId)
+            .maybeSingle();
+          if (agentRow && agentRow.is_active === false) {
+            router.replace("/auth/set-password");
+            return;
+          }
+        }
+        router.replace(next);
       } else if (accessToken && refreshToken) {
         // ── Implicit / hash-fragment path ──────────────────────────
         const { error } = await supabase.auth.setSession({

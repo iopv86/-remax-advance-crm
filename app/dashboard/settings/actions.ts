@@ -99,7 +99,7 @@ export async function inviteAgent(
   if (inviteError) return { ok: false, error: inviteError.message };
 
   // Insert agent record immediately so role/phone are set before acceptance
-  await serviceSupabase.from("agents").insert({
+  const { error: insertErr } = await serviceSupabase.from("agents").insert({
     id: inviteData.user.id,
     email: email.toLowerCase(),
     full_name: fullName.trim(),
@@ -107,8 +107,14 @@ export async function inviteAgent(
     phone: phone?.trim() || null,
     whatsapp_number: whatsappNumber?.trim() || null,
     max_leads_per_week: maxLeadsPerWeek ?? null,
-    is_active: false, // activated on first login via set-password
+    is_active: false,
   });
+
+  if (insertErr) {
+    // Rollback: delete the auth user to avoid orphaned account
+    await serviceSupabase.auth.admin.deleteUser(inviteData.user.id);
+    return { ok: false, error: insertErr.message };
+  }
 
   return { ok: true };
 }
@@ -129,22 +135,38 @@ export async function resendInvitation(
     return { ok: false, error: "No autorizado" };
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://remax-advance-crm.vercel.app";
+
   const serviceSupabase = createServiceClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
-  const { error } = await serviceSupabase.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://remax-advance-crm.vercel.app"}/auth/confirm`,
+  const { error: inviteError } = await serviceSupabase.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${siteUrl}/auth/confirm`,
   });
-  if (error) return { ok: false, error: error.message };
 
-  return { ok: true };
+  if (!inviteError) return { ok: true };
+
+  // If the user already exists in auth (re-invite scenario), send a password
+  // reset email instead — same UX: user clicks link → /auth/set-password
+  const alreadyExists =
+    inviteError.message.toLowerCase().includes("already been registered") ||
+    inviteError.message.toLowerCase().includes("already registered");
+
+  if (alreadyExists) {
+    const { error: resetError } = await serviceSupabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${siteUrl}/auth/confirm`,
+    });
+    if (resetError) return { ok: false, error: resetError.message };
+    return { ok: true };
+  }
+
+  return { ok: false, error: inviteError.message };
 }
 
 export async function sendAgentPasswordReset(
-  email: string,
-  siteUrl: string
+  email: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -155,6 +177,7 @@ export async function sendAgentPasswordReset(
     return { ok: false, error: "No autorizado" };
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${siteUrl}/auth/confirm?type=recovery`,
   });
@@ -224,7 +247,7 @@ export async function deleteAgent(
   if (authError) return { ok: false, error: authError.message };
 
   // agents row cascades on auth delete, but delete explicitly as fallback
-  await serviceSupabase.from("agents").delete().eq("id", agentId);
+  await serviceSupabase.from("agents").delete().eq("id", agentId); // ignore error — cascade may have already removed it
 
   return { ok: true };
 }

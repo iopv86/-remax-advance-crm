@@ -39,8 +39,11 @@ async function fetchLeadData(leadgenId: string): Promise<LeadFormData | null> {
   if (!token) return null;
   const url =
     `https://graph.facebook.com/${GRAPH_VERSION}/${leadgenId}` +
-    `?fields=field_data,ad_id,campaign_id&access_token=${token}`;
-  const res = await fetch(url, { next: { revalidate: 0 } });
+    `?fields=field_data,ad_id,campaign_id`;
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    next: { revalidate: 0 },
+  });
   if (!res.ok) {
     console.error(`[lead-webhook] Graph API ${res.status} for leadgen_id ${leadgenId}`);
     return null;

@@ -52,10 +52,10 @@ export async function fireCapiEvent(opts: CapiEventOptions): Promise<void> {
     };
   }
 
-  const url = `https://graph.facebook.com/${CAPI_VERSION}/${encodeURIComponent(pixelId)}/events?access_token=${token}`;
+  const url = `https://graph.facebook.com/${CAPI_VERSION}/${encodeURIComponent(pixelId)}/events`;
   const res = await fetch(url, {
     method:  "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body:    JSON.stringify({ data: [event] }),
   });
 
