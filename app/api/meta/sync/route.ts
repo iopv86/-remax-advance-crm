@@ -2,6 +2,7 @@ import { timingSafeEqual } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { resolveMetaConfig } from "@/lib/meta-config";
 
 function safeCompare(a: string, b: string): boolean {
   try {
@@ -70,17 +71,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const token = process.env.META_ACCESS_TOKEN;
-  const rawAccountId = process.env.META_AD_ACCOUNT_ID;
-  // Strip act_ prefix if user included it — API call adds it
-  const accountId = rawAccountId?.replace(/^act_/, "");
-
-  if (!token || !accountId) {
+  const metaCfg = await resolveMetaConfig();
+  if (!metaCfg) {
     return NextResponse.json(
-      { error: "META_ACCESS_TOKEN and META_AD_ACCOUNT_ID must be set in environment variables." },
+      { error: "META_ACCESS_TOKEN must be set in Vercel env vars and META_AD_ACCOUNT_ID must be configured (Vercel env vars or CRM Settings → Integraciones)." },
       { status: 503 }
     );
   }
+  const { accessToken: token, accountId } = metaCfg;
 
   // Fetch from Meta Graph API (paginated)
   const allRows: MetaInsightRow[] = [];
