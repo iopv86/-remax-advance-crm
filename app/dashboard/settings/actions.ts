@@ -344,10 +344,25 @@ export async function saveMetaConfig(
     return { ok: false, error: "No autorizado" };
   }
 
+  const FIELD_LIMITS: Record<MetaDbKey, { max: number; pattern?: RegExp; hint: string }> = {
+    meta_pixel_id:          { max: 20,  pattern: /^\d{1,20}$/,          hint: "solo dígitos, máx 20" },
+    meta_ad_account_id:     { max: 25,  pattern: /^(act_)?\d{1,20}$/,   hint: "formato act_XXXXXXXX o solo dígitos" },
+    meta_phone_number_id:   { max: 20,  pattern: /^\d{1,20}$/,          hint: "solo dígitos, máx 20" },
+    meta_lead_template_name:{ max: 100, pattern: /^[a-z0-9_]{1,100}$/,  hint: "letras minúsculas, números y guion bajo" },
+  };
+
   const validKeys = new Set<string>(META_DB_KEYS);
-  const rows = Object.entries(config)
-    .filter(([key, val]) => validKeys.has(key) && val !== undefined)
-    .map(([key, value]) => ({ key, value: (value as string).trim() }));
+  const rows: { key: string; value: string }[] = [];
+
+  for (const [key, val] of Object.entries(config)) {
+    if (!validKeys.has(key) || val === undefined) continue;
+    const trimmed = (val as string).trim();
+    if (!trimmed) { rows.push({ key, value: "" }); continue; } // allow clearing
+    const rule = FIELD_LIMITS[key as MetaDbKey];
+    if (trimmed.length > rule.max) return { ok: false, error: `${key}: excede ${rule.max} caracteres` };
+    if (rule.pattern && !rule.pattern.test(trimmed)) return { ok: false, error: `${key}: formato inválido (${rule.hint})` };
+    rows.push({ key, value: trimmed });
+  }
 
   if (rows.length === 0) return { ok: true };
 
@@ -357,7 +372,7 @@ export async function saveMetaConfig(
   return { ok: true };
 }
 
-export async function validateMetaToken(
+async function validateMetaToken(
   token: string
 ): Promise<{ ok: boolean; name?: string; error?: string }> {
   if (!token || token.trim().length < 10) return { ok: false, error: "Token inválido" };
@@ -381,6 +396,16 @@ export async function validateMetaToken(
 
 // Validates the META_ACCESS_TOKEN stored in Vercel env vars (no client input needed)
 export async function testMetaConnection(): Promise<{ ok: boolean; name?: string; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) return { ok: false, error: "No autorizado" };
+
+  try {
+    await assertAdminOrManager(supabase, user.email);
+  } catch {
+    return { ok: false, error: "No autorizado" };
+  }
+
   const token = process.env.META_ACCESS_TOKEN;
   if (!token) return { ok: false, error: "META_ACCESS_TOKEN no está configurado en Vercel" };
   return validateMetaToken(token);
