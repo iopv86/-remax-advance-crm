@@ -251,3 +251,137 @@ export async function deleteAgent(
 
   return { ok: true };
 }
+
+// ── Meta Ads config ──────────────────────────────────
+// Secrets (ACCESS_TOKEN, APP_SECRET, WEBHOOK_VERIFY_TOKEN) are stored in Vercel env vars only.
+// Non-secret identifiers are stored in agency_config and editable via the UI.
+
+const META_DB_KEYS = [
+  "meta_pixel_id",
+  "meta_ad_account_id",
+  "meta_phone_number_id",
+  "meta_lead_template_name",
+] as const;
+
+export type MetaDbKey = (typeof META_DB_KEYS)[number];
+
+export interface MetaDbConfig {
+  meta_pixel_id: string;
+  meta_ad_account_id: string;
+  meta_phone_number_id: string;
+  meta_lead_template_name: string;
+}
+
+export interface MetaEnvStatus {
+  has_access_token: boolean;
+  has_app_secret: boolean;
+  has_webhook_verify_token: boolean;
+}
+
+export interface MetaFullConfig {
+  db: MetaDbConfig;
+  env: MetaEnvStatus;
+}
+
+async function assertAdminOrManager(supabase: Awaited<ReturnType<typeof createClient>>, email: string) {
+  const { data } = await supabase.from("agents").select("role").eq("email", email).single();
+  if (!data || !["admin", "manager"].includes(data.role)) throw new Error("No autorizado");
+}
+
+export async function getMetaConfig(): Promise<MetaFullConfig> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) {
+    return {
+      db: { meta_pixel_id: "", meta_ad_account_id: "", meta_phone_number_id: "", meta_lead_template_name: "" },
+      env: { has_access_token: false, has_app_secret: false, has_webhook_verify_token: false },
+    };
+  }
+
+  try {
+    await assertAdminOrManager(supabase, user.email);
+  } catch {
+    return {
+      db: { meta_pixel_id: "", meta_ad_account_id: "", meta_phone_number_id: "", meta_lead_template_name: "" },
+      env: { has_access_token: false, has_app_secret: false, has_webhook_verify_token: false },
+    };
+  }
+
+  const { data } = await supabase
+    .from("agency_config")
+    .select("key, value")
+    .in("key", [...META_DB_KEYS]);
+
+  const map = Object.fromEntries(
+    (data ?? []).map(({ key, value }: { key: string; value: string }) => [key, value ?? ""])
+  );
+
+  return {
+    db: {
+      meta_pixel_id: map.meta_pixel_id ?? "",
+      meta_ad_account_id: map.meta_ad_account_id ?? "",
+      meta_phone_number_id: map.meta_phone_number_id ?? "",
+      meta_lead_template_name: map.meta_lead_template_name ?? "",
+    },
+    env: {
+      has_access_token: Boolean(process.env.META_ACCESS_TOKEN),
+      has_app_secret: Boolean(process.env.META_APP_SECRET),
+      has_webhook_verify_token: Boolean(process.env.META_WEBHOOK_VERIFY_TOKEN),
+    },
+  };
+}
+
+export async function saveMetaConfig(
+  config: Partial<MetaDbConfig>
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user?.email) return { ok: false, error: "No autorizado" };
+
+  try {
+    await assertAdminOrManager(supabase, user.email);
+  } catch {
+    return { ok: false, error: "No autorizado" };
+  }
+
+  const validKeys = new Set<string>(META_DB_KEYS);
+  const rows = Object.entries(config)
+    .filter(([key, val]) => validKeys.has(key) && val !== undefined)
+    .map(([key, value]) => ({ key, value: (value as string).trim() }));
+
+  if (rows.length === 0) return { ok: true };
+
+  const { error } = await supabase.from("agency_config").upsert(rows, { onConflict: "key" });
+  if (error) return { ok: false, error: error.message };
+
+  return { ok: true };
+}
+
+export async function validateMetaToken(
+  token: string
+): Promise<{ ok: boolean; name?: string; error?: string }> {
+  if (!token || token.trim().length < 10) return { ok: false, error: "Token inválido" };
+
+  try {
+    const res = await fetch(
+      `https://graph.facebook.com/v19.0/me?access_token=${encodeURIComponent(token.trim())}`,
+      { cache: "no-store" }
+    );
+    const json = (await res.json()) as {
+      name?: string;
+      id?: string;
+      error?: { message: string };
+    };
+    if (json.error) return { ok: false, error: json.error.message };
+    return { ok: true, name: json.name };
+  } catch {
+    return { ok: false, error: "Error de conexión con Meta" };
+  }
+}
+
+// Validates the META_ACCESS_TOKEN stored in Vercel env vars (no client input needed)
+export async function testMetaConnection(): Promise<{ ok: boolean; name?: string; error?: string }> {
+  const token = process.env.META_ACCESS_TOKEN;
+  if (!token) return { ok: false, error: "META_ACCESS_TOKEN no está configurado en Vercel" };
+  return validateMetaToken(token);
+}

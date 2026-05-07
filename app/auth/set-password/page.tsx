@@ -39,10 +39,15 @@ export default function SetPasswordPage() {
     // Mark agent active now that onboarding is complete
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      await supabase
+      const { error: activeErr } = await supabase
         .from("agents")
         .update({ is_active: true })
         .eq("id", user.id);
+      if (activeErr) {
+        setError("Contraseña guardada, pero no se pudo activar la cuenta. Contacta al administrador.");
+        setLoading(false);
+        return;
+      }
     }
 
     router.push("/dashboard");

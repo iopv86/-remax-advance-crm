@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SettingsClient } from "./settings-client";
+import { getMetaConfig } from "./actions";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
@@ -12,7 +13,7 @@ export default async function SettingsPage() {
   const { data: roleCheck } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
   if (roleCheck && roleCheck.role !== "admin") redirect("/dashboard");
 
-  const [{ data: agents }, { data: agent }] = await Promise.all([
+  const [{ data: agents }, { data: agent }, metaConfig] = await Promise.all([
     supabase
       .from("agents")
       .select("id, full_name, role, phone, email, avatar_url, is_active, created_at")
@@ -22,6 +23,7 @@ export default async function SettingsPage() {
       .select("*")
       .eq("email", user?.email ?? "")
       .single(),
+    getMetaConfig(),
   ]);
 
   return (
@@ -30,6 +32,7 @@ export default async function SettingsPage() {
         agents={agents ?? []}
         currentAgent={agent ?? null}
         currentUser={user}
+        metaConfig={metaConfig}
       />
     </Suspense>
   );

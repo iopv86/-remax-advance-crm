@@ -5,12 +5,13 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InviteAgentDialog } from "@/components/invite-agent-dialog";
 import { resendInvitation, deleteAgent, updateAgent, sendAgentPasswordReset } from "./actions";
+import { MetaAdsConfig } from "./meta-ads-config";
 import { createClient } from "@/lib/supabase/client";
 import type { Agent } from "@/lib/types";
+import type { MetaFullConfig } from "./actions";
 import {
   Users,
   User,
-  Link2,
   Bell,
   Bot,
   CheckCircle2,
@@ -30,6 +31,7 @@ interface Props {
   agents: Agent[];
   currentAgent: Agent | null;
   currentUser: { email?: string; id: string } | null;
+  metaConfig: MetaFullConfig;
 }
 
 // ── Design tokens ───────────────────────────────────
@@ -821,7 +823,7 @@ function TabImportar() {
 
 // ── TabIntegraciones ─────────────────────────────────
 
-function TabIntegraciones() {
+function TabIntegraciones({ metaConfig }: { metaConfig: MetaFullConfig }) {
   const [copied, setCopied] = useState(false);
 
   function handleCopy() {
@@ -856,41 +858,6 @@ function TabIntegraciones() {
         >
           Gestionado por Ava — agente Railway
         </div>
-      ),
-    },
-    {
-      name: "Meta Ads",
-      description: "Importación directa de leads desde Facebook/Instagram.",
-      status: "disconnected" as const,
-      icon: (
-        <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7">
-          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-        </svg>
-      ),
-      iconBg: "var(--secondary)",
-      iconBorder: "var(--glass-bg-md)",
-      iconColor: "var(--muted-foreground)",
-      badge: "INACTIVO",
-      badgeStyle: {
-        background: "var(--glass-bg)",
-        color: "var(--muted-foreground)",
-        border: "1px solid var(--glass-border)",
-      } as React.CSSProperties,
-      detail: (
-        <a
-          href="https://business.facebook.com/settings/ad-accounts"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full py-3 rounded-xl font-bold text-sm transition-all hover:opacity-90 flex items-center justify-center gap-2"
-          style={{
-            background: `linear-gradient(135deg, ${GOLD_LIGHT} 0%, ${GOLD} 100%)`,
-            color: "var(--primary-foreground)",
-            textDecoration: "none",
-          }}
-        >
-          <Link2 className="w-4 h-4" />
-          CONECTAR EN META BUSINESS
-        </a>
       ),
     },
     {
@@ -949,7 +916,12 @@ function TabIntegraciones() {
     <div>
       <ContentHeader section="Integraciones" title="Integraciones — WhatsApp Business" />
 
-      {/* Cards grid */}
+      {/* Meta Ads config panel */}
+      <section className="mb-6">
+        <MetaAdsConfig initialConfig={metaConfig} />
+      </section>
+
+      {/* Cards grid — other integrations */}
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
         {integrations.map((intg) => (
           <div
@@ -1150,7 +1122,7 @@ function TabNotificaciones({ userId }: { userId: string }) {
 
 // ── SettingsClient ───────────────────────────────────
 
-export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
+export function SettingsClient({ agents, currentAgent, currentUser, metaConfig }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -1257,7 +1229,7 @@ export function SettingsClient({ agents, currentAgent, currentUser }: Props) {
           <InviteAgentDialog open={inviteOpen} onClose={() => setInviteOpen(false)} />
           {activeTab === "equipo" && <TabEquipo agents={agents} onInvite={() => setInviteOpen(true)} currentUserId={currentUser?.id} onRefresh={() => router.refresh()} />}
           {activeTab === "perfil" && <TabPerfil currentAgent={currentAgent} currentUser={currentUser} />}
-          {activeTab === "integraciones" && <TabIntegraciones />}
+          {activeTab === "integraciones" && <TabIntegraciones metaConfig={metaConfig} />}
           {activeTab === "notificaciones" && <TabNotificaciones userId={currentUser?.id ?? ""} />}
           {activeTab === "importar" && <TabImportar />}
         </main>
