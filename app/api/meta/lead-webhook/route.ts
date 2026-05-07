@@ -210,6 +210,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   }
 
+  // Gate: only process leads when explicitly enabled.
+  // Set META_LEAD_WEBHOOK_ENABLED=true in Vercel env vars to activate.
+  // Keeps the HMAC check + 200 response active (Meta requires it) without
+  // creating contacts from campaigns not yet routed through this CRM.
+  if (process.env.META_LEAD_WEBHOOK_ENABLED !== "true") {
+    console.log("[lead-webhook] Intake disabled (META_LEAD_WEBHOOK_ENABLED != true). Payload acknowledged but not processed.");
+    return NextResponse.json({ received: true });
+  }
+
   const db = adminClient();
 
   // 3. Process each leadgen change
