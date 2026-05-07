@@ -14,7 +14,7 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 const META_GRAPH_VERSION = "v19.0";
-const META_FIELDS = "campaign_id,campaign_name,impressions,clicks,spend,leads,reach,actions";
+const META_FIELDS = "campaign_id,campaign_name,impressions,clicks,spend,reach,actions";
 const DATE_PRESET = "last_30d";
 
 interface MetaInsightRow {
