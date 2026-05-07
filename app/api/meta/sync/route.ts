@@ -81,13 +81,15 @@ export async function POST(request: Request) {
   const { accessToken: token, accountId } = metaCfg;
 
   // Fetch from Meta Graph API (paginated)
+  // Token goes in Authorization header — never in the URL (prevents leakage in server logs)
+  const metaHeaders = { Authorization: `Bearer ${token}` };
   const allRows: MetaInsightRow[] = [];
   let url: string | null =
     `https://graph.facebook.com/${META_GRAPH_VERSION}/act_${accountId}/insights` +
-    `?fields=${META_FIELDS}&date_preset=${DATE_PRESET}&level=campaign&access_token=${token}`;
+    `?fields=${META_FIELDS}&date_preset=${DATE_PRESET}&level=campaign`;
 
   while (url) {
-    const res = await fetch(url);
+    const res = await fetch(url, { headers: metaHeaders });
     const json = (await res.json()) as MetaApiResponse;
 
     if (json.error) {

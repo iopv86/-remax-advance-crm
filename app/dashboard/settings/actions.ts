@@ -379,8 +379,11 @@ async function validateMetaToken(
 
   try {
     const res = await fetch(
-      `https://graph.facebook.com/v19.0/me?access_token=${encodeURIComponent(token.trim())}`,
-      { cache: "no-store" }
+      `https://graph.facebook.com/v19.0/me`,
+      {
+        headers: { Authorization: `Bearer ${token.trim()}` },
+        cache: "no-store",
+      }
     );
     const json = (await res.json()) as {
       name?: string;
