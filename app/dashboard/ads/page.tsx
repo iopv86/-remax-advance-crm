@@ -2,6 +2,8 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Megaphone, TrendingUp, MousePointerClick, Users, DollarSign, Eye, Share2, Link } from "lucide-react";
 import { PLATFORM_LABELS, PLATFORM_COLOR } from "./_lib/platform-config";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 
 export default async function AdsPage({
   searchParams,
@@ -31,6 +33,14 @@ export default async function AdsPage({
     .select("*")
     .order("date", { ascending: false })
     .limit(200);
+
+  const { data: syncConfig } = await supabase
+    .from("agency_config")
+    .select("value")
+    .eq("key", "meta_last_synced")
+    .maybeSingle();
+
+  const lastSyncedAt = syncConfig?.value ?? null;
 
   // Attribution: count of CRM contacts per meta_campaign_id
   const { data: attributionRows } = await supabase
@@ -256,11 +266,18 @@ export default async function AdsPage({
                       <Share2 className="w-4 h-4" style={{ color: "#1877f2" }} />
                       <span className="font-sans font-semibold text-sm text-foreground">Campañas Meta Ads</span>
                     </div>
-                    <form action="/api/meta/sync" method="POST">
-                      <button type="submit" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ background: "rgba(24,119,242,0.1)", color: "#1877f2" }}>
-                        Sincronizar
-                      </button>
-                    </form>
+                    <div className="flex items-center gap-3">
+                      {lastSyncedAt && (
+                        <span className="font-mono text-xs text-muted-foreground">
+                          Última sync: {formatDistanceToNow(new Date(lastSyncedAt), { addSuffix: true, locale: es })}
+                        </span>
+                      )}
+                      <form action="/api/meta/sync" method="POST">
+                        <button type="submit" className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors" style={{ background: "rgba(24,119,242,0.1)", color: "#1877f2" }}>
+                          Sincronizar
+                        </button>
+                      </form>
+                    </div>
                   </div>
                   <div className="divide-y overflow-x-auto" style={{ borderColor: "var(--border)" }}>
                     <div className="grid px-6 py-3" style={{ gridTemplateColumns: "1fr 100px 90px 80px 80px 80px 70px 80px" }}>

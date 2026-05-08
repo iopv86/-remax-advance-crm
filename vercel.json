@@ -8,5 +8,11 @@
     "app/api/ava/route.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/meta-sync",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }
