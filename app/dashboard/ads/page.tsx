@@ -1,26 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Megaphone, TrendingUp, MousePointerClick, Users, DollarSign, Eye, Share2, Link } from "lucide-react";
-
-const PLATFORM_LABELS: Record<string, string> = {
-  facebook: "Share2",
-  instagram: "Instagram",
-  google: "Google Ads",
-  tiktok: "TikTok",
-  whatsapp: "WhatsApp",
-  ctwa: "CTWA",
-  other: "Otro",
-};
-
-const PLATFORM_COLOR: Record<string, string> = {
-  facebook: "oklch(0.45 0.15 250)",
-  instagram: "oklch(0.55 0.20 340)",
-  google: "var(--red)",
-  tiktok: "oklch(0.5 0.18 180)",
-  whatsapp: "oklch(0.5 0.16 145)",
-  ctwa: "var(--teal)",
-  other: "var(--muted-foreground)",
-};
+import { PLATFORM_LABELS, PLATFORM_COLOR } from "./_lib/platform-config";
 
 export default async function AdsPage({
   searchParams,
@@ -287,7 +268,7 @@ export default async function AdsPage({
                   </h3>
                   <p className="text-sm" style={{ color: "var(--muted-foreground)" }}>
                     {metaConnected
-                      ? "Token detectado. Usa Sincronizar para importar datos de tus campañas de Share2 e Instagram."
+                      ? "Token detectado. Usa Sincronizar para importar datos de tus campañas de Facebook e Instagram."
                       : "Para conectar Meta Ads, agrega META_ACCESS_TOKEN y META_AD_ACCOUNT_ID en las variables de entorno de Vercel."}
                   </p>
                 </div>
