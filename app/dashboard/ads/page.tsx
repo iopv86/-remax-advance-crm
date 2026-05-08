@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Megaphone } from "lucide-react";
 import { CampanasTab } from "./_components/CampanasTab";
 import { MetaAdsTab } from "./_components/MetaAdsTab";
+import { resolveMetaConfig } from "@/lib/meta-config";
 
 export default async function AdsPage({
   searchParams,
@@ -27,17 +28,20 @@ export default async function AdsPage({
     metaInsightsResult,
     attributedContactsResult,
     syncConfigResult,
+    metaCfg,
   ] = await Promise.all([
     supabase.from("campaigns").select("*").order("start_date", { ascending: false }).limit(50),
     supabase.from("meta_ad_insights").select("*").order("date", { ascending: false }).limit(200),
     supabase.from("contacts").select("meta_campaign_id").not("meta_campaign_id", "is", null),
     supabase.from("agency_config").select("value").eq("key", "meta_last_synced").maybeSingle(),
+    resolveMetaConfig(),
   ]);
 
   const campaigns         = campaignsResult.data ?? [];
   const metaInsights      = metaInsightsResult.data ?? [];
   const attributedContacts = attributedContactsResult.data ?? [];
   const lastSyncedAt      = syncConfigResult.data?.value ?? null;
+  const metaConfigured    = !!metaCfg;
 
   // Build attribution map: meta_campaign_id → CRM lead count
   const crmLeadsByCampaign: Record<string, number> = {};
@@ -103,6 +107,7 @@ export default async function AdsPage({
             insights={metaInsights}
             crmLeadsByCampaign={crmLeadsByCampaign}
             lastSyncedAt={lastSyncedAt}
+            metaConfigured={metaConfigured}
           />
         )}
       </div>

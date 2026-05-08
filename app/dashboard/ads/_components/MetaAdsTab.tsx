@@ -18,10 +18,11 @@ interface MetaAdsTabProps {
   insights: MetaInsight[];
   crmLeadsByCampaign: Record<string, number>;
   lastSyncedAt: string | null;
+  metaConfigured: boolean;
 }
 
-export function MetaAdsTab({ insights, crmLeadsByCampaign, lastSyncedAt }: MetaAdsTabProps) {
-  const metaConnected = !!process.env.META_ACCESS_TOKEN;
+export function MetaAdsTab({ insights, crmLeadsByCampaign, lastSyncedAt, metaConfigured }: MetaAdsTabProps) {
+  const metaConnected = metaConfigured;
   const metaHasData   = insights.length > 0;
 
   const metaSpend  = insights.reduce((s, r) => s + Number(r.spend ?? 0), 0);
