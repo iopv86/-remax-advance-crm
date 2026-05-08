@@ -32,6 +32,18 @@ export default async function AdsPage({
     .order("date", { ascending: false })
     .limit(200);
 
+  // Attribution: count of CRM contacts per meta_campaign_id
+  const { data: attributionRows } = await supabase
+    .from("contacts")
+    .select("meta_campaign_id")
+    .not("meta_campaign_id", "is", null);
+
+  const attributionMap = new Map<string, number>();
+  for (const row of attributionRows ?? []) {
+    const cid = row.meta_campaign_id as string;
+    if (cid) attributionMap.set(cid, (attributionMap.get(cid) ?? 0) + 1);
+  }
+
   const active      = (campaigns ?? []).filter((c) => c.status === "active");
   const totalSpend  = (campaigns ?? []).reduce((sum, c) => sum + (c.spend ?? 0), 0);
   const totalLeads  = (campaigns ?? []).reduce((sum, c) => sum + (c.leads_generated ?? 0), 0);
@@ -251,21 +263,30 @@ export default async function AdsPage({
                     </form>
                   </div>
                   <div className="divide-y overflow-x-auto" style={{ borderColor: "var(--border)" }}>
-                    <div className="grid px-6 py-3" style={{ gridTemplateColumns: "1fr 100px 80px 80px 80px 80px" }}>
-                      {["Campaña", "Fecha", "Impresiones", "Clics", "Gasto", "CPL"].map((h) => (
+                    <div className="grid px-6 py-3" style={{ gridTemplateColumns: "1fr 100px 90px 80px 80px 80px 70px 80px" }}>
+                      {["Campaña", "Fecha", "Impresiones", "Reach", "Freq.", "Clics", "Gasto", "Leads CRM"].map((h) => (
                         <span key={h} className="font-sans text-xs uppercase tracking-[0.12em] text-muted-foreground">{h}</span>
                       ))}
                     </div>
-                    {(metaInsights ?? []).map((r) => (
-                      <div key={r.id} className="grid items-center px-6 py-3.5" style={{ gridTemplateColumns: "1fr 100px 80px 80px 80px 80px" }}>
-                        <p className="font-sans text-sm text-foreground truncate">{r.campaign_name ?? r.campaign_id}</p>
-                        <span className="font-mono text-xs text-muted-foreground">{r.date}</span>
-                        <span className="font-mono text-sm text-muted-foreground">{(r.impressions ?? 0).toLocaleString()}</span>
-                        <span className="font-mono text-sm text-muted-foreground">{(r.clicks ?? 0).toLocaleString()}</span>
-                        <span className="font-mono text-sm text-foreground">${Number(r.spend ?? 0).toFixed(0)}</span>
-                        <span className="font-mono text-sm text-foreground">{r.cpl != null ? "$" + Number(r.cpl).toFixed(0) : "—"}</span>
-                      </div>
-                    ))}
+                    {(metaInsights ?? []).map((r) => {
+                      const reach     = r.reach ?? 0;
+                      const frequency = reach > 0 ? ((r.impressions ?? 0) / reach).toFixed(2) : "—";
+                      const crmLeads  = attributionMap.get(r.campaign_id) ?? 0;
+                      return (
+                        <div key={r.id} className="grid items-center px-6 py-3.5" style={{ gridTemplateColumns: "1fr 100px 90px 80px 80px 80px 70px 80px" }}>
+                          <p className="font-sans text-sm text-foreground truncate">{r.campaign_name ?? r.campaign_id}</p>
+                          <span className="font-mono text-xs text-muted-foreground">{r.date}</span>
+                          <span className="font-mono text-sm text-muted-foreground">{(r.impressions ?? 0).toLocaleString()}</span>
+                          <span className="font-mono text-sm text-muted-foreground">{reach > 0 ? reach.toLocaleString() : "—"}</span>
+                          <span className="font-mono text-sm text-muted-foreground">{frequency}</span>
+                          <span className="font-mono text-sm text-muted-foreground">{(r.clicks ?? 0).toLocaleString()}</span>
+                          <span className="font-mono text-sm text-foreground">${Number(r.spend ?? 0).toFixed(0)}</span>
+                          <span className="font-mono text-sm font-semibold" style={{ color: crmLeads > 0 ? "var(--teal)" : "var(--muted-foreground)" }}>
+                            {crmLeads > 0 ? crmLeads : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </>
