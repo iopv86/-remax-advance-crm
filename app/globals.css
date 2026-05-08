@@ -137,47 +137,47 @@
 }
 
 /* ═══════════════════════════════════════
-   DARK MODE — Ciber-Neo
-   Tech-noir #080B0F + Neon Cyan #00E5FF + Gold #C9963A secondary
+   DARK MODE — Obsidian Edge
+   #0D0E14 bg + Estate Gold #C9963A accent
 ═══════════════════════════════════════ */
 .dark {
-  /* Page bg — deep tech-noir */
-  --background: #080B0F;
-  --foreground: #E8EDF5;
+  /* Page bg — deep charcoal-navy */
+  --background: #0D0E14;
+  --foreground: #F5F0E8;
 
-  /* Cards */
-  --card: #0E1219;
-  --card-foreground: #E8EDF5;
-  --popover: #111827;
-  --popover-foreground: #E8EDF5;
+  /* Cards — solid dark base (glassmorphism via .card-base/.card-glass classes) */
+  --card: #131520;
+  --card-foreground: #F5F0E8;
+  --popover: #161820;
+  --popover-foreground: #F5F0E8;
 
-  /* Primary — Neon Cyan */
-  --primary: #00E5FF;
-  --primary-foreground: #080B0F;
+  /* Primary — Estate Gold */
+  --primary: #C9963A;
+  --primary-foreground: #0D0E14;
 
-  --secondary: #141B26;
-  --secondary-foreground: #A8B4C8;
-  --muted: #141B26;
-  --muted-foreground: #8892A4;
+  --secondary: #1A1A2E;
+  --secondary-foreground: #B8B0A4;
+  --muted: #1A1A2E;
+  --muted-foreground: #8B8178;
   --accent: rgba(201, 150, 58, 0.08);
   --accent-foreground: #C9963A;
   --destructive: #ef4444;
-  --border: rgba(0, 229, 255, 0.15);
-  --input: #141B26;
-  --ring: rgba(0, 229, 255, 0.4);
+  --border: rgba(201, 150, 58, 0.15);
+  --input: #1A1A2E;
+  --ring: rgba(201, 150, 58, 0.3);
 
-  /* Sidebar — unified Ciber-Neo */
-  --sidebar: #080B0F;
-  --sidebar-foreground: #E8EDF5;
-  --sidebar-primary: #00E5FF;
-  --sidebar-primary-foreground: #080B0F;
-  --sidebar-accent: rgba(0, 229, 255, 0.08);
-  --sidebar-accent-foreground: #00E5FF;
-  --sidebar-border: rgba(0, 229, 255, 0.06);
-  --sidebar-ring: #00E5FF;
-  --sidebar-accent-border: rgba(201, 150, 58, 0.2);
+  /* Sidebar — unified dark (Obsidian Edge) */
+  --sidebar: #0D0E14;
+  --sidebar-foreground: #F5F0E8;
+  --sidebar-primary: #C9963A;
+  --sidebar-primary-foreground: #0D0E14;
+  --sidebar-accent: rgba(201, 150, 58, 0.1);
+  --sidebar-accent-foreground: #C9963A;
+  --sidebar-border: rgba(201, 150, 58, 0.08);
+  --sidebar-ring: #C9963A;
+  --sidebar-accent-border: rgba(201, 150, 58, 0.25);
 
-  /* Gold (secondary accent — preserved) */
+  /* Estate Gold (primary accent) */
   --amber: #C9963A;
   --amber-muted: rgba(201, 150, 58, 0.1);
   --gold: #C9963A;
@@ -196,17 +196,17 @@
   --teal: #14b8a6;
   --teal-muted: rgba(20, 184, 166, 0.1);
 
-  /* Adaptive glass/overlay tokens — cyan-tinted borders */
-  --glass-bg:            rgba(255,255,255,0.03);
-  --glass-bg-md:         rgba(255,255,255,0.05);
-  --glass-border:        rgba(0, 229, 255, 0.08);
-  --glass-border-md:     rgba(0, 229, 255, 0.12);
-  --glass-border-lg:     rgba(0, 229, 255, 0.18);
-  --glass-dim:           rgba(0, 0, 0, 0.6);
-  --glass-disabled:      rgba(255,255,255,0.12);
+  /* Adaptive glass/overlay tokens (dark: white-on-dark) */
+  --glass-bg:            rgba(255,255,255,0.04);
+  --glass-bg-md:         rgba(255,255,255,0.06);
+  --glass-border:        rgba(255,255,255,0.08);
+  --glass-border-md:     rgba(255,255,255,0.12);
+  --glass-border-lg:     rgba(255,255,255,0.18);
+  --glass-dim:           rgba(255,255,255,0.35);
+  --glass-disabled:      rgba(255,255,255,0.15);
 
   /* Frosted-glass sticky header */
-  --bg-header:           rgba(8, 11, 15, 0.85);
+  --bg-header:           rgba(13, 14, 20, 0.80);
 }
 
 /* Dark mode component overrides — Obsidian Edge */
