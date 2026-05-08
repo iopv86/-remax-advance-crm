@@ -114,9 +114,18 @@ export default async function AdsPage({
 
             {/* Campaigns table */}
             <div className="card-base overflow-hidden animate-fade-up-2">
-              <div className="flex items-center gap-2 px-6 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
-                <Megaphone className="w-4 h-4" style={{ color: "var(--amber)" }} />
-                <span className="font-sans font-semibold text-sm text-foreground">Campañas</span>
+              <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--border)" }}>
+                <div className="flex items-center gap-2">
+                  <Megaphone className="w-4 h-4" style={{ color: "var(--amber)" }} />
+                  <span className="font-sans font-semibold text-sm text-foreground">Campañas</span>
+                </div>
+                <a
+                  href="/dashboard/ads/campaigns/new"
+                  className="text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors"
+                  style={{ background: "rgba(201,150,58,0.1)", color: "#C9963A" }}
+                >
+                  + Nueva campaña
+                </a>
               </div>
 
               {(campaigns ?? []).length === 0 ? (
@@ -126,8 +135,8 @@ export default async function AdsPage({
                 </div>
               ) : (
                 <div className="divide-y" style={{ borderColor: "var(--border)" }}>
-                  <div className="grid px-6 py-3 overflow-x-auto" style={{ gridTemplateColumns: "1fr 100px 80px 80px 80px 80px 80px" }}>
-                    {["Campaña", "Plataforma", "Estado", "Gasto", "Leads", "Clics", "CPL"].map((h) => (
+                  <div className="grid px-6 py-3 overflow-x-auto" style={{ gridTemplateColumns: "1fr 100px 80px 80px 80px 80px 80px 60px" }}>
+                    {["Campaña", "Plataforma", "Estado", "Gasto", "Leads", "Clics", "CPL", ""].map((h) => (
                       <span key={h} className="font-sans text-xs uppercase tracking-[0.12em] text-muted-foreground">{h}</span>
                     ))}
                   </div>
@@ -135,7 +144,7 @@ export default async function AdsPage({
                     const cpl = c.leads_generated > 0 ? (c.spend ?? 0) / c.leads_generated : null;
                     const platformColor = PLATFORM_COLOR[c.platform] ?? "var(--muted-foreground)";
                     return (
-                      <div key={c.id} className="grid items-center px-6 py-3.5 table-row-hover transition-colors" style={{ gridTemplateColumns: "1fr 100px 80px 80px 80px 80px 80px" }}>
+                      <div key={c.id} className="grid items-center px-6 py-3.5 table-row-hover transition-colors" style={{ gridTemplateColumns: "1fr 100px 80px 80px 80px 80px 80px 60px" }}>
                         <div>
                           <p className="font-sans font-medium text-sm text-foreground truncate">{c.name}</p>
                           {(c.start_date || c.end_date) && (
@@ -165,6 +174,13 @@ export default async function AdsPage({
                         <span className="font-mono text-sm font-semibold" style={{ color: "var(--teal)" }}>{c.leads_generated ?? "—"}</span>
                         <span className="font-mono text-sm text-muted-foreground">{c.clicks != null ? Number(c.clicks).toLocaleString() : "—"}</span>
                         <span className="font-mono text-sm text-foreground">{cpl != null ? "$" + cpl.toFixed(0) : "—"}</span>
+                        <a
+                          href={`/dashboard/ads/campaigns/${c.id}/edit`}
+                          className="font-sans text-xs font-semibold transition-colors"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
+                          Editar
+                        </a>
                       </div>
                     );
                   })}
