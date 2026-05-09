@@ -123,7 +123,7 @@ export async function POST(request: Request) {
   const supabase = await createClient();
   const { error: upsertError } = await supabase
     .from("meta_ad_insights")
-    .upsert(rows, { onConflict: "campaign_id,date" });
+    .upsert(rows, { onConflict: "campaign_id" });
 
   if (upsertError) {
     return NextResponse.json({ error: upsertError.message }, { status: 500 });
