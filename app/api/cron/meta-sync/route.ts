@@ -103,7 +103,7 @@ export async function GET(request: Request) {
   const supabase = await createClient();
   const { error: upsertError } = await supabase
     .from("meta_ad_insights")
-    .upsert(rows, { onConflict: "campaign_id,date" });
+    .upsert(rows, { onConflict: "campaign_id" });
 
   if (upsertError) {
     console.error("[cron/meta-sync] upsert error:", upsertError.message);
