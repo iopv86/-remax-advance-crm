@@ -378,14 +378,15 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
       if (result.ok) {
         try {
           await navigator.clipboard.writeText(result.link);
-          setFeedback({ id: email, message: "Enlace copiado ✓", ok: true });
+          setFeedback({ id: email, message: "Enlace copiado — úsalo de inmediato, expira en 24h ✓", ok: true });
         } catch {
-          setFeedback({ id: email, message: result.link, ok: true });
+          // clipboard blocked (non-HTTPS or permission denied) — show truncated link
+          setFeedback({ id: email, message: `Copia el enlace manualmente: ${result.link.slice(0, 80)}…`, ok: true });
         }
       } else {
         setFeedback({ id: email, message: result.error, ok: false });
       }
-      setTimeout(() => setFeedback(null), 8000);
+      setTimeout(() => setFeedback(null), 10000);
     });
   }
 
