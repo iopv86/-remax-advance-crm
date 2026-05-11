@@ -165,6 +165,47 @@ export async function resendInvitation(
   return { ok: false, error: inviteError.message };
 }
 
+export async function generateInviteLink(
+  email: string
+): Promise<{ ok: true; link: string } | { ok: false; error: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "No autorizado" };
+
+  const { data: callerRole } = await supabase
+    .from("agents")
+    .select("role")
+    .eq("email", user.email!)
+    .single();
+  if (!callerRole || callerRole.role !== "admin") {
+    return { ok: false, error: "No autorizado" };
+  }
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://remax-advance-crm.vercel.app";
+  const serviceSupabase = createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  // Try invite link first (pending agents); fall back to recovery link (already confirmed)
+  const { data, error } = await serviceSupabase.auth.admin.generateLink({
+    type: "invite",
+    email,
+    options: { redirectTo: `${siteUrl}/auth/confirm` },
+  });
+
+  if (!error) return { ok: true, link: data.properties.action_link };
+
+  const { data: recData, error: recError } = await serviceSupabase.auth.admin.generateLink({
+    type: "recovery",
+    email,
+    options: { redirectTo: `${siteUrl}/auth/confirm` },
+  });
+
+  if (recError) return { ok: false, error: recError.message };
+  return { ok: true, link: recData.properties.action_link };
+}
+
 export async function sendAgentPasswordReset(
   email: string
 ): Promise<{ ok: true } | { ok: false; error: string }> {
