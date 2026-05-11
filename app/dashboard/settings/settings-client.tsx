@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useTransition } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { InviteAgentDialog } from "@/components/invite-agent-dialog";
-import { resendInvitation, deleteAgent, updateAgent, sendAgentPasswordReset, generateInviteLink } from "./actions";
+import { resendInvitation, deleteAgent, updateAgent, sendAgentPasswordReset } from "./actions";
 import { MetaAdsConfig } from "./meta-ads-config";
 import { createClient } from "@/lib/supabase/client";
 import type { Agent } from "@/lib/types";
@@ -353,7 +353,6 @@ function EditAgentDialog({ agent, onClose, onSaved }: { agent: Agent; onClose: (
 function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Agent[]; onInvite: () => void; currentUserId?: string; onRefresh?: () => void }) {
   const [isPending, startTransition] = useTransition();
   const [resendingEmail, setResendingEmail] = useState<string | null>(null);
-  const [copyingEmail, setCopyingEmail] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<{ id: string; message: string; ok: boolean } | null>(null);
   const [editingAgent, setEditingAgent] = useState<Agent | null>(null);
@@ -366,27 +365,6 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
       setResendingEmail(null);
       setFeedback({ id: email, message: result.ok ? "Enviado ✓" : result.error, ok: result.ok });
       setTimeout(() => setFeedback(null), result.ok ? 3000 : 5000);
-    });
-  }
-
-  function handleCopyLink(email: string) {
-    setCopyingEmail(email);
-    setFeedback(null);
-    startTransition(async () => {
-      const result = await generateInviteLink(email);
-      setCopyingEmail(null);
-      if (result.ok) {
-        try {
-          await navigator.clipboard.writeText(result.link);
-          setFeedback({ id: email, message: "Enlace copiado — úsalo de inmediato, expira en 24h ✓", ok: true });
-        } catch {
-          // clipboard blocked (non-HTTPS or permission denied) — show truncated link
-          setFeedback({ id: email, message: `Copia el enlace manualmente: ${result.link.slice(0, 80)}…`, ok: true });
-        }
-      } else {
-        setFeedback({ id: email, message: result.error, ok: false });
-      }
-      setTimeout(() => setFeedback(null), 10000);
     });
   }
 
@@ -520,36 +498,20 @@ function TabEquipo({ agents, onInvite, currentUserId, onRefresh }: { agents: Age
                             {feedback.message}
                           </span>
                         ) : (
-                          <>
-                            <button
-                              disabled={isPending && resendingEmail === a.email}
-                              onClick={() => handleResend(a.email)}
-                              className="text-xs font-medium transition-colors px-3 py-1 rounded-lg"
-                              style={{
-                                color: GOLD_LIGHT,
-                                border: "1px solid rgba(201,150,58,0.25)",
-                                background: "rgba(201,150,58,0.05)",
-                                opacity: isPending && resendingEmail === a.email ? 0.5 : 1,
-                                cursor: isPending && resendingEmail === a.email ? "not-allowed" : "pointer",
-                              }}
-                            >
-                              {isPending && resendingEmail === a.email ? "Enviando…" : "Reenviar invite"}
-                            </button>
-                            <button
-                              disabled={isPending && copyingEmail === a.email}
-                              onClick={() => handleCopyLink(a.email)}
-                              className="text-xs font-medium transition-colors px-3 py-1 rounded-lg"
-                              style={{
-                                color: "#9899A8",
-                                border: "1px solid rgba(152,153,168,0.2)",
-                                background: "rgba(152,153,168,0.05)",
-                                opacity: isPending && copyingEmail === a.email ? 0.5 : 1,
-                                cursor: isPending && copyingEmail === a.email ? "not-allowed" : "pointer",
-                              }}
-                            >
-                              {isPending && copyingEmail === a.email ? "Generando…" : "Copiar enlace"}
-                            </button>
-                          </>
+                          <button
+                            disabled={isPending && resendingEmail === a.email}
+                            onClick={() => handleResend(a.email)}
+                            className="text-xs font-medium transition-colors px-3 py-1 rounded-lg"
+                            style={{
+                              color: GOLD_LIGHT,
+                              border: "1px solid rgba(201,150,58,0.25)",
+                              background: "rgba(201,150,58,0.05)",
+                              opacity: isPending && resendingEmail === a.email ? 0.5 : 1,
+                              cursor: isPending && resendingEmail === a.email ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            {isPending && resendingEmail === a.email ? "Enviando…" : "Reenviar invite"}
+                          </button>
                         )
                       )}
                       {a.id !== currentUserId && (
