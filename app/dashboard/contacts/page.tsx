@@ -54,10 +54,19 @@ export default async function ContactsPage({
     dataQuery = dataQuery.eq("lead_status", params.status);
   }
 
-  const [{ count: totalCount }, { data: contacts, error: contactsError }] = await Promise.all([
-    countQuery,
-    dataQuery,
-  ]);
+  // Load agents for assignment dropdown (admin/manager only)
+  const agentsQuery = isPrivileged(session.role)
+    ? supabase
+        .from("agents")
+        .select("id, full_name, email")
+        .eq("is_active", true)
+        .order("full_name")
+    : null;
+
+  const [{ count: totalCount }, { data: contacts, error: contactsError }, agentsResult] =
+    await Promise.all([countQuery, dataQuery, agentsQuery ?? Promise.resolve({ data: [] })]);
+
+  const availableAgents = (agentsResult as { data: { id: string; full_name: string; email: string }[] | null }).data ?? [];
 
   if (contactsError) {
     console.error("[contacts] query error:", JSON.stringify(contactsError));
@@ -134,6 +143,7 @@ export default async function ContactsPage({
           pagination={{ currentPage, totalCount: total, pageSize: PAGE_SIZE, basePath: "/dashboard/contacts", filterParams: paginationFilterParams }}
           currentAgentId={session.agentId}
           currentRole={session.role}
+          availableAgents={availableAgents}
         />
       </section>
     </div>

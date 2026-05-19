@@ -27,6 +27,12 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
+interface AgentOption {
+  id: string;
+  full_name: string;
+  email: string;
+}
+
 interface ContactFormState {
   first_name: string;
   last_name: string;
@@ -37,6 +43,7 @@ interface ContactFormState {
   source: string;
   budget_min: string;
   budget_max: string;
+  agent_id: string;
 }
 
 const EMPTY_FORM: ContactFormState = {
@@ -49,6 +56,7 @@ const EMPTY_FORM: ContactFormState = {
   source: "",
   budget_min: "",
   budget_max: "",
+  agent_id: "",
 };
 
 function contactToForm(c: Contact): ContactFormState {
@@ -62,6 +70,7 @@ function contactToForm(c: Contact): ContactFormState {
     source: c.source ?? "",
     budget_min: c.budget_min?.toString() ?? "",
     budget_max: c.budget_max?.toString() ?? "",
+    agent_id: c.agent_id ?? "",
   };
 }
 
@@ -70,6 +79,8 @@ interface ContactSheetProps {
   onOpenChange: (open: boolean) => void;
   contact?: Contact | null;
   onSaved: () => void;
+  availableAgents?: AgentOption[];
+  currentRole?: string;
 }
 
 export function ContactSheet({
@@ -77,7 +88,10 @@ export function ContactSheet({
   onOpenChange,
   contact,
   onSaved,
+  availableAgents = [],
+  currentRole,
 }: ContactSheetProps) {
+  const isPrivileged = currentRole === "admin" || currentRole === "manager";
   const isEdit = !!contact;
   const [form, setForm] = useState<ContactFormState>(
     contact ? contactToForm(contact) : EMPTY_FORM
@@ -114,6 +128,7 @@ export function ContactSheet({
       source: (form.source || null) as LeadSource | null,
       budget_min: form.budget_min ? Number(form.budget_min) : null,
       budget_max: form.budget_max ? Number(form.budget_max) : null,
+      ...(isPrivileged && form.agent_id ? { agent_id: form.agent_id } : {}),
     };
 
     let error;
@@ -123,7 +138,28 @@ export function ContactSheet({
         .update(payload)
         .eq("id", contact!.id));
     } else {
-      ({ error } = await supabase.from("contacts").insert(payload));
+      // Resolve the current user's agent row (required by contacts RLS INSERT policy)
+      let agentId = form.agent_id || null;
+      if (!agentId) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          toast.error("Sesión expirada. Recarga la página.");
+          setLoading(false);
+          return;
+        }
+        const { data: agent } = await supabase
+          .from("agents")
+          .select("id")
+          .eq("email", user.email!)
+          .maybeSingle();
+        if (!agent) {
+          toast.error("No se encontró tu perfil de agente.");
+          setLoading(false);
+          return;
+        }
+        agentId = agent.id;
+      }
+      ({ error } = await supabase.from("contacts").insert({ ...payload, agent_id: agentId }));
     }
 
     setLoading(false);
@@ -253,6 +289,27 @@ export function ContactSheet({
               </SelectContent>
             </Select>
           </div>
+
+          {isPrivileged && availableAgents.length > 0 && (
+            <div>
+              <Label>Agente asignado</Label>
+              <Select
+                value={form.agent_id}
+                onValueChange={(v) => v && set("agent_id", v)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccionar agente…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableAgents.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.full_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           <div className="grid grid-cols-2 gap-3">
             <div>

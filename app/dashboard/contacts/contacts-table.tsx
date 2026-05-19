@@ -159,14 +159,21 @@ interface PaginationProps {
   filterParams?: Record<string, string>;
 }
 
+interface AgentOption {
+  id: string;
+  full_name: string;
+  email: string;
+}
+
 interface Props {
   contacts: Contact[];
   pagination?: PaginationProps;
   currentAgentId?: string;
   currentRole?: string;
+  availableAgents?: AgentOption[];
 }
 
-export function ContactsTable({ contacts: initial, pagination, currentAgentId, currentRole }: Props) {
+export function ContactsTable({ contacts: initial, pagination, currentAgentId, currentRole, availableAgents = [] }: Props) {
   const router = useRouter();
   const [editContact, setEditContact] = useState<Contact | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -814,6 +821,8 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
         onOpenChange={setSheetOpen}
         contact={editContact}
         onSaved={handleSaved}
+        availableAgents={availableAgents}
+        currentRole={currentRole}
       />
     </>
   );
