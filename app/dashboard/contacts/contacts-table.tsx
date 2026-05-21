@@ -763,36 +763,41 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                           </svg>
                         </button>
-                        {/* Eliminar */}
-                        <button
-                          onClick={(e) => handleDelete(c, e)}
-                          title="Eliminar"
-                          disabled={deletingId === c.id}
-                          style={{
-                            background: "none",
-                            border: "none",
-                            cursor: deletingId === c.id ? "default" : "pointer",
-                            color: T.onSurfaceVariant,
-                            padding: 0,
-                            display: "flex",
-                            lineHeight: 1,
-                            opacity: deletingId === c.id ? 0.4 : 1,
-                          }}
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                        {/* Eliminar — solo admin */}
+                        {currentRole === "admin" && (
+                          <button
+                            onClick={(e) => handleDelete(c, e)}
+                            title="Eliminar contacto"
+                            disabled={deletingId === c.id}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              cursor: deletingId === c.id ? "default" : "pointer",
+                              color: "#ef4444",
+                              padding: 0,
+                              display: "flex",
+                              lineHeight: 1,
+                              opacity: deletingId === c.id ? 0.4 : 0.6,
+                            }}
                           >
-                            <circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" />
-                          </svg>
-                        </button>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18"
+                              height="18"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="3 6 5 6 21 6" />
+                              <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                              <path d="M10 11v6M14 11v6" />
+                              <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

@@ -58,37 +58,63 @@ interface AssignedAgent {
 }
 
 async function roundRobinAgent(db: ReturnType<typeof adminClient>): Promise<AssignedAgent | null> {
-  // Pick the active agent with the fewest contacts assigned in the last 30 days
-  const { data } = await db
-    .from("agents")
-    .select("id, phone, full_name")
+  // Primary: use round_robin_config for the agent pool (admin-configurable from Settings UI)
+  const { data: rrConfig } = await db
+    .from("round_robin_config")
+    .select("agent_id, position")
     .eq("is_active", true)
-    .in("role", ["agent", "admin"])
-    .order("created_at")
-    .limit(20);
+    .order("position");
 
-  if (!data || data.length === 0) return null;
-  if (data.length === 1) return data[0] as AssignedAgent;
+  let agentPool: AssignedAgent[] = [];
 
-  // Simple count-based round-robin: pick agent with fewest contacts in last 30d
+  if (rrConfig && rrConfig.length > 0) {
+    const agentIds = rrConfig.map((r: { agent_id: string }) => r.agent_id);
+    const { data: agentDetails } = await db
+      .from("agents")
+      .select("id, phone, full_name")
+      .in("id", agentIds)
+      .eq("is_active", true);
+    if (agentDetails && agentDetails.length > 0) {
+      const detailsMap: Record<string, AssignedAgent> = {};
+      for (const a of agentDetails as AssignedAgent[]) detailsMap[a.id] = a;
+      agentPool = rrConfig
+        .map((r: { agent_id: string }) => detailsMap[r.agent_id])
+        .filter(Boolean) as AssignedAgent[];
+    }
+  }
+
+  // Fallback: query agents directly if round_robin_config is empty
+  if (agentPool.length === 0) {
+    const { data: fallback } = await db
+      .from("agents")
+      .select("id, phone, full_name")
+      .eq("is_active", true)
+      .in("role", ["agent", "admin"])
+      .order("created_at")
+      .limit(20);
+    agentPool = (fallback ?? []) as AssignedAgent[];
+  }
+
+  if (agentPool.length === 0) return null;
+  if (agentPool.length === 1) return agentPool[0];
+
+  // Count-based round-robin: pick agent with fewest contacts in last 30 days
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const counts: Record<string, number> = {};
-  for (const a of data) counts[a.id] = 0;
+  for (const a of agentPool) counts[a.id] = 0;
 
   const { data: recent } = await db
     .from("contacts")
     .select("agent_id")
-    .in("agent_id", (data as Array<{ id: string }>).map((a) => a.id))
+    .in("agent_id", agentPool.map((a) => a.id))
     .gte("created_at", thirtyDaysAgo);
 
   for (const c of (recent ?? []) as Array<{ agent_id: string }>) {
     if (c.agent_id in counts) counts[c.agent_id]++;
   }
 
-  const sorted = [...data].sort(
-    (a: { id: string }, b: { id: string }) => (counts[a.id] ?? 0) - (counts[b.id] ?? 0)
-  );
-  return sorted[0] as AssignedAgent;
+  const sorted = [...agentPool].sort((a, b) => (counts[a.id] ?? 0) - (counts[b.id] ?? 0));
+  return sorted[0];
 }
 
 function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string | null): void {

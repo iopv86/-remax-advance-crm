@@ -209,7 +209,7 @@ export default async function ContactDetailPage({
           >
             Exportar
           </button>
-          <ContactEditButton contact={contact} />
+          <ContactEditButton contact={contact} currentRole={session.role} />
         </div>
       </header>
 

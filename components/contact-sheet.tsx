@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -98,10 +98,14 @@ export function ContactSheet({
   );
   const [loading, setLoading] = useState(false);
 
-  function handleOpenChange(o: boolean) {
-    if (o) {
+  // Sync form whenever sheet opens or the target contact changes
+  useEffect(() => {
+    if (open) {
       setForm(contact ? contactToForm(contact) : EMPTY_FORM);
     }
+  }, [open, contact]);
+
+  function handleOpenChange(o: boolean) {
     onOpenChange(o);
   }
 

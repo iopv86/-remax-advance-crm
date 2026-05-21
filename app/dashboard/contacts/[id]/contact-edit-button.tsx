@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -19,6 +19,12 @@ interface EditableContact {
   budget_max?: number | null;
   budget_currency?: string | null;
   agent_notes?: string | null;
+  agent_id?: string | null;
+}
+
+interface AgentOption {
+  id: string;
+  full_name: string;
 }
 
 const FIELD_STYLE = {
@@ -41,10 +47,11 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ContactEditButton({ contact }: { contact: EditableContact }) {
+export function ContactEditButton({ contact, currentRole }: { contact: EditableContact; currentRole?: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [agents, setAgents] = useState<AgentOption[]>([]);
   const [form, setForm] = useState({
     first_name: contact.first_name ?? "",
     last_name: contact.last_name ?? "",
@@ -57,7 +64,21 @@ export function ContactEditButton({ contact }: { contact: EditableContact }) {
     budget_max: contact.budget_max?.toString() ?? "",
     budget_currency: contact.budget_currency ?? "USD",
     agent_notes: contact.agent_notes ?? "",
+    agent_id: contact.agent_id ?? "",
   });
+
+  const isPrivileged = currentRole === "admin" || currentRole === "manager";
+
+  useEffect(() => {
+    if (!open || !isPrivileged) return;
+    const supabase = createClient();
+    supabase
+      .from("agents")
+      .select("id, full_name")
+      .eq("is_active", true)
+      .order("full_name")
+      .then(({ data }) => { if (data) setAgents(data); });
+  }, [open, isPrivileged]);
 
   function set<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -70,22 +91,26 @@ export function ContactEditButton({ contact }: { contact: EditableContact }) {
     }
     setSaving(true);
     const supabase = createClient();
+    const updatePayload: Record<string, unknown> = {
+      first_name: form.first_name.trim() || null,
+      last_name: form.last_name.trim() || null,
+      phone: form.phone.trim() || null,
+      email: form.email.trim() || null,
+      lead_classification: form.lead_classification,
+      lead_status: form.lead_status,
+      source: form.source,
+      budget_min: form.budget_min ? parseFloat(form.budget_min) : null,
+      budget_max: form.budget_max ? parseFloat(form.budget_max) : null,
+      budget_currency: form.budget_currency,
+      agent_notes: form.agent_notes.trim() || null,
+      updated_at: new Date().toISOString(),
+    };
+    if (isPrivileged && form.agent_id) {
+      updatePayload.agent_id = form.agent_id;
+    }
     const { error } = await supabase
       .from("contacts")
-      .update({
-        first_name: form.first_name.trim() || null,
-        last_name: form.last_name.trim() || null,
-        phone: form.phone.trim() || null,
-        email: form.email.trim() || null,
-        lead_classification: form.lead_classification,
-        lead_status: form.lead_status,
-        source: form.source,
-        budget_min: form.budget_min ? parseFloat(form.budget_min) : null,
-        budget_max: form.budget_max ? parseFloat(form.budget_max) : null,
-        budget_currency: form.budget_currency,
-        agent_notes: form.agent_notes.trim() || null,
-        updated_at: new Date().toISOString(),
-      })
+      .update(updatePayload)
       .eq("id", contact.id);
 
     if (error) {
@@ -224,6 +249,23 @@ export function ContactEditButton({ contact }: { contact: EditableContact }) {
                     style={{ ...FIELD_STYLE, resize: "none" as const }}
                   />
                 </div>
+
+                {/* Agent assignment — admin/manager only */}
+                {isPrivileged && agents.length > 0 && (
+                  <div>
+                    <Label>Agente asignado</Label>
+                    <select
+                      value={form.agent_id}
+                      onChange={(e) => set("agent_id", e.target.value)}
+                      style={FIELD_STYLE}
+                    >
+                      <option value="">— Sin asignar —</option>
+                      {agents.map((a) => (
+                        <option key={a.id} value={a.id}>{a.full_name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
 
               </div>
             </div>
