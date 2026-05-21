@@ -85,6 +85,25 @@ function NewContactForm({ onClose }: { onClose: () => void }) {
     }
     setLoading(true);
     const supabase = createClient();
+
+    // Resolve the current user's agent row (required by contacts RLS INSERT policy)
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Sesión expirada. Recarga la página.");
+      setLoading(false);
+      return;
+    }
+    const { data: agent } = await supabase
+      .from("agents")
+      .select("id")
+      .eq("email", user.email!)
+      .maybeSingle();
+    if (!agent) {
+      toast.error("No se encontró tu perfil de agente.");
+      setLoading(false);
+      return;
+    }
+
     const { error } = await supabase.from("contacts").insert({
       first_name: form.first_name.trim(),
       last_name: form.last_name.trim() || null,
@@ -94,6 +113,7 @@ function NewContactForm({ onClose }: { onClose: () => void }) {
       source_detail: form.source_detail.trim() || null,
       lead_classification: form.lead_classification,
       lead_status: "new",
+      agent_id: agent.id,
     });
     setLoading(false);
     if (error) {

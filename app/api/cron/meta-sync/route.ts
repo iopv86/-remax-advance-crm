@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "crypto";
-import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import { resolveMetaConfig } from "@/lib/meta-config";
 
@@ -100,7 +100,7 @@ export async function GET(request: Request) {
     cpl:           extractLeads(r) > 0 ? parseFloat(r.spend) / extractLeads(r) : null,
   }));
 
-  const supabase = await createClient();
+  const supabase = adminClient();
   const { error: upsertError } = await supabase
     .from("meta_ad_insights")
     .upsert(rows, { onConflict: "campaign_id" });
