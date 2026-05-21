@@ -302,7 +302,11 @@ export function ContactSheet({
                 onValueChange={(v) => v && set("agent_id", v)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Seleccionar agente…" />
+                  <SelectValue placeholder="Seleccionar agente…">
+                    {form.agent_id
+                      ? (availableAgents.find((a) => a.id === form.agent_id)?.full_name ?? "Agente asignado")
+                      : null}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {availableAgents.map((a) => (
