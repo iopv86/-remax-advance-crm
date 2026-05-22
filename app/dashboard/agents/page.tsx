@@ -165,7 +165,7 @@ export default async function AgentsPage({
       .from("agents")
       .select("id, full_name, email, role")
       .eq("is_active", true)
-      .in("role", ["agent", "manager"])
+      .in("role", ["agent", "manager", "admin"])
       .order("full_name"),
 
     // Round Robin — current config

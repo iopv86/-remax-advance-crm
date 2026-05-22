@@ -263,7 +263,7 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
       {/* Edit / delete actions — separate row below content, no overlap */}
       <div
         className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
-        style={{ pointerEvents: "auto", marginTop: 10, justifyContent: "flex-end" }}
+        style={{ pointerEvents: "auto", marginTop: 10, justifyContent: "flex-end", position: "relative", zIndex: 2 }}
       >
         <Link
           href={`/dashboard/pipeline/${deal.id}`}
