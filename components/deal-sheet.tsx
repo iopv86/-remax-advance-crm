@@ -31,6 +31,7 @@ interface ContactOption {
   id: string;
   first_name: string | null;
   last_name: string | null;
+  agent_id: string | null;
 }
 
 interface DealFormState {
@@ -102,12 +103,19 @@ export function DealSheet({
     }
     setLoading(true);
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data: agent } = await supabase
-      .from("agents")
-      .select("id")
-      .eq("email", user?.email ?? "")
-      .single();
+
+    // Inherit agent_id from the contact; fall back to the logged-in user's agent
+    const contactAgent = contacts.find((c) => c.id === form.contact_id)?.agent_id ?? null;
+    let agentId: string | null = contactAgent;
+    if (!agentId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: agent } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("email", user?.email ?? "")
+        .single();
+      agentId = agent?.id ?? null;
+    }
 
     const payload = {
       contact_id: form.contact_id,
@@ -116,7 +124,7 @@ export function DealSheet({
       currency: form.currency,
       expected_close_date: form.expected_close_date || null,
       notes: form.notes.trim() || null,
-      agent_id: agent?.id ?? null,
+      agent_id: agentId,
     };
 
     let error;

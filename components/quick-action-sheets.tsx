@@ -35,6 +35,7 @@ interface ContactOption {
   id: string;
   first_name: string | null;
   last_name: string | null;
+  agent_id: string | null;
 }
 
 // ── Shared label style ───────────────────────────────────────────────────────
@@ -241,18 +242,25 @@ function NewDealForm({
     }
     setLoading(true);
     const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data: agent } = await supabase
-      .from("agents")
-      .select("id")
-      .eq("email", user?.email ?? "")
-      .single();
+
+    // Inherit agent_id from the contact; fall back to logged-in user's agent
+    const contactAgent = contacts.find((c) => c.id === form.contact_id)?.agent_id ?? null;
+    let agentId: string | null = contactAgent;
+    if (!agentId) {
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: agent } = await supabase
+        .from("agents")
+        .select("id")
+        .eq("email", user?.email ?? "")
+        .single();
+      agentId = agent?.id ?? null;
+    }
 
     const { error } = await supabase.from("deals").insert({
       contact_id: form.contact_id,
       deal_value: form.deal_value ? Number(form.deal_value) : null,
       stage: form.stage,
-      agent_id: agent?.id ?? null,
+      agent_id: agentId,
       currency: "USD",
     });
     setLoading(false);
@@ -492,7 +500,7 @@ export function NewDealButton() {
     const supabase = createClient();
     supabase
       .from("contacts")
-      .select("id, first_name, last_name")
+      .select("id, first_name, last_name, agent_id")
       .order("created_at", { ascending: false })
       .limit(100)
       .then(({ data }) => {

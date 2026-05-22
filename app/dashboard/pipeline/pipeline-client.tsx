@@ -28,6 +28,7 @@ interface ContactOption {
   id: string;
   first_name: string | null;
   last_name: string | null;
+  agent_id: string | null;
 }
 
 interface Props {
@@ -410,7 +411,7 @@ export function PipelineClient({
     const supabase = createClient();
     supabase
       .from("contacts")
-      .select("id, first_name, last_name")
+      .select("id, first_name, last_name, agent_id")
       .order("created_at", { ascending: false })
       .limit(100)
       .then(({ data }) => {
