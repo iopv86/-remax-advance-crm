@@ -89,7 +89,7 @@ export default async function ContactDetailPage({
 
   const { data: contact } = await supabase
     .from("contacts")
-    .select("*, agent:agents(full_name, email)")
+    .select("*, agent:agents!contacts_agent_id_fkey(full_name, email)")
     .eq("id", id)
     .single();
 
