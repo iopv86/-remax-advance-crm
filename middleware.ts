@@ -6,11 +6,11 @@ export async function middleware(request: NextRequest) {
   const nonce = btoa(crypto.randomUUID());
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}'`,
+    `script-src 'self' 'nonce-${nonce}' https://us-assets.i.posthog.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https:",
-    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com",
+    "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.openai.com https://us.i.posthog.com https://us-assets.i.posthog.com",
     "media-src 'self' https:",
     "frame-src 'none'",
     "object-src 'none'",
