@@ -58,6 +58,26 @@ export async function POST(req: NextRequest) {
 
   const db = adminClient();
 
+  // If a phone was supplied, check for an existing contact first.
+  // Never change agent_id on an existing contact — that would steal the lead.
+  if (safePhone) {
+    const { data: existing, error: lookupError } = await db
+      .from("contacts")
+      .select("id")
+      .eq("phone", safePhone)
+      .maybeSingle();
+
+    if (lookupError) {
+      console.error("[POST /api/leads] lookup error:", lookupError.message);
+      return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
+    }
+
+    if (existing) {
+      // Contact already exists — return its id without mutating agent_id or status.
+      return NextResponse.json({ ok: true, id: existing.id }, { status: 200 });
+    }
+  }
+
   const { data, error } = await db
     .from("contacts")
     .insert({
@@ -73,6 +93,18 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
+    // 23505 = unique_violation — another request raced us to INSERT.
+    // Retry the lookup and return the winner's id.
+    if (error.code === "23505" && safePhone) {
+      const { data: raceWinner } = await db
+        .from("contacts")
+        .select("id")
+        .eq("phone", safePhone)
+        .maybeSingle();
+      if (raceWinner) {
+        return NextResponse.json({ ok: true, id: raceWinner.id }, { status: 200 });
+      }
+    }
     console.error("[POST /api/leads] Supabase insert error:", error.message);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }

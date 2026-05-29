@@ -268,7 +268,43 @@ export async function POST(req: NextRequest) {
       const [firstName, ...rest] = rawName.split(" ");
       const lastName = rest.join(" ") || null;
 
-      // 4. Insert contact — ON CONFLICT (meta_lead_id) DO NOTHING
+      // 4. Upsert contact — deduplicate on phone first, then meta_lead_id.
+      //    Never overwrite agent_id on an existing contact (would steal the lead).
+
+      // Check for existing contact by phone (the canonical dedup key for WhatsApp leads)
+      let existingId: string | null = null;
+      if (phone) {
+        const { data: byPhone } = await db
+          .from("contacts")
+          .select("id")
+          .eq("phone", phone)
+          .maybeSingle();
+        if (byPhone) existingId = byPhone.id;
+      }
+
+      // Also check by meta_lead_id if no phone match
+      if (!existingId) {
+        const { data: byMeta } = await db
+          .from("contacts")
+          .select("id")
+          .eq("meta_lead_id", leadgen_id)
+          .maybeSingle();
+        if (byMeta) existingId = byMeta.id;
+      }
+
+      if (existingId) {
+        // Contact already exists — skip insert, proceed to deal creation below
+        const inserted = { id: existingId };
+        // 5. Create deal at lead_captured stage (idempotent — unique on contact_id+stage if needed)
+        await db.from("deals").insert({
+          contact_id: inserted.id,
+          agent_id:   null, // keep existing agent
+          stage:      "lead_captured",
+          currency:   "USD",
+        });
+        continue;
+      }
+
       const agent = await roundRobinAgent(db);
       if (!agent) {
         console.error("[lead-webhook] No active agents found for assignment");
@@ -292,12 +328,11 @@ export async function POST(req: NextRequest) {
         .select("id, email, phone")
         .maybeSingle();
 
-      // Duplicate — meta_lead_id already exists; skip silently
       if (insertErr) {
-        const isDuplicate =
-          insertErr.code === "23505" ||
-          insertErr.message.includes("idx_contacts_meta_lead_id");
-        if (!isDuplicate) {
+        // 23505 = unique violation — race condition, another request won
+        if (insertErr.code === "23505") {
+          console.warn("[lead-webhook] Race condition on insert, skipping:", insertErr.message);
+        } else {
           console.error("[lead-webhook] Insert error:", insertErr.message);
         }
         continue;
