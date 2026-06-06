@@ -41,6 +41,8 @@ export interface Contact {
   created_at: string;
   meta_campaign_id?: string | null;
   meta_lead_id?: string | null;
+  ai_summary?: string | null;
+  agent_notes?: string | null;
   // Joined
   agent?: Agent;
 }

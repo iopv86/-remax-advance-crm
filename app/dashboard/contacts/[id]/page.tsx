@@ -406,6 +406,36 @@ export default async function ContactDetailPage({
                 </div>
               )}
 
+              {/* Lo que busca */}
+              {contact.ai_summary && (
+                <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
+                  <p
+                    className="font-bold text-sm mb-3"
+                    style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "var(--foreground)" }}
+                  >
+                    Lo que busca
+                  </p>
+                  <p className="text-sm" style={{ color: "var(--muted-foreground)", lineHeight: 1.6 }}>
+                    {contact.ai_summary}
+                  </p>
+                </div>
+              )}
+
+              {/* Notas del Agente */}
+              {contact.agent_notes && (
+                <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
+                  <p
+                    className="font-bold text-sm mb-3"
+                    style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "var(--foreground)" }}
+                  >
+                    Notas del Agente
+                  </p>
+                  <p className="text-sm" style={{ color: "var(--muted-foreground)", lineHeight: 1.6 }}>
+                    {contact.agent_notes}
+                  </p>
+                </div>
+              )}
+
               {/* Tasks */}
               {(tasks?.length ?? 0) > 0 && (
                 <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
