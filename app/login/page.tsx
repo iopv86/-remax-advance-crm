@@ -31,22 +31,15 @@ export default function LoginPage() {
     e.preventDefault();
     setForgotLoading(true);
     setForgotError(null);
-    try {
-      const response = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: forgotEmail }),
-      });
-      if (response.status === 429) {
-        const data = await response.json();
-        setForgotError(data.error || 'Demasiados intentos. Intenta en 15 minutos.');
-      } else {
-        setForgotSent(true);
-      }
-    } catch {
-      setForgotError('Error de red. Intenta de nuevo.');
-    } finally {
-      setForgotLoading(false);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/auth/confirm?type=recovery`,
+    });
+    setForgotLoading(false);
+    if (error) {
+      setForgotError(error.message);
+    } else {
+      setForgotSent(true);
     }
   }
 

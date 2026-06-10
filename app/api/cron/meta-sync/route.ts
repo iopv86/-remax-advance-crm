@@ -74,9 +74,8 @@ export async function GET(request: Request) {
     const json = (await res.json()) as MetaApiResponse;
 
     if (json.error) {
-      console.error('[cron/meta-sync] Meta API error:', json.error.code, json.error.message);
       return NextResponse.json(
-        { error: 'Error obteniendo datos de Meta API' },
+        { error: `Meta API error ${json.error.code}: ${json.error.message}` },
         { status: 502 }
       );
     }
@@ -107,8 +106,8 @@ export async function GET(request: Request) {
     .upsert(rows, { onConflict: "campaign_id" });
 
   if (upsertError) {
-    console.error('[cron/meta-sync] upsert error:', upsertError.message);
-    return NextResponse.json({ error: 'Error sincronizando datos' }, { status: 500 });
+    console.error("[cron/meta-sync] upsert error:", upsertError.message);
+    return NextResponse.json({ error: upsertError.message }, { status: 500 });
   }
 
   // Record sync timestamp in agency_config
