@@ -11,7 +11,6 @@ const service = createServiceClient(
 interface Agent {
   id: string;
   full_name: string;
-  email: string;
   phone: string | null;
   avatar_url: string | null;
 }
@@ -46,7 +45,7 @@ export default async function ProposalPublicPage({
   const [agentResult, propertiesResult] = await Promise.all([
     service
       .from("agents")
-      .select("id, full_name, email, phone, avatar_url")
+      .select("id, full_name, phone, avatar_url")
       .eq("id", proposal.agent_id)
       .single(),
     service
