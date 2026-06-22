@@ -40,8 +40,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const token = process.env.META_ACCESS_TOKEN;
-  if (!token) return NextResponse.json({ error: "META_ACCESS_TOKEN not set" }, { status: 503 });
+  const userToken = process.env.META_ACCESS_TOKEN;
+  if (!userToken) return NextResponse.json({ error: "META_ACCESS_TOKEN not set" }, { status: 503 });
+
+  // Listing a page's leadgen_forms requires a PAGE access token (the user token returns []).
+  // Derive it from the user token; fall back to the user token for lead reads.
+  const accts = await graphGet<{ data: { access_token: string }[] }>(
+    `https://graph.facebook.com/${GRAPH_VERSION}/me/accounts?fields=access_token&access_token=${userToken}`
+  );
+  const token = accts?.data?.[0]?.access_token ?? userToken;
 
   const db = adminClient();
 
