@@ -43,6 +43,7 @@ const PRIORITY_LABELS: Record<string, string> = {
 };
 
 const STAGE_ACCENT: Record<DealStage, string> = {
+  nuevo_sin_contactar: "#94a3b8",
   lead_captured: "#94a3b8",
   qualified: "#2563eb",
   contacted: "#2563eb",

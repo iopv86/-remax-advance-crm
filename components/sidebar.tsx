@@ -23,6 +23,7 @@ import {
   X,
   ChevronDown,
   ListChecks,
+  Inbox,
   Sun,
   Moon,
 } from "lucide-react";
@@ -37,6 +38,7 @@ const ALL_PRIMARY_NAV_ITEMS = [
   { href: "/dashboard",                 label: "Dashboard",       icon: LayoutGrid,   roles: ["admin","manager","agent","viewer"] },
   { href: "/dashboard/contacts",        label: "Clientes",        icon: Users,        roles: ["admin","manager","agent"] },
   { href: "/dashboard/pipeline",        label: "Oportunidades",   icon: Kanban,       roles: ["admin","manager","agent"] },
+  { href: "/dashboard/leads-entrantes", label: "Leads Entrantes", icon: Inbox,        roles: ["admin","manager","agent"] },
   { href: "/dashboard/properties",      label: "Propiedades",     icon: Building2,    roles: ["admin","manager","agent"] },
 ];
 

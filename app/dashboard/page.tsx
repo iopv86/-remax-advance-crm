@@ -125,11 +125,12 @@ export default async function DashboardPage() {
   const revenuePrev = (revenuePrevQ.data ?? []).reduce((s, d) => s + (d.deal_value ?? 0), 0);
 
   // ─── Active deals + pipeline value ────────────────────────────────────────
+  // Exclude nuevo_sin_contactar — holding stage, no es pipeline contable (B14).
   const activeDealsQ = await agentScope(
     supabase
       .from("deals")
       .select("deal_value, stage")
-      .not("stage", "in", '("closed_won","closed_lost")')
+      .not("stage", "in", '("closed_won","closed_lost","nuevo_sin_contactar")')
   );
 
   const activeDeals  = (activeDealsQ.data ?? []).length;
@@ -256,11 +257,13 @@ export default async function DashboardPage() {
     .slice(0, 10);
 
   // ─── Pipeline stage breakdown ──────────────────────────────────────────────
+  // Exclude nuevo_sin_contactar — no es pipeline contable (B14). El STAGE_ORDER
+  // local de abajo tampoco lo lista, pero lo excluimos también en la query.
   const allActiveQ = await agentScope(
     supabase
       .from("deals")
       .select("stage, deal_value")
-      .not("stage", "in", '("closed_lost")')
+      .not("stage", "in", '("closed_lost","nuevo_sin_contactar")')
   );
 
   const stageMap: Record<string, { count: number; value: number }> = {};

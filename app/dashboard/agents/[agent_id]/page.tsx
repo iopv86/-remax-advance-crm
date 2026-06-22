@@ -18,6 +18,7 @@ function formatValue(v?: number): string {
 }
 
 const STAGE_COLOR: Record<DealStage, string> = {
+  nuevo_sin_contactar: "var(--surface-3)",
   lead_captured:     "var(--blue-muted)",
   qualified:         "var(--teal-muted)",
   contacted:         "var(--teal-muted)",
@@ -34,6 +35,7 @@ const STAGE_COLOR: Record<DealStage, string> = {
 };
 
 const STAGE_TEXT: Record<DealStage, string> = {
+  nuevo_sin_contactar: "var(--text-2)",
   lead_captured:     "var(--blue)",
   qualified:         "var(--teal)",
   contacted:         "var(--teal)",
@@ -89,6 +91,7 @@ export default async function AgentDetailPage({
       .select("id, stage, deal_value, currency, created_at, expected_close_date, contact:contacts(first_name, last_name, phone)")
       .eq("agent_id", agent_id)
       .neq("stage", "closed_lost")
+      .neq("stage", "nuevo_sin_contactar")
       .order("created_at", { ascending: false }),
     supabase
       .from("agent_monthly_kpis")

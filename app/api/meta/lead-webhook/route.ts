@@ -57,64 +57,33 @@ interface AssignedAgent {
   full_name: string | null;
 }
 
-async function roundRobinAgent(db: ReturnType<typeof adminClient>): Promise<AssignedAgent | null> {
-  // Primary: use round_robin_config for the agent pool (admin-configurable from Settings UI)
-  const { data: rrConfig } = await db
-    .from("round_robin_config")
-    .select("agent_id, position")
-    .eq("is_active", true)
-    .order("position");
+// E.164-like phone validation — single source of truth ported from Ava (tools.py).
+// Rejects UUIDs and placeholders so junk never lands in contacts.
+const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+const E164_RE = /^\+?[1-9]\d{7,14}$/;
 
-  let agentPool: AssignedAgent[] = [];
+function isValidPhone(phone: string | null): boolean {
+  if (!phone) return false;
+  if (UUID_RE.test(phone)) return false;
+  if (phone.includes("[") || phone.includes(" ")) return false;
+  return E164_RE.test(phone);
+}
 
-  if (rrConfig && rrConfig.length > 0) {
-    const agentIds = rrConfig.map((r: { agent_id: string }) => r.agent_id);
-    const { data: agentDetails } = await db
-      .from("agents")
-      .select("id, phone, full_name")
-      .in("id", agentIds)
-      .eq("is_active", true);
-    if (agentDetails && agentDetails.length > 0) {
-      const detailsMap: Record<string, AssignedAgent> = {};
-      for (const a of agentDetails as AssignedAgent[]) detailsMap[a.id] = a;
-      agentPool = rrConfig
-        .map((r: { agent_id: string }) => detailsMap[r.agent_id])
-        .filter(Boolean) as AssignedAgent[];
-    }
+// Single round-robin authority: the atomic SQL RPC `assign_next_rr_agent()`
+// (SECURITY DEFINER, FOR UPDATE SKIP LOCKED). Same authority Ava uses — no
+// second JS implementation that could split-brain the agent pool.
+async function assignRrAgent(db: ReturnType<typeof adminClient>): Promise<AssignedAgent | null> {
+  const { data: agentId, error } = await db.rpc("assign_next_rr_agent");
+  if (error || !agentId) {
+    if (error) console.error("[lead-webhook] assign_next_rr_agent error:", error.message);
+    return null;
   }
-
-  // Fallback: query agents directly if round_robin_config is empty
-  if (agentPool.length === 0) {
-    const { data: fallback } = await db
-      .from("agents")
-      .select("id, phone, full_name")
-      .eq("is_active", true)
-      .in("role", ["agent", "admin"])
-      .order("created_at")
-      .limit(20);
-    agentPool = (fallback ?? []) as AssignedAgent[];
-  }
-
-  if (agentPool.length === 0) return null;
-  if (agentPool.length === 1) return agentPool[0];
-
-  // Count-based round-robin: pick agent with fewest contacts in last 30 days
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
-  const counts: Record<string, number> = {};
-  for (const a of agentPool) counts[a.id] = 0;
-
-  const { data: recent } = await db
-    .from("contacts")
-    .select("agent_id")
-    .in("agent_id", agentPool.map((a) => a.id))
-    .gte("created_at", thirtyDaysAgo);
-
-  for (const c of (recent ?? []) as Array<{ agent_id: string }>) {
-    if (c.agent_id in counts) counts[c.agent_id]++;
-  }
-
-  const sorted = [...agentPool].sort((a, b) => (counts[a.id] ?? 0) - (counts[b.id] ?? 0));
-  return sorted[0];
+  const { data: agent } = await db
+    .from("agents")
+    .select("id, phone, full_name")
+    .eq("id", agentId as string)
+    .maybeSingle();
+  return (agent as AssignedAgent) ?? { id: agentId as string, phone: null, full_name: null };
 }
 
 function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string | null): void {
@@ -263,49 +232,77 @@ export async function POST(req: NextRequest) {
       const rawName  = parseField(fields, "full_name") ??
                        parseField(fields, "name") ?? "";
       const email    = parseField(fields, "email");
-      const phone    = parseField(fields, "phone_number") ??
+      const rawPhone = parseField(fields, "phone_number") ??
                        parseField(fields, "phone");
+      // E.164 validation — reject junk/UUIDs so they never enter contacts.
+      const phone    = isValidPhone(rawPhone) ? rawPhone : null;
+      if (rawPhone && !phone) {
+        console.warn("[lead-webhook] Invalid phone rejected, falling back to meta_lead_id dedup");
+      }
       const [firstName, ...rest] = rawName.split(" ");
       const lastName = rest.join(" ") || null;
 
       // 4. Upsert contact — deduplicate on phone first, then meta_lead_id.
       //    Never overwrite agent_id on an existing contact (would steal the lead).
-
-      // Check for existing contact by phone (the canonical dedup key for WhatsApp leads)
       let existingId: string | null = null;
+      let existingAgentId: string | null = null;
       if (phone) {
         const { data: byPhone } = await db
           .from("contacts")
-          .select("id")
+          .select("id, agent_id")
           .eq("phone", phone)
           .maybeSingle();
-        if (byPhone) existingId = byPhone.id;
+        if (byPhone) { existingId = byPhone.id; existingAgentId = byPhone.agent_id; }
       }
-
-      // Also check by meta_lead_id if no phone match
       if (!existingId) {
         const { data: byMeta } = await db
           .from("contacts")
-          .select("id")
+          .select("id, agent_id")
           .eq("meta_lead_id", leadgen_id)
           .maybeSingle();
-        if (byMeta) existingId = byMeta.id;
+        if (byMeta) { existingId = byMeta.id; existingAgentId = byMeta.agent_id; }
       }
 
-      if (existingId) {
-        // Contact already exists — skip insert, proceed to deal creation below
-        const inserted = { id: existingId };
-        // 5. Create deal at lead_captured stage (idempotent — unique on contact_id+stage if needed)
+      // Helper: create the holding-stage deal, never with a null agent (agent_id is NOT NULL).
+      // Idempotent: skip if the contact already has an open intake deal.
+      const createIntakeDeal = async (contactId: string, agentId: string) => {
+        const { data: openDeal } = await db
+          .from("deals")
+          .select("id")
+          .eq("contact_id", contactId)
+          .in("stage", ["nuevo_sin_contactar", "lead_captured"])
+          .limit(1)
+          .maybeSingle();
+        if (openDeal) return; // already in intake/pipeline — don't duplicate
         await db.from("deals").insert({
-          contact_id: inserted.id,
-          agent_id:   null, // keep existing agent
-          stage:      "lead_captured",
+          contact_id: contactId,
+          agent_id:   agentId,
+          stage:      "nuevo_sin_contactar",
           currency:   "USD",
         });
+      };
+
+      if (existingId) {
+        // Contact exists. Resolve a non-null agent: keep current, else assign via RPC.
+        let agent: AssignedAgent | null = null;
+        let agentId = existingAgentId;
+        if (!agentId) {
+          agent = await assignRrAgent(db);
+          if (!agent) { console.error("[lead-webhook] No agent for existing contact"); continue; }
+          agentId = agent.id;
+          await db.from("contacts")
+            .update({ agent_id: agentId, assigned_at: new Date().toISOString() })
+            .eq("id", existingId);
+        }
+        await createIntakeDeal(existingId, agentId);
+        fireCapiEvent({ stage: "lead_captured", email, phone }).catch((err) =>
+          console.error("[lead-webhook] CAPI error:", (err as Error).message));
+        if (agent) { notifyAgent(agent, rawName, phone); }
         continue;
       }
 
-      const agent = await roundRobinAgent(db);
+      // New contact — assign agent via the single RPC authority.
+      const agent = await assignRrAgent(db);
       if (!agent) {
         console.error("[lead-webhook] No active agents found for assignment");
         continue;
@@ -324,6 +321,7 @@ export async function POST(req: NextRequest) {
           meta_lead_id:     leadgen_id,
           meta_campaign_id: lead.campaign_id ?? change.value.ad_id ?? null,
           agent_id:         agentId,
+          assigned_at:      new Date().toISOString(),
         })
         .select("id, email, phone")
         .maybeSingle();
@@ -340,15 +338,11 @@ export async function POST(req: NextRequest) {
 
       if (!inserted) continue;
 
-      // 5. Create deal at lead_captured stage
-      await db.from("deals").insert({
-        contact_id:   inserted.id,
-        agent_id:     agentId,
-        stage:        "lead_captured",
-        currency:     "USD",
-      });
+      // 5. Create holding-stage deal (nuevo_sin_contactar) with the assigned agent
+      await createIntakeDeal(inserted.id, agentId);
 
-      // 6. Fire CAPI Lead event (fire-and-forget — must not block <5s response)
+      // 6. Fire CAPI Lead event — pass "lead_captured" (the Meta event key); the
+      //    internal stage is nuevo_sin_contactar, which is not in the CAPI map.
       fireCapiEvent({
         stage: "lead_captured",
         email: inserted.email,

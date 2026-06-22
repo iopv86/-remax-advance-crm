@@ -40,6 +40,7 @@ interface Props {
 // ── Stage config ──────────────────────────────────────────────────────────────
 
 const STAGE_ORDER: DealStage[] = [
+  "nuevo_sin_contactar",
   "lead_captured",
   "qualified",
   "contacted",
@@ -56,6 +57,7 @@ const STAGE_ORDER: DealStage[] = [
 ];
 
 const STAGE_SHORT: Record<DealStage, string> = {
+  nuevo_sin_contactar: "SIN CONTACTAR",
   lead_captured: "NUEVO LEAD",
   qualified: "CALIFICADO",
   contacted: "CONTACTADO",
@@ -73,6 +75,7 @@ const STAGE_SHORT: Record<DealStage, string> = {
 
 // Dot color per stage
 const STAGE_DOT: Record<DealStage, string> = {
+  nuevo_sin_contactar: "#94a3b8",
   lead_captured: "#3b82f6",
   qualified: "#f59e0b",
   contacted: "#8b5cf6",

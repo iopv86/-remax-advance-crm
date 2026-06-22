@@ -18,10 +18,12 @@ export default async function ReportsPage() {
     redirect("/dashboard");
   }
 
-  // All deals with agent info
+  // All deals with agent info.
+  // Exclude 'nuevo_sin_contactar' — leads sin contactar no son pipeline contable (B14).
   const { data: deals } = await supabase
     .from("deals")
     .select("id, stage, deal_value, currency, commission_value, created_at, actual_close_date, agent_id")
+    .neq("stage", "nuevo_sin_contactar")
     .order("created_at", { ascending: false });
 
   // Agent performance

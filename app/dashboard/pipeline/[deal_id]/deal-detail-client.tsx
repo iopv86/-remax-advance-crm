@@ -16,12 +16,13 @@ import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 
 const ALL_STAGES: DealStage[] = [
-  "lead_captured", "qualified", "contacted", "showing_scheduled",
+  "nuevo_sin_contactar", "lead_captured", "qualified", "contacted", "showing_scheduled",
   "showing_done", "offer_made", "negotiation", "promesa_de_venta",
   "financiamiento", "contract", "due_diligence", "closed_won", "closed_lost",
 ];
 
 const STAGE_COLORS: Record<string, string> = {
+  nuevo_sin_contactar: "#94a3b8",
   lead_captured: "#3b82f6",
   qualified: "#8b5cf6",
   contacted: "#6366f1",

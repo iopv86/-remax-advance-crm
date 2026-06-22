@@ -1,7 +1,7 @@
 export type LeadClassification = "hot" | "warm" | "cold" | "unqualified";
 export type LeadStatus = "new" | "contacted" | "qualified" | "unqualified" | "nurturing" | "archived";
 export type LeadSource = "ctwa_ad" | "lead_form" | "referral" | "walk_in" | "website" | "social_media" | "other";
-export type DealStage = "lead_captured" | "qualified" | "contacted" | "showing_scheduled" | "showing_done" | "offer_made" | "negotiation" | "promesa_de_venta" | "financiamiento" | "contract" | "due_diligence" | "closed_won" | "closed_lost";
+export type DealStage = "nuevo_sin_contactar" | "lead_captured" | "qualified" | "contacted" | "showing_scheduled" | "showing_done" | "offer_made" | "negotiation" | "promesa_de_venta" | "financiamiento" | "contract" | "due_diligence" | "closed_won" | "closed_lost";
 export type PropertyType = "apartment" | "penthouse" | "villa" | "house" | "land" | "commercial" | "apart_hotel" | "farm";
 export type CurrencyType = "USD" | "DOP";
 export type AgentRole = "admin" | "manager" | "agent";
@@ -181,6 +181,7 @@ export interface Task {
 }
 
 export const STAGE_LABELS: Record<DealStage, string> = {
+  nuevo_sin_contactar: "Nuevo sin contactar",
   lead_captured: "Lead capturado",
   qualified: "Calificado",
   contacted: "Contactado",
@@ -195,6 +196,31 @@ export const STAGE_LABELS: Record<DealStage, string> = {
   closed_won: "Cerrado/Ganado",
   closed_lost: "Cerrado/Perdido",
 };
+
+/**
+ * Etapas que NO cuentan como pipeline real. Fuente única de verdad para excluir
+ * de reportes/KPI/forecast. Usar este set explícito — NUNCA comparación ordinal
+ * del enum (ADD VALUE BEFORE cambia enumsortorder y la rompe).
+ */
+export const NON_COUNTABLE_STAGES: DealStage[] = ["nuevo_sin_contactar"];
+
+/** Orden del kanban (incluye holding stage primero). */
+export const PIPELINE_STAGE_ORDER: DealStage[] = [
+  "nuevo_sin_contactar",
+  "lead_captured",
+  "qualified",
+  "contacted",
+  "showing_scheduled",
+  "showing_done",
+  "offer_made",
+  "negotiation",
+  "promesa_de_venta",
+  "financiamiento",
+  "contract",
+  "due_diligence",
+  "closed_won",
+  "closed_lost",
+];
 
 /** Raw row from agent_monthly_kpis view */
 export interface AgentKPIView {
