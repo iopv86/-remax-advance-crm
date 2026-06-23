@@ -183,6 +183,15 @@ export function ContactEditForm({
         setSaving(false);
         return;
       }
+      // The INSERT trigger (trg_contact_score) recomputes lead_classification from the
+      // empty score_* fields → 'unqualified', overriding the agent's choice. Re-apply it
+      // with a follow-up UPDATE (the trigger only fires on score_* changes, so this sticks).
+      if (form.lead_classification !== "unqualified") {
+        await supabase
+          .from("contacts")
+          .update({ lead_classification: form.lead_classification })
+          .eq("id", inserted.id);
+      }
       toast.success("Contacto creado");
       router.push(`/dashboard/contacts/${inserted.id}`);
       router.refresh();
