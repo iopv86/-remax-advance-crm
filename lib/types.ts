@@ -43,8 +43,27 @@ export interface Contact {
   meta_lead_id?: string | null;
   ai_summary?: string | null;
   agent_notes?: string | null;
+  // B-16: full-page editor + lead-form capture (migration 0013)
+  decision_maker?: string | null;
+  linked_property_id?: string | null;
+  lead_form_answers?: LeadFormAnswers | null;
+  source_detail?: string | null;
   // Joined
   agent?: Agent;
+}
+
+/** Lossless capture of a Meta Lead Form submission (contacts.lead_form_answers). */
+export interface LeadFormAnswer {
+  name: string;
+  label: string;
+  values: string[];
+}
+
+export interface LeadFormAnswers {
+  lead_id?: string;
+  form_id?: string | null;
+  captured_at?: string;
+  fields: LeadFormAnswer[];
 }
 
 export interface Deal {

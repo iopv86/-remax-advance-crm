@@ -13,8 +13,8 @@ import { ContactDocuments } from "./contact-documents";
 import type { ContactDocument } from "./contact-documents";
 import { ContactActivity } from "./contact-activity";
 import type { ContactActivity as ContactActivityType } from "./contact-activity";
-import { ContactEditButton } from "./contact-edit-button";
 import { MatchedProperties } from "./matched-properties";
+import { LeadFormAnswers } from "@/components/contacts/lead-form-answers";
 import { getMatchedProperties } from "@/lib/properties/matching";
 
 type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
@@ -210,7 +210,13 @@ export default async function ContactDetailPage({
           >
             Exportar
           </button>
-          <ContactEditButton contact={contact} currentRole={session.role} />
+          <Link
+            href={`/dashboard/contacts/${id}/edit`}
+            className="px-4 py-1.5 rounded-lg text-sm font-semibold transition-all hover:brightness-95"
+            style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+          >
+            Editar
+          </Link>
         </div>
       </header>
 
@@ -598,6 +604,8 @@ export default async function ContactDetailPage({
               )}
 
               <MatchedProperties matches={matchedProperties} hasBudget={hasBudget} />
+
+              <LeadFormAnswers answers={contact.lead_form_answers} />
             </div>
           )}
 

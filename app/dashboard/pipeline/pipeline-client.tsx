@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { DealSheet } from "@/components/deal-sheet";
 import { AgentFilter, type AgentFilterOption } from "@/components/agent-filter";
 import { STAGE_LABELS } from "@/lib/types";
 import type { Deal, DealStage } from "@/lib/types";
@@ -23,13 +22,6 @@ import {
 } from "@dnd-kit/core";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-
-interface ContactOption {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  agent_id: string | null;
-}
 
 interface Props {
   deals: Deal[];
@@ -95,13 +87,12 @@ const STAGE_DOT: Record<DealStage, string> = {
 
 interface DealCardProps {
   deal: Deal;
-  onEdit: (deal: Deal, e: React.MouseEvent) => void;
   onDelete: (deal: Deal, e: React.MouseEvent) => void;
   deletingId: string | null;
   isDragging?: boolean;
 }
 
-function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: DealCardProps) {
+function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging: dragging } = useDraggable({
     id: deal.id,
     data: { deal },
@@ -287,8 +278,9 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
         >
           Ver
         </Link>
-        <button
-          onClick={(e) => onEdit(deal, e)}
+        <Link
+          href={`/dashboard/pipeline/${deal.id}/edit`}
+          onClick={(e) => e.stopPropagation()}
           title="Editar"
           style={{
             padding: "3px 6px",
@@ -298,19 +290,22 @@ function DealCard({ deal, onEdit, onDelete, deletingId, isDragging = false }: De
             color: "var(--muted-foreground)",
             fontSize: 11,
             cursor: "pointer",
+            textDecoration: "none",
+            display: "inline-flex",
+            alignItems: "center",
             transition: "color 0.15s, border-color 0.15s",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "#f5bd5d";
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(245,189,93,0.5)";
+            (e.currentTarget as HTMLAnchorElement).style.color = "#f5bd5d";
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,189,93,0.5)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--muted-foreground)";
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(201,150,58,0.2)";
+            (e.currentTarget as HTMLAnchorElement).style.color = "var(--muted-foreground)";
+            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(201,150,58,0.2)";
           }}
         >
           Editar
-        </button>
+        </Link>
         <button
           onClick={(e) => onDelete(deal, e)}
           title="Eliminar"
@@ -385,10 +380,7 @@ export function PipelineClient({
 }: Props) {
   const router = useRouter();
   const [deals, setDeals] = useState<Deal[]>(initial);
-  const [editDeal, setEditDeal] = useState<Deal | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [contacts, setContacts] = useState<ContactOption[]>([]);
   const [activeDeal, setActiveDeal] = useState<Deal | null>(null);
   const [overStage, setOverStage] = useState<DealStage | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -409,26 +401,6 @@ export function PipelineClient({
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
   );
 
-  useEffect(() => {
-    if (!sheetOpen) return;
-    const supabase = createClient();
-    supabase
-      .from("contacts")
-      .select("id, first_name, last_name, agent_id")
-      .order("created_at", { ascending: false })
-      .limit(100)
-      .then(({ data }) => {
-        if (data) setContacts(data as ContactOption[]);
-      });
-  }, [sheetOpen]);
-
-  function openEdit(deal: Deal, e: React.MouseEvent) {
-    e.stopPropagation();
-    e.preventDefault();
-    setEditDeal(deal);
-    setSheetOpen(true);
-  }
-
   async function handleDelete(deal: Deal, e: React.MouseEvent) {
     e.stopPropagation();
     e.preventDefault();
@@ -445,12 +417,6 @@ export function PipelineClient({
       return;
     }
     toast.success("Oportunidad eliminada");
-    router.refresh();
-  }
-
-  function handleSaved() {
-    setSheetOpen(false);
-    setEditDeal(null);
     router.refresh();
   }
 
@@ -661,7 +627,6 @@ export function PipelineClient({
                       <DealCard
                         key={deal.id}
                         deal={deal}
-                        onEdit={openEdit}
                         onDelete={handleDelete}
                         deletingId={deletingId}
                       />
@@ -754,14 +719,6 @@ export function PipelineClient({
             })()}
         </DragOverlay>
       </DndContext>
-
-      <DealSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        deal={editDeal}
-        contacts={contacts}
-        onSaved={handleSaved}
-      />
     </>
   );
 }

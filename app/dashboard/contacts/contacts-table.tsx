@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { createClient } from "@/lib/supabase/client";
-import { ContactSheet } from "@/components/contact-sheet";
 import { Pagination } from "@/components/pagination";
 import type { Contact } from "@/lib/types";
 
@@ -173,10 +172,8 @@ interface Props {
   availableAgents?: AgentOption[];
 }
 
-export function ContactsTable({ contacts: initial, pagination, currentAgentId, currentRole, availableAgents = [] }: Props) {
+export function ContactsTable({ contacts: initial, pagination, currentAgentId, currentRole }: Props) {
   const router = useRouter();
-  const [editContact, setEditContact] = useState<Contact | null>(null);
-  const [sheetOpen, setSheetOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [relativeTimes, setRelativeTimes] = useState<Record<string, string>>({});
@@ -248,8 +245,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
   function openEdit(c: Contact, e: React.MouseEvent) {
     e.stopPropagation();
     e.preventDefault();
-    setEditContact(c);
-    setSheetOpen(true);
+    router.push(`/dashboard/contacts/${c.id}/edit`);
   }
 
   async function handleDelete(c: Contact, e: React.MouseEvent) {
@@ -266,12 +262,6 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
       return;
     }
     toast.success("Contacto eliminado");
-    router.refresh();
-  }
-
-  function handleSaved() {
-    setSheetOpen(false);
-    setEditContact(null);
     router.refresh();
   }
 
@@ -820,15 +810,6 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
           />
         </div>
       )}
-
-      <ContactSheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        contact={editContact}
-        onSaved={handleSaved}
-        availableAgents={availableAgents}
-        currentRole={currentRole}
-      />
     </>
   );
 }

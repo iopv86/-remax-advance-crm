@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { fireCapiEvent } from "@/lib/meta-capi";
+import { buildLeadFormAnswers, hasCustomAnswers, parseBudgetRange, pickField } from "@/lib/meta-leads";
 
 const GRAPH_VERSION = "v19.0";
 
@@ -242,6 +243,12 @@ export async function POST(req: NextRequest) {
       const [firstName, ...rest] = rawName.split(" ");
       const lastName = rest.join(" ") || null;
 
+      // Lossless capture of every answered question + best-effort budget mapping.
+      const leadFormAnswers = buildLeadFormAnswers(fields, leadgen_id);
+      const budget = parseBudgetRange(
+        pickField(fields, ["presupuesto", "presupuesto_estimado", "budget", "rango_de_presupuesto", "cuanto_desea_invertir"])
+      );
+
       // 4. Upsert contact — deduplicate on phone first, then meta_lead_id.
       //    Never overwrite agent_id on an existing contact (would steal the lead).
       let existingId: string | null = null;
@@ -294,6 +301,12 @@ export async function POST(req: NextRequest) {
             .update({ agent_id: agentId, assigned_at: new Date().toISOString() })
             .eq("id", existingId);
         }
+        if (hasCustomAnswers(fields)) {
+          const { data: cur } = await db.from("contacts").select("lead_form_answers").eq("id", existingId).maybeSingle();
+          if (cur && cur.lead_form_answers == null) {
+            await db.from("contacts").update({ lead_form_answers: leadFormAnswers }).eq("id", existingId);
+          }
+        }
         await createIntakeDeal(existingId, agentId);
         fireCapiEvent({ stage: "lead_captured", email, phone }).catch((err) =>
           console.error("[lead-webhook] CAPI error:", (err as Error).message));
@@ -322,6 +335,8 @@ export async function POST(req: NextRequest) {
           meta_campaign_id: lead.campaign_id ?? change.value.ad_id ?? null,
           agent_id:         agentId,
           assigned_at:      new Date().toISOString(),
+          lead_form_answers: leadFormAnswers,
+          ...(budget ? { budget_min: budget.min, budget_max: budget.max, budget_currency: budget.currency } : {}),
         })
         .select("id, email, phone")
         .maybeSingle();

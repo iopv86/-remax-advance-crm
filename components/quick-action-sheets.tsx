@@ -42,7 +42,16 @@ interface ContactOption {
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-sans text-xs font-medium text-slate-500 mb-1">
+    <p
+      className="font-sans mb-1.5"
+      style={{
+        fontSize: 10,
+        fontWeight: 700,
+        color: "var(--secondary-foreground)",
+        textTransform: "uppercase",
+        letterSpacing: "0.12em",
+      }}
+    >
       {children}
     </p>
   );

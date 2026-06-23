@@ -1,5 +1,6 @@
 import { adminClient } from "@/lib/supabase/admin";
 import { fireCapiEvent } from "@/lib/meta-capi";
+import type { LeadFormAnswers } from "@/lib/types";
 
 export const GRAPH_VERSION = "v19.0";
 
@@ -27,6 +28,64 @@ export function pickField(fields: FieldData[], names: string[]): string | null {
     if (v) return v;
   }
   return null;
+}
+
+// ── lead form answer capture (lossless) ────────────────────────────────────────
+
+/** Field names already mapped to typed contact columns — excluded from "custom answers". */
+const CORE_FIELD_NAMES = new Set([
+  "full_name", "full name", "name", "nombre", "nombre_completo",
+  "email", "correo", "correo_electronico",
+  "phone_number", "phone", "telefono", "teléfono", "numero", "número",
+]);
+
+/**
+ * Builds the lossless jsonb captured into contacts.lead_form_answers.
+ * Stores EVERY field (name + values) so no answered question is ever discarded.
+ * Meta's leads edge does not return the human question text, so label === name.
+ */
+export function buildLeadFormAnswers(fields: FieldData[], leadId: string, formId?: string | null): LeadFormAnswers {
+  return {
+    lead_id: leadId,
+    form_id: formId ?? null,
+    captured_at: new Date().toISOString(),
+    fields: (fields ?? []).map((f) => ({
+      name: f.name,
+      label: f.name,
+      values: Array.isArray(f.values) ? f.values : [],
+    })),
+  };
+}
+
+/** True when the lead has at least one custom (non name/email/phone) answer worth keeping. */
+export function hasCustomAnswers(fields: FieldData[]): boolean {
+  return (fields ?? []).some((f) => !CORE_FIELD_NAMES.has(f.name) && (f.values?.[0]?.trim()));
+}
+
+/**
+ * Best-effort parse of a free-text budget answer into { min, max, currency }.
+ * Fails safe: returns null on no confident match (raw answer stays in jsonb).
+ * Handles: "50000", "50k", "50,000-80,000", "US$50000 a 80000", "RD$ 3.5M".
+ */
+export function parseBudgetRange(raw: string | null): { min: number | null; max: number | null; currency: "USD" | "DOP" } | null {
+  if (!raw) return null;
+  const text = raw.trim().toLowerCase();
+  const currency: "USD" | "DOP" = /rd\$|rd |dop|pesos/.test(text) ? "DOP" : "USD";
+  // Extract numbers, expanding k/m suffixes; strip thousands separators.
+  const matches = [...text.matchAll(/(\d[\d.,]*)\s*(k|m|mil|millones|millón|millon)?/g)];
+  const nums: number[] = [];
+  for (const m of matches) {
+    let n = parseFloat(m[1].replace(/,/g, ""));
+    if (!isFinite(n)) continue;
+    const suffix = m[2];
+    if (suffix === "k" || suffix === "mil") n *= 1_000;
+    else if (suffix === "m" || suffix === "millones" || suffix === "millón" || suffix === "millon") n *= 1_000_000;
+    if (n >= 1000) nums.push(n); // ignore stray small numbers (e.g. "2 habitaciones")
+  }
+  if (nums.length === 0) return null;
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+  return { min, max: max === min ? null : max, currency };
 }
 
 // ── phone validation (E.164, rejects UUIDs/placeholders) ───────────────────────
@@ -132,6 +191,12 @@ export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessRe
   const [firstName, ...rest] = rawName.split(" ");
   const lastName = rest.join(" ") || null;
 
+  // Lossless capture of every answered question + best-effort budget mapping.
+  const leadFormAnswers = buildLeadFormAnswers(fields, lead.id);
+  const budget = parseBudgetRange(
+    pickField(fields, ["presupuesto", "presupuesto_estimado", "budget", "rango_de_presupuesto", "cuanto_desea_invertir"])
+  );
+
   // Dedup by phone, then meta_lead_id
   let existingId: string | null = null;
   let existingAgentId: string | null = null;
@@ -164,6 +229,14 @@ export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessRe
       agentId = agent.id;
       await db.from("contacts").update({ agent_id: agentId, assigned_at: new Date().toISOString() }).eq("id", existingId);
     }
+    // Capture form answers if we have custom ones and the contact has none yet
+    // (never clobber a richer manual edit).
+    if (hasCustomAnswers(fields)) {
+      const { data: cur } = await db.from("contacts").select("lead_form_answers").eq("id", existingId).maybeSingle();
+      if (cur && cur.lead_form_answers == null) {
+        await db.from("contacts").update({ lead_form_answers: leadFormAnswers }).eq("id", existingId);
+      }
+    }
     const dealCreated = await createIntakeDeal(existingId, agentId);
     if (dealCreated) {
       fireCapiEvent({ stage: "lead_captured", email, phone }).catch(() => {});
@@ -190,6 +263,8 @@ export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessRe
       meta_campaign_id: lead.campaign_id ?? lead.ad_id ?? null,
       agent_id: agentId,
       assigned_at: new Date().toISOString(),
+      lead_form_answers: leadFormAnswers,
+      ...(budget ? { budget_min: budget.min, budget_max: budget.max, budget_currency: budget.currency } : {}),
     })
     .select("id, email, phone")
     .maybeSingle();
