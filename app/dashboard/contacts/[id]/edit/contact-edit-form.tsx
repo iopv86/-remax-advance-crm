@@ -87,40 +87,43 @@ export function ContactEditForm({
   agents,
   properties,
   privileged,
+  currentAgentId,
 }: {
-  contact: Contact;
+  contact?: Contact | null;
   agents: { id: string; full_name: string }[];
   properties: PropertyOption[];
   privileged: boolean;
+  currentAgentId?: string;
 }) {
   const router = useRouter();
-  const backHref = `/dashboard/contacts/${contact.id}`;
+  const isCreate = !contact;
+  const backHref = contact ? `/dashboard/contacts/${contact.id}` : "/dashboard/contacts";
   const [saving, setSaving] = useState(false);
   const [locDraft, setLocDraft] = useState("");
 
   const [form, setForm] = useState({
-    first_name: contact.first_name ?? "",
-    last_name: contact.last_name ?? "",
-    phone: contact.phone ?? "",
-    email: contact.email ?? "",
-    whatsapp_number: contact.whatsapp_number ?? "",
-    lead_classification: contact.lead_classification ?? "warm",
-    lead_status: contact.lead_status ?? "new",
-    source: contact.source ?? "other",
-    source_detail: contact.source_detail ?? "",
-    agent_id: contact.agent_id ?? "",
-    property_type_interest: contact.property_type_interest ?? "",
-    preferred_locations: (contact.preferred_locations ?? []) as string[],
-    purpose: contact.purpose ?? "",
-    timeline: contact.timeline ?? "",
-    payment_method: contact.payment_method ?? "",
-    decision_maker: contact.decision_maker ?? "",
-    linked_property_id: contact.linked_property_id ?? "",
-    budget_currency: contact.budget_currency ?? "USD",
-    budget_min: contact.budget_min?.toString() ?? "",
-    budget_max: contact.budget_max?.toString() ?? "",
-    ai_summary: contact.ai_summary ?? "",
-    agent_notes: contact.agent_notes ?? "",
+    first_name: contact?.first_name ?? "",
+    last_name: contact?.last_name ?? "",
+    phone: contact?.phone ?? "",
+    email: contact?.email ?? "",
+    whatsapp_number: contact?.whatsapp_number ?? "",
+    lead_classification: contact?.lead_classification ?? "warm",
+    lead_status: contact?.lead_status ?? "new",
+    source: contact?.source ?? (isCreate ? "referral" : "other"),
+    source_detail: contact?.source_detail ?? "",
+    agent_id: contact?.agent_id ?? "",
+    property_type_interest: contact?.property_type_interest ?? "",
+    preferred_locations: (contact?.preferred_locations ?? []) as string[],
+    purpose: contact?.purpose ?? "",
+    timeline: contact?.timeline ?? "",
+    payment_method: contact?.payment_method ?? "",
+    decision_maker: contact?.decision_maker ?? "",
+    linked_property_id: contact?.linked_property_id ?? "",
+    budget_currency: contact?.budget_currency ?? "USD",
+    budget_min: contact?.budget_min?.toString() ?? "",
+    budget_max: contact?.budget_max?.toString() ?? "",
+    ai_summary: contact?.ai_summary ?? "",
+    agent_notes: contact?.agent_notes ?? "",
   });
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
@@ -132,6 +135,10 @@ export function ContactEditForm({
   async function handleSave() {
     if (!form.first_name.trim()) {
       toast.error("El nombre es requerido");
+      return;
+    }
+    if (isCreate && !form.phone.trim() && !form.email.trim()) {
+      toast.error("Ingresa al menos un teléfono o email");
       return;
     }
     setSaving(true);
@@ -161,11 +168,30 @@ export function ContactEditForm({
       budget_max: form.budget_max ? parseFloat(form.budget_max) : null,
       ai_summary: form.ai_summary.trim() || null,
       agent_notes: form.agent_notes.trim() || null,
-      updated_at: new Date().toISOString(),
     };
-    if (privileged && form.agent_id) payload.agent_id = form.agent_id;
 
-    const { error } = await supabase.from("contacts").update(payload).eq("id", contact.id);
+    if (isCreate) {
+      // agent_id must satisfy RLS: own id for non-privileged, chosen/own for privileged.
+      payload.agent_id = (privileged && form.agent_id) || currentAgentId || null;
+      const { data: inserted, error } = await supabase
+        .from("contacts")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error || !inserted) {
+        toast.error("Error al crear: " + (error?.message ?? "desconocido"));
+        setSaving(false);
+        return;
+      }
+      toast.success("Contacto creado");
+      router.push(`/dashboard/contacts/${inserted.id}`);
+      router.refresh();
+      return;
+    }
+
+    payload.updated_at = new Date().toISOString();
+    if (privileged && form.agent_id) payload.agent_id = form.agent_id;
+    const { error } = await supabase.from("contacts").update(payload).eq("id", contact!.id);
     if (error) {
       toast.error("Error al guardar: " + error.message);
       setSaving(false);
@@ -176,7 +202,7 @@ export function ContactEditForm({
     router.refresh();
   }
 
-  const fullName = [contact.first_name, contact.last_name].filter(Boolean).join(" ") || "Contacto";
+  const fullName = [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Contacto";
   const propertyOpts: SelectOption[] = properties.map((p) => ({
     value: p.id,
     label: [p.title, p.sector || p.city].filter(Boolean).join(" · "),
@@ -184,11 +210,12 @@ export function ContactEditForm({
 
   return (
     <FormShell
-      title="Editar contacto"
-      subtitle={fullName}
+      title={isCreate ? "Nuevo contacto" : "Editar contacto"}
+      subtitle={isCreate ? undefined : fullName}
       backHref={backHref}
       onSubmit={handleSave}
       saving={saving}
+      saveLabel={isCreate ? "Crear contacto" : "Guardar cambios"}
     >
       <FormSection title="Identidad">
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
@@ -298,7 +325,7 @@ export function ContactEditForm({
         </Field>
       </FormSection>
 
-      <LeadFormAnswers answers={contact.lead_form_answers} />
+      <LeadFormAnswers answers={contact?.lead_form_answers} />
     </FormShell>
   );
 }

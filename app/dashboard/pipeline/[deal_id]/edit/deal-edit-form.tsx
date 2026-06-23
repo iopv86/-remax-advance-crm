@@ -48,25 +48,28 @@ export function DealEditForm({
   deal,
   contacts,
   properties,
+  currentAgentId,
 }: {
-  deal: Deal;
+  deal?: Deal | null;
   contacts: ContactOption[];
   properties: PropertyOption[];
+  currentAgentId?: string;
 }) {
   const router = useRouter();
-  const backHref = `/dashboard/pipeline/${deal.id}`;
+  const isCreate = !deal;
+  const backHref = deal ? `/dashboard/pipeline/${deal.id}` : "/dashboard/pipeline";
   const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
-    contact_id: deal.contact_id ?? "",
-    stage: deal.stage,
-    deal_value: deal.deal_value?.toString() ?? "",
-    currency: deal.currency ?? "USD",
-    commission_percentage: deal.commission_percentage?.toString() ?? "",
-    expected_close_date: deal.expected_close_date ?? "",
-    priority: deal.priority ?? "medium",
-    property_id: deal.property_id ?? "",
-    notes: deal.notes ?? "",
+    contact_id: deal?.contact_id ?? "",
+    stage: deal?.stage ?? ("lead_captured" as DealStage),
+    deal_value: deal?.deal_value?.toString() ?? "",
+    currency: deal?.currency ?? "USD",
+    commission_percentage: deal?.commission_percentage?.toString() ?? "",
+    expected_close_date: deal?.expected_close_date ?? "",
+    priority: deal?.priority ?? "medium",
+    property_id: deal?.property_id ?? "",
+    notes: deal?.notes ?? "",
   });
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
@@ -94,11 +97,35 @@ export function DealEditForm({
       priority: form.priority,
       property_id: form.property_id || null,
       notes: form.notes.trim() || null,
-      updated_at: new Date().toISOString(),
     };
-    if (contactAgent) payload.agent_id = contactAgent;
 
-    const { error } = await supabase.from("deals").update(payload).eq("id", deal.id);
+    if (isCreate) {
+      // agent_id is NOT NULL — inherit contact's owner, else the current agent.
+      payload.agent_id = contactAgent || currentAgentId || null;
+      if (!payload.agent_id) {
+        toast.error("No se pudo resolver el agente. Recarga la página.");
+        setSaving(false);
+        return;
+      }
+      const { data: inserted, error } = await supabase
+        .from("deals")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error || !inserted) {
+        toast.error("Error al crear: " + (error?.message ?? "desconocido"));
+        setSaving(false);
+        return;
+      }
+      toast.success("Oportunidad creada");
+      router.push(`/dashboard/pipeline/${inserted.id}`);
+      router.refresh();
+      return;
+    }
+
+    payload.updated_at = new Date().toISOString();
+    if (contactAgent) payload.agent_id = contactAgent;
+    const { error } = await supabase.from("deals").update(payload).eq("id", deal!.id);
     if (error) {
       toast.error("Error al guardar: " + error.message);
       setSaving(false);
@@ -120,10 +147,11 @@ export function DealEditForm({
 
   return (
     <FormShell
-      title="Editar oportunidad"
+      title={isCreate ? "Nueva oportunidad" : "Editar oportunidad"}
       backHref={backHref}
       onSubmit={handleSave}
       saving={saving}
+      saveLabel={isCreate ? "Crear oportunidad" : "Guardar cambios"}
     >
       <FormSection title="Oportunidad">
         <Field label="Contacto" htmlFor="contact" required>

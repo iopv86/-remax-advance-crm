@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Plus, UserPlus, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -21,15 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { LeadClassification, DealStage } from "@/lib/types";
-
-type SheetType = "contact" | "deal" | "task" | null;
-
-const QUICK_ACTIONS: { key: Exclude<SheetType, null>; label: string }[] = [
-  { key: "contact", label: "Nuevo cliente" },
-  { key: "deal", label: "Nueva oportunidad" },
-  { key: "task", label: "Agendar seguimiento" },
-];
 
 interface ContactOption {
   id: string;
@@ -38,7 +30,7 @@ interface ContactOption {
   agent_id: string | null;
 }
 
-// ── Shared label style ───────────────────────────────────────────────────────
+// ── Shared label style (legible — matches components/form) ────────────────────
 
 function Label({ children }: { children: React.ReactNode }) {
   return (
@@ -57,289 +49,7 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-const SOURCE_OPTIONS = [
-  { value: "referral",     label: "Referido" },
-  { value: "walk_in",      label: "Visita directa / Oficina" },
-  { value: "website",      label: "Website" },
-  { value: "social_media", label: "Redes sociales" },
-  { value: "other",        label: "Otro" },
-];
-
-// ── Contact form ─────────────────────────────────────────────────────────────
-
-function NewContactForm({ onClose }: { onClose: () => void }) {
-  const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    phone: "",
-    email: "",
-    source: "referral",
-    source_detail: "",
-    lead_classification: "warm" as LeadClassification,
-  });
-  const [loading, setLoading] = useState(false);
-
-  function set(field: keyof typeof form, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.first_name.trim()) {
-      toast.error("El nombre es obligatorio");
-      return;
-    }
-    if (!form.phone.trim() && !form.email.trim()) {
-      toast.error("Ingresa al menos un teléfono o email");
-      return;
-    }
-    setLoading(true);
-    const supabase = createClient();
-
-    // Resolve the current user's agent row (required by contacts RLS INSERT policy)
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Sesión expirada. Recarga la página.");
-      setLoading(false);
-      return;
-    }
-    const { data: agent } = await supabase
-      .from("agents")
-      .select("id")
-      .eq("email", user.email!)
-      .maybeSingle();
-    if (!agent) {
-      toast.error("No se encontró tu perfil de agente.");
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase.from("contacts").insert({
-      first_name: form.first_name.trim(),
-      last_name: form.last_name.trim() || null,
-      phone: form.phone.trim() || null,
-      email: form.email.trim() || null,
-      source: form.source as "referral" | "walk_in" | "website" | "social_media" | "other",
-      source_detail: form.source_detail.trim() || null,
-      lead_classification: form.lead_classification,
-      lead_status: "new",
-      agent_id: agent.id,
-    });
-    setLoading(false);
-    if (error) {
-      toast.error("Error al crear contacto: " + error.message);
-      return;
-    }
-    toast.success("Contacto creado");
-    onClose();
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <Label>Nombre *</Label>
-          <Input
-            placeholder="María"
-            value={form.first_name}
-            onChange={(e) => set("first_name", e.target.value)}
-          />
-        </div>
-        <div>
-          <Label>Apellido</Label>
-          <Input
-            placeholder="García"
-            value={form.last_name}
-            onChange={(e) => set("last_name", e.target.value)}
-          />
-        </div>
-      </div>
-      <div>
-        <Label>Teléfono</Label>
-        <Input
-          placeholder="+1 809 000 0000"
-          value={form.phone}
-          onChange={(e) => set("phone", e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Email</Label>
-        <Input
-          type="email"
-          placeholder="maria@ejemplo.com"
-          value={form.email}
-          onChange={(e) => set("email", e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Origen del cliente</Label>
-        <Select
-          value={form.source}
-          onValueChange={(v) => v && set("source", v)}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {SOURCE_OPTIONS.map((o) => (
-              <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      {(form.source === "referral" || form.source === "other") && (
-        <div>
-          <Label>{form.source === "referral" ? "¿Quién refirió?" : "Detalle"}</Label>
-          <Input
-            placeholder={form.source === "referral" ? "Nombre del referidor" : "Describe el origen"}
-            value={form.source_detail}
-            onChange={(e) => set("source_detail", e.target.value)}
-          />
-        </div>
-      )}
-      <div>
-        <Label>Clasificación</Label>
-        <Select
-          value={form.lead_classification}
-          onValueChange={(v) => v && set("lead_classification", v)}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="hot">🔥 HOT</SelectItem>
-            <SelectItem value="warm">🟠 WARM</SelectItem>
-            <SelectItem value="cold">❄️ COLD</SelectItem>
-            <SelectItem value="unqualified">Unqualified</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <SheetFooter>
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Guardando…" : "Crear contacto"}
-        </Button>
-      </SheetFooter>
-    </form>
-  );
-}
-
-// ── Deal form ─────────────────────────────────────────────────────────────────
-
-function NewDealForm({
-  contacts,
-  onClose,
-}: {
-  contacts: ContactOption[];
-  onClose: () => void;
-}) {
-  const [form, setForm] = useState({
-    contact_id: "",
-    deal_value: "",
-    stage: "lead_captured" as DealStage,
-  });
-  const [loading, setLoading] = useState(false);
-
-  function set(field: keyof typeof form, value: string) {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!form.contact_id) {
-      toast.error("Selecciona un contacto");
-      return;
-    }
-    setLoading(true);
-    const supabase = createClient();
-
-    // Inherit agent_id from the contact; fall back to logged-in user's agent
-    const contactAgent = contacts.find((c) => c.id === form.contact_id)?.agent_id ?? null;
-    let agentId: string | null = contactAgent;
-    if (!agentId) {
-      const { data: { user } } = await supabase.auth.getUser();
-      const { data: agent } = await supabase
-        .from("agents")
-        .select("id")
-        .eq("email", user?.email ?? "")
-        .single();
-      agentId = agent?.id ?? null;
-    }
-
-    const { error } = await supabase.from("deals").insert({
-      contact_id: form.contact_id,
-      deal_value: form.deal_value ? Number(form.deal_value) : null,
-      stage: form.stage,
-      agent_id: agentId,
-      currency: "USD",
-    });
-    setLoading(false);
-    if (error) {
-      toast.error("Error al crear oportunidad: " + error.message);
-      return;
-    }
-    toast.success("Oportunidad creada");
-    onClose();
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div>
-        <Label>Contacto *</Label>
-        <Select value={form.contact_id} onValueChange={(v) => v && set("contact_id", v)}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Seleccionar contacto…" />
-          </SelectTrigger>
-          <SelectContent>
-            {contacts.map((c) => (
-              <SelectItem key={c.id} value={c.id}>
-                {c.first_name ?? ""} {c.last_name ?? ""}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div>
-        <Label>Valor estimado (USD)</Label>
-        <Input
-          type="number"
-          placeholder="150000"
-          value={form.deal_value}
-          onChange={(e) => set("deal_value", e.target.value)}
-        />
-      </div>
-      <div>
-        <Label>Etapa</Label>
-        <Select value={form.stage} onValueChange={(v) => v && set("stage", v as DealStage)}>
-          <SelectTrigger className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="lead_captured">Lead capturado</SelectItem>
-            <SelectItem value="qualified">Calificado</SelectItem>
-            <SelectItem value="contacted">Contactado</SelectItem>
-            <SelectItem value="showing_scheduled">Visita agendada</SelectItem>
-            <SelectItem value="showing_done">Visita realizada</SelectItem>
-            <SelectItem value="offer_made">Oferta presentada</SelectItem>
-            <SelectItem value="negotiation">En negociación</SelectItem>
-            <SelectItem value="promesa_de_venta">Promesa de venta</SelectItem>
-            <SelectItem value="financiamiento">Financiamiento</SelectItem>
-            <SelectItem value="contract">Contrato firmado</SelectItem>
-            <SelectItem value="due_diligence">Due diligence</SelectItem>
-            <SelectItem value="closed_won">Cerrado/Ganado</SelectItem>
-            <SelectItem value="closed_lost">Cerrado/Perdido</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <SheetFooter>
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Guardando…" : "Crear oportunidad"}
-        </Button>
-      </SheetFooter>
-    </form>
-  );
-}
-
-// ── Task form ─────────────────────────────────────────────────────────────────
+// ── Task form (kept as a quick drawer — not part of B-16 full-page editors) ───
 
 function NewTaskForm({
   contacts,
@@ -451,119 +161,42 @@ function NewTaskForm({
   );
 }
 
-// ── Page-level button: Nuevo cliente ─────────────────────────────────────────
+// ── Page-level buttons: full-page create flows ────────────────────────────────
+
+const PILL_CLASS =
+  "inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-95";
 
 export function NewContactButton() {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-
-  function handleClose() {
-    setOpen(false);
-    router.refresh();
-  }
-
   return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-95"
-        style={{ background: "var(--red)" }}
-      >
-        <UserPlus className="h-3.5 w-3.5" />
-        Nuevo cliente
-      </button>
-
-      <Sheet open={open} onOpenChange={(o) => !o && handleClose()}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
-          <SheetHeader className="p-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
-            <SheetTitle
-              style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--foreground)",
-              }}
-            >
-              Nuevo cliente
-            </SheetTitle>
-          </SheetHeader>
-          <div className="p-6">
-            <NewContactForm onClose={handleClose} />
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+    <Link href="/dashboard/contacts/new" className={PILL_CLASS} style={{ background: "var(--red)" }}>
+      <UserPlus className="h-3.5 w-3.5" />
+      Nuevo cliente
+    </Link>
   );
 }
-
-// ── Page-level button: Nueva oportunidad ─────────────────────────────────────
 
 export function NewDealButton() {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [contacts, setContacts] = useState<ContactOption[]>([]);
-
-  // Load contacts when sheet opens
-  useEffect(() => {
-    if (!open) return;
-    const supabase = createClient();
-    supabase
-      .from("contacts")
-      .select("id, first_name, last_name, agent_id")
-      .order("created_at", { ascending: false })
-      .limit(100)
-      .then(({ data }) => {
-        if (data) setContacts(data as ContactOption[]);
-      });
-  }, [open]);
-
-  function handleClose() {
-    setOpen(false);
-    router.refresh();
-  }
-
   return (
-    <>
-      <button
-        onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-95"
-        style={{ background: "var(--red)" }}
-      >
-        <TrendingUp className="h-3.5 w-3.5" />
-        Nueva oportunidad
-      </button>
-
-      <Sheet open={open} onOpenChange={(o) => !o && handleClose()}>
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
-          <SheetHeader className="p-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
-            <SheetTitle
-              style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--foreground)",
-              }}
-            >
-              Nueva oportunidad
-            </SheetTitle>
-          </SheetHeader>
-          <div className="p-6">
-            <NewDealForm contacts={contacts} onClose={handleClose} />
-          </div>
-        </SheetContent>
-      </Sheet>
-    </>
+    <Link href="/dashboard/pipeline/new" className={PILL_CLASS} style={{ background: "var(--red)" }}>
+      <TrendingUp className="h-3.5 w-3.5" />
+      Nueva oportunidad
+    </Link>
   );
 }
 
-// ── Main export ───────────────────────────────────────────────────────────────
+// ── Sidebar quick actions ─────────────────────────────────────────────────────
+
+const QUICK_LINKS: { label: string; href: string }[] = [
+  { label: "Nuevo cliente", href: "/dashboard/contacts/new" },
+  { label: "Nueva oportunidad", href: "/dashboard/pipeline/new" },
+];
 
 export function QuickActionSheets() {
-  const [openSheet, setOpenSheet] = useState<SheetType>(null);
+  const [taskOpen, setTaskOpen] = useState(false);
   const [contacts, setContacts] = useState<ContactOption[]>([]);
 
-  // Load contacts once for deal + task pickers
   useEffect(() => {
+    if (!taskOpen) return;
     const supabase = createClient();
     supabase
       .from("contacts")
@@ -573,40 +206,33 @@ export function QuickActionSheets() {
       .then(({ data }) => {
         if (data) setContacts(data as ContactOption[]);
       });
-  }, []);
-
-  function closeSheet() {
-    setOpenSheet(null);
-  }
-
-  const titles: Record<Exclude<SheetType, null>, string> = {
-    contact: "Nuevo cliente",
-    deal: "Nueva oportunidad",
-    task: "Agendar seguimiento",
-  };
+  }, [taskOpen]);
 
   return (
     <>
-      {/* Buttons rendered inside the dark sidebar block */}
       <div className="space-y-2">
-        {QUICK_ACTIONS.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setOpenSheet(key)}
+        {QUICK_LINKS.map(({ label, href }) => (
+          <Link
+            key={href}
+            href={href}
             className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm text-white/90 transition-all hover:bg-white/10"
             style={{ background: "var(--glass-bg)" }}
           >
             {label}
             <Plus className="h-4 w-4 text-white/50" />
-          </button>
+          </Link>
         ))}
+        <button
+          onClick={() => setTaskOpen(true)}
+          className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm text-white/90 transition-all hover:bg-white/10"
+          style={{ background: "var(--glass-bg)" }}
+        >
+          Agendar seguimiento
+          <Plus className="h-4 w-4 text-white/50" />
+        </button>
       </div>
 
-      {/* Sheet — Nuevo cliente */}
-      <Sheet
-        open={openSheet === "contact"}
-        onOpenChange={(open) => !open && closeSheet()}
-      >
+      <Sheet open={taskOpen} onOpenChange={(o) => !o && setTaskOpen(false)}>
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
           <SheetHeader className="p-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
             <SheetTitle
@@ -617,59 +243,11 @@ export function QuickActionSheets() {
                 color: "var(--foreground)",
               }}
             >
-              {titles.contact}
+              Agendar seguimiento
             </SheetTitle>
           </SheetHeader>
           <div className="p-6">
-            <NewContactForm onClose={closeSheet} />
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Sheet — Nueva oportunidad */}
-      <Sheet
-        open={openSheet === "deal"}
-        onOpenChange={(open) => !open && closeSheet()}
-      >
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
-          <SheetHeader className="p-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
-            <SheetTitle
-              style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--foreground)",
-              }}
-            >
-              {titles.deal}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="p-6">
-            <NewDealForm contacts={contacts} onClose={closeSheet} />
-          </div>
-        </SheetContent>
-      </Sheet>
-
-      {/* Sheet — Agendar seguimiento */}
-      <Sheet
-        open={openSheet === "task"}
-        onOpenChange={(open) => !open && closeSheet()}
-      >
-        <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto p-0">
-          <SheetHeader className="p-6 pb-4" style={{ borderBottom: "1px solid var(--border)" }}>
-            <SheetTitle
-              style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                color: "var(--foreground)",
-              }}
-            >
-              {titles.task}
-            </SheetTitle>
-          </SheetHeader>
-          <div className="p-6">
-            <NewTaskForm contacts={contacts} onClose={closeSheet} />
+            <NewTaskForm contacts={contacts} onClose={() => setTaskOpen(false)} />
           </div>
         </SheetContent>
       </Sheet>
