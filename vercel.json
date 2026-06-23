@@ -16,7 +16,7 @@
     },
     {
       "path": "/api/cron/lead-poll",
-      "schedule": "*/10 * * * *"
+      "schedule": "* * * * *"
     }
   ]
 }
