@@ -108,7 +108,10 @@ export function ContactEditForm({
     phone: contact?.phone ?? "",
     email: contact?.email ?? "",
     whatsapp_number: contact?.whatsapp_number ?? "",
-    lead_classification: contact?.lead_classification ?? "warm",
+    // New contacts default to "Sin calificar" (unqualified) so the editor stamps
+    // qualification_source='auto' and the gate manages the badge. The agent can
+    // still pick a temperature (hot/warm/cold), which freezes the row as manual.
+    lead_classification: contact?.lead_classification ?? "unqualified",
     lead_status: contact?.lead_status ?? "new",
     source: contact?.source ?? (isCreate ? "referral" : "other"),
     source_detail: contact?.source_detail ?? "",
