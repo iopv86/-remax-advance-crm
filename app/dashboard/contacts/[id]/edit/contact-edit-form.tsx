@@ -50,25 +50,26 @@ const PROPERTY_TYPE_OPTS: SelectOption[] = [
   { value: "apart_hotel", label: "Apart-hotel" },
   { value: "farm", label: "Finca" },
 ];
+// Values MUST match the Postgres enums (purpose_type / timeline_type /
+// payment_method). Labels stay in Spanish; only the stored value is the enum.
 const PURPOSE_OPTS: SelectOption[] = [
-  { value: "comprar", label: "Comprar" },
-  { value: "alquilar", label: "Alquilar" },
-  { value: "invertir", label: "Invertir" },
-  { value: "vacacional", label: "Uso vacacional" },
+  { value: "investment", label: "Inversión" },
+  { value: "personal", label: "Uso personal" },
+  { value: "both", label: "Ambos" },
 ];
 const TIMELINE_OPTS: SelectOption[] = [
-  { value: "inmediato", label: "Inmediato" },
-  { value: "1-3 meses", label: "1 – 3 meses" },
-  { value: "3-6 meses", label: "3 – 6 meses" },
-  { value: "6-12 meses", label: "6 – 12 meses" },
-  { value: "+12 meses", label: "Más de 12 meses" },
-  { value: "explorando", label: "Solo explorando" },
+  { value: "immediate", label: "Inmediato" },
+  { value: "1_3_months", label: "1 – 3 meses" },
+  { value: "3_6_months", label: "3 – 6 meses" },
+  { value: "6_12_months", label: "6 – 12 meses" },
+  { value: "exploring", label: "Solo explorando" },
 ];
 const PAYMENT_OPTS: SelectOption[] = [
-  { value: "contado", label: "Contado" },
-  { value: "financiamiento", label: "Financiamiento bancario" },
-  { value: "mixto", label: "Mixto" },
-  { value: "otro", label: "Otro" },
+  { value: "cash", label: "Contado" },
+  { value: "financing", label: "Financiamiento bancario" },
+  { value: "mixed", label: "Mixto" },
+  { value: "crypto", label: "Cripto" },
+  { value: "unknown", label: "Otro / Sin definir" },
 ];
 const CURRENCY_OPTS: SelectOption[] = [
   { value: "USD", label: "USD (US$)" },
@@ -152,6 +153,11 @@ export function ContactEditForm({
       whatsapp_number: form.whatsapp_number.trim() || form.phone.trim() || null,
       lead_classification: form.lead_classification,
       lead_status: form.lead_status,
+      // Setting a real temperature (hot/warm/cold) is a manual decision: freeze the
+      // row so the auto-qualification trigger never overrides it. Leaving it
+      // "Sin calificar" (unqualified) hands the row to the auto engine, so filling
+      // budget/type/timeline can promote it to cold/qualified via the gate.
+      qualification_source: form.lead_classification === "unqualified" ? "auto" : "manual",
       source: form.source,
       // Only touch source_detail when the field is actually shown — never null
       // a previously-recorded value just because the source type hides it.
@@ -183,15 +189,8 @@ export function ContactEditForm({
         setSaving(false);
         return;
       }
-      // The INSERT trigger (trg_contact_score) recomputes lead_classification from the
-      // empty score_* fields → 'unqualified', overriding the agent's choice. Re-apply it
-      // with a follow-up UPDATE (the trigger only fires on score_* changes, so this sticks).
-      if (form.lead_classification !== "unqualified") {
-        await supabase
-          .from("contacts")
-          .update({ lead_classification: form.lead_classification })
-          .eq("id", inserted.id);
-      }
+      // No post-insert workaround needed: qualification_source='manual' in the
+      // payload freezes the row, so the agent's classification sticks on insert.
       toast.success("Contacto creado");
       router.push(`/dashboard/contacts/${inserted.id}`);
       router.refresh();
