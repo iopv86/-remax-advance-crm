@@ -4,8 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { PIPELINE_STAGE_ORDER, STAGE_LABELS } from "@/lib/types";
-import type { Deal, DealStage, DealParty, DealPartyInput, DealPartyType } from "@/lib/types";
+import { PIPELINE_STAGE_ORDER, STAGE_LABELS, INSTALLMENT_KIND_LABELS } from "@/lib/types";
+import type {
+  Deal, DealStage, DealParty, DealPartyInput, DealPartyType,
+  DealInstallment, DealInstallmentInput, DealInstallmentKind, DealInstallmentStatus,
+  CurrencyType,
+} from "@/lib/types";
 import {
   Field,
   TextInput,
@@ -15,7 +19,7 @@ import {
   type SelectOption,
 } from "@/components/form/fields";
 import { FormShell, FormSection } from "@/components/form/form-shell";
-import { saveDealParties } from "../../actions";
+import { saveDealParties, saveDealInstallments } from "../../actions";
 
 // One editable party row (co-buyer or referrer). UI scope: 1 of each (S4 decision).
 interface PartyRow {
@@ -31,6 +35,33 @@ function pickParty(parties: DealParty[], type: DealPartyType): PartyRow {
     ? { full_name: p.full_name ?? "", phone: p.phone ?? "", relationship: p.relationship ?? "" }
     : { ...EMPTY_PARTY };
 }
+
+// One editable installment row of the payment plan (Plan de pagos — S5).
+// `_key` is a stable React key so removing a row doesn't reindex focus/state.
+interface InstRow {
+  _key: string;
+  kind: DealInstallmentKind;
+  label: string;
+  amount: string; // raw input; parsed at build time
+  due_date: string; // YYYY-MM-DD or ""
+  status: DealInstallmentStatus;
+  paid_date: string;
+}
+const EMPTY_INST: Omit<InstRow, "_key"> = {
+  kind: "reserva",
+  label: "",
+  amount: "",
+  due_date: "",
+  status: "pendiente",
+  paid_date: "",
+};
+const KIND_OPTS: SelectOption[] = (
+  ["reserva", "inicial", "saldo", "otro"] as DealInstallmentKind[]
+).map((k) => ({ value: k, label: INSTALLMENT_KIND_LABELS[k] }));
+const INST_STATUS_OPTS: SelectOption[] = [
+  { value: "pendiente", label: "Pendiente" },
+  { value: "pagada", label: "Pagada" },
+];
 
 const STAGE_OPTS: SelectOption[] = PIPELINE_STAGE_ORDER.map((s) => ({
   value: s,
@@ -66,12 +97,14 @@ export function DealEditForm({
   properties,
   currentAgentId,
   initialParties = [],
+  initialInstallments = [],
 }: {
   deal?: Deal | null;
   contacts: ContactOption[];
   properties: PropertyOption[];
   currentAgentId?: string;
   initialParties?: DealParty[];
+  initialInstallments?: DealInstallment[];
 }) {
   const router = useRouter();
   const isCreate = !deal;
@@ -80,6 +113,46 @@ export function DealEditForm({
 
   const [coBuyer, setCoBuyer] = useState<PartyRow>(() => pickParty(initialParties, "co_buyer"));
   const [referrer, setReferrer] = useState<PartyRow>(() => pickParty(initialParties, "referrer"));
+
+  const [installments, setInstallments] = useState<InstRow[]>(() =>
+    initialInstallments
+      .slice()
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((i) => ({
+        _key: i.id,
+        kind: i.kind,
+        label: i.label ?? "",
+        amount: i.amount != null ? i.amount.toString() : "",
+        due_date: i.due_date ?? "",
+        status: i.status,
+        paid_date: i.paid_date ?? "",
+      })),
+  );
+
+  function addInstallment() {
+    setInstallments((rows) => [...rows, { ...EMPTY_INST, _key: crypto.randomUUID() }]);
+  }
+  function updateInstallment(idx: number, patch: Partial<InstRow>) {
+    setInstallments((rows) => rows.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
+  }
+  function removeInstallment(idx: number) {
+    setInstallments((rows) => rows.filter((_, i) => i !== idx));
+  }
+
+  function buildInstallments(): DealInstallmentInput[] {
+    return installments
+      .filter((r) => r.amount.trim() !== "")
+      .map((r) => ({
+        kind: r.kind,
+        label: r.label.trim() || null,
+        amount: Number(r.amount),
+        currency: form.currency as CurrencyType,
+        due_date: r.due_date || null,
+        status: r.status,
+        paid_date: r.status === "pagada" ? r.paid_date || null : null,
+        notes: null, // reservado para notas por cuota (no expuesto en la UI de S5)
+      }));
+  }
 
   function buildParties(): DealPartyInput[] {
     const out: DealPartyInput[] = [];
@@ -156,6 +229,18 @@ export function DealEditForm({
         router.push(`/dashboard/pipeline/${inserted.id}`);
         return;
       }
+      const instResult = await saveDealInstallments(
+        inserted.id as string,
+        form.currency as CurrencyType,
+        buildInstallments(),
+      );
+      if (!instResult.success) {
+        setSaving(false);
+        toast.error("Oportunidad creada, pero el plan de pagos falló: " + instResult.error);
+        router.push(`/dashboard/pipeline/${inserted.id}`);
+        return;
+      }
+      setSaving(false);
       toast.success("Oportunidad creada");
       router.push(`/dashboard/pipeline/${inserted.id}`);
       router.refresh();
@@ -177,6 +262,14 @@ export function DealEditForm({
       router.push(backHref);
       return;
     }
+    const instResult = await saveDealInstallments(deal!.id, form.currency as CurrencyType, buildInstallments());
+    if (!instResult.success) {
+      setSaving(false);
+      toast.error("Oportunidad guardada, pero el plan de pagos falló: " + instResult.error);
+      router.push(backHref);
+      return;
+    }
+    setSaving(false);
     toast.success("Oportunidad actualizada");
     router.push(backHref);
     router.refresh();
@@ -262,6 +355,104 @@ export function DealEditForm({
             <TextInput id="rf_rel" value={referrer.relationship} onChange={(v) => setReferrer((p) => ({ ...p, relationship: v }))} placeholder="Amigo, cliente previo…" />
           </Field>
         </div>
+      </FormSection>
+
+      <FormSection title="Plan de pagos">
+        {(() => {
+          const sym = form.currency === "DOP" ? "RD$" : "US$";
+          const total = installments.reduce((s, r) => {
+            const n = Number(r.amount);
+            return s + (Number.isFinite(n) && n > 0 ? n : 0);
+          }, 0);
+          const dealVal = form.deal_value ? Number(form.deal_value) : null;
+          const nf = new Intl.NumberFormat("es-DO", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+          return (
+            <>
+              <p className="text-xs mb-2" style={{ color: "var(--muted-foreground)" }}>
+                Cuotas del plan (reserva, inicial, saldo…). Todas usan la moneda de la
+                oportunidad (<strong>{form.currency}</strong>) — cámbiala en el campo Moneda de arriba. Opcional.
+              </p>
+
+              {installments.length === 0 && (
+                <p className="text-xs mb-2" style={{ color: "var(--muted-foreground)", fontStyle: "italic" }}>
+                  Sin cuotas. Agrega la primera con el botón de abajo.
+                </p>
+              )}
+
+              {installments.map((row, idx) => (
+                <div
+                  key={row._key}
+                  style={{ padding: "12px", marginBottom: 10, borderRadius: 8, border: "1px solid var(--glass-border)", background: "var(--glass-bg)" }}
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: "var(--secondary-foreground)" }}>
+                      Cuota {idx + 1}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeInstallment(idx)}
+                      aria-label={`Quitar cuota ${idx + 1}`}
+                      className="text-xs transition-colors hover:opacity-80"
+                      style={{ color: "var(--red)", background: "none", border: "none", cursor: "pointer" }}
+                    >
+                      Quitar
+                    </button>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    <Field label="Tipo" htmlFor={`inst_kind_${idx}`}>
+                      <NativeSelect id={`inst_kind_${idx}`} value={row.kind} onChange={(v) => updateInstallment(idx, { kind: v as DealInstallmentKind })} options={KIND_OPTS} />
+                    </Field>
+                    <Field label={`Monto (${sym})`} htmlFor={`inst_amount_${idx}`}>
+                      <NumberInput id={`inst_amount_${idx}`} value={row.amount} onChange={(v) => updateInstallment(idx, { amount: v })} placeholder="10000" />
+                    </Field>
+                    <Field label="Vencimiento" htmlFor={`inst_due_${idx}`}>
+                      <TextInput id={`inst_due_${idx}`} type="date" value={row.due_date} onChange={(v) => updateInstallment(idx, { due_date: v })} />
+                    </Field>
+                    <Field label="Estado" htmlFor={`inst_status_${idx}`}>
+                      <NativeSelect
+                        id={`inst_status_${idx}`}
+                        value={row.status}
+                        onChange={(v) => updateInstallment(idx, { status: v as DealInstallmentStatus, paid_date: v === "pagada" ? row.paid_date : "" })}
+                        options={INST_STATUS_OPTS}
+                      />
+                    </Field>
+                    {row.status === "pagada" && (
+                      <Field label="Fecha de pago" htmlFor={`inst_paid_${idx}`}>
+                        <TextInput id={`inst_paid_${idx}`} type="date" value={row.paid_date} onChange={(v) => updateInstallment(idx, { paid_date: v })} />
+                      </Field>
+                    )}
+                    <Field label="Etiqueta (opcional)" htmlFor={`inst_label_${idx}`} style={{ gridColumn: row.status === "pagada" ? "auto" : "1 / -1" }}>
+                      <TextInput id={`inst_label_${idx}`} value={row.label} onChange={(v) => updateInstallment(idx, { label: v })} placeholder="Cuota 3 de 12" />
+                    </Field>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addInstallment}
+                className="text-xs font-semibold transition-colors hover:opacity-80"
+                style={{ color: "var(--primary)", background: "none", border: "1px dashed var(--glass-border)", borderRadius: 8, padding: "8px 12px", cursor: "pointer", width: "100%" }}
+              >
+                + Agregar cuota
+              </button>
+
+              {installments.length > 0 && (
+                <div className="mt-3 text-xs" style={{ color: "var(--muted-foreground)" }}>
+                  <div>Total cuotas: <strong style={{ color: "var(--foreground)" }}>{sym}{nf.format(total)}</strong></div>
+                  {dealVal != null && (
+                    <div>
+                      Valor de la oportunidad: {sym}{nf.format(dealVal)}{" "}
+                      {Math.abs(total - dealVal) < 0.01
+                        ? "· coincide"
+                        : `· difiere por ${sym}${nf.format(Math.abs(total - dealVal))}`}
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </FormSection>
 
       <FormSection title="Notas">

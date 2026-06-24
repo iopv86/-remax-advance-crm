@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { DealDetailClient } from "./deal-detail-client";
-import type { Deal, DealStage, Task, DealParty } from "@/lib/types";
+import type { Deal, DealStage, Task, DealParty, DealInstallment } from "@/lib/types";
 import type { DealActivity } from "./deal-activity";
 
 interface StageHistoryEntry {
@@ -29,7 +29,7 @@ export default async function DealDetailPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [dealResult, historyResult, tasksResult, activitiesResult, partiesResult] = await Promise.all([
+  const [dealResult, historyResult, tasksResult, activitiesResult, partiesResult, installmentsResult] = await Promise.all([
     supabase
       .from("deals")
       .select(
@@ -78,6 +78,13 @@ export default async function DealDetailPage({
       .select("id, deal_id, party_type, full_name, phone, relationship, notes, created_at, updated_at")
       .eq("deal_id", deal_id)
       .order("created_at", { ascending: true }),
+
+    // Payment plan installments. RLS returns [] to agents who don't own this deal.
+    supabase
+      .from("deal_installments")
+      .select("id, deal_id, kind, label, amount, currency, due_date, status, paid_date, sort_order, notes, created_at, updated_at")
+      .eq("deal_id", deal_id)
+      .order("sort_order", { ascending: true }),
   ]);
 
   if (dealResult.error || !dealResult.data) notFound();
@@ -92,6 +99,8 @@ export default async function DealDetailPage({
       initialTasks={(tasksResult.data ?? []) as unknown as Task[]}
       initialActivities={(activitiesResult.data ?? []) as unknown as DealActivity[]}
       parties={(partiesResult.data ?? []) as unknown as DealParty[]}
+      installments={(installmentsResult.data ?? []) as unknown as DealInstallment[]}
+      today={new Date().toISOString().slice(0, 10)}
       agentId={session.agentId}
     />
   );

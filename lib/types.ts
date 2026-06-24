@@ -192,6 +192,50 @@ export interface DealPartyInput {
   notes: string | null;
 }
 
+// ─── Deal installments (Plan de pagos) — migration 0019 ───────────────────────
+// Deal-scoped via RLS (owner agent + admin/manager). One currency per plan,
+// inherited from the deal. "vencida" is DERIVED at read time, never stored.
+export type DealInstallmentKind = "reserva" | "inicial" | "saldo" | "otro";
+export type DealInstallmentStatus = "pendiente" | "pagada"; // vencida derived
+
+export interface DealInstallment {
+  id: string;
+  deal_id: string;
+  kind: DealInstallmentKind;
+  label: string | null;
+  amount: number;
+  currency: CurrencyType;
+  due_date: string | null;   // ISO date (YYYY-MM-DD)
+  status: DealInstallmentStatus;
+  paid_date: string | null;
+  sort_order: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Form/write input — server supplies deal_id, sort_order (by position), timestamps.
+export interface DealInstallmentInput {
+  kind: DealInstallmentKind;
+  label: string | null;
+  amount: number;
+  currency: CurrencyType;
+  due_date: string | null;
+  status: DealInstallmentStatus;
+  paid_date: string | null;
+  notes: string | null;
+}
+
+export const INSTALLMENT_KIND_LABELS: Record<DealInstallmentKind, string> = {
+  reserva: "Reserva / Separación",
+  inicial: "Inicial",
+  saldo: "Saldo a financiamiento",
+  otro: "Otro",
+};
+
+// Derived presentation status (vencida computed; not a DB value).
+export type DealInstallmentDerivedStatus = "pendiente" | "pagada" | "vencida";
+
 export type UnitEstado = "disponible" | "vendido" | "reservado" | "bloqueado";
 
 export interface ProjectUnit {

@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
-import type { Deal, DealParty } from "@/lib/types";
+import type { Deal, DealParty, DealInstallment } from "@/lib/types";
 import { DealEditForm } from "./deal-edit-form";
 
 export default async function DealEditPage({
@@ -29,7 +29,7 @@ export default async function DealEditPage({
     .limit(500);
   if (!privileged) contactsQuery = contactsQuery.eq("agent_id", session.agentId);
 
-  const [{ data: deal }, { data: contacts }, { data: properties }, { data: parties }] =
+  const [{ data: deal }, { data: contacts }, { data: properties }, { data: parties }, { data: installments }] =
     await Promise.all([
       supabase
         .from("deals")
@@ -53,6 +53,12 @@ export default async function DealEditPage({
         .select("id, deal_id, party_type, full_name, phone, relationship, notes, created_at, updated_at")
         .eq("deal_id", deal_id)
         .order("created_at", { ascending: true }),
+      // Payment plan installments — RLS returns [] to agents who don't own this deal.
+      supabase
+        .from("deal_installments")
+        .select("id, deal_id, kind, label, amount, currency, due_date, status, paid_date, sort_order, notes, created_at, updated_at")
+        .eq("deal_id", deal_id)
+        .order("sort_order", { ascending: true }),
     ]);
 
   if (!deal) notFound();
@@ -65,6 +71,7 @@ export default async function DealEditPage({
         contacts={(contacts ?? []) as { id: string; first_name: string | null; last_name: string | null; agent_id: string | null }[]}
         properties={(properties ?? []) as { id: string; title: string; city: string | null; sector: string | null }[]}
         initialParties={(parties ?? []) as DealParty[]}
+        initialInstallments={(installments ?? []) as DealInstallment[]}
         currentAgentId={session.agentId}
       />
     </div>

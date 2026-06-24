@@ -10,7 +10,8 @@ import {
   CheckSquare, Square, Plus, MessageSquare,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { STAGE_LABELS, type Deal, type DealStage, type Task, type DealParty } from "@/lib/types";
+import { STAGE_LABELS, INSTALLMENT_KIND_LABELS, type Deal, type DealStage, type Task, type DealParty, type DealInstallment, type DealInstallmentDerivedStatus } from "@/lib/types";
+import { deriveInstallmentStatus } from "@/lib/installments";
 import { DealActivityPanel, type DealActivity } from "./deal-activity";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -80,6 +81,8 @@ interface Props {
   initialTasks: Task[];
   initialActivities: DealActivity[];
   parties: DealParty[];
+  installments: DealInstallment[];
+  today: string;
   agentId: string;
 }
 
@@ -88,11 +91,23 @@ const PARTY_TYPE_LABELS: Record<string, string> = {
   referrer: "Referidor",
 };
 
+// Derived-status badge styling (vencida is computed, not stored).
+const DERIVED_STATUS_STYLE: Record<DealInstallmentDerivedStatus, { bg: string; fg: string; label: string }> = {
+  pagada: { bg: "rgba(34,197,94,0.12)", fg: "#22c55e", label: "Pagada" },
+  vencida: { bg: "rgba(239,68,68,0.12)", fg: "#ef4444", label: "Vencida" },
+  pendiente: { bg: "var(--accent)", fg: "var(--accent-foreground)", label: "Pendiente" },
+};
+
+function fmtMoney(amount: number, currency: string): string {
+  const sym = currency === "DOP" ? "RD$" : "US$";
+  return sym + new Intl.NumberFormat("es-DO", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+}
+
 function sanitizePhone(phone: string): string {
   return phone.replace(/[\s\-\+\(\)]/g, "");
 }
 
-export function DealDetailClient({ deal: initialDeal, history, initialTasks, initialActivities, parties, agentId }: Props) {
+export function DealDetailClient({ deal: initialDeal, history, initialTasks, initialActivities, parties, installments, today, agentId }: Props) {
   const router = useRouter();
   const [deal, setDeal] = useState(initialDeal);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -698,6 +713,82 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                 </div>
               </div>
             )}
+
+            {/* Plan de pagos — installments gated by RLS + page-level owner check */}
+            {installments.length > 0 && (() => {
+              const planCurrency = installments[0].currency;
+              const total = installments.reduce((s, i) => s + (i.amount ?? 0), 0);
+              const paid = installments
+                .filter((i) => i.status === "pagada")
+                .reduce((s, i) => s + (i.amount ?? 0), 0);
+              const pending = total - paid;
+              return (
+                <div className="card-base p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                      Plan de pagos
+                    </p>
+                    <Link href={`/dashboard/pipeline/${deal.id}/edit`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
+                      Editar <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                  <div className="space-y-3">
+                    {installments.map((i) => {
+                      const derived = deriveInstallmentStatus(i, today);
+                      const st = DERIVED_STATUS_STYLE[derived];
+                      return (
+                        <div key={i.id} style={{ paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 999, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
+                              {INSTALLMENT_KIND_LABELS[i.kind] ?? i.kind}
+                            </span>
+                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 999, background: st.bg, color: st.fg }}>
+                              {st.label}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+                              {fmtMoney(i.amount, i.currency)}
+                            </span>
+                            <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                              {i.due_date ? `Vence ${format(parseISO(i.due_date), "dd MMM yyyy", { locale: es })}` : "Sin fecha"}
+                            </span>
+                          </div>
+                          {i.label && (
+                            <p className="text-xs mt-0.5" style={{ color: "var(--muted-foreground)" }}>{i.label}</p>
+                          )}
+                          {derived === "pagada" && i.paid_date && (
+                            <p className="text-xs mt-0.5" style={{ color: "#22c55e" }}>
+                              Pagada el {format(parseISO(i.paid_date), "dd MMM yyyy", { locale: es })}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-3 pt-2 text-xs space-y-1" style={{ color: "var(--muted-foreground)" }}>
+                    <div className="flex justify-between">
+                      <span>Total del plan</span>
+                      <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{fmtMoney(total, planCurrency)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Pagado</span>
+                      <span style={{ color: "#22c55e" }}>{fmtMoney(paid, planCurrency)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Pendiente</span>
+                      <span style={{ color: "var(--foreground)" }}>{fmtMoney(pending, planCurrency)}</span>
+                    </div>
+                    {deal.deal_value != null && deal.currency === planCurrency && Math.abs(total - deal.deal_value) >= 0.01 && (
+                      <div className="flex justify-between" style={{ fontStyle: "italic" }}>
+                        <span>Valor de la oportunidad</span>
+                        <span>{fmtMoney(deal.deal_value, planCurrency)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Notes */}
             <div className="card-base p-5">
