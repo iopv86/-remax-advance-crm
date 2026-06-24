@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { DashboardClient } from "./dashboard-client";
 import type { AgentKpi } from "./components/agent-kpi-chart";
+import { FX_RATES_KEY, type RatesSnapshot } from "@/lib/fx-rates";
 
 // ─── Data types ──────────────────────────────────────────────────────────────
 export interface KPIData {
@@ -58,6 +59,7 @@ export interface DashboardData {
   tasks: TaskItem[];
   ava: { isActive: boolean; msgsToday: number };
   agentKpis: AgentKpi[];
+  fxRates: RatesSnapshot | null;
 }
 
 const STAGE_LABELS: Record<string, string> = {
@@ -313,18 +315,29 @@ export default async function DashboardPage() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
 
-  const [avaConfigRes, avaMsgsRes] = await Promise.all([
+  const [avaConfigRes, avaMsgsRes, fxRes] = await Promise.all([
     supabase.from("ava_config").select("is_active").maybeSingle(),
     supabase
       .from("messages")
       .select("id", { count: "exact", head: true })
       .gte("created_at", todayStart.toISOString()),
+    supabase.from("agency_config").select("value").eq("key", FX_RATES_KEY).maybeSingle(),
   ]);
 
   const ava = {
     isActive: Boolean(avaConfigRes.data?.is_active),
     msgsToday: avaMsgsRes.count ?? 0,
   };
+
+  // USD/DOP snapshot cached by /api/cron/tasas-sync. Pure DB read, no API call.
+  let fxRates: RatesSnapshot | null = null;
+  if (fxRes.data?.value) {
+    try {
+      fxRates = JSON.parse(fxRes.data.value) as RatesSnapshot;
+    } catch {
+      fxRates = null; // never break the dashboard on a malformed cache
+    }
+  }
 
   // ─── Agent KPI rollup (current month) ─────────────────────────────────────
   const { data: agentKpisData } = await supabase
@@ -346,6 +359,7 @@ export default async function DashboardPage() {
     tasks,
     ava,
     agentKpis,
+    fxRates,
   };
 
   return <DashboardClient data={data} />;

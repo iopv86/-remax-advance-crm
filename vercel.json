@@ -17,6 +17,10 @@
     {
       "path": "/api/cron/lead-poll",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/tasas-sync",
+      "schedule": "0 11,14,17,20,23,3 * * *"
     }
   ]
 }

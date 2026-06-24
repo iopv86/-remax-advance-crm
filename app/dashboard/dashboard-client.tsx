@@ -1,6 +1,7 @@
 "use client";
 
 import { NotificationBell } from "@/components/notification-bell";
+import { FxRatePill } from "./components/fx-rate-pill";
 import Link from "next/link";
 import { Plus, Users, PhoneCall, BarChart2 } from "lucide-react";
 import type { DashboardData } from "./page";
@@ -61,7 +62,7 @@ const TODAY_LABEL = new Date().toLocaleDateString("es-DO", {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export function DashboardClient({ data }: { data: DashboardData }) {
-  const { session, kpi, pipeline, revenue6m, activity, tasks, ava, agentKpis } = data;
+  const { session, kpi, pipeline, revenue6m, activity, tasks, ava, agentKpis, fxRates } = data;
   const agentInitials = initials(session.fullName);
 
   return (
@@ -83,6 +84,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       }}>
         {/* Right: actions */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <FxRatePill snapshot={fxRates} />
           <NotificationBell />
           <a
             href="https://calendar.google.com"
