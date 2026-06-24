@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { PIPELINE_STAGE_ORDER, STAGE_LABELS } from "@/lib/types";
-import type { Deal, DealStage } from "@/lib/types";
+import type { Deal, DealStage, DealParty, DealPartyInput, DealPartyType } from "@/lib/types";
 import {
   Field,
   TextInput,
@@ -15,6 +15,22 @@ import {
   type SelectOption,
 } from "@/components/form/fields";
 import { FormShell, FormSection } from "@/components/form/form-shell";
+import { saveDealParties } from "../../actions";
+
+// One editable party row (co-buyer or referrer). UI scope: 1 of each (S4 decision).
+interface PartyRow {
+  full_name: string;
+  phone: string;
+  relationship: string;
+}
+const EMPTY_PARTY: PartyRow = { full_name: "", phone: "", relationship: "" };
+
+function pickParty(parties: DealParty[], type: DealPartyType): PartyRow {
+  const p = parties.find((x) => x.party_type === type);
+  return p
+    ? { full_name: p.full_name ?? "", phone: p.phone ?? "", relationship: p.relationship ?? "" }
+    : { ...EMPTY_PARTY };
+}
 
 const STAGE_OPTS: SelectOption[] = PIPELINE_STAGE_ORDER.map((s) => ({
   value: s,
@@ -49,16 +65,32 @@ export function DealEditForm({
   contacts,
   properties,
   currentAgentId,
+  initialParties = [],
 }: {
   deal?: Deal | null;
   contacts: ContactOption[];
   properties: PropertyOption[];
   currentAgentId?: string;
+  initialParties?: DealParty[];
 }) {
   const router = useRouter();
   const isCreate = !deal;
   const backHref = deal ? `/dashboard/pipeline/${deal.id}` : "/dashboard/pipeline";
   const [saving, setSaving] = useState(false);
+
+  const [coBuyer, setCoBuyer] = useState<PartyRow>(() => pickParty(initialParties, "co_buyer"));
+  const [referrer, setReferrer] = useState<PartyRow>(() => pickParty(initialParties, "referrer"));
+
+  function buildParties(): DealPartyInput[] {
+    const out: DealPartyInput[] = [];
+    if (coBuyer.full_name.trim()) {
+      out.push({ party_type: "co_buyer", full_name: coBuyer.full_name, phone: coBuyer.phone || null, relationship: coBuyer.relationship || null, notes: null });
+    }
+    if (referrer.full_name.trim()) {
+      out.push({ party_type: "referrer", full_name: referrer.full_name, phone: referrer.phone || null, relationship: referrer.relationship || null, notes: null });
+    }
+    return out;
+  }
 
   const [form, setForm] = useState({
     contact_id: deal?.contact_id ?? "",
@@ -117,6 +149,13 @@ export function DealEditForm({
         setSaving(false);
         return;
       }
+      const partyResult = await saveDealParties(inserted.id as string, buildParties());
+      if (!partyResult.success) {
+        setSaving(false);
+        toast.error("Oportunidad creada, pero las partes fallaron: " + partyResult.error);
+        router.push(`/dashboard/pipeline/${inserted.id}`);
+        return;
+      }
       toast.success("Oportunidad creada");
       router.push(`/dashboard/pipeline/${inserted.id}`);
       router.refresh();
@@ -129,6 +168,13 @@ export function DealEditForm({
     if (error) {
       toast.error("Error al guardar: " + error.message);
       setSaving(false);
+      return;
+    }
+    const partyResult = await saveDealParties(deal!.id, buildParties());
+    if (!partyResult.success) {
+      setSaving(false);
+      toast.error("Oportunidad guardada, pero las partes fallaron: " + partyResult.error);
+      router.push(backHref);
       return;
     }
     toast.success("Oportunidad actualizada");
@@ -182,6 +228,40 @@ export function DealEditForm({
         <Field label="Propiedad vinculada" htmlFor="property">
           <NativeSelect id="property" value={form.property_id} onChange={(v) => set("property_id", v)} options={propertyOpts} placeholder="— Ninguna —" />
         </Field>
+      </FormSection>
+
+      <FormSection title="Co-comprador">
+        <p className="text-xs mb-1" style={{ color: "var(--muted-foreground)" }}>
+          Persona que compra junto al cliente principal. Opcional.
+        </p>
+        <Field label="Nombre completo" htmlFor="cb_name">
+          <TextInput id="cb_name" value={coBuyer.full_name} onChange={(v) => setCoBuyer((p) => ({ ...p, full_name: v }))} placeholder="Nombre del co-comprador" />
+        </Field>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <Field label="Teléfono" htmlFor="cb_phone">
+            <TextInput id="cb_phone" value={coBuyer.phone} onChange={(v) => setCoBuyer((p) => ({ ...p, phone: v }))} placeholder="809-000-0000" />
+          </Field>
+          <Field label="Relación" htmlFor="cb_rel">
+            <TextInput id="cb_rel" value={coBuyer.relationship} onChange={(v) => setCoBuyer((p) => ({ ...p, relationship: v }))} placeholder="Cónyuge, socio…" />
+          </Field>
+        </div>
+      </FormSection>
+
+      <FormSection title="Referidor">
+        <p className="text-xs mb-1" style={{ color: "var(--muted-foreground)" }}>
+          Quien refirió este negocio. Opcional.
+        </p>
+        <Field label="Nombre completo" htmlFor="rf_name">
+          <TextInput id="rf_name" value={referrer.full_name} onChange={(v) => setReferrer((p) => ({ ...p, full_name: v }))} placeholder="Nombre del referidor" />
+        </Field>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <Field label="Teléfono" htmlFor="rf_phone">
+            <TextInput id="rf_phone" value={referrer.phone} onChange={(v) => setReferrer((p) => ({ ...p, phone: v }))} placeholder="809-000-0000" />
+          </Field>
+          <Field label="Relación" htmlFor="rf_rel">
+            <TextInput id="rf_rel" value={referrer.relationship} onChange={(v) => setReferrer((p) => ({ ...p, relationship: v }))} placeholder="Amigo, cliente previo…" />
+          </Field>
+        </div>
       </FormSection>
 
       <FormSection title="Notas">

@@ -166,6 +166,32 @@ export interface PropertyOwnerInput {
   notes: string | null;
 }
 
+// ─── Deal parties (Co-comprador / Referidor) — migration 0018 ─────────────────
+// PII (name + phone) is deal-scoped via RLS: readable/writable only by the owning
+// agent of the parent deal + admin/manager.
+export type DealPartyType = "co_buyer" | "referrer";
+
+export interface DealParty {
+  id: string;
+  deal_id: string;
+  party_type: DealPartyType;
+  full_name: string;
+  phone: string | null;
+  relationship: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Form/write input — server supplies deal_id, timestamps.
+export interface DealPartyInput {
+  party_type: DealPartyType;
+  full_name: string;
+  phone: string | null;
+  relationship: string | null;
+  notes: string | null;
+}
+
 export type UnitEstado = "disponible" | "vendido" | "reservado" | "bloqueado";
 
 export interface ProjectUnit {

@@ -2,7 +2,7 @@ import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { DealDetailClient } from "./deal-detail-client";
-import type { Deal, DealStage, Task } from "@/lib/types";
+import type { Deal, DealStage, Task, DealParty } from "@/lib/types";
 import type { DealActivity } from "./deal-activity";
 
 interface StageHistoryEntry {
@@ -29,7 +29,7 @@ export default async function DealDetailPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [dealResult, historyResult, tasksResult, activitiesResult] = await Promise.all([
+  const [dealResult, historyResult, tasksResult, activitiesResult, partiesResult] = await Promise.all([
     supabase
       .from("deals")
       .select(
@@ -70,6 +70,14 @@ export default async function DealDetailPage({
       .eq("deal_id", deal_id)
       .order("created_at", { ascending: false })
       .limit(100),
+
+    // PII parties (co-buyer / referrer). RLS returns [] to agents who don't own
+    // this deal; only owner + admin/manager reach this page anyway (gate below).
+    supabase
+      .from("deal_parties")
+      .select("id, deal_id, party_type, full_name, phone, relationship, notes, created_at, updated_at")
+      .eq("deal_id", deal_id)
+      .order("created_at", { ascending: true }),
   ]);
 
   if (dealResult.error || !dealResult.data) notFound();
@@ -83,6 +91,7 @@ export default async function DealDetailPage({
       history={(historyResult.data ?? []) as unknown as StageHistoryEntry[]}
       initialTasks={(tasksResult.data ?? []) as unknown as Task[]}
       initialActivities={(activitiesResult.data ?? []) as unknown as DealActivity[]}
+      parties={(partiesResult.data ?? []) as unknown as DealParty[]}
       agentId={session.agentId}
     />
   );

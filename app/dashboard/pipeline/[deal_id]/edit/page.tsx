@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
-import type { Deal } from "@/lib/types";
+import type { Deal, DealParty } from "@/lib/types";
 import { DealEditForm } from "./deal-edit-form";
 
 export default async function DealEditPage({
@@ -29,24 +29,31 @@ export default async function DealEditPage({
     .limit(500);
   if (!privileged) contactsQuery = contactsQuery.eq("agent_id", session.agentId);
 
-  const [{ data: deal }, { data: contacts }, { data: properties }] = await Promise.all([
-    supabase
-      .from("deals")
-      .select(
-        `id, contact_id, property_id, agent_id, stage, deal_value, currency,
-         commission_percentage, commission_value, expected_close_date,
-         actual_close_date, notes, priority, created_at`
-      )
-      .eq("id", deal_id)
-      .single(),
-    contactsQuery,
-    supabase
-      .from("properties")
-      .select("id, title, city, sector")
-      .eq("status", "active")
-      .order("created_at", { ascending: false })
-      .limit(300),
-  ]);
+  const [{ data: deal }, { data: contacts }, { data: properties }, { data: parties }] =
+    await Promise.all([
+      supabase
+        .from("deals")
+        .select(
+          `id, contact_id, property_id, agent_id, stage, deal_value, currency,
+           commission_percentage, commission_value, expected_close_date,
+           actual_close_date, notes, priority, created_at`
+        )
+        .eq("id", deal_id)
+        .single(),
+      contactsQuery,
+      supabase
+        .from("properties")
+        .select("id, title, city, sector")
+        .eq("status", "active")
+        .order("created_at", { ascending: false })
+        .limit(300),
+      // PII parties — RLS returns [] to agents who don't own this deal.
+      supabase
+        .from("deal_parties")
+        .select("id, deal_id, party_type, full_name, phone, relationship, notes, created_at, updated_at")
+        .eq("deal_id", deal_id)
+        .order("created_at", { ascending: true }),
+    ]);
 
   if (!deal) notFound();
   if (!privileged && deal.agent_id !== session.agentId) notFound();
@@ -57,6 +64,8 @@ export default async function DealEditPage({
         deal={deal as Deal}
         contacts={(contacts ?? []) as { id: string; first_name: string | null; last_name: string | null; agent_id: string | null }[]}
         properties={(properties ?? []) as { id: string; title: string; city: string | null; sector: string | null }[]}
+        initialParties={(parties ?? []) as DealParty[]}
+        currentAgentId={session.agentId}
       />
     </div>
   );

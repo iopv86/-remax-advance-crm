@@ -10,7 +10,7 @@ import {
   CheckSquare, Square, Plus, MessageSquare,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { STAGE_LABELS, type Deal, type DealStage, type Task } from "@/lib/types";
+import { STAGE_LABELS, type Deal, type DealStage, type Task, type DealParty } from "@/lib/types";
 import { DealActivityPanel, type DealActivity } from "./deal-activity";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -79,14 +79,20 @@ interface Props {
   history: StageHistoryEntry[];
   initialTasks: Task[];
   initialActivities: DealActivity[];
+  parties: DealParty[];
   agentId: string;
 }
+
+const PARTY_TYPE_LABELS: Record<string, string> = {
+  co_buyer: "Co-comprador",
+  referrer: "Referidor",
+};
 
 function sanitizePhone(phone: string): string {
   return phone.replace(/[\s\-\+\(\)]/g, "");
 }
 
-export function DealDetailClient({ deal: initialDeal, history, initialTasks, initialActivities, agentId }: Props) {
+export function DealDetailClient({ deal: initialDeal, history, initialTasks, initialActivities, parties, agentId }: Props) {
   const router = useRouter();
   const [deal, setDeal] = useState(initialDeal);
   const [tasks, setTasks] = useState<Task[]>(initialTasks);
@@ -656,6 +662,41 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                 formName={contact.meta_form_name}
                 platform={contact.meta_platform}
               />
+            )}
+
+            {/* Co-comprador / Referidor — PII gated by RLS + page-level owner check */}
+            {parties.length > 0 && (
+              <div className="card-base p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                    Co-comprador / Referidor
+                  </p>
+                  <Link href={`/dashboard/pipeline/${deal.id}/edit`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
+                    Editar <ChevronRight className="w-3 h-3" />
+                  </Link>
+                </div>
+                <div className="space-y-3">
+                  {parties.map((p) => (
+                    <div key={p.id} style={{ paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>{p.full_name}</span>
+                        <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 999, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
+                          {PARTY_TYPE_LABELS[p.party_type] ?? p.party_type}
+                        </span>
+                      </div>
+                      {p.relationship && (
+                        <p className="text-xs mb-1" style={{ color: "var(--muted-foreground)" }}>{p.relationship}</p>
+                      )}
+                      {p.phone && (
+                        <div className="flex items-center gap-3">
+                          <a href={`tel:${sanitizePhone(p.phone)}`} className="text-sm transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>{p.phone}</a>
+                          <a href={`https://wa.me/${sanitizePhone(p.phone)}`} target="_blank" rel="noopener noreferrer" className="text-xs transition-colors hover:opacity-80" style={{ color: "var(--muted-foreground)" }}>WhatsApp</a>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Notes */}
