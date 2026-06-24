@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ChevronLeft, Upload, X, Download, FileText, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { createProperty, updateProperty } from "@/app/dashboard/properties/actions";
+import { createProperty, updateProperty, savePropertyOwners } from "@/app/dashboard/properties/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Property } from "@/lib/types";
+import type { Property, PropertyOwner, PropertyOwnerInput } from "@/lib/types";
 import {
   type CsvRowParsed,
   CSV_HEADERS,
@@ -200,6 +200,34 @@ function propertyToForm(p: Property): FormState {
   };
 }
 
+// ─── Owner (Propietario) state ────────────────────────────────────────────────
+interface OwnerFields {
+  full_name: string;
+  phone: string;
+  email: string;
+  notes: string;
+}
+
+const EMPTY_OWNER: OwnerFields = { full_name: "", phone: "", email: "", notes: "" };
+
+function ownerToFields(o: PropertyOwner): OwnerFields {
+  return {
+    full_name: o.full_name ?? "",
+    phone: o.phone ?? "",
+    email: o.email ?? "",
+    notes: o.notes ?? "",
+  };
+}
+
+function fieldsToInput(o: OwnerFields): PropertyOwnerInput {
+  return {
+    full_name: o.full_name.trim(),
+    phone: o.phone.trim() || null,
+    email: o.email.trim() || null,
+    notes: o.notes.trim() || null,
+  };
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function FieldLabel({ children }: { children: React.ReactNode }) {
@@ -278,15 +306,28 @@ function AmenityCheckbox({ label, checked, onChange }: { label: string; checked:
 export interface PropertyFormProps {
   mode: "create" | "edit";
   initialData?: Property;
+  initialOwners?: PropertyOwner[];
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export function PropertyForm({ mode, initialData }: PropertyFormProps) {
+export function PropertyForm({ mode, initialData, initialOwners }: PropertyFormProps) {
   const router = useRouter();
   const isEdit = mode === "edit";
   const [form, setForm] = useState<FormState>(initialData ? propertyToForm(initialData) : EMPTY_FORM);
   const [images, setImages] = useState<string[]>(initialData?.images ?? []);
+
+  // ── Owners (Propietarios) — primary + optional co-owner ──────────────────────
+  const sortedOwners = (initialOwners ?? [])
+    .slice()
+    .sort((a, b) => (a.is_primary === b.is_primary ? 0 : a.is_primary ? -1 : 1));
+  const [primaryOwner, setPrimaryOwner] = useState<OwnerFields>(
+    sortedOwners[0] ? ownerToFields(sortedOwners[0]) : EMPTY_OWNER,
+  );
+  const [coOwner, setCoOwner] = useState<OwnerFields>(
+    sortedOwners[1] ? ownerToFields(sortedOwners[1]) : EMPTY_OWNER,
+  );
+  const [showCoOwner, setShowCoOwner] = useState<boolean>(Boolean(sortedOwners[1]));
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -313,6 +354,12 @@ export function PropertyForm({ mode, initialData }: PropertyFormProps) {
 
   function set<K extends keyof FormState>(field: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+  }
+
+  function setOwner(which: "primary" | "co", field: keyof OwnerFields, value: string) {
+    const setter = which === "primary" ? setPrimaryOwner : setCoOwner;
+    setter((prev) => ({ ...prev, [field]: value }));
     setIsDirty(true);
   }
 
@@ -520,11 +567,24 @@ export function PropertyForm({ mode, initialData }: PropertyFormProps) {
       setCsvProgress(null);
     }
 
+    // Save owners (primary + optional co-owner). Empty-name rows are dropped server-side.
+    const ownerInputs: PropertyOwnerInput[] = [fieldsToInput(primaryOwner)];
+    if (showCoOwner && coOwner.full_name.trim()) {
+      ownerInputs.push(fieldsToInput(coOwner));
+    }
+    const ownerResult = await savePropertyOwners(savedId, ownerInputs);
+    if (!ownerResult.success) {
+      setSaving(false);
+      toast.error("Propiedad guardada, pero el propietario falló: " + ownerResult.error);
+      router.push(`/dashboard/properties/${savedId}`);
+      return;
+    }
+
     setSaving(false);
     setIsDirty(false);
     toast.success(isEdit ? "Propiedad actualizada" : "Propiedad creada");
     router.push(`/dashboard/properties/${savedId}`);
-  }, [form, images, csvRows, isEdit, initialData, priceOverride, router]);
+  }, [form, images, csvRows, isEdit, initialData, priceOverride, router, primaryOwner, coOwner, showCoOwner]);
 
   // ─────────────────────────────────────────────────────────────────────────────
   // RENDER
@@ -840,6 +900,119 @@ export function PropertyForm({ mode, initialData }: PropertyFormProps) {
               />
             ))}
           </div>
+        </SectionCard>
+
+        {/* ── Propietario ──────────────────────────────────────────────────── */}
+        <SectionCard title="Propietario">
+          <p style={{ margin: "-8px 0 16px", fontSize: 12, color: TEXT_MUTED }}>
+            Datos privados del propietario. Solo visibles para ti (agente responsable) y la administración.
+          </p>
+          <FieldRow cols={2}>
+            <div>
+              <FieldLabel>Nombre del propietario</FieldLabel>
+              <Input
+                value={primaryOwner.full_name}
+                onChange={(e) => setOwner("primary", "full_name", e.target.value)}
+                placeholder="Ej. Juan Pérez"
+                style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+              />
+            </div>
+            <div>
+              <FieldLabel>Teléfono</FieldLabel>
+              <Input
+                value={primaryOwner.phone}
+                onChange={(e) => setOwner("primary", "phone", e.target.value)}
+                placeholder="Ej. +1 809 555 1234"
+                style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+              />
+            </div>
+          </FieldRow>
+          <FieldRow cols={2}>
+            <div>
+              <FieldLabel>Email</FieldLabel>
+              <Input
+                value={primaryOwner.email}
+                onChange={(e) => setOwner("primary", "email", e.target.value)}
+                placeholder="correo@ejemplo.com"
+                style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+              />
+            </div>
+            <div>
+              <FieldLabel>Notas</FieldLabel>
+              <Input
+                value={primaryOwner.notes}
+                onChange={(e) => setOwner("primary", "notes", e.target.value)}
+                placeholder="Ej. Prefiere llamadas por la tarde"
+                style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+              />
+            </div>
+          </FieldRow>
+
+          {!showCoOwner ? (
+            <button
+              type="button"
+              onClick={() => setShowCoOwner(true)}
+              style={{ marginTop: 4, background: "none", border: "none", color: GOLD, cursor: "pointer", fontSize: 13, padding: 0 }}
+            >
+              + Agregar co-propietario / contacto
+            </button>
+          ) : (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${BORDER}` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: TEXT_PRIMARY }}>Co-propietario / contacto</p>
+                <button
+                  type="button"
+                  onClick={() => { setShowCoOwner(false); setCoOwner(EMPTY_OWNER); setIsDirty(true); }}
+                  style={{ display: "flex", alignItems: "center", gap: 4, background: "none", border: "none", color: TEXT_MUTED, cursor: "pointer", fontSize: 12 }}
+                >
+                  <X size={13} /> Quitar
+                </button>
+              </div>
+              <FieldRow cols={2}>
+                <div>
+                  <FieldLabel>Nombre</FieldLabel>
+                  <Input
+                    value={coOwner.full_name}
+                    onChange={(e) => setOwner("co", "full_name", e.target.value)}
+                    placeholder="Ej. María Pérez"
+                    style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Teléfono</FieldLabel>
+                  <Input
+                    value={coOwner.phone}
+                    onChange={(e) => setOwner("co", "phone", e.target.value)}
+                    placeholder="Ej. +1 809 555 5678"
+                    style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+                  />
+                </div>
+              </FieldRow>
+              <FieldRow cols={2}>
+                <div>
+                  <FieldLabel>Email</FieldLabel>
+                  <Input
+                    value={coOwner.email}
+                    onChange={(e) => setOwner("co", "email", e.target.value)}
+                    placeholder="correo@ejemplo.com"
+                    style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+                  />
+                </div>
+                <div>
+                  <FieldLabel>Notas</FieldLabel>
+                  <Input
+                    value={coOwner.notes}
+                    onChange={(e) => setOwner("co", "notes", e.target.value)}
+                    placeholder="Relación, observaciones…"
+                    style={{ background: BG_SURFACE, border: `1px solid ${BORDER}`, color: TEXT_PRIMARY }}
+                  />
+                </div>
+              </FieldRow>
+              <p style={{ margin: "4px 0 0", fontSize: 11, color: TEXT_MUTED }}>
+                Si dejas el nombre vacío, el co-propietario no se guarda.
+              </p>
+            </div>
+          )}
         </SectionCard>
 
         {/* ── Descripción ──────────────────────────────────────────────────── */}

@@ -143,6 +143,29 @@ export interface Property {
   created_at: string;
 }
 
+// ─── Property owners (Propietarios) — migration 0017 ──────────────────────────
+// PII (name + phone) is owner-scoped via RLS: readable/writable only by the
+// listing agent of the parent property + admin/manager.
+export interface PropertyOwner {
+  id: string;
+  property_id: string;
+  full_name: string;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Form/write input — server supplies property_id, is_primary (by position), timestamps.
+export interface PropertyOwnerInput {
+  full_name: string;
+  phone: string | null;
+  email: string | null;
+  notes: string | null;
+}
+
 export type UnitEstado = "disponible" | "vendido" | "reservado" | "bloqueado";
 
 export interface ProjectUnit {

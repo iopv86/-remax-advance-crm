@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Bed, Bath, Square, Car, Home, Calendar, Tag, MessageSquare, FileText, Building2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, ExternalLink, MapPin, Bed, Bath, Square, Car, Home, Calendar, Tag, MessageSquare, FileText, Building2, User, Phone, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import type { PropertyType, CurrencyType } from "@/lib/types";
+import type { PropertyType, CurrencyType, PropertyOwner } from "@/lib/types";
 import { STAGE_LABELS } from "@/lib/types";
 import { PropertyUnitsTab } from "./property-units-tab";
 import { LoanCalculator } from "@/components/loan-calculator";
@@ -237,6 +237,61 @@ function Spec({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
+function OwnerEntry({ owner, isPrimary }: { owner: PropertyOwner; isPrimary: boolean }) {
+  return (
+    <div style={{ paddingTop: isPrimary ? 0 : 14, marginTop: isPrimary ? 0 : 14, borderTop: isPrimary ? "none" : `1px solid ${BORDER_DIM}` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+        <User style={{ width: 14, height: 14, color: GOLD }} />
+        <span style={{ fontSize: 14, fontWeight: 600, color: TEXT_PRIMARY }}>{owner.full_name}</span>
+        <span style={{ fontSize: 10, fontWeight: 600, color: TEXT_MUTED, letterSpacing: "0.04em", padding: "2px 6px", borderRadius: 4, background: BORDER_DIM }}>
+          {isPrimary ? "PRINCIPAL" : "CO-PROPIETARIO"}
+        </span>
+      </div>
+      {owner.phone && (
+        <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+          <a
+            href={`tel:${owner.phone}`}
+            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "7px 0", background: BG_SURFACE, color: TEXT_MUTED, fontSize: 12, borderRadius: 8, border: `1px solid ${BORDER_DIM}`, textDecoration: "none" }}
+          >
+            <Phone style={{ width: 12, height: 12 }} /> {owner.phone}
+          </a>
+          <a
+            href={`https://wa.me/${sanitizePhone(owner.phone)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "7px 12px", background: "rgba(37,211,102,0.1)", color: "#25D366", fontSize: 12, borderRadius: 8, border: "1px solid rgba(37,211,102,0.2)", textDecoration: "none" }}
+          >
+            <MessageSquare style={{ width: 12, height: 12 }} />
+          </a>
+        </div>
+      )}
+      {owner.email && (
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: TEXT_MUTED, marginBottom: 4 }}>
+          <Mail style={{ width: 12, height: 12, flexShrink: 0 }} />
+          <a href={`mailto:${owner.email}`} style={{ color: TEXT_MUTED, textDecoration: "none", overflow: "hidden", textOverflow: "ellipsis" }}>{owner.email}</a>
+        </div>
+      )}
+      {owner.notes && (
+        <p style={{ margin: "4px 0 0", fontSize: 12, color: TEXT_MUTED, lineHeight: 1.5, whiteSpace: "pre-wrap" }}>{owner.notes}</p>
+      )}
+    </div>
+  );
+}
+
+function OwnerCard({ owners }: { owners: PropertyOwner[] }) {
+  if (owners.length === 0) return null;
+  return (
+    <div style={{ background: BG_ELEVATED, border: `1px solid ${BORDER_GOLD}`, borderRadius: 14, padding: 20 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: TEXT_MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 14 }}>
+        Propietario
+      </div>
+      {owners.map((o) => (
+        <OwnerEntry key={o.id} owner={o} isPrimary={o.is_primary} />
+      ))}
+    </div>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 type DetailTab = "info" | "unidades";
@@ -244,11 +299,13 @@ type DetailTab = "info" | "unidades";
 export function PropertyDetailClient({
   property,
   deals,
+  owners,
   canEdit,
   initialTab,
 }: {
   property: PropertyDetail;
   deals: DealEntry[];
+  owners: PropertyOwner[];
   canEdit: boolean;
   initialTab?: DetailTab;
 }) {
@@ -711,6 +768,9 @@ export function PropertyDetailClient({
                 )}
               </div>
             )}
+
+            {/* Owner card (PII — only authorized viewers receive owners) */}
+            {canEdit && <OwnerCard owners={owners} />}
 
             {/* Loan calculator */}
             <LoanCalculator initialPrice={property.price} currency={property.currency} />

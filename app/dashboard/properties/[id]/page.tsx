@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { PropertyDetailClient, type PropertyDetail } from "./property-detail-client";
+import type { PropertyOwner } from "@/lib/types";
 
 export default async function PropertyDetailPage({
   params,
@@ -39,10 +40,24 @@ export default async function PropertyDetailPage({
     .order("created_at", { ascending: false })
     .limit(20);
 
+  // Owners are PII (owner-scoped RLS). Only query for authorized viewers; non-listing
+  // agents never fetch the data (defense in depth on top of RLS).
+  let owners: PropertyOwner[] = [];
+  if (canEdit) {
+    const { data: ownerRows } = await supabase
+      .from("property_owners")
+      .select("id, property_id, full_name, phone, email, notes, is_primary, created_at, updated_at")
+      .eq("property_id", id)
+      .order("is_primary", { ascending: false })
+      .order("created_at", { ascending: true });
+    owners = (ownerRows as PropertyOwner[]) ?? [];
+  }
+
   return (
     <PropertyDetailClient
       property={property}
       deals={(deals as any[]) ?? []}
+      owners={owners}
       canEdit={canEdit}
       initialTab={tab === "unidades" ? "unidades" : "info"}
     />
