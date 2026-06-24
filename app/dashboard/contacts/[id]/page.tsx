@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { STAGE_LABELS } from "@/lib/types";
 import type { Deal, Task, Message, DealStage, LeadClassification } from "@/lib/types";
 import { ContactActions } from "./contact-actions";
+import { ClassificationQuickEdit } from "./classification-quick-edit";
 import { ContactWhatsApp } from "./contact-whatsapp";
 import { ContactDocuments } from "./contact-documents";
 import type { ContactDocument } from "./contact-documents";
@@ -16,6 +17,15 @@ import type { ContactActivity as ContactActivityType } from "./contact-activity"
 import { MatchedProperties } from "./matched-properties";
 import { LeadFormAnswers } from "@/components/contacts/lead-form-answers";
 import { getMatchedProperties } from "@/lib/properties/matching";
+import {
+  PROPERTY_TYPE_LABELS,
+  OPERATION_TYPE_LABELS,
+  CONDITION_LABELS,
+  TIMELINE_LABELS,
+  PURPOSE_LABELS,
+  PAYMENT_LABELS,
+  AMENITY_LABELS,
+} from "@/lib/intereses-labels";
 
 type ContactTab = "resumen" | "actividad" | "documentos" | "whatsapp";
 
@@ -58,19 +68,6 @@ const STAGE_ACCENT: Record<DealStage, string> = {
   closed_won: "var(--emerald)",
   closed_lost: "#94a3b8",
 };
-
-function getClassificationStyle(c?: string) {
-  switch (c) {
-    case "hot":
-      return { bg: "rgba(16,185,129,0.12)", color: "#10b981", border: "rgba(16,185,129,0.25)", label: "Lead Caliente" };
-    case "warm":
-      return { bg: "rgba(251,146,60,0.12)", color: "#fb923c", border: "rgba(251,146,60,0.25)", label: "Warm Lead" };
-    case "cold":
-      return { bg: "rgba(129,140,248,0.12)", color: "#818cf8", border: "rgba(129,140,248,0.25)", label: "Lead Frío" };
-    default:
-      return { bg: "var(--glass-bg)", color: "var(--muted-foreground)", border: "var(--glass-border-md)", label: "Sin clasificar" };
-  }
-}
 
 export default async function ContactDetailPage({
   params,
@@ -143,7 +140,6 @@ export default async function ContactDetailPage({
       .toUpperCase() || "?";
 
   const classification = contact.lead_classification as LeadClassification | undefined;
-  const classStyle = getClassificationStyle(classification);
 
   // Top deal (most recent active)
   const topDeal = (deals ?? []).find((d) => d.stage !== "closed_lost") as Deal | undefined;
@@ -256,16 +252,7 @@ export default async function ContactDetailPage({
                 {fullName}
               </h3>
 
-              <div
-                className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border"
-                style={{
-                  background: classStyle.bg,
-                  color: classStyle.color,
-                  borderColor: classStyle.border,
-                }}
-              >
-                {classStyle.label}
-              </div>
+              <ClassificationQuickEdit contactId={id} classification={classification} />
 
               {/* Action buttons */}
               <div className="flex gap-2 w-full mt-4">
@@ -412,6 +399,97 @@ export default async function ContactDetailPage({
                   </p>
                 </div>
               )}
+
+              {/* Intereses */}
+              {(() => {
+                const types = (contact.property_types ?? []) as string[];
+                const amenities = (contact.desired_amenities ?? []) as string[];
+                // Dedupe — legacy rows may hold repeated zones; chip keys must be unique.
+                const zones = [...new Set((contact.preferred_locations ?? []) as string[])];
+                const hasIntereses =
+                  types.length > 0 ||
+                  amenities.length > 0 ||
+                  zones.length > 0 ||
+                  contact.operation_type ||
+                  contact.condition ||
+                  contact.bedrooms != null ||
+                  contact.timeline ||
+                  contact.purpose ||
+                  contact.payment_method;
+                if (!hasIntereses) return null;
+                const rows: { label: string; value: string }[] = [];
+                if (contact.operation_type)
+                  rows.push({ label: "Operación", value: OPERATION_TYPE_LABELS[contact.operation_type] ?? contact.operation_type });
+                if (contact.condition)
+                  rows.push({ label: "Condición", value: CONDITION_LABELS[contact.condition] ?? contact.condition });
+                if (contact.bedrooms != null)
+                  rows.push({ label: "Habitaciones", value: `${contact.bedrooms}` });
+                if (contact.timeline)
+                  rows.push({ label: "Timeline", value: TIMELINE_LABELS[contact.timeline] ?? contact.timeline });
+                if (contact.purpose)
+                  rows.push({ label: "Propósito", value: PURPOSE_LABELS[contact.purpose] ?? contact.purpose });
+                if (contact.payment_method)
+                  rows.push({ label: "Método de pago", value: PAYMENT_LABELS[contact.payment_method] ?? contact.payment_method });
+                const chip = (text: string) => (
+                  <span
+                    key={text}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      padding: "3px 10px",
+                      borderRadius: 999,
+                      fontSize: 12,
+                      background: "var(--accent)",
+                      color: "var(--accent-foreground)",
+                      border: "1px solid var(--border)",
+                    }}
+                  >
+                    {text}
+                  </span>
+                );
+                return (
+                  <div style={{ borderBottom: "1px solid var(--glass-border)", paddingBottom: 16 }}>
+                    <p
+                      className="font-bold text-sm mb-3"
+                      style={{ fontFamily: "var(--font-manrope), Manrope, sans-serif", color: "var(--foreground)" }}
+                    >
+                      Intereses
+                    </p>
+                    {types.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-xs mb-1.5" style={{ color: "var(--muted-foreground)" }}>Tipo de propiedad</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {types.map((t) => chip(PROPERTY_TYPE_LABELS[t] ?? t))}
+                        </div>
+                      </div>
+                    )}
+                    {rows.length > 0 && (
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        {rows.map((r) => (
+                          <div key={r.label}>
+                            <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{r.label}</p>
+                            <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>{r.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {zones.length > 0 && (
+                      <div className="mb-3">
+                        <p className="text-xs mb-1.5" style={{ color: "var(--muted-foreground)" }}>Zonas de interés</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{zones.map((z) => chip(z))}</div>
+                      </div>
+                    )}
+                    {amenities.length > 0 && (
+                      <div>
+                        <p className="text-xs mb-1.5" style={{ color: "var(--muted-foreground)" }}>Amenidades deseadas</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                          {amenities.map((a) => chip(AMENITY_LABELS[a] ?? a))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Lo que busca */}
               {contact.ai_summary && (

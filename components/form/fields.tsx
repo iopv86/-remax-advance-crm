@@ -172,6 +172,67 @@ export function NativeSelect({
 }
 
 /**
+ * Multi-select over a fixed vocabulary, backed by a string[]. Renders every
+ * option as a toggle pill (no native <select multiple> — unusable on dark
+ * mobile). Selected pills reuse the TagInput chip look; unselected pills are
+ * outlined. Theme tokens only. Immutable toggles.
+ */
+export function MultiSelect({
+  id,
+  value,
+  onChange,
+  options,
+  placeholder,
+}: {
+  id?: string;
+  value: string[];
+  onChange: (v: string[]) => void;
+  options: SelectOption[];
+  placeholder?: string;
+}) {
+  function toggle(v: string) {
+    onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v]);
+  }
+  return (
+    <div id={id} style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+      {value.length === 0 && placeholder && (
+        <span style={{ fontSize: 12, color: "var(--muted-foreground)", alignSelf: "center" }}>
+          {placeholder}
+        </span>
+      )}
+      {options.map((o) => {
+        const selected = value.includes(o.value);
+        return (
+          <button
+            key={o.value}
+            type="button"
+            onClick={() => toggle(o.value)}
+            aria-pressed={selected}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "5px 11px",
+              borderRadius: 999,
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: "pointer",
+              transition: "all 120ms",
+              background: selected ? "var(--accent)" : "var(--glass-bg)",
+              color: selected ? "var(--accent-foreground)" : "var(--muted-foreground)",
+              border: `1px solid ${selected ? "var(--border)" : "var(--glass-border)"}`,
+            }}
+          >
+            {o.label}
+            {selected && <span style={{ lineHeight: 1, opacity: 0.75 }}>×</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/**
  * Comma/Enter-driven tag input backed by a string[] (e.g. preferred_locations).
  * Adds a tag on Enter or comma; removes the last tag on Backspace when the
  * draft is empty; click a chip's × to remove it.

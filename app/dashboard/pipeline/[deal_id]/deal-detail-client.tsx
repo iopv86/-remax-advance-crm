@@ -14,6 +14,15 @@ import { STAGE_LABELS, type Deal, type DealStage, type Task } from "@/lib/types"
 import { DealActivityPanel, type DealActivity } from "./deal-activity";
 import { format, parseISO, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
+import {
+  PROPERTY_TYPE_LABELS,
+  OPERATION_TYPE_LABELS,
+  CONDITION_LABELS,
+  TIMELINE_LABELS,
+  PURPOSE_LABELS,
+  PAYMENT_LABELS,
+  AMENITY_LABELS,
+} from "@/lib/intereses-labels";
 
 const ALL_STAGES: DealStage[] = [
   "nuevo_sin_contactar", "lead_captured", "qualified", "contacted", "showing_scheduled",
@@ -100,7 +109,22 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
   const [newTaskPriority, setNewTaskPriority] = useState<"high" | "medium" | "low">("medium");
   const [savingTask, setSavingTask] = useState(false);
 
-  const contact = deal.contact as { id: string; first_name?: string | null; last_name?: string | null; email?: string | null; phone?: string | null } | null;
+  const contact = deal.contact as {
+    id: string;
+    first_name?: string | null;
+    last_name?: string | null;
+    email?: string | null;
+    phone?: string | null;
+    property_types?: string[] | null;
+    operation_type?: string | null;
+    condition?: string | null;
+    desired_amenities?: string[] | null;
+    bedrooms?: number | null;
+    timeline?: string | null;
+    purpose?: string | null;
+    payment_method?: string | null;
+    preferred_locations?: string[] | null;
+  } | null;
   const property = deal.property;
   const agent = deal.agent as { full_name?: string | null; email?: string | null } | null;
 
@@ -545,6 +569,70 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                 </div>
               </div>
             </div>
+
+            {/* Intereses del cliente — surfaced read-only from the linked contact */}
+            {contact && (() => {
+              const types = contact.property_types ?? [];
+              const amenities = contact.desired_amenities ?? [];
+              // Dedupe — legacy rows may hold repeated zones; chip keys must be unique.
+              const zones = [...new Set(contact.preferred_locations ?? [])];
+              const rows: { label: string; value: string }[] = [];
+              if (contact.operation_type) rows.push({ label: "Operación", value: OPERATION_TYPE_LABELS[contact.operation_type] ?? contact.operation_type });
+              if (contact.condition) rows.push({ label: "Condición", value: CONDITION_LABELS[contact.condition] ?? contact.condition });
+              if (contact.bedrooms != null) rows.push({ label: "Habitaciones", value: `${contact.bedrooms}` });
+              if (contact.timeline) rows.push({ label: "Timeline", value: TIMELINE_LABELS[contact.timeline] ?? contact.timeline });
+              if (contact.purpose) rows.push({ label: "Propósito", value: PURPOSE_LABELS[contact.purpose] ?? contact.purpose });
+              if (contact.payment_method) rows.push({ label: "Pago", value: PAYMENT_LABELS[contact.payment_method] ?? contact.payment_method });
+              const hasAny = types.length > 0 || amenities.length > 0 || zones.length > 0 || rows.length > 0;
+              if (!hasAny) return null;
+              const chip = (text: string) => (
+                <span key={text} style={{ display: "inline-flex", alignItems: "center", padding: "3px 10px", borderRadius: 999, fontSize: 12, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
+                  {text}
+                </span>
+              );
+              return (
+                <div className="card-base p-5">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                      Intereses del cliente
+                    </p>
+                    <Link href={`/dashboard/contacts/${contact.id}/edit`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
+                      Editar <ChevronRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                  <div className="space-y-3">
+                    {types.length > 0 && (
+                      <div>
+                        <p className="text-xs mb-1.5" style={{ color: "var(--muted-foreground)" }}>Tipo de propiedad</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{types.map((t) => chip(PROPERTY_TYPE_LABELS[t] ?? t))}</div>
+                      </div>
+                    )}
+                    {rows.length > 0 && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {rows.map((r) => (
+                          <div key={r.label}>
+                            <p className="text-xs" style={{ color: "var(--muted-foreground)" }}>{r.label}</p>
+                            <p className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>{r.value}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    {zones.length > 0 && (
+                      <div>
+                        <p className="text-xs mb-1.5" style={{ color: "var(--muted-foreground)" }}>Zonas de interés</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{zones.map((z) => chip(z))}</div>
+                      </div>
+                    )}
+                    {amenities.length > 0 && (
+                      <div>
+                        <p className="text-xs mb-1.5" style={{ color: "var(--muted-foreground)" }}>Amenidades deseadas</p>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>{amenities.map((a) => chip(AMENITY_LABELS[a] ?? a))}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Notes */}
             <div className="card-base p-5">

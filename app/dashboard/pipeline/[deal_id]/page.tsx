@@ -36,7 +36,9 @@ export default async function DealDetailPage({
         `id, contact_id, property_id, agent_id, stage, deal_value, currency,
          commission_percentage, commission_value, expected_close_date,
          actual_close_date, lost_reason, notes, priority, created_at, updated_at,
-         contact:contacts(id, first_name, last_name, email, phone),
+         contact:contacts(id, first_name, last_name, email, phone,
+           property_types, operation_type, condition, desired_amenities, bedrooms,
+           timeline, purpose, payment_method, preferred_locations),
          property:properties(id, title, city, sector, price, currency),
          agent:agents(id, full_name, email)`
       )

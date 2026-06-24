@@ -19,18 +19,27 @@ export async function getMatchedProperties(contactId: string): Promise<PropertyM
 
   const { data: contact, error: contactError } = await supabase
     .from("contacts")
-    .select("budget_min, budget_max, budget_currency, property_type_interest")
+    .select("budget_min, budget_max, budget_currency, property_type_interest, property_types")
     .eq("id", contactId)
     .single();
 
   if (contactError || !contact) return [];
 
-  const { budget_min, budget_max, property_type_interest } = contact as {
+  const { budget_min, budget_max, property_type_interest, property_types } = contact as {
     budget_min: number | null;
     budget_max: number | null;
     budget_currency: CurrencyType | null;
     property_type_interest: PropertyType | null;
+    property_types: PropertyType[] | null;
   };
+
+  // Prefer the multi-select array; fall back to the legacy scalar (kept in sync by the DB trigger).
+  const wantedTypes: PropertyType[] =
+    property_types && property_types.length > 0
+      ? property_types
+      : property_type_interest
+        ? [property_type_interest]
+        : [];
 
   // No budget data means Ava hasn't captured preferences yet — return empty
   if (budget_min == null && budget_max == null) return [];
@@ -50,7 +59,7 @@ export async function getMatchedProperties(contactId: string): Promise<PropertyM
     .map((p) => ({
       ...p,
       match_score: (
-        property_type_interest != null && p.property_type === property_type_interest
+        wantedTypes.length > 0 && wantedTypes.includes(p.property_type)
       ) ? 2 : 1,
     } as PropertyMatch))
     .sort((a, b) => b.match_score - a.match_score || a.price - b.price)

@@ -11,11 +11,21 @@ import {
   NumberInput,
   TextArea,
   NativeSelect,
+  MultiSelect,
   TagInput,
   type SelectOption,
 } from "@/components/form/fields";
 import { FormShell, FormSection } from "@/components/form/form-shell";
 import { LeadFormAnswers } from "@/components/contacts/lead-form-answers";
+import {
+  PROPERTY_TYPE_OPTS,
+  OPERATION_TYPE_OPTS,
+  CONDITION_OPTS,
+  TIMELINE_OPTS,
+  PAYMENT_OPTS,
+  PURPOSE_OPTS,
+  AMENITY_OPTS,
+} from "@/lib/intereses-labels";
 
 const CLASSIFICATION_OPTS: SelectOption[] = [
   { value: "hot", label: "Caliente (HOT)" },
@@ -40,37 +50,8 @@ const SOURCE_OPTS: SelectOption[] = [
   { value: "social_media", label: "Redes sociales" },
   { value: "other", label: "Otro" },
 ];
-const PROPERTY_TYPE_OPTS: SelectOption[] = [
-  { value: "apartment", label: "Apartamento" },
-  { value: "penthouse", label: "Penthouse" },
-  { value: "villa", label: "Villa" },
-  { value: "house", label: "Casa" },
-  { value: "land", label: "Terreno / Solar" },
-  { value: "commercial", label: "Comercial" },
-  { value: "apart_hotel", label: "Apart-hotel" },
-  { value: "farm", label: "Finca" },
-];
-// Values MUST match the Postgres enums (purpose_type / timeline_type /
-// payment_method). Labels stay in Spanish; only the stored value is the enum.
-const PURPOSE_OPTS: SelectOption[] = [
-  { value: "investment", label: "Inversión" },
-  { value: "personal", label: "Uso personal" },
-  { value: "both", label: "Ambos" },
-];
-const TIMELINE_OPTS: SelectOption[] = [
-  { value: "immediate", label: "Inmediato" },
-  { value: "1_3_months", label: "1 – 3 meses" },
-  { value: "3_6_months", label: "3 – 6 meses" },
-  { value: "6_12_months", label: "6 – 12 meses" },
-  { value: "exploring", label: "Solo explorando" },
-];
-const PAYMENT_OPTS: SelectOption[] = [
-  { value: "cash", label: "Contado" },
-  { value: "financing", label: "Financiamiento bancario" },
-  { value: "mixed", label: "Mixto" },
-  { value: "crypto", label: "Cripto" },
-  { value: "unknown", label: "Otro / Sin definir" },
-];
+// Property type / operation / condition / timeline / payment / purpose / amenity
+// option arrays come from lib/intereses-labels (shared with the read surfaces).
 const CURRENCY_OPTS: SelectOption[] = [
   { value: "USD", label: "USD (US$)" },
   { value: "DOP", label: "DOP (RD$)" },
@@ -116,7 +97,13 @@ export function ContactEditForm({
     source: contact?.source ?? (isCreate ? "referral" : "other"),
     source_detail: contact?.source_detail ?? "",
     agent_id: contact?.agent_id ?? "",
-    property_type_interest: contact?.property_type_interest ?? "",
+    // Canonical multi-select (migration 0015). The DB mirror trigger keeps the
+    // legacy scalar property_type_interest in sync, so we only write the array.
+    property_types: (contact?.property_types ?? []) as string[],
+    desired_amenities: (contact?.desired_amenities ?? []) as string[],
+    operation_type: contact?.operation_type ?? "",
+    condition: contact?.condition ?? "",
+    bedrooms: contact?.bedrooms?.toString() ?? "",
     preferred_locations: (contact?.preferred_locations ?? []) as string[],
     purpose: contact?.purpose ?? "",
     timeline: contact?.timeline ?? "",
@@ -165,7 +152,14 @@ export function ContactEditForm({
       // Only touch source_detail when the field is actually shown — never null
       // a previously-recorded value just because the source type hides it.
       ...(showSourceDetail ? { source_detail: form.source_detail.trim() || null } : {}),
-      property_type_interest: form.property_type_interest || null,
+      // Write the canonical array only; the 0015 mirror trigger updates the
+      // legacy scalar property_type_interest. null on empty → clears the array.
+      property_types: form.property_types.length ? form.property_types : null,
+      // desired_amenities is NOT NULL default '{}' — always send an array.
+      desired_amenities: form.desired_amenities,
+      operation_type: form.operation_type || null,
+      condition: form.condition || null,
+      bedrooms: form.bedrooms ? parseInt(form.bedrooms, 10) : null,
       preferred_locations: form.preferred_locations.length ? form.preferred_locations : null,
       purpose: form.purpose || null,
       timeline: form.timeline || null,
@@ -280,14 +274,25 @@ export function ContactEditForm({
       </FormSection>
 
       <FormSection title="Búsqueda inmobiliaria" description="Qué busca el cliente y cómo lo busca.">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 120px", gap: 14 }}>
           <Field label="Intereses / Propósito" htmlFor="purpose">
             <NativeSelect id="purpose" value={form.purpose} onChange={(v) => set("purpose", v)} options={PURPOSE_OPTS} placeholder="— Seleccionar —" />
           </Field>
-          <Field label="Tipo de propiedad" htmlFor="ptype">
-            <NativeSelect id="ptype" value={form.property_type_interest} onChange={(v) => set("property_type_interest", v as Contact["property_type_interest"] & string)} options={PROPERTY_TYPE_OPTS} placeholder="— Seleccionar —" />
+          <Field label="Operación" htmlFor="operation">
+            <NativeSelect id="operation" value={form.operation_type} onChange={(v) => set("operation_type", v as Contact["operation_type"] & string)} options={OPERATION_TYPE_OPTS} placeholder="— Seleccionar —" />
+          </Field>
+          <Field label="Habitaciones" htmlFor="bedrooms">
+            <NumberInput id="bedrooms" value={form.bedrooms} onChange={(v) => set("bedrooms", v)} placeholder="Ej: 3" />
           </Field>
         </div>
+
+        <Field label="Tipo de propiedad" htmlFor="ptype" hint="Selecciona una o varias categorías.">
+          <MultiSelect id="ptype" value={form.property_types} onChange={(v) => set("property_types", v)} options={PROPERTY_TYPE_OPTS} placeholder="— Ninguna seleccionada —" />
+        </Field>
+
+        <Field label="Condición" htmlFor="condition">
+          <NativeSelect id="condition" value={form.condition} onChange={(v) => set("condition", v as Contact["condition"] & string)} options={CONDITION_OPTS} placeholder="— Seleccionar —" />
+        </Field>
 
         <Field label="Zonas de interés" htmlFor="zonas" hint="Escribe una zona y presiona Enter o coma.">
           <TagInput
@@ -298,6 +303,10 @@ export function ContactEditForm({
             onDraftChange={setLocDraft}
             placeholder="Ej: Piantini, Naco, Punta Cana…"
           />
+        </Field>
+
+        <Field label="Amenidades deseadas" htmlFor="amenities" hint="Selecciona las que el cliente busca.">
+          <MultiSelect id="amenities" value={form.desired_amenities} onChange={(v) => set("desired_amenities", v)} options={AMENITY_OPTS} placeholder="— Ninguna seleccionada —" />
         </Field>
 
         <Field label="Presupuesto">

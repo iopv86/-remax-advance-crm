@@ -8,6 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { createClient } from "@/lib/supabase/client";
 import { Pagination } from "@/components/pagination";
+import { PROPERTY_TYPE_LABELS } from "@/lib/intereses-labels";
 import type { Contact } from "@/lib/types";
 
 // ── Design tokens (adaptive — CSS vars) ───────────────────────────────────────
@@ -36,16 +37,8 @@ const SOURCE_LABELS: Record<string, string> = {
   instagram: "Instagram",
 };
 
-const PROPERTY_LABELS: Record<string, string> = {
-  apartment: "Apartamentos",
-  penthouse: "Penthouses",
-  villa: "Villas",
-  house: "Casas",
-  land: "Terrenos",
-  commercial: "Comercial",
-  apart_hotel: "Apart-hotel",
-  farm: "Fincas",
-};
+// Single source of truth — shared with the read surfaces and the editor.
+const PROPERTY_LABELS = PROPERTY_TYPE_LABELS;
 
 // ── Avatar color palette (deterministic from initials) ────────────────────────
 const AVATAR_PALETTES = [
@@ -505,12 +498,11 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                 const { bg: avBg, color: avColor } = avatarPalette(initials);
                 const badge = getStatusBadge(c.lead_classification);
 
-                // Interest text
+                // Interest text — prefer the multi-select array, fall back to legacy scalar.
                 const interestParts: string[] = [];
-                if (c.property_type_interest) {
-                  interestParts.push(
-                    PROPERTY_LABELS[c.property_type_interest] ?? c.property_type_interest
-                  );
+                const cTypes = c.property_types ?? (c.property_type_interest ? [c.property_type_interest] : []);
+                if (cTypes.length > 0) {
+                  interestParts.push(cTypes.map((t) => PROPERTY_LABELS[t] ?? t).join(", "));
                 }
                 if (c.preferred_locations && c.preferred_locations.length > 0) {
                   interestParts.push(c.preferred_locations[0]);
