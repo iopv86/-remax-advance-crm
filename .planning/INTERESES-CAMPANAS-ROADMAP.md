@@ -30,11 +30,13 @@ Migración `0015_contact_intereses` aplicada a prod (`zlnqsgepzfghlmsfolko`):
 - Smoke test PASS (array, escalar, down-recompute, freeze manual, backfill 5/5, 0 mismatches). `lib/types.ts` + `lib/properties/matching.ts` actualizados (array-aware, no-breaking). tsc 0.
 - Código app (types/matcher) es INERTE hasta 1B (el mirror hace que array=[escalar]); se despliega junto con 1B vía all-deploy + QA.
 
-### Sesión 1B — Intereses: visibilidad + edición  (siguiente)
-- Bloque "Intereses" completo en detalle de contacto + surface en detalle del deal (lee/escribe el contacto vinculado).
-- Editor: multi-select de Categorías (`property_types`), Amenidades (`desired_amenities`), Operación, Condición, Habitaciones.
-- Quick-edit desde la card/detalle para que el agente "depure" al contactar y cambie hot/warm/cold ahí mismo.
-- Deploy all-deploy + QA. (Aquí también retirar/migrar lectores al array; `property_type_interest` se elimina en 1C.)
+### Sesión 1B — Intereses: visibilidad + edición  ✅ HECHO (2026-06-24, CRM `f40756e` + Ava `2527277`)
+- Bloque "Intereses" (read) en detalle de contacto + card "Intereses del cliente" en detalle del deal (surface del contacto vinculado, query ampliada). `lib/intereses-labels.ts` = fuente única de labels/opciones.
+- Editor: `MultiSelect` (toggle-pills) para Categorías (`property_types`) y Amenidades (`desired_amenities`); Operación/Condición/Habitaciones nuevos; escribe SOLO el array (el mirror 0015 sincroniza el escalar).
+- Quick-edit hot/warm/cold/Sin-calificar desde el badge del detalle del contacto (respeta freeze B-17: temperatura→manual, Sin calificar→auto). Surface en card del pipeline DIFERIDO (conflicto dnd-kit) — backlog.
+- Lectores migrados a array-first (contacts list + table via mapa compartido). matching.ts ya era array-aware (1A).
+- **FIX Ava timeline (2 bugs):** (1) el dispatch `brain.py` NUNCA reenviaba move_timeline/payment/purpose/bedrooms (→ move_timeline siempre vacío en prod, 0 filas, sin backfill). (2) `tools.py` escribía el escalar huérfano `move_timeline` en vez de `timeline` (enum del gate). Arreglado: dispatch reenvía los 4; `tools.py` mapea free-text→enum (timeline/payment/purpose) con SKIP en no-match (evita 400 que tumbaría todo el PATCH); valida property_type; schema endurecido (enum timeline canónico, quita `office`/`alquilar`). QA: lead estilo-Ava (timeline=immediate+budget+tipo) auto-califica unqualified→cold/qualified vía gate; move_timeline queda muerto → drop en 1C.
+- QA prod Playwright PASS (editor round-trip + read block + gate + quick-edit + mirror) + smoke Ava-path en DB. tsc 0, py_compile OK, security 0 CRITICAL/HIGH.
 
 ### Sesión 2 — Campañas: atribución Meta al entrar el lead
 - Expandir queries Graph (follow-up `/{ad_id}?fields=name,adset{name},campaign{name}` + platform + nombre de formulario).
@@ -47,5 +49,6 @@ Migración `0015_contact_intereses` aplicada a prod (`zlnqsgepzfghlmsfolko`):
 ### Sesión 6 — Tasas Bancarias USD/DOP (dashboard; fuente compartida con Finance/TASAREAL)
 
 ## Follow-ups / deuda
-- BUG Ava move_timeline→timeline (afecta auto-calificación de leads de Ava). Candidato a fold en 1B o ticket aparte.
-- 1C cleanup: retirar `property_type_interest` escalar una vez todos los lectores usen `property_types`.
+- ✅ BUG Ava move_timeline→timeline RESUELTO en 1B (más un 2º bug: el dispatch nunca reenviaba los params).
+- 1C cleanup: `drop column move_timeline` (muerto, 0 filas) + retirar `property_type_interest` escalar una vez el CSV export (`app/api/contacts/export`) use el array; resto de lectores ya usan `property_types`.
+- Backlog: quick-edit de clasificación en la card del pipeline (diferido por conflicto dnd-kit).
