@@ -23,6 +23,7 @@ import {
   PAYMENT_LABELS,
   AMENITY_LABELS,
 } from "@/lib/intereses-labels";
+import { CampaignAttribution } from "@/components/contacts/campaign-attribution";
 
 const ALL_STAGES: DealStage[] = [
   "nuevo_sin_contactar", "lead_captured", "qualified", "contacted", "showing_scheduled",
@@ -124,6 +125,14 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
     purpose?: string | null;
     payment_method?: string | null;
     preferred_locations?: string[] | null;
+    meta_campaign_id?: string | null;
+    meta_campaign_name?: string | null;
+    meta_adset_id?: string | null;
+    meta_adset_name?: string | null;
+    meta_ad_id?: string | null;
+    meta_ad_name?: string | null;
+    meta_form_name?: string | null;
+    meta_platform?: string | null;
   } | null;
   const property = deal.property;
   const agent = deal.agent as { full_name?: string | null; email?: string | null } | null;
@@ -633,6 +642,21 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                 </div>
               );
             })()}
+
+            {/* Campañas — Meta attribution surfaced from the linked contact */}
+            {contact && (
+              <CampaignAttribution
+                variant="deal"
+                campaignId={contact.meta_campaign_id}
+                campaignName={contact.meta_campaign_name}
+                adsetId={contact.meta_adset_id}
+                adsetName={contact.meta_adset_name}
+                adId={contact.meta_ad_id}
+                adName={contact.meta_ad_name}
+                formName={contact.meta_form_name}
+                platform={contact.meta_platform}
+              />
+            )}
 
             {/* Notes */}
             <div className="card-base p-5">

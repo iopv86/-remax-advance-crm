@@ -16,6 +16,7 @@ import { ContactActivity } from "./contact-activity";
 import type { ContactActivity as ContactActivityType } from "./contact-activity";
 import { MatchedProperties } from "./matched-properties";
 import { LeadFormAnswers } from "@/components/contacts/lead-form-answers";
+import { CampaignAttribution } from "@/components/contacts/campaign-attribution";
 import { getMatchedProperties } from "@/lib/properties/matching";
 import {
   PROPERTY_TYPE_LABELS,
@@ -490,6 +491,19 @@ export default async function ContactDetailPage({
                   </div>
                 );
               })()}
+
+              {/* Campañas — Meta attribution (read-only) */}
+              <CampaignAttribution
+                variant="contact"
+                campaignId={contact.meta_campaign_id}
+                campaignName={contact.meta_campaign_name}
+                adsetId={contact.meta_adset_id}
+                adsetName={contact.meta_adset_name}
+                adId={contact.meta_ad_id}
+                adName={contact.meta_ad_name}
+                formName={contact.meta_form_name}
+                platform={contact.meta_platform}
+              />
 
               {/* Lo que busca */}
               {contact.ai_summary && (

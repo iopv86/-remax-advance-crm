@@ -2,7 +2,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { fireCapiEvent } from "@/lib/meta-capi";
-import { buildLeadFormAnswers, hasCustomAnswers, parseBudgetRange, pickField } from "@/lib/meta-leads";
+import { attributionColumns, buildLeadFormAnswers, fetchCampaignAttribution, hasCustomAnswers, parseBudgetRange, pickField } from "@/lib/meta-leads";
 
 const GRAPH_VERSION = "v19.0";
 
@@ -29,6 +29,8 @@ interface LeadFormData {
   field_data: FieldData[];
   ad_id?: string;
   campaign_id?: string;
+  form_id?: string;
+  platform?: string;
 }
 
 function parseField(fields: FieldData[], name: string): string | null {
@@ -40,7 +42,7 @@ async function fetchLeadData(leadgenId: string): Promise<LeadFormData | null> {
   if (!token) return null;
   const url =
     `https://graph.facebook.com/${GRAPH_VERSION}/${leadgenId}` +
-    `?fields=field_data,ad_id,campaign_id`;
+    `?fields=field_data,ad_id,campaign_id,form_id,platform`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 0 },
@@ -307,6 +309,17 @@ export async function POST(req: NextRequest) {
             await db.from("contacts").update({ lead_form_answers: leadFormAnswers }).eq("id", existingId);
           }
         }
+        // Backfill campaign attribution only if never attributed (first-touch wins).
+        if (lead.campaign_id || lead.ad_id || change.value.ad_id) {
+          const { data: cur } = await db
+            .from("contacts").select("meta_campaign_id, meta_ad_id").eq("id", existingId).maybeSingle();
+          if (cur && cur.meta_campaign_id == null && cur.meta_ad_id == null) {
+            const attrInput = { ...lead, ad_id: lead.ad_id ?? change.value.ad_id };
+            // Webhook does not list forms, so it has no form name to supply.
+            const attr = await fetchCampaignAttribution(attrInput, process.env.META_ACCESS_TOKEN ?? "", null);
+            await db.from("contacts").update(attributionColumns(attr)).eq("id", existingId);
+          }
+        }
         await createIntakeDeal(existingId, agentId);
         fireCapiEvent({ stage: "lead_captured", email, phone }).catch((err) =>
           console.error("[lead-webhook] CAPI error:", (err as Error).message));
@@ -322,6 +335,11 @@ export async function POST(req: NextRequest) {
       }
       const agentId = agent.id;
 
+      // De-conflated, enriched Meta attribution (IDs always; names best-effort).
+      // The lead node's ad_id is canonical; fall back to the webhook change value.
+      const attrInput = { ...lead, ad_id: lead.ad_id ?? change.value.ad_id };
+      const attr = await fetchCampaignAttribution(attrInput, process.env.META_ACCESS_TOKEN ?? "", null);
+
       const { data: inserted, error: insertErr } = await db
         .from("contacts")
         .insert({
@@ -332,7 +350,7 @@ export async function POST(req: NextRequest) {
           whatsapp_number:  phone || null,
           source:           "lead_form",
           meta_lead_id:     leadgen_id,
-          meta_campaign_id: lead.campaign_id ?? change.value.ad_id ?? null,
+          ...attributionColumns(attr),
           agent_id:         agentId,
           assigned_at:      new Date().toISOString(),
           lead_form_answers: leadFormAnswers,

@@ -38,7 +38,9 @@ export default async function DealDetailPage({
          actual_close_date, lost_reason, notes, priority, created_at, updated_at,
          contact:contacts(id, first_name, last_name, email, phone,
            property_types, operation_type, condition, desired_amenities, bedrooms,
-           timeline, purpose, payment_method, preferred_locations),
+           timeline, purpose, payment_method, preferred_locations,
+           meta_campaign_id, meta_campaign_name, meta_adset_id, meta_adset_name,
+           meta_ad_id, meta_ad_name, meta_form_name, meta_platform),
          property:properties(id, title, city, sector, price, currency),
          agent:agents(id, full_name, email)`
       )

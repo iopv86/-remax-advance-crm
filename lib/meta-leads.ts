@@ -14,9 +14,102 @@ export interface LeadFormData {
   field_data: FieldData[];
   ad_id?: string;
   campaign_id?: string;
+  form_id?: string;
+  platform?: string;
 }
 
 type Db = ReturnType<typeof adminClient>;
+
+// ── campaign attribution ────────────────────────────────────────────────────
+
+/** Full Meta attribution captured at intake. IDs always; names best-effort. */
+export interface CampaignAttribution {
+  campaign_id: string | null;
+  campaign_name: string | null;
+  adset_id: string | null;
+  adset_name: string | null;
+  ad_id: string | null;
+  ad_name: string | null;
+  form_name: string | null;
+  platform: string | null;
+}
+
+interface AdNode {
+  name?: string;
+  adset?: { id?: string; name?: string };
+  campaign?: { id?: string; name?: string };
+}
+
+/**
+ * Resolves campaign/adset/ad/form/platform for a lead. IDs come straight off the
+ * lead node (always stored). Names require a follow-up `/{ad_id}` call that needs
+ * ads_read on the token — wrapped so ANY failure degrades to null names without
+ * ever throwing. Lead intake must never block on enrichment.
+ *
+ * Pass the USER token (META_ACCESS_TOKEN) — ads permissions live there, not on
+ * the derived page token. `formName` lets the poller supply the name it already
+ * lists (the lead node only exposes form_id).
+ */
+export async function fetchCampaignAttribution(
+  lead: LeadFormData,
+  token: string,
+  formName?: string | null,
+): Promise<CampaignAttribution> {
+  const adId = lead.ad_id ?? null;
+  const attr: CampaignAttribution = {
+    campaign_id: lead.campaign_id ?? null,
+    campaign_name: null,
+    adset_id: null,
+    adset_name: null,
+    ad_id: adId,
+    ad_name: null,
+    form_name: formName ?? null,
+    platform: lead.platform ?? null,
+  };
+  if (!adId || !token) return attr;
+  // 4s budget so a slow Graph call can never block lead intake (webhook 5s SLA).
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 4000);
+  try {
+    const fields = encodeURIComponent("name,adset{id,name},campaign{id,name}");
+    // Token in Authorization header (NOT the query string) so it never lands in
+    // outbound-request logs/APM traces.
+    const res = await fetch(
+      `https://graph.facebook.com/${GRAPH_VERSION}/${adId}?fields=${fields}`,
+      { headers: { Authorization: `Bearer ${token}` }, signal: controller.signal, next: { revalidate: 0 } },
+    );
+    if (!res.ok) {
+      console.error(`[meta-leads] ad enrichment ${res.status} for ad ${adId}`);
+      return attr;
+    }
+    const node = (await res.json()) as AdNode;
+    attr.ad_name = node.name ?? null;
+    attr.adset_id = node.adset?.id ?? null;
+    attr.adset_name = node.adset?.name ?? null;
+    // campaign.id should equal lead.campaign_id; keep the lead-node id canonical.
+    attr.campaign_id = lead.campaign_id ?? node.campaign?.id ?? null;
+    attr.campaign_name = node.campaign?.name ?? null;
+  } catch (e) {
+    console.error("[meta-leads] ad enrichment error:", (e as Error).message);
+  } finally {
+    clearTimeout(timer);
+  }
+  return attr;
+}
+
+/** Map a CampaignAttribution into the contacts column set (insert/update payload). */
+export function attributionColumns(attr: CampaignAttribution) {
+  return {
+    meta_campaign_id: attr.campaign_id,
+    meta_campaign_name: attr.campaign_name,
+    meta_adset_id: attr.adset_id,
+    meta_adset_name: attr.adset_name,
+    meta_ad_id: attr.ad_id,
+    meta_ad_name: attr.ad_name,
+    meta_form_name: attr.form_name,
+    meta_platform: attr.platform,
+  };
+}
 
 // ── field parsing ─────────────────────────────────────────────────────────────
 
@@ -182,7 +275,7 @@ export interface ProcessResult {
  * same lead (deduped by phone, then meta_lead_id; intake deal deduped per contact).
  * Used by BOTH the push webhook and the pull poller.
  */
-export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessResult> {
+export async function processLead(db: Db, lead: LeadFormData, formName?: string | null): Promise<ProcessResult> {
   const fields = lead.field_data ?? [];
   const rawName = pickField(fields, ["full_name", "full name", "name", "nombre", "nombre_completo"]) ?? "";
   const email = pickField(fields, ["email", "correo", "correo_electronico"]);
@@ -237,6 +330,16 @@ export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessRe
         await db.from("contacts").update({ lead_form_answers: leadFormAnswers }).eq("id", existingId);
       }
     }
+    // Backfill campaign attribution only if the contact was never attributed
+    // (both id columns null). Preserves first-touch; skips the Graph call otherwise.
+    if (lead.campaign_id || lead.ad_id) {
+      const { data: cur } = await db
+        .from("contacts").select("meta_campaign_id, meta_ad_id").eq("id", existingId).maybeSingle();
+      if (cur && cur.meta_campaign_id == null && cur.meta_ad_id == null) {
+        const attr = await fetchCampaignAttribution(lead, process.env.META_ACCESS_TOKEN ?? "", formName);
+        await db.from("contacts").update(attributionColumns(attr)).eq("id", existingId);
+      }
+    }
     const dealCreated = await createIntakeDeal(existingId, agentId);
     if (dealCreated) {
       fireCapiEvent({ stage: "lead_captured", email, phone }).catch(() => {});
@@ -250,6 +353,9 @@ export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessRe
   if (!agent) return { created: false, contactId: null, reason: "no_agent" };
   const agentId = agent.id;
 
+  // De-conflated, enriched Meta attribution (IDs always; names best-effort).
+  const attr = await fetchCampaignAttribution(lead, process.env.META_ACCESS_TOKEN ?? "", formName);
+
   const { data: inserted, error: insertErr } = await db
     .from("contacts")
     .insert({
@@ -260,7 +366,7 @@ export async function processLead(db: Db, lead: LeadFormData): Promise<ProcessRe
       whatsapp_number: phone || null,
       source: "lead_form",
       meta_lead_id: lead.id,
-      meta_campaign_id: lead.campaign_id ?? lead.ad_id ?? null,
+      ...attributionColumns(attr),
       agent_id: agentId,
       assigned_at: new Date().toISOString(),
       lead_form_answers: leadFormAnswers,
