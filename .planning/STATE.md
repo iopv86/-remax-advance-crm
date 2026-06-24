@@ -1,16 +1,25 @@
 # Project State: Advance Estate CRM
 
-**Last Updated:** 2026-06-22
-**Current Version:** v11.0 (B-14)
+**Last Updated:** 2026-06-24
+**Current Version:** Roadmap Intereses+Campañas S2 (CRM `97e9f65` prod `8jx3feny6`) — atribución Meta al entrar el lead
 
 ## Active Phases
 
-_Ninguna fase activa actualmente._
+**Roadmap Intereses + Campañas (6 sesiones)** — `.planning/INTERESES-CAMPANAS-ROADMAP.md`. Replica el flujo AlterEstate al entrar un lead (INTERESES que el agente califica + CAMPAÑAS atribución Meta).
+- **1A HECHA** (migración 0015 en prod). **1B HECHA+DESPLEGADA+QA** (CRM `f40756e`). **2 HECHA+DESPLEGADA+QA** (CRM `97e9f65` prod `8jx3feny6`).
+- **3 PRÓXIMA**: Propietarios (con teléfono) en propiedades. Prompt listo en `memory/next-session-prompt.md`.
+- Restantes: 4 Co-comprador/Referidor · 5 Planes de Pago · 6 Tasas Bancarias USD/DOP.
 
 ## Completed Phases
 
 | Phase | Status | Version | Deployed |
 |-------|--------|---------|---------|
+| 2: Campañas — atribución Meta al entrar el lead. Migración 0016 (+6 cols meta_campaign_name/adset_id/adset_name/ad_name/form_name/platform; `meta_ad_id` ya existía → conflación era código). `fetchCampaignAttribution` enriquece `/{ad_id}` (token ads_read, header auth, AbortController 4s, degrada a null); de-conflate+backfill first-touch poller+webhook; read block "Campañas" contacto+deal | ✓ Complete + QA | CRM `97e9f65` | 2026-06-24 |
+| 1B: Intereses visibilidad+edición (read block contacto+deal, MultiSelect, quick-edit badge) + fix Ava timeline (2 bugs) | ✓ Complete + QA | CRM `f40756e` + Ava `2527277` | 2026-06-24 |
+| 1A: Intereses data model — migración 0015 (`property_types` multi, `operation_type`/`condition`/`desired_amenities`, `bedrooms`; gate array-aware + trigger mirror bidireccional; A-prime solo-DB) | ✓ Complete (schema) | — (sin deploy Vercel) | 2026-06-24 |
+| B-17: Auto-calificacion badge UNQUALIFIED — trigger DB `apply_auto_qualification` (gate presupuesto+(tipo\|zona)+timeline≠exploring → cold+qualified), `qualification_source` freeze manual/ava, DROP `trg_contact_score`, fix enum-values editor (timeline/payment/purpose), migracion 0014 | ✓ Complete | v11.3 (`70d55ad`) | 2026-06-24 |
+| B-16: Editores full-page (contacto/deal, create+edit) + captura field_data Meta (jsonb) + fix legibilidad + clasificacion en create | ✓ Complete | v11.2 (`80041d5`→`e784ecc`) | 2026-06-23 |
+| B-14 + Lead Poll: Lead Forms via polling (cron 1 min, saltea push; token Meta long-lived) | ✓ Complete | v11.1 (`f82c616`) | 2026-06-23 |
 | B-14: Lead Unification + Leads Entrantes | ✓ Complete | v11.0 (`38d5dee`) | 2026-06-22 |
 | B-13: Round Robin & Lead Assignment Fix | ✓ Complete | v10.23 | 2026-05-22 |
 | B-11: Publicidad Module | ✓ Complete | v10.15 | 2026-05-07 |
@@ -36,6 +45,9 @@ _Ninguna fase activa actualmente._
 - **Server Components first:** mutations via Server Actions o API routes; UI components son RSC por defecto
 - **Lead webhook gate:** META_LEAD_WEBHOOK_ENABLED controla si los leads Meta Form entran al CRM
 - **Round Robin:** `round_robin_config` tabla es source of truth; roles elegibles: agent + manager + admin
+- **Editores = páginas full (B-16):** editar/crear contacto y deal son rutas propias (`/contacts/[id]/edit`, `/contacts/new`, `/pipeline/[deal_id]/edit`, `/pipeline/new`). NO drawers. Kit legible compartido en `components/form/{fields,form-shell}.tsx` (labels `--secondary-foreground`, NUNCA `text-slate-*`/`bg-white`). Mutación via browser supabase client (RLS user JWT).
+- **Migración 0013:** `contacts` tiene `decision_maker text`, `linked_property_id uuid FK`, `lead_form_answers jsonb` (captura lossless del field_data Meta).
+- **Trigger `trg_contact_score` (GOTCHA):** BEFORE INSERT recalcula `lead_classification` desde columnas `score_*` (vacías en create manual → 'unqualified'), sobreescribiendo el valor del payload en el INSERT. En UPDATE solo dispara si cambian `score_*`. Por eso el create del editor hace un UPDATE follow-up de `lead_classification` para respetar la elección del agente.
 
 ## Key Files
 
