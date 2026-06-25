@@ -88,6 +88,7 @@ Las 6 sesiones (1A · 1B · 2 · 3 · 4 · 5 · 6) están HECHAS, DESPLEGADAS y 
 
 ## Follow-ups / deuda
 - ✅ BUG Ava move_timeline→timeline RESUELTO en 1B (más un 2º bug: el dispatch nunca reenviaba los params).
-- 1C cleanup: `drop column move_timeline` (muerto, 0 filas) + retirar `property_type_interest` escalar una vez el CSV export (`app/api/contacts/export`) use el array; resto de lectores ya usan `property_types`.
+- ✅ 1C cleanup RESUELTO (Mantenimiento S3, 2026-06-25, commit 9fe1c88 + migración drop_legacy_contact_columns): dropeadas `move_timeline` + `property_type_interest`; CSV export migrado al array; 4 views legacy recreadas sin la columna.
 - Backlog: quick-edit de clasificación en la card del pipeline (diferido por conflicto dnd-kit).
-- Deuda S2: el webhook (`app/api/meta/lead-webhook/route.ts`, gated off por `META_LEAD_WEBHOOK_ENABLED!='true'`) duplica `isValidPhone`/`assignRrAgent`/`notifyAgent`(con emoji)/`GRAPH_VERSION` en vez de llamar a `processLead()`. Refactor a `processLead(db, lead, null)` con el fallback `change.value.ad_id` antes de la llamada → elimina drift y limpia el emoji. No bloqueante (path apagado; poller es el live).
+- ✅ Deuda S2 webhook RESUELTA (Mantenimiento S3, 2026-06-25, commit 7c9e052): `lead-webhook/route.ts` delega a `processLead(db, lead, null)`; eliminada toda la duplicación + el emoji; preserva HMAC/gate/GET challenge/fetchLeadData + fallback `change.value.ad_id`.
+- ✅ Pill USD/DOP mobile RESUELTO (Mantenimiento S3, 2026-06-25, commit dd139df): `FxRatePill` prop `align`; instancia mobile-only hermana del hero (evita el clip de overflow:hidden).

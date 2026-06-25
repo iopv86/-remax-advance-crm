@@ -76,18 +76,31 @@ para empatar con el CRM; mantener cache 5 min y orden de fuentes; poner `TASAREA
 **DB:** `zlnqsgepzfghlmsfolko`. **Accesos:** https://remax-advance-ava-production.up.railway.app.
 </details>
 
-### Sesión 3 — CRM: cleanup técnico (deuda)  ⬜ PENDIENTE
-**Proyecto:** Advance CRM — `C:\Users\ivanp\advance-crm` (Vercel). NO toca Ava. (Roadmap Intereses+Campañas YA completo.)
-Items independientes, commitear por separado. Ver `INTERESES-CAMPANAS-ROADMAP.md` sección "Follow-ups / deuda".
-1. **Cleanup 1C:** `drop column move_timeline` de `contacts` (muerta, 0 filas — VERIFICAR primero en prod y que
-   ningún lector la use). Retirar el escalar `property_type_interest` SOLO tras migrar el CSV export
-   (`app/api/contacts/export`) al array `property_types` (resto de lectores ya usan el array). Migración via MCP.
-2. **Deuda S2 webhook:** refactor de `app/api/meta/lead-webhook/route.ts` para llamar a `processLead()`
-   (`lib/meta-leads.ts`) en vez de duplicar `isValidPhone`/`assignRrAgent`/`notifyAgent`(emoji)/`GRAPH_VERSION`
-   (pasar fallback `change.value.ad_id`). Path gated off (`META_LEAD_WEBHOOK_ENABLED`) → bajo riesgo. Quita el emoji.
-3. **Pill USD/DOP mobile:** hoy vive en el header `hidden md:flex` (solo desktop). Darle lugar accesible en
-   mobile (hero quick-stats o slot del layout mobile) sin romper desktop.
-**QA prod Playwright** por item. **Accesos:** https://remax-advance-crm.vercel.app (ipimentel@remaxadvance.com / Rodrigo2016).
+### Sesión 3 — CRM: cleanup técnico (deuda)  ✅ HECHA (2026-06-25, commits 9fe1c88 · 7c9e052 · dd139df, Vercel prod, NO toca Ava)
+**3 items independientes, 3 commits, 3 deploys + QA prod Playwright por item.** Architect validó el diseño de los 3 al inicio.
+1. **Cleanup 1C (commit 9fe1c88 + migración `drop_legacy_contact_columns`):** verificado en prod — `move_timeline` 0/150
+   filas, 0 lectores; `property_type_interest` (5) totalmente espejado en `property_types` (5). App migrada PRIMERO
+   (CSV export `app/api/contacts/export` ahora emite `property_types` con labels ES vía `PROPERTY_TYPE_LABELS`;
+   `page.tsx`/`contacts-table`/`matching.ts`/`types.ts` array-only), desplegada, LUEGO migración (replace-then-drop:
+   reescribe `apply_auto_qualification()` sin el mirror escalar, recrea trigger sin el escalar en el watch list,
+   dropea ambas columnas). **Sorpresa:** 4 views legacy (`contacts_active/archived/export/with_email`) dependían del
+   escalar → drop+recreate sin la columna + re-grant exacto (NO usadas por app/funciones; deuda pre-existente:
+   son views definer que exponen contacts a anon, fuera de scope). QA: lista 150 contactos OK, CSV "Tipo Propiedad"=
+   "Apartamento" (label del array, sin escalar), detalle contacto + matched properties OK; DB verificada (0 dead cols,
+   trigger watch correcto, 4 views, property_types intacto 5).
+2. **Deuda S2 webhook (commit 7c9e052):** `app/api/meta/lead-webhook/route.ts` 396→145 líneas — delega a
+   `processLead(db, lead, null)` (autoridad única compartida con el poller); elimina duplicación (notifyAgent con emoji,
+   GRAPH_VERSION local, isValidPhone, assignRrAgent, notifyLead, createIntakeDeal). Preserva GET challenge, HMAC,
+   gate `META_LEAD_WEBHOOK_ENABLED`, fetchLeadData; fallback `lead.ad_id ?? change.value.ad_id`. Fixes de review
+   aplicados: guard `lead.id` (Meta puede dar 2xx con error body) + fetch+process dentro de un try/catch por-change
+   (un lead malo no aborta el batch ni 500ea a Meta). QA prod: GET token-malo→403, POST sin firma→401, app 200.
+3. **Pill USD/DOP mobile (commit dd139df):** `FxRatePill` gana prop `align` (left|right, default right); render
+   mobile-only (`flex md:hidden`) como **hermano** del hero strip (NO dentro — su `overflow:hidden` recortaría el
+   popover); `align="left"` ancla el popover de 280px al borde izquierdo. QA Playwright: 375px→1 pill visible +
+   popover sin overflow + lista completa; 320px→popover cabe (left16/right296); 1440px→1 pill en el header + ancla
+   derecha (desktop intacto).
+**Reviews:** security-reviewer + code-reviewer por item (0 CRITICAL/HIGH sin resolver; HIGH+MEDIUM del webhook aplicados).
+**Accesos:** https://remax-advance-crm.vercel.app (ipimentel@remaxadvance.com / Rodrigo2016). **Siguiente: S4 Ava hardening+n8n+docs.**
 
 ### Sesión 4 — Ava: hardening + n8n + docs  ⬜ PENDIENTE
 **Proyecto:** Ava — `C:\Users\ivanp\whatsapp-agentkit` + n8n (`irmgroup.app.n8n.cloud`).
@@ -114,5 +127,5 @@ el evento llega a Meta (Events Manager / test events). **Accesos:** CRM prod (ad
 ---
 
 ## Estado
-- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ⬜ S3 CRM cleanup · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
+- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ✅ S3 CRM cleanup (2026-06-25, commits 9fe1c88·7c9e052·dd139df + migración drop_legacy_contact_columns) · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
 - Sugerencia: S1–S4 son las de mayor valor/menor riesgo. S5 es feature. S6 es opcional/bloqueado.
