@@ -1,5 +1,5 @@
 import { adminClient } from "@/lib/supabase/admin";
-import { fireCapiEvent } from "@/lib/meta-capi";
+import { enqueueCapiEvent } from "@/lib/meta-capi";
 import type { LeadFormAnswers } from "@/lib/types";
 
 export const GRAPH_VERSION = "v19.0";
@@ -293,24 +293,26 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
   // Dedup by phone, then meta_lead_id
   let existingId: string | null = null;
   let existingAgentId: string | null = null;
+  let existingCtwa: string | null = null;
   if (phone) {
-    const { data } = await db.from("contacts").select("id, agent_id").eq("phone", phone).maybeSingle();
-    if (data) { existingId = data.id; existingAgentId = data.agent_id; }
+    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid").eq("phone", phone).maybeSingle();
+    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; }
   }
   if (!existingId) {
-    const { data } = await db.from("contacts").select("id, agent_id").eq("meta_lead_id", lead.id).maybeSingle();
-    if (data) { existingId = data.id; existingAgentId = data.agent_id; }
+    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid").eq("meta_lead_id", lead.id).maybeSingle();
+    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; }
   }
 
-  const createIntakeDeal = async (contactId: string, agentId: string) => {
+  // Returns the new deal's id, or null if one already exists in the holding stages.
+  const createIntakeDeal = async (contactId: string, agentId: string): Promise<string | null> => {
     const { data: openDeal } = await db
       .from("deals").select("id").eq("contact_id", contactId)
       .in("stage", ["nuevo_sin_contactar", "lead_captured"]).limit(1).maybeSingle();
-    if (openDeal) return false;
-    await db.from("deals").insert({
+    if (openDeal) return null;
+    const { data: newDeal } = await db.from("deals").insert({
       contact_id: contactId, agent_id: agentId, stage: "nuevo_sin_contactar", currency: "USD",
-    });
-    return true;
+    }).select("id").maybeSingle();
+    return newDeal?.id ?? null;
   };
 
   if (existingId) {
@@ -340,12 +342,14 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
         await db.from("contacts").update(attributionColumns(attr)).eq("id", existingId);
       }
     }
-    const dealCreated = await createIntakeDeal(existingId, agentId);
-    if (dealCreated) {
-      fireCapiEvent({ stage: "lead_captured", email, phone }).catch(() => {});
+    const newDealId = await createIntakeDeal(existingId, agentId);
+    if (newDealId) {
+      await enqueueCapiEvent(db, {
+        stage: "lead_captured", dealId: newDealId, contactId: existingId, email, phone, ctwaClid: existingCtwa,
+      });
       if (agent) notifyAgent(agent, rawName, phone);
     }
-    return { created: dealCreated, contactId: existingId, reason: dealCreated ? "existing_contact_new_deal" : "already_in_pipeline" };
+    return { created: !!newDealId, contactId: existingId, reason: newDealId ? "existing_contact_new_deal" : "already_in_pipeline" };
   }
 
   // New contact
@@ -386,8 +390,14 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
   }
   if (!inserted) return { created: false, contactId: null, reason: "no_insert" };
 
-  await createIntakeDeal(inserted.id, agentId);
-  fireCapiEvent({ stage: "lead_captured", email: inserted.email, phone: inserted.phone }).catch(() => {});
+  const newDealId = await createIntakeDeal(inserted.id, agentId);
+  if (newDealId) {
+    // New lead-form contact: never CTWA-sourced, so no ctwa_clid enrichment.
+    await enqueueCapiEvent(db, {
+      stage: "lead_captured", dealId: newDealId, contactId: inserted.id,
+      email: inserted.email, phone: inserted.phone, ctwaClid: null,
+    });
+  }
   notifyAgent(agent, rawName, phone);
   notifyLead(phone, firstName).catch(() => {});
   return { created: true, contactId: inserted.id, reason: "new_contact" };

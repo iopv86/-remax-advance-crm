@@ -102,28 +102,85 @@ para empatar con el CRM; mantener cache 5 min y orden de fuentes; poner `TASAREA
 **Reviews:** security-reviewer + code-reviewer por item (0 CRITICAL/HIGH sin resolver; HIGH+MEDIUM del webhook aplicados).
 **Accesos:** https://remax-advance-crm.vercel.app (ipimentel@remaxadvance.com / Rodrigo2016). **Siguiente: S4 Ava hardening+n8n+docs.**
 
-### Sesión 4 — Ava: hardening + n8n + docs  ⬜ PENDIENTE
+### Sesión 4 — Ava: hardening + n8n + docs  ✅ HECHA (2026-06-25, Ava commits `1b7d366` (hardening) · `e6bcb71` (docs) + migración `drop_legacy_contacts_pii_views` + fix n8n WF05 vía REST PUT)
+**4 items independientes, verificados contra prod (la memoria estaba parcialmente STALE). n8n-MCP NO conectó esta sesión → se usó la REST API pública de n8n (`N8N_API_KEY`).**
+1. **Hardening (commit `1b7d366`, Railway deploy + QA PASS):** la premisa "reads en service-role" estaba STALE —
+   **TODAS las lecturas YA usaban anon apikey + JWT autenticado** (`memory.py`/`tools.py`/`brain.py`/`follow_up.py`
+   vía `_headers`/`_supabase_headers`). RLS verificada: permite todos los reads de Ava (`mensajes` por `auth.email()`,
+   `contacts`/`deals` por `is_ava_bot()`, `projects`/`agents`/`project_units` para authenticated; `project_content`/
+   `project_availability` con RLS off). La ÚNICA exposición service-role restante = el **fallback de
+   `get_access_token()`** que devolvía la service-role key como bearer si el sign-in fallaba (god-mode, bypass RLS).
+   Fix: **fail-closed** (raise RuntimeError, sin escalación) + guard en `inicializar_db()` (todo el arranque auth+probe
+   bajo un try/except → no tumba el boot). security-review + code-reviewer CLEAN. QA prod: health 200 + `/cron/follow-ups?dry_run=true` 200 (auth path OK, sin regresión).
+2. **n8n WF05 (fix + QA PASS) — estaba FUNCIONALMENTE MUERTO:** activo y "10/10 success" pero **nunca envió nada**.
+   Root cause: los nodos Fetch/Patch leían `contacts` con `Authorization: Bearer <anon>` → la RLS `contacts_select`
+   devuelve **0 filas a anon** (curl: anon→0, JWT-Ava→16; `follow_up_state` step/exhausted = 0 en 150 contactos =
+   nunca disparó). Fix vía REST PUT: nodo nuevo **`S0 Supabase Auth`** (sign-in como `info@remaxadvance.com`) + los 6
+   nodos de contacts usan ese JWT (`is_ava_bot()` pasa). **Segundo bug descubierto en la QA:** los `Patch State` usaban
+   `$('Prep').item` (paired-item a través del Send) → sólo actualizaban 1 fila/run → 15/16 enviados sin registrar =
+   **duplicados diarios**. Reescritos a un **PATCH bulk `id=in.(…)`** (idempotente). QA prod live: **16 plantillas
+   `ava_reengagement_24h` enviadas y aceptadas por Meta** (wamid por fila), `step1=16` registrado, `s1_eligible=0`
+   (cero duplicados el próximo cron). **NOTA: se enviaron 16 WhatsApp reales hoy** (Ivan lo aprobó).
+3. **P3 M4 docs (commit `e6bcb71`):** documentados los 2 workflows WA legacy en `n8n/README.md` — ambos `active` pero
+   **0 ejecuciones** (Meta apunta a Railway), `WA - Lead Capture & Qualify` = la Ava pre-Railway (25 nodos, tablas
+   legacy `messages`/`tasks`, anon-key inline → mismo bug de RLS que WF05 si se revivieran). Desactivación diferida (dueño).
+4. **Deuda de seguridad (migración `drop_legacy_contacts_pii_views`):** decisión Ivan (AskUserQuestion) = **DROP de las
+   4 views**. Verificado **0 consumidores** (ni función/view DB ni código advance-crm). PII leak a `anon` cerrado;
+   0 views restantes. Reversible desde historial de migración.
+**Deuda S2 sin tocar** (deals_insert agent_id, MEDIUM, a propósito). **Nota:** `orchestrator.py` tenía cambios sin commitear (NO míos) → dejados intactos; sólo se commitearon los 2 archivos del item 1 + el README del item 3.
+**Siguiente: S5 CRM B-15 CAPI.**
+
+<details><summary>Spec original</summary>
 **Proyecto:** Ava — `C:\Users\ivanp\whatsapp-agentkit` + n8n (`irmgroup.app.n8n.cloud`).
 1. **Hardening:** migrar las lecturas read-only de Ava de service-role key → anon key (pendiente v9). VERIFICAR
    que las RLS de Ava (`is_ava_bot`) permiten los reads con anon+JWT ANTES de cambiar.
-2. **n8n WF05 Follow-up QA (ACTIVO en S4, ya no condicional al 01-jul):** validar exec del workflow 05
-   (`5zfxCLHPgMMG2DJY`) — Step 1/2/3 re-engagement, vía n8n-MCP. Nota: los templates Meta resetean mensualmente,
-   así que la QA debe considerar el estado actual de la ventana de templates (no asumir reset reciente).
+2. **n8n WF05 Follow-up QA:** validar exec del workflow 05 (`5zfxCLHPgMMG2DJY`) — Step 1/2/3 re-engagement.
 3. **P3 M4:** documentar los WA workflows legacy (`WA - Webhook Verify`, `WA - Lead Capture & Qualify`).
-4. **Deuda de seguridad (CRM DB, descubierta en S3, solo Supabase) — definer-views que filtran PII:** las 4 views
-   `contacts_active`/`contacts_archived`/`contacts_export`/`contacts_with_email` (Supabase `zlnqsgepzfghlmsfolko`)
-   corren con **definer rights** y conceden `SELECT` a `anon`/`authenticated` → exponen `contacts` (incl. `phone`,
-   `email`) saltándose la RLS owner-scoped de la tabla. Además están **stale** (les faltan `property_types` y todo lo
-   post-0012). NO las usa ningún código de app ni función DB (verificado en S3). **Acción:** decidir con AskUserQuestion
-   entre (a) `DROP` de las 4 (no hay consumidor conocido — lo más limpio) o (b) `ALTER VIEW … SET (security_invoker=on)`
-   + `REVOKE` de `anon` para que respeten la RLS de quien consulta. Migración via MCP; **encaja en S4 por ser hardening
-   de exposición anon en la misma DB compartida** (pero es cambio CRM-DB: NO toca código Ava/Vercel/Railway, solo SQL).
-**Deploy:** git push a `iopv86/remax-advance-ava` si toca código Ava; el item 4 es migración Supabase pura (sin deploy de app). **Plugins:** n8n-MCP, Supabase MCP.
+4. **Deuda de seguridad (CRM DB):** las 4 views legacy `contacts_*` exponen `contacts` a `anon` vía definer-rights.
+   Decidir con AskUserQuestion entre (a) `DROP` o (b) `security_invoker=on` + `REVOKE anon`.
+**Deploy:** git push a `iopv86/remax-advance-ava`; el item 4 es migración Supabase pura. **Plugins:** n8n-MCP, Supabase MCP.
+</details>
 
-### Sesión 5 — CRM: B-15 CAPI Enhancement (feature)  ⬜ PENDIENTE
-**Proyecto:** Advance CRM. Del roadmap original (B-15): señal negativa **closed_lost** a Meta CAPI + **match por
-`ctwa_clid`**. Es feature, no cleanup → Architect + spec completos, posible migración. QA prod Playwright + verificar
-el evento llega a Meta (Events Manager / test events). **Accesos:** CRM prod (admin Rodrigo2016).
+### Sesión 5 — CRM: B-15 CAPI Enhancement (feature)  🟡 CÓDIGO HECHO + DESPLEGADO + QA-LÓGICA PASS · ENTREGA A META BLOQUEADA por pixel id inválido (config pre-existente)
+**Desplegado 2026-06-25 (Vercel prod, NO toca Ava/Finance). Migración `0021_capi_outbox` aplicada via MCP.**
+Decisiones delegadas a experto Meta (Tracking & Measurement Specialist), luego Architect → spec → execute → security+code review → deploy → QA Playwright.
+
+**Verdicts del experto (adoptados):** D1 disparador = **solo closed_lost**; D2 cobertura = **solo si Meta ya vio al
+contacto** (tiene ctwa_clid O una fila previa en el outbox); D3 evento = **`Lead` estándar con `value:0` +
+`lead_event_status:"disqualified"`** (NO custom event — lo que optimiza en 2026 es value-based + audiencias de
+exclusión); D4 transporte = **outbox + cron** (un evento perdido mis-entrena el bidding).
+
+**Implementado (commit pendiente):** (1) `lib/meta-capi.ts` reescrito — `buildCapiEvent` puro con **2 formas de
+payload**: CTWA (`action_source:"business_messaging"` + `messaging_channel:"whatsapp"` + `user_data.ctwa_clid` raw +
+`page_id`) vs web (`action_source:"other"`); `enqueueCapiEvent` (inserta en outbox, service-role); `dispatchCapiOutbox`
+(drena, POST Graph **v23.0**, retry backoff 5 intentos, AbortController 8s); `resolvePixelId` = **env → agency_config**
+(el fix real: el resto de la app usa fallback DB, meta-capi NO lo hacía). `event_id` determinista **por stage**
+(`${dealId}:${stage}`) para no colisionar entre stages que mapean al mismo evento Meta. (2) migración `0021_capi_outbox`
+(tabla aditiva, `event_id` único, RLS **deny-all** = solo service-role). (3) cron `/api/cron/capi-dispatch` (`*/2`,
+CRON_SECRET) + 4º cron en vercel.json. (4) rewire 4 call sites a `enqueueCapiEvent` (`createIntakeDeal` devuelve id;
+dedup lee `ctwa_clid`). (5) trigger **closed_lost** + gate **D2** + **anti-IDOR** en `/api/meta/capi` (lee el deal por
+user-client/RLS, encola por admin); cliente manda solo `{deal_id, stage}`.
+
+**Reviews:** security-reviewer **CLEAR** (0 CRIT/HIGH; anti-IDOR sólido, PII sha256, RLS deny-all, secretos no logueados).
+code-reviewer 3 HIGH **aplicados** (event_id por-stage anti-colisión, guard `if(newDealId)` en new-contact, +timeout/429).
+tsc + next build EXIT 0.
+
+**QA prod Playwright (PASS a nivel lógica):** C1 ctwa→closed_lost = fila `business_messaging` + ctwa_clid + page_id +
+value:0 disqualified (D2 abierto vía ctwa); C2 →qualified→closed_lost = 2 filas distintas (`:qualified` Lead "other" +
+`:closed_lost` disqualified, D2 abierto vía prior, **sin colisión de event_id**); C3 →closed_lost directo = **0 filas**
+(D2 cerrado correctamente). Dispatcher corrió, reintentó con backoff, capturó error. Test data limpiada (0 remanentes).
+
+**🔴 BLOCKER (config, NO código) — por esto el CAPI llevaba MUERTO en prod:** el `agency_config.meta_pixel_id` =
+`443666763866610744` es **inválido** → Meta responde **400 "Object with ID … does not exist / missing permissions"**.
+(El Meta App ID es `4436676386610744` de 16 díg; el pixel guardado tiene 18 díg = parece app-id mal tecleado.)
+`META_PIXEL_ID` tampoco está en Vercel env (por eso cayó al valor malo de agency_config). **El dispatcher, token, v23,
+ambas formas de payload y el retry FUNCIONAN — Meta solo rechaza por el pixel id.** Para cerrar S5 falta: el dueño
+provee el **Pixel/Dataset ID correcto** (de Events Manager) + confirma que `META_ACCESS_TOKEN` tiene acceso CAPI a ese
+dataset → setearlo en `agency_config.meta_pixel_id` (editable desde Settings → Integraciones, sin redeploy) o en Vercel
+`META_PIXEL_ID` → re-QA: el outbox debe pasar a `status=sent` y el evento aparecer en Events Manager/Test Events.
+**Sin regresión:** antes ya no entregaba (fire-and-forget silencioso); ahora encola + reintenta + deja traza del error.
+
+**Accesos:** CRM prod (admin Rodrigo2016). DB `zlnqsgepzfghlmsfolko`.
 
 ### Sesión 6 — Diferidos / bloqueados (opcional)  ⬜ PENDIENTE
 1. **CRM:** quick-edit de clasificación hot/warm/cold en la card del pipeline (diferido por conflicto dnd-kit —
@@ -136,5 +193,5 @@ el evento llega a Meta (Events Manager / test events). **Accesos:** CRM prod (ad
 ---
 
 ## Estado
-- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ✅ S3 CRM cleanup (2026-06-25, commits 9fe1c88·7c9e052·dd139df + migración drop_legacy_contact_columns) · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
+- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ✅ S3 CRM cleanup (2026-06-25, commits 9fe1c88·7c9e052·dd139df + migración drop_legacy_contact_columns) · ✅ S4 Ava hardening+n8n+docs (2026-06-25, commits 1b7d366·e6bcb71 + migración drop_legacy_contacts_pii_views + fix WF05 vía n8n REST) · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
 - Sugerencia: S1–S4 son las de mayor valor/menor riesgo. S5 es feature. S6 es opcional/bloqueado.
