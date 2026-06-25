@@ -22,7 +22,15 @@ Prioridad: quick-win de alta visibilidad y bugs de prod primero; luego limpieza;
 
 ---
 
-### Sesión 1 — Finance: tasa USD/DOP (quick win)  ⬜ PENDIENTE
+### Sesión 1 — Finance: tasa USD/DOP (quick win)  ✅ HECHA (2026-06-25, commit 36319a2)
+**Resultado:** ticker muestra `USD/DOP 60.25` (Banco Popular venta, = pill del CRM; fuente TasaReal.com). Fix en
+`lib/bcrd-client.ts` → `fetchFromTasaReal()`: URL real `tasareal.com/api/v1/rates`, parse `rates[]`, cadena
+`popular.sell → bcrd.sell → primer banco con sell>0` (Ivan eligió Popular sobre BCRD oficial 59.68 para empatar
+con el CRM y no subestimar comisiones USD). Banda de plausibilidad 40–100 antes de commission-engine (security HIGH).
+Shape `{rate,source,timestamp}`, cache 5min y orden de fuentes intactos. `TASAREAL_API_KEY` puesta en Vercel prod.
+QA prod Playwright PASS: ticker 60.25 + dashboard + /commissions intactos. **Siguiente: S2 Ava.**
+
+<details><summary>Spec original</summary>
 **Proyecto:** Advance Finance — `C:\Users\ivanp\advance-finance` (Vercel). NO toca CRM/Ava.
 **Objetivo:** que el header (UsdDopTicker) deje de mostrar "USD/DOP --" y muestre la VENTA real.
 **Root cause YA identificado (solo confirmar):** `lib/bcrd-client.ts` apunta a `https://api.tasareal.com/v1/rates/USD`
@@ -35,6 +43,7 @@ para empatar con el CRM; mantener cache 5 min y orden de fuentes; poner `TASAREA
 **NO romper:** commission-engine (usa `getUsdDopRate`) ni el invariante "montos se guardan NATIVO" (v3.8).
 **QA prod:** ticker con venta real + `/commissions` y dashboard intactos.
 **Accesos:** https://advance-finance-iota.vercel.app (ipimentel@remaxadvance.com / Advance2026). Constraint: `db` port 6543 en TODOS los routes.
+</details>
 
 ### Sesión 2 — Ava: bug de prod `obtener_info_proyecto` + verificación B14  ⬜ PENDIENTE
 **Proyecto:** Ava — `C:\Users\ivanp\whatsapp-agentkit` (Railway, Python FastAPI + GPT-4o).
@@ -88,5 +97,5 @@ el evento llega a Meta (Events Manager / test events). **Accesos:** CRM prod (ad
 ---
 
 ## Estado
-- ⬜ S1 Finance tasa · ⬜ S2 Ava bug+B14 · ⬜ S3 CRM cleanup · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
+- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ⬜ S2 Ava bug+B14 · ⬜ S3 CRM cleanup · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
 - Sugerencia: S1–S4 son las de mayor valor/menor riesgo. S5 es feature. S6 es opcional/bloqueado.
