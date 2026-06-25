@@ -159,7 +159,7 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
           listeners and the badge becomes editable without breaking column drag. */}
       <div
         className={`flex justify-between items-start${contactId ? "" : " mb-4"}`}
-        style={{ position: "relative", zIndex: 2, pointerEvents: "auto" }}
+        style={{ position: "relative", zIndex: 3, pointerEvents: "auto" }}
       >
         {contactId ? (
           <ClassificationQuickEdit
