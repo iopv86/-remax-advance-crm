@@ -184,16 +184,36 @@ campañas de leads llegaran a optimizar contra ese, cambiar el valor de agency_c
 
 **Accesos:** CRM prod (admin Rodrigo2016). DB `zlnqsgepzfghlmsfolko`.
 
-### Sesión 6 — Diferidos / bloqueados (opcional)  ⬜ PENDIENTE
-1. **CRM:** quick-edit de clasificación hot/warm/cold en la card del pipeline (diferido por conflicto dnd-kit —
-   resolver el conflicto de drag-and-drop primero). UX chico.
-2. **Ava — C03 Voz (Retell): BLOQUEADO** por cuentas externas. Requiere que Ivan: cree el voice agent en
-   `dashboard.retellai.com` (→ `RETELL_AGENT_ID`), importe número Twilio como SIP trunk (→ `RETELL_FROM_NUMBER`),
-   y entregue `RETELL_API_KEY`. Solo ejecutable cuando Ivan provea esas 3 vars; entonces: set en Railway + set webhook
+### Sesión 6 — Diferidos / bloqueados  ✅ Track A HECHA (2026-06-25, CRM commits `bb28eff`·`f44e501` Vercel prod) · ⛔ Track B BLOQUEADO
+1. **CRM Track A — quick-edit hot/warm/cold en la card del pipeline ✅ HECHA + DESPLEGADA + QA PASS.** Reusa el
+   componente `ClassificationQuickEdit` (de `app/dashboard/contacts/[id]/classification-quick-edit.tsx`, sesión 1B,
+   sin tocarlo) en cada `DealCard` de `app/dashboard/pipeline/pipeline-client.tsx`. **Approach elegido (Architect):**
+   (b) — el badge se SUBE a una capa hermana interactiva (`pointerEvents:auto` + `zIndex`) por encima del overlay de
+   drag de dnd-kit, MISMO patrón de escape que la fila Ver/Editar/Borrar ya probada en prod. NO se tocó el
+   PointerSensor (ya tenía `activationConstraint distance:8`) ni el overlay ni `handleDragEnd`. Render condicional:
+   si `deal.contact_id` es string → `ClassificationQuickEdit`; si null → badge estático (fallback). **Bug encontrado
+   en QA y arreglado (commit `f44e501`):** el popover quedaba ocluido por la fila hover Ver/Editar/Borrar — ambas capas
+   eran `zIndex:2` hermanas, la posterior en DOM (acciones) pintaba encima e interceptaba los clics de las opciones
+   bajas del popover. Fix: header layer a `zIndex:3` (> 2) → el popover (z50 dentro de ese contexto) pinta sobre la
+   fila de acciones. Drag intacto. **Reviews:** security-reviewer **CLEAR** (mismo trust boundary que el detalle de
+   contacto: write vía browser client bajo RLS owner-scoped + is_admin_or_manager; sin IDOR/XSS/PII nuevos);
+   code-reviewer **APPROVE-WITH-FIXES** (doble margen 32px → fix `mb-4` condicional). tsc + next build EXIT 0 (local y
+   Vercel). **QA prod Playwright (admin, deal real Rosvalsan):** popover abre con 4 opciones; COLD persiste
+   `lead_classification='cold'` + `qualification_source='manual'` (freeze B-17, verificado en DB); "Sin calificar"→
+   `qualification_source='auto'` con down-recompute del gate correcto; **drag `lead_captured`→`qualified` persiste**
+   (3 dimensiones independientes intactas); popover NO ocluido en la card del fondo de la columna (elementFromPoint =
+   la option); responsive 375px sin overflow + opciones clickeables. Test data revertida. Deploy aislado all-deploy
+   (preview→health 200→prod→health 200), NO tocó Ava/Finance. **Con esto el roadmap Mantenimiento queda COMPLETO en su
+   parte accionable.**
+2. **Ava — C03 Voz (Retell): ⛔ BLOQUEADO (sin cambios esta sesión).** Ivan NO proveyó las 3 vars externas requeridas.
+   Sigue bloqueado por cuentas externas: requiere que Ivan cree el voice agent en `dashboard.retellai.com`
+   (→ `RETELL_AGENT_ID`), importe número Twilio como SIP trunk (→ `RETELL_FROM_NUMBER`), y entregue `RETELL_API_KEY`.
+   Solo ejecutable cuando provea esas 3 vars; entonces: set en Railway (Ava) + set webhook
    `https://remax-advance-ava-production.up.railway.app/retell/webhook` + QA de llamada saliente.
 
 ---
 
 ## Estado
-- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ✅ S3 CRM cleanup (2026-06-25, commits 9fe1c88·7c9e052·dd139df + migración drop_legacy_contact_columns) · ✅ S4 Ava hardening+n8n+docs (2026-06-25, commits 1b7d366·e6bcb71 + migración drop_legacy_contacts_pii_views + fix WF05 vía n8n REST) · ✅ S5 CRM B-15 CAPI (2026-06-25, commit dd3915e + migración 0021_capi_outbox + fix config agency_config.meta_pixel_id=1417942562598927; evento aceptado por Meta status=sent) · ⬜ S6 diferidos/bloqueados
-- Sugerencia: S1–S4 son las de mayor valor/menor riesgo. S5 es feature. S6 es opcional/bloqueado.
+- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ✅ S3 CRM cleanup (2026-06-25, commits 9fe1c88·7c9e052·dd139df + migración drop_legacy_contact_columns) · ✅ S4 Ava hardening+n8n+docs (2026-06-25, commits 1b7d366·e6bcb71 + migración drop_legacy_contacts_pii_views + fix WF05 vía n8n REST) · ✅ S5 CRM B-15 CAPI (2026-06-25, commit dd3915e + migración 0021_capi_outbox + fix config agency_config.meta_pixel_id=1417942562598927; evento aceptado por Meta status=sent) · ✅ S6 Track A CRM quick-edit pipeline (2026-06-25, commits bb28eff·f44e501, Vercel prod, QA PASS) · ⛔ S6 Track B Ava Retell voz BLOQUEADO (faltan RETELL_AGENT_ID/FROM_NUMBER/API_KEY)
+- **ROADMAP COMPLETO en su parte accionable** (S1–S5 + S6 Track A). Único pendiente = S6 Track B (Retell), bloqueado por cuentas externas que solo Ivan puede crear.
+- Sugerencia: S1–S4 son las de mayor valor/menor riesgo. S5 es feature. S6 Track A es UX chico ya hecho; Track B bloqueado.
