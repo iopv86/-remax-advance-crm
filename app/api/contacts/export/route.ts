@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { isPrivileged, type AgentRole } from "@/lib/supabase/get-session-agent";
+import { PROPERTY_TYPE_LABELS } from "@/lib/intereses-labels";
 
 const HEADERS_ES: Record<string, string> = {
   first_name:             "Nombre",
@@ -15,7 +16,7 @@ const HEADERS_ES: Record<string, string> = {
   budget_min:             "Presupuesto Mín",
   budget_max:             "Presupuesto Máx",
   budget_currency:        "Moneda",
-  property_type_interest: "Tipo Propiedad",
+  property_types:         "Tipo Propiedad",
   purpose:                "Propósito",
   payment_method:         "Forma de Pago",
   is_qualified:           "Calificado",
@@ -29,7 +30,7 @@ const COLUMN_ORDER = [
   "first_name", "last_name", "phone", "whatsapp_number", "email",
   "lead_classification", "lead_status", "source", "lead_score",
   "budget_min", "budget_max", "budget_currency",
-  "property_type_interest", "purpose", "payment_method",
+  "property_types", "purpose", "payment_method",
   "is_qualified", "follow_up_count", "agent_name",
   "created_at", "last_activity_at",
 ];
@@ -46,6 +47,11 @@ function escapeCell(value: unknown): string {
 function formatValue(key: string, value: unknown): string {
   if (value === null || value === undefined) return "";
   if (key === "is_qualified") return value ? "Sí" : "No";
+  if (key === "property_types") {
+    // property_type[] → Spanish labels joined with "; " (escapeCell quotes if needed)
+    const arr = Array.isArray(value) ? (value as string[]) : [];
+    return arr.map((t) => PROPERTY_TYPE_LABELS[t] ?? t).join("; ");
+  }
   if (key === "created_at" || key === "last_activity_at") {
     try {
       return new Date(value as string).toLocaleDateString("es-DO");
@@ -88,7 +94,7 @@ export async function GET(req: NextRequest) {
       `id, first_name, last_name, phone, whatsapp_number, email,
        lead_classification, lead_status, source, lead_score,
        budget_min, budget_max, budget_currency,
-       property_type_interest, purpose, payment_method,
+       property_types, purpose, payment_method,
        is_qualified, follow_up_count,
        created_at, last_activity_at,
        agent:agents!contacts_agent_id_fkey(full_name)`

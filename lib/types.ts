@@ -33,8 +33,7 @@ export interface Contact {
   budget_max?: number;
   budget_currency?: CurrencyType;
   preferred_locations?: string[];
-  property_type_interest?: PropertyType | null; // legacy scalar (auto-synced mirror of property_types; retired in 1C)
-  property_types?: PropertyType[] | null;       // canonical multi-select (migration 0015)
+  property_types?: PropertyType[] | null;       // canonical multi-select (migration 0015; scalar property_type_interest dropped in 1C)
   operation_type?: "buy" | "sell" | "rent" | null;
   condition?: "ready" | "under_construction" | "any" | null;
   desired_amenities?: string[];                 // property has_* keys (migration 0006 vocabulary)

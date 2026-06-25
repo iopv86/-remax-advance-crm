@@ -498,9 +498,9 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                 const { bg: avBg, color: avColor } = avatarPalette(initials);
                 const badge = getStatusBadge(c.lead_classification);
 
-                // Interest text — prefer the multi-select array, fall back to legacy scalar.
+                // Interest text — from the multi-select array.
                 const interestParts: string[] = [];
-                const cTypes = c.property_types ?? (c.property_type_interest ? [c.property_type_interest] : []);
+                const cTypes = c.property_types ?? [];
                 if (cTypes.length > 0) {
                   interestParts.push(cTypes.map((t) => PROPERTY_LABELS[t] ?? t).join(", "));
                 }

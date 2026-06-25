@@ -19,27 +19,22 @@ export async function getMatchedProperties(contactId: string): Promise<PropertyM
 
   const { data: contact, error: contactError } = await supabase
     .from("contacts")
-    .select("budget_min, budget_max, budget_currency, property_type_interest, property_types")
+    .select("budget_min, budget_max, budget_currency, property_types")
     .eq("id", contactId)
     .single();
 
   if (contactError || !contact) return [];
 
-  const { budget_min, budget_max, property_type_interest, property_types } = contact as {
+  const { budget_min, budget_max, property_types } = contact as {
     budget_min: number | null;
     budget_max: number | null;
     budget_currency: CurrencyType | null;
-    property_type_interest: PropertyType | null;
     property_types: PropertyType[] | null;
   };
 
-  // Prefer the multi-select array; fall back to the legacy scalar (kept in sync by the DB trigger).
+  // Multi-select property types of interest.
   const wantedTypes: PropertyType[] =
-    property_types && property_types.length > 0
-      ? property_types
-      : property_type_interest
-        ? [property_type_interest]
-        : [];
+    property_types && property_types.length > 0 ? property_types : [];
 
   // No budget data means Ava hasn't captured preferences yet — return empty
   if (budget_min == null && budget_max == null) return [];
