@@ -158,6 +158,16 @@ export function DashboardClient({ data }: { data: DashboardData }) {
       {/* ── Canvas ── */}
       <section className="px-4 py-5 pb-10 flex flex-col gap-5 md:px-8 md:py-6 md:pb-14">
 
+        {/* ── Mobile-only FX pill ── */}
+        {/* The header (with the desktop pill) is hidden on mobile, so the USD/DOP
+            rate would otherwise be unreachable on phones. Rendered as a sibling of
+            the hero strip — NOT inside it — because the hero's overflow:hidden would
+            clip the popover. align="left" anchors the 280px popover to the left edge
+            so it never spills off a narrow viewport. Desktop is untouched (md:hidden). */}
+        <div className="flex md:hidden">
+          <FxRatePill snapshot={fxRates} align="left" />
+        </div>
+
         {/* ── Hero welcome strip ── */}
         <div
           className="animate-fade-up"

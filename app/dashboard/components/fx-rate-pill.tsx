@@ -29,7 +29,16 @@ function formatUpdated(apiDate: string): string {
   });
 }
 
-export function FxRatePill({ snapshot }: { snapshot: RatesSnapshot | null }) {
+export function FxRatePill({
+  snapshot,
+  align = "right",
+}: {
+  snapshot: RatesSnapshot | null;
+  // Popover anchor edge. "right" (default) for the desktop header pill; "left"
+  // for the mobile pill so the 280px popover expands rightward and never spills
+  // off the left viewport edge on narrow screens.
+  align?: "left" | "right";
+}) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -133,7 +142,8 @@ export function FxRatePill({ snapshot }: { snapshot: RatesSnapshot | null }) {
           style={{
             position: "absolute",
             top: 40,
-            right: 0,
+            right: align === "right" ? 0 : "auto",
+            left: align === "left" ? 0 : "auto",
             width: 280,
             maxHeight: 420,
             overflowY: "auto",
