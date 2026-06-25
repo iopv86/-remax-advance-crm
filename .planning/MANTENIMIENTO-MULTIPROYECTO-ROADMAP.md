@@ -45,19 +45,36 @@ para empatar con el CRM; mantener cache 5 min y orden de fuentes; poner `TASAREA
 **Accesos:** https://advance-finance-iota.vercel.app (ipimentel@remaxadvance.com / Advance2026). Constraint: `db` port 6543 en TODOS los routes.
 </details>
 
-### Sesión 2 — Ava: bug de prod `obtener_info_proyecto` + verificación B14  ⬜ PENDIENTE
+### Sesión 2 — Ava: bug de prod `obtener_info_proyecto` + verificación B14  ✅ HECHA (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls)
+**Resultado:** las dos "verdades" de la memoria eran STALE. Root cause real, verificado contra prod:
+1. **`obtener_info_proyecto` NO estaba roto por auth.** Sign-in (SUPABASE_AVA_EMAIL/PASSWORD, presentes en
+   Railway con esos nombres; `AVA_EMAIL`/`AVA_PASS` nunca los lee el código) → 200; OpenAI → 200; RPC
+   `match_project_content` → 200 con 3 chunks. La path vectorial SIEMPRE funcionó. **Bug real:** el fallback
+   tsvector usaba el operador PostgREST `fts` (→ `to_tsquery`), que da **HTTP 400** ante cualquier frase
+   multi-palabra ("amenidades del proyecto"). Si OpenAI fallaba, el fallback 400 → devolvía vacío (de ahí el
+   síntoma "roto para los 6"). Fix 1 línea en `agent/tools.py`: `fts` → `plfts` (`plainto_tsquery`, prod-test 200).
+   Deploy: git push → Railway build **SUCCESS** (88fa3be). QA prod: vector 200/3 chunks + plfts 200; e2e real
+   `obtener_info_proyecto` devuelve 3 chunks para bcr/gv/col (los 6 tienen embeddings).
+2. **B14 sí estaba roto — descubierto en la verificación.** `registrar_lead` con score creaba el contacto pero
+   `_create_deal_for_contact` daba **403 RLS** al insertar en `deals` (la policy `deals_insert` no incluía
+   `is_ava_bot()`; el bot no es agente ni admin/manager). Fix: **migración `b14_deals_ava_bot_rls`** (aplicada a
+   prod via MCP) — añade `OR is_ava_bot()` a `deals_insert` (WITH CHECK) y `deals_select` (USING), espejando el
+   patrón YA existente en `contacts`. QA prod live: HOT→deal nuevo_sin_contactar+agente; WARM-A/WARM-B→idem
+   (ambos mapean a warm); COLD→sin agente/sin deal. Filas QA limpiadas (0 remanentes). security-review (0 CRIT/HIGH;
+   1 MEDIUM diferido: deals_insert no limita qué agent_id puede poner el bot — el FK ya bloquea UUIDs inexistentes,
+   y un constraint is_active re-rompería deals de contactos cuyo agente se desactiva) + code-reviewer APPROVE.
+**Deuda:** orchestrator.py tenía cambios sin commitear (NO míos) → dejados intactos. RR pointer avanzó +3 por el test.
+**Siguiente: S3 CRM cleanup.**
+
+<details><summary>Spec original</summary>
 **Proyecto:** Ava — `C:\Users\ivanp\whatsapp-agentkit` (Railway, Python FastAPI + GPT-4o).
-**Objetivo:** arreglar el tool roto en prod y verificar el flujo de leads con score.
 1. **BUG `obtener_info_proyecto` roto para los 6 proyectos.** Memoria dice `AVA_EMAIL`/`AVA_PASS` faltantes,
-   pero Railway lista `SUPABASE_AVA_EMAIL`/`SUPABASE_AVA_PASSWORD` → DISCREPANCIA DE NOMBRE. VERIFICAR qué var
-   lee el código (`agent/supabase_auth.py` / `tools.py`), confirmar en Railway, probar el tool en prod.
-   Root cause antes de parchear (sin auth → PostgREST slug→ID → pgvector RPC no ejecuta).
+   pero Railway lista `SUPABASE_AVA_EMAIL`/`SUPABASE_AVA_PASSWORD`. VERIFICAR qué var lee el código, confirmar
+   en Railway, probar el tool en prod. Root cause antes de parchear.
 2. **Verificación funcional B14:** `registrar_lead` con `score` (HOT/WARM-A/WARM-B/COLD) → crea deal en
-   `nuevo_sin_contactar` para hot/warm, COLD solo follow-up. Disparar el path (conversación WA real o test que
-   invoque `registrar_lead` con score) y confirmar contacto+deal+agente en el CRM.
-**Deploy:** git push a `iopv86/remax-advance-ava` (verificar build Railway SUCCESS). py_compile + tests antes de push.
-**DB:** Ava lee/escribe en la DB del CRM (`zlnqsgepzfghlmsfolko`: contacts/mensajes) + `project_availability`.
-**Accesos:** https://remax-advance-ava-production.up.railway.app.
+   `nuevo_sin_contactar` para hot/warm, COLD solo follow-up.
+**DB:** `zlnqsgepzfghlmsfolko`. **Accesos:** https://remax-advance-ava-production.up.railway.app.
+</details>
 
 ### Sesión 3 — CRM: cleanup técnico (deuda)  ⬜ PENDIENTE
 **Proyecto:** Advance CRM — `C:\Users\ivanp\advance-crm` (Vercel). NO toca Ava. (Roadmap Intereses+Campañas YA completo.)
@@ -97,5 +114,5 @@ el evento llega a Meta (Events Manager / test events). **Accesos:** CRM prod (ad
 ---
 
 ## Estado
-- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ⬜ S2 Ava bug+B14 · ⬜ S3 CRM cleanup · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
+- ✅ S1 Finance tasa (2026-06-25, commit 36319a2) · ✅ S2 Ava bug+B14 (2026-06-25, commit 88fa3be + migración b14_deals_ava_bot_rls) · ⬜ S3 CRM cleanup · ⬜ S4 Ava hardening+n8n+docs · ⬜ S5 CRM B-15 CAPI · ⬜ S6 diferidos/bloqueados
 - Sugerencia: S1–S4 son las de mayor valor/menor riesgo. S5 es feature. S6 es opcional/bloqueado.
