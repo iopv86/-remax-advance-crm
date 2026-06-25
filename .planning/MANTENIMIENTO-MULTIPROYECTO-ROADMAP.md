@@ -109,7 +109,15 @@ para empatar con el CRM; mantener cache 5 min y orden de fuentes; poner `TASAREA
 2. **n8n WF05 Follow-up QA:** agendado ≥ 2026-07-01 (reset mensual de templates Meta). Validar exec del workflow 05
    (`5zfxCLHPgMMG2DJY`) — Step 1/2/3 re-engagement. (Si la sesión es antes del 01-jul, saltar este punto.)
 3. **P3 M4:** documentar los WA workflows legacy (`WA - Webhook Verify`, `WA - Lead Capture & Qualify`).
-**Deploy:** git push a `iopv86/remax-advance-ava` si toca código. **Plugins:** n8n-MCP.
+4. **Deuda de seguridad (CRM DB, descubierta en S3, solo Supabase) — definer-views que filtran PII:** las 4 views
+   `contacts_active`/`contacts_archived`/`contacts_export`/`contacts_with_email` (Supabase `zlnqsgepzfghlmsfolko`)
+   corren con **definer rights** y conceden `SELECT` a `anon`/`authenticated` → exponen `contacts` (incl. `phone`,
+   `email`) saltándose la RLS owner-scoped de la tabla. Además están **stale** (les faltan `property_types` y todo lo
+   post-0012). NO las usa ningún código de app ni función DB (verificado en S3). **Acción:** decidir con AskUserQuestion
+   entre (a) `DROP` de las 4 (no hay consumidor conocido — lo más limpio) o (b) `ALTER VIEW … SET (security_invoker=on)`
+   + `REVOKE` de `anon` para que respeten la RLS de quien consulta. Migración via MCP; **encaja en S4 por ser hardening
+   de exposición anon en la misma DB compartida** (pero es cambio CRM-DB: NO toca código Ava/Vercel/Railway, solo SQL).
+**Deploy:** git push a `iopv86/remax-advance-ava` si toca código Ava; el item 4 es migración Supabase pura (sin deploy de app). **Plugins:** n8n-MCP, Supabase MCP.
 
 ### Sesión 5 — CRM: B-15 CAPI Enhancement (feature)  ⬜ PENDIENTE
 **Proyecto:** Advance CRM. Del roadmap original (B-15): señal negativa **closed_lost** a Meta CAPI + **match por
