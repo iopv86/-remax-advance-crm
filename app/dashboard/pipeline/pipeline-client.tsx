@@ -6,7 +6,8 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { AgentFilter, type AgentFilterOption } from "@/components/agent-filter";
 import { STAGE_LABELS } from "@/lib/types";
-import type { Deal, DealStage } from "@/lib/types";
+import type { Deal, DealStage, LeadClassification } from "@/lib/types";
+import { ClassificationQuickEdit } from "@/app/dashboard/contacts/[id]/classification-quick-edit";
 import Link from "next/link";
 import {
   DndContext,
@@ -152,10 +153,20 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
       {/* Drag handle area */}
       <div {...listeners} {...attributes} className="absolute inset-0 rounded" style={{ cursor: "grab" }} />
 
-      {/* Card content (above drag layer) */}
-      <div className="relative" style={{ pointerEvents: "none" }}>
-        {/* Header row: classification badge + age */}
-        <div className="flex justify-between items-start mb-4">
+      {/* Interactive header layer — quick-edit temperature + Ganado.
+          Sibling of the drag overlay with pointerEvents:auto + zIndex (same escape
+          pattern as the Ver/Editar/Borrar row), so clicks here never reach the drag
+          listeners and the badge becomes editable without breaking column drag. */}
+      <div
+        className={`flex justify-between items-start${contactId ? "" : " mb-4"}`}
+        style={{ position: "relative", zIndex: 2, pointerEvents: "auto" }}
+      >
+        {contactId ? (
+          <ClassificationQuickEdit
+            contactId={contactId}
+            classification={contact?.lead_classification as LeadClassification | undefined}
+          />
+        ) : (
           <span
             style={{
               background: "rgba(59,130,246,0.1)",
@@ -171,22 +182,25 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
           >
             {contact?.lead_classification ?? "Lead"}
           </span>
-          {isWon && (
-            <span
-              style={{
-                fontSize: "10px",
-                color: "#34d399",
-                fontWeight: 700,
-                display: "flex",
-                alignItems: "center",
-                gap: 3,
-              }}
-            >
-              ✓ Ganado
-            </span>
-          )}
-        </div>
+        )}
+        {isWon && (
+          <span
+            style={{
+              fontSize: "10px",
+              color: "#34d399",
+              fontWeight: 700,
+              display: "flex",
+              alignItems: "center",
+              gap: 3,
+            }}
+          >
+            ✓ Ganado
+          </span>
+        )}
+      </div>
 
+      {/* Card content (above drag layer) */}
+      <div className="relative" style={{ pointerEvents: "none" }}>
         {/* Property / deal name — contact name as headline */}
         <h4
           style={{
