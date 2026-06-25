@@ -106,8 +106,9 @@ para empatar con el CRM; mantener cache 5 min y orden de fuentes; poner `TASAREA
 **Proyecto:** Ava — `C:\Users\ivanp\whatsapp-agentkit` + n8n (`irmgroup.app.n8n.cloud`).
 1. **Hardening:** migrar las lecturas read-only de Ava de service-role key → anon key (pendiente v9). VERIFICAR
    que las RLS de Ava (`is_ava_bot`) permiten los reads con anon+JWT ANTES de cambiar.
-2. **n8n WF05 Follow-up QA:** agendado ≥ 2026-07-01 (reset mensual de templates Meta). Validar exec del workflow 05
-   (`5zfxCLHPgMMG2DJY`) — Step 1/2/3 re-engagement. (Si la sesión es antes del 01-jul, saltar este punto.)
+2. **n8n WF05 Follow-up QA (ACTIVO en S4, ya no condicional al 01-jul):** validar exec del workflow 05
+   (`5zfxCLHPgMMG2DJY`) — Step 1/2/3 re-engagement, vía n8n-MCP. Nota: los templates Meta resetean mensualmente,
+   así que la QA debe considerar el estado actual de la ventana de templates (no asumir reset reciente).
 3. **P3 M4:** documentar los WA workflows legacy (`WA - Webhook Verify`, `WA - Lead Capture & Qualify`).
 4. **Deuda de seguridad (CRM DB, descubierta en S3, solo Supabase) — definer-views que filtran PII:** las 4 views
    `contacts_active`/`contacts_archived`/`contacts_export`/`contacts_with_email` (Supabase `zlnqsgepzfghlmsfolko`)
