@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { adminClient } from "@/lib/supabase/admin";
-import { notifyAgentTemplate } from "@/lib/meta-leads";
+import { notifyAgentTemplate, formatBudgetShort } from "@/lib/meta-leads";
 import { redirect } from "next/navigation";
 import type {
   DealPartyInput, DealPartyType,
@@ -39,6 +39,22 @@ async function getAgentId(): Promise<string> {
 // agent's phone (which the caller's own RLS may not expose). A notify-once guard
 // (agent_notified_at) makes it idempotent and blocks send-spam on the paid
 // WhatsApp template over the number shared with Ava.
+// Best-effort pull of the "preferred contact time" answer from the captured
+// lead_form_answers jsonb ({ fields: [{ name, label, values }] }). Returns null
+// for manual leads that never had a Meta form.
+function extractHorario(answers: unknown): string | null {
+  const fields = (answers as { fields?: Array<{ name?: string; values?: string[] }> } | null)?.fields;
+  if (!Array.isArray(fields)) return null;
+  for (const f of fields) {
+    const name = (f?.name ?? "").toLowerCase();
+    if (name.includes("momento") || name.includes("horario")) {
+      const v = f?.values?.[0]?.trim();
+      if (v) return v.slice(0, 100);
+    }
+  }
+  return null;
+}
+
 export async function notifyAgentNewLead(dealId: string): Promise<void> {
   try {
     if (!UUID_RE.test(dealId)) return;
@@ -81,7 +97,7 @@ export async function notifyAgentNewLead(dealId: string): Promise<void> {
     const { data: contact } = deal.contact_id
       ? await admin
           .from("contacts")
-          .select("first_name, last_name, phone")
+          .select("first_name, last_name, phone, budget_min, budget_max, budget_currency, meta_form_name, lead_form_answers")
           .eq("id", deal.contact_id)
           .maybeSingle()
       : { data: null };
@@ -90,7 +106,21 @@ export async function notifyAgentNewLead(dealId: string): Promise<void> {
       : "";
     const leadPhone = (contact?.phone as string | null) ?? null;
 
-    notifyAgentTemplate(agent.phone as string, leadName, leadPhone);
+    // Enriched agent-notification fields (v2 template). All fall back to a
+    // placeholder — Meta rejects empty template params.
+    const c = contact as Record<string, unknown> | null;
+    const budgetDisplay = formatBudgetShort(
+      c?.budget_min as number | null,
+      c?.budget_max as number | null,
+      c?.budget_currency as string | null,
+    );
+    // Interest = the human-readable campaign/form name. property_types/purpose are
+    // raw English enums, so they're intentionally NOT used here to avoid leaking
+    // tokens like "apartment"/"investment" into a Spanish agent message.
+    const interes = (c?.meta_form_name as string | null)?.trim() || "No especificado";
+    const horario = extractHorario(c?.lead_form_answers) || "No especificado";
+
+    notifyAgentTemplate(agent.phone as string, leadName, leadPhone, budgetDisplay, interes, horario);
   } catch (err) {
     console.error("[actions] notifyAgentNewLead error:", (err as Error).message);
   }

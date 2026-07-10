@@ -218,9 +218,44 @@ export async function assignRrAgent(db: Db): Promise<AssignedAgent | null> {
 // ── agent + lead notifications (fire-and-forget) ───────────────────────────────
 
 // Approved Meta template that alerts the assigned agent about a new lead.
-// UTILITY category, Spanish, body params: {{1}} lead name, {{2}} lead phone.
-// Hardcoded (stable name, no env drift). Created in WhatsApp Manager.
-const AGENT_TEMPLATE_NAME = "ava_nuevo_lead_agente";
+// UTILITY, Spanish. v2 body params: {{1}} name, {{2}} interest/project,
+// {{3}} budget, {{4}} preferred contact time, {{5}} lead phone (tappable in
+// WhatsApp). Static "Abrir CRM" URL button (dynamic wa.me buttons are rejected
+// by Meta). Hardcoded stable name; v1 kept as a comment for instant rollback
+// (revert the constant): "ava_nuevo_lead_agente".
+const AGENT_TEMPLATE_NAME = "ava_nuevo_lead_agente_v2";
+
+/** Compact budget display, e.g. "US$72.5k-80k" / "RD$3.5M" / "No especificado". */
+export function formatBudgetShort(
+  min: number | null | undefined,
+  max: number | null | undefined,
+  currency: string | null | undefined,
+): string {
+  const sym = currency === "DOP" ? "RD$" : "US$";
+  const short = (n: number): string => {
+    if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k";
+    return String(Math.round(n));
+  };
+  const lo = typeof min === "number" && min > 0 ? min : null;
+  const hi = typeof max === "number" && max > 0 ? max : null;
+  if (lo && hi) return `${sym}${short(lo)}-${short(hi)}`;
+  if (lo) return `${sym}${short(lo)}`;
+  if (hi) return `${sym}${short(hi)}`;
+  return "No especificado";
+}
+
+/** First field value whose name contains any keyword (case-insensitive). */
+export function findAnswer(fields: FieldData[], keywords: string[]): string | null {
+  for (const f of fields ?? []) {
+    const name = (f.name ?? "").toLowerCase();
+    if (keywords.some((k) => name.includes(k))) {
+      const v = f.values?.[0]?.trim();
+      if (v) return v;
+    }
+  }
+  return null;
+}
 
 /**
  * Notifies the assigned agent about a new lead via an approved Meta template,
@@ -228,17 +263,30 @@ const AGENT_TEMPLATE_NAME = "ava_nuevo_lead_agente";
  * free-text path silently failed for agents outside that window). Fire-and-forget;
  * failure never blocks intake — the in-app bell (trg_notify_deal_assigned) covers
  * every deal insert regardless. Sends directly via Graph, same pattern as notifyLead.
+ * Callers pass already-derived strings; empty values fall back to placeholders
+ * (Meta rejects empty template params with 132000).
  */
-export function notifyAgentTemplate(agentPhone: string | null, leadName: string, leadPhone: string | null): void {
+export function notifyAgentTemplate(
+  agentPhone: string | null,
+  leadName: string,
+  leadPhone: string | null,
+  budgetDisplay: string,
+  interes: string,
+  horario: string,
+): void {
   const accessToken = process.env.META_ACCESS_TOKEN;
   const phoneNumberId = process.env.META_PHONE_NUMBER_ID;
   if (!agentPhone || !accessToken || !phoneNumberId) return;
   const digits = agentPhone.replace(/\D/g, "");
   if (!digits) return;
-  // WhatsApp template params must be single-line; cap length so an oversized
-  // value can't 400 the send (Meta also rejects params > ~1024 chars).
-  const p1 = (leadName || "Sin nombre").replace(/\s+/g, " ").trim().slice(0, 300);
-  const p2 = (leadPhone || "No provisto").replace(/\s+/g, " ").trim().slice(0, 60);
+  // WhatsApp template params must be single-line and non-empty; cap length so an
+  // oversized value can't 400 the send.
+  const clean = (v: string, n: number): string => (v || "").replace(/\s+/g, " ").trim().slice(0, n);
+  const p1 = clean(leadName, 300) || "Sin nombre";
+  const p2 = clean(interes, 200) || "No especificado";
+  const p3 = clean(budgetDisplay, 60) || "No especificado";
+  const p4 = clean(horario, 100) || "No especificado";
+  const p5 = clean(leadPhone ?? "", 60) || "No provisto";
   fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${phoneNumberId}/messages`, {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
@@ -255,6 +303,9 @@ export function notifyAgentTemplate(agentPhone: string | null, leadName: string,
             parameters: [
               { type: "text", text: p1 },
               { type: "text", text: p2 },
+              { type: "text", text: p3 },
+              { type: "text", text: p4 },
+              { type: "text", text: p5 },
             ],
           },
         ],
@@ -263,9 +314,16 @@ export function notifyAgentTemplate(agentPhone: string | null, leadName: string,
   }).catch((err) => console.error("[meta-leads] notifyAgentTemplate error:", (err as Error).message));
 }
 
-export function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string | null): void {
+export function notifyAgent(
+  agent: AssignedAgent,
+  leadName: string,
+  leadPhone: string | null,
+  budgetDisplay: string,
+  interes: string,
+  horario: string,
+): void {
   if (!agent.phone) return;
-  notifyAgentTemplate(agent.phone, leadName, leadPhone);
+  notifyAgentTemplate(agent.phone, leadName, leadPhone, budgetDisplay, interes, horario);
 }
 
 export async function notifyLead(leadPhone: string | null, leadFirstName: string): Promise<void> {
@@ -319,6 +377,13 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
   const budget = parseBudgetRange(
     pickField(fields, ["presupuesto", "presupuesto_estimado", "budget", "rango_de_presupuesto", "cuanto_desea_invertir"])
   );
+
+  // Agent-notification fields (interest = form/campaign name; horario = the
+  // time-of-day question, matched loosely since Meta returns question text as
+  // the field name). Both fall back to a placeholder — never empty.
+  const budgetDisplay = formatBudgetShort(budget?.min, budget?.max, budget?.currency);
+  const interes = (formName?.trim() || findAnswer(fields, ["proyecto", "interes", "interés"]) || "No especificado");
+  const horario = (findAnswer(fields, ["momento", "horario"]) || "No especificado");
 
   // Dedup by phone, then meta_lead_id
   let existingId: string | null = null;
@@ -377,7 +442,7 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
       await enqueueCapiEvent(db, {
         stage: "lead_captured", dealId: newDealId, contactId: existingId, email, phone, ctwaClid: existingCtwa,
       });
-      if (agent) notifyAgent(agent, rawName, phone);
+      if (agent) notifyAgent(agent, rawName, phone, budgetDisplay, interes, horario);
     }
     return { created: !!newDealId, contactId: existingId, reason: newDealId ? "existing_contact_new_deal" : "already_in_pipeline" };
   }
@@ -428,7 +493,7 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
       email: inserted.email, phone: inserted.phone, ctwaClid: null,
     });
   }
-  notifyAgent(agent, rawName, phone);
+  notifyAgent(agent, rawName, phone, budgetDisplay, interes, horario);
   notifyLead(phone, firstName).catch(() => {});
   return { created: true, contactId: inserted.id, reason: "new_contact" };
 }
