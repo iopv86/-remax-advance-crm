@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
+import { computeCommission } from "@/lib/commission";
 
 // Stage buckets for funnel counting
 const CONTACTED_STAGES = [
@@ -76,7 +77,7 @@ export async function GET(req: NextRequest) {
   // Fetch contacts with meta_campaign_id in date range, joined with their deals
   const { data: contacts, error } = await db
     .from("contacts")
-    .select("id, meta_campaign_id, deals(stage, deal_value, commission_value)")
+    .select("id, meta_campaign_id, deals(stage, deal_value, commission_value, commission_percentage)")
     .not("meta_campaign_id", "is", null)
     .gte("created_at", fromTs)
     .lte("created_at", toTs);
@@ -121,6 +122,7 @@ export async function GET(req: NextRequest) {
       stage: string;
       deal_value: number | null;
       commission_value: number | null;
+      commission_percentage: number | null;
     }> | null) ?? [];
 
     for (const deal of deals) {
@@ -137,7 +139,7 @@ export async function GET(req: NextRequest) {
       }
       if (stage === "closed_won") {
         row.closed_won_count++;
-        row.total_commission += deal.commission_value ?? 0;
+        row.total_commission += computeCommission(deal);
       }
       // Pipeline value: all active deals (not closed_lost or lead_captured)
       if (stage !== "closed_lost" && stage !== "lead_captured") {

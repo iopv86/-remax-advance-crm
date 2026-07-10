@@ -288,6 +288,15 @@
 
   body { @apply bg-background text-foreground; }
 
+  /* Native <select> dropdown options — force theme-aware colors so the
+     OS-drawn option popup is legible in dark mode (otherwise it inherits
+     nothing and renders near-invisible on the dark surface). */
+  select option,
+  select optgroup {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
+
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 99px; }

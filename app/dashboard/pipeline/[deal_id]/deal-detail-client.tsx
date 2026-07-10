@@ -25,6 +25,7 @@ import {
   AMENITY_LABELS,
 } from "@/lib/intereses-labels";
 import { CampaignAttribution } from "@/components/contacts/campaign-attribution";
+import { computeCommission } from "@/lib/commission";
 
 const ALL_STAGES: DealStage[] = [
   "nuevo_sin_contactar", "lead_captured", "qualified", "contacted", "showing_scheduled",
@@ -567,11 +568,20 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                     <TrendingUp className="w-3 h-3" /> Comisión estimada
                   </p>
                   <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
-                    {deal.commission_value
-                      ? formatCurrency(deal.commission_value, deal.currency)
-                      : deal.commission_percentage
-                      ? `${deal.commission_percentage}%`
-                      : "—"}
+                    {(() => {
+                      const amt = computeCommission(deal);
+                      if (amt <= 0 && deal.commission_value == null && deal.commission_percentage == null) return "—";
+                      return (
+                        <>
+                          {formatCurrency(amt, deal.currency)}
+                          {deal.commission_percentage != null && (
+                            <span className="text-xs font-normal ml-1" style={{ color: "var(--muted-foreground)" }}>
+                              ({deal.commission_percentage}%)
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
                   </span>
                 </div>
 

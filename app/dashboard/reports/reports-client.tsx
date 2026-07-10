@@ -14,6 +14,7 @@ import {
 import { Download, TrendingUp, Users, DollarSign, Award } from "lucide-react";
 import { AgentFilter } from "@/components/agent-filter";
 import type { DealRow, AgentRow } from "./page";
+import { computeCommission } from "@/lib/commission";
 
 // ─── Tokens ────────────────────────────────────────────────────────────────────
 
@@ -93,7 +94,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
   const closedLost  = filtered.filter((d) => d.stage === "closed_lost");
   const active      = filtered.filter((d) => !["closed_won", "closed_lost"].includes(d.stage));
   const totalRevenue = closedWon.reduce((s, d) => s + (d.deal_value ?? 0), 0);
-  const totalCommission = closedWon.reduce((s, d) => s + (d.commission_value ?? 0), 0);
+  const totalCommission = closedWon.reduce((s, d) => s + computeCommission(d), 0);
   const conversionRate = filtered.length > 0
     ? ((closedWon.length / filtered.length) * 100).toFixed(1)
     : "0.0";
@@ -120,7 +121,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
     const won          = agentDeals.filter((d) => d.stage === "closed_won");
     const lost         = agentDeals.filter((d) => d.stage === "closed_lost");
     const revenue      = won.reduce((s, d) => s + (d.deal_value ?? 0), 0);
-    const commission   = won.reduce((s, d) => s + (d.commission_value ?? 0), 0);
+    const commission   = won.reduce((s, d) => s + computeCommission(d), 0);
     const conv         = agentDeals.length > 0 ? ((won.length / agentDeals.length) * 100).toFixed(0) : "0";
     return { id: a.id, name: a.full_name ?? a.email, total: agentDeals.length, won: won.length, lost: lost.length, revenue, commission, conv };
   }).filter((a) => a.total > 0)

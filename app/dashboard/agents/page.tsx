@@ -8,6 +8,7 @@ import type {
   AgentRole,
 } from "@/lib/types";
 import { AgentsClient } from "./agents-client";
+import { computeCommission } from "@/lib/commission";
 
 // ─── Domain types ─────────────────────────────────────────────────────────────
 
@@ -205,12 +206,11 @@ export default async function AgentsPage({
       deals_closed: 0,
       total_revenue: 0,
     };
-    const rev =
-      deal.commission_value != null
-        ? (deal.commission_value as number)
-        : (((deal.deal_value as number) ?? 0) *
-            ((deal.commission_percentage as number) ?? 3)) /
-          100;
+    const rev = computeCommission({
+      commission_value: deal.commission_value as number | null,
+      deal_value: deal.deal_value as number | null,
+      commission_percentage: deal.commission_percentage as number | null,
+    });
     closedByAgent.set(deal.agent_id, {
       deals_closed: prev.deals_closed + 1,
       total_revenue: prev.total_revenue + rev,
