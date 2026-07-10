@@ -1,6 +1,8 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { adminClient } from "@/lib/supabase/admin";
+import { notifyAgentTemplate } from "@/lib/meta-leads";
 import { redirect } from "next/navigation";
 import type {
   DealPartyInput, DealPartyType,
@@ -21,6 +23,77 @@ async function getAgentId(): Promise<string> {
 
   if (!agent) redirect("/login");
   return agent.id as string;
+}
+
+// ─── WhatsApp alert to the assigned agent on manual deal creation ─────────────
+// The Meta poller and Ava already notify the agent on their own intake paths;
+// manual creation in the CRM did not. Fires the approved template so a manually
+// created + assigned lead reaches the agent's phone too. Fire-and-forget: never
+// blocks the create flow, and the in-app bell (trg_notify_deal_assigned) covers
+// regardless. Server-only so the Meta token never reaches the browser.
+//
+// Access control: the deal is read with the USER-scoped client so RLS
+// (deals: agent_id = auth.uid() OR is_admin_or_manager()) rejects the read for a
+// caller with no legitimate access — no IDOR via an arbitrary dealId. The
+// service-role client is used only AFTER that check, to look up the assigned
+// agent's phone (which the caller's own RLS may not expose). A notify-once guard
+// (agent_notified_at) makes it idempotent and blocks send-spam on the paid
+// WhatsApp template over the number shared with Ava.
+export async function notifyAgentNewLead(dealId: string): Promise<void> {
+  try {
+    if (!UUID_RE.test(dealId)) return;
+    // Silent auth — this is a background side-effect, never redirect the user.
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user?.email) return;
+    const { data: caller } = await supabase
+      .from("agents").select("id").eq("email", user.email).maybeSingle();
+    if (!caller) return;
+    const creatorAgentId = caller.id as string;
+
+    // RLS-scoped read: null if the caller cannot see this deal.
+    const { data: deal } = await supabase
+      .from("deals")
+      .select("agent_id, contact_id, agent_notified_at")
+      .eq("id", dealId)
+      .maybeSingle();
+    if (!deal?.agent_id) return;
+    // Don't WhatsApp yourself; only a cross-assignment alerts.
+    if (deal.agent_id === creatorAgentId) return;
+    // Notify-once: idempotent + anti-spam.
+    if (deal.agent_notified_at) return;
+
+    // Claim the send first so concurrent/duplicate calls short-circuit above.
+    await supabase
+      .from("deals")
+      .update({ agent_notified_at: new Date().toISOString() })
+      .eq("id", dealId);
+
+    // Post-authorization: service-role lookup for the agent phone + contact PII.
+    const admin = adminClient();
+    const { data: agent } = await admin
+      .from("agents")
+      .select("phone")
+      .eq("id", deal.agent_id)
+      .maybeSingle();
+    if (!agent?.phone) return;
+
+    const { data: contact } = deal.contact_id
+      ? await admin
+          .from("contacts")
+          .select("first_name, last_name, phone")
+          .eq("id", deal.contact_id)
+          .maybeSingle()
+      : { data: null };
+    const leadName = contact
+      ? `${contact.first_name ?? ""} ${contact.last_name ?? ""}`.trim()
+      : "";
+    const leadPhone = (contact?.phone as string | null) ?? null;
+
+    notifyAgentTemplate(agent.phone as string, leadName, leadPhone);
+  } catch (err) {
+    console.error("[actions] notifyAgentNewLead error:", (err as Error).message);
+  }
 }
 
 // ─── Deal parties (Co-comprador / Referidor) — migration 0018 ─────────────────

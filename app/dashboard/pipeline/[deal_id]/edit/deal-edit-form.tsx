@@ -19,7 +19,7 @@ import {
   type SelectOption,
 } from "@/components/form/fields";
 import { FormShell, FormSection } from "@/components/form/form-shell";
-import { saveDealParties, saveDealInstallments } from "../../actions";
+import { saveDealParties, saveDealInstallments, notifyAgentNewLead } from "../../actions";
 
 // One editable party row (co-buyer or referrer). UI scope: 1 of each (S4 decision).
 interface PartyRow {
@@ -222,6 +222,9 @@ export function DealEditForm({
         setSaving(false);
         return;
       }
+      // Fire-and-forget WhatsApp alert to the assigned agent (server action).
+      // Only notifies on cross-assignment (agent != creator); never blocks navigation.
+      void notifyAgentNewLead(inserted.id as string).catch(() => {});
       const partyResult = await saveDealParties(inserted.id as string, buildParties());
       if (!partyResult.success) {
         setSaving(false);

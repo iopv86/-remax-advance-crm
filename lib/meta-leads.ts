@@ -217,25 +217,55 @@ export async function assignRrAgent(db: Db): Promise<AssignedAgent | null> {
 
 // ── agent + lead notifications (fire-and-forget) ───────────────────────────────
 
-export function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string | null): void {
-  const webhookUrl = process.env.AVA_WEBHOOK_URL;
-  if (!webhookUrl) return;
-  const phone = agent.phone ?? process.env.AVA_NOTIFY_PHONE;
-  if (!phone) return;
-  const agentLabel = agent.full_name ?? "Agente";
-  const digits = leadPhone?.replace(/\D/g, "") ?? "";
-  const waLink = digits ? `\nWhatsApp: https://wa.me/${digits}` : "";
-  const message =
-    `*LEAD NUEVO (Formulario) -- ${leadName || "Sin nombre"}*\n` +
-    `Asignado a: ${agentLabel}\n` +
-    `Telefono: ${leadPhone || "No provisto"}${waLink}\n` +
-    `\nContacta en los proximos 5 minutos -- las probabilidades de cierre caen 80% despues de 30 min.\n` +
-    `CRM: https://remax-advance-crm.vercel.app/dashboard/leads-entrantes`;
-  fetch(webhookUrl, {
+// Approved Meta template that alerts the assigned agent about a new lead.
+// UTILITY category, Spanish, body params: {{1}} lead name, {{2}} lead phone.
+// Hardcoded (stable name, no env drift). Created in WhatsApp Manager.
+const AGENT_TEMPLATE_NAME = "ava_nuevo_lead_agente";
+
+/**
+ * Notifies the assigned agent about a new lead via an approved Meta template,
+ * so delivery does NOT depend on the 24h customer-service window (the old
+ * free-text path silently failed for agents outside that window). Fire-and-forget;
+ * failure never blocks intake — the in-app bell (trg_notify_deal_assigned) covers
+ * every deal insert regardless. Sends directly via Graph, same pattern as notifyLead.
+ */
+export function notifyAgentTemplate(agentPhone: string | null, leadName: string, leadPhone: string | null): void {
+  const accessToken = process.env.META_ACCESS_TOKEN;
+  const phoneNumberId = process.env.META_PHONE_NUMBER_ID;
+  if (!agentPhone || !accessToken || !phoneNumberId) return;
+  const digits = agentPhone.replace(/\D/g, "");
+  if (!digits) return;
+  // WhatsApp template params must be single-line; cap length so an oversized
+  // value can't 400 the send (Meta also rejects params > ~1024 chars).
+  const p1 = (leadName || "Sin nombre").replace(/\s+/g, " ").trim().slice(0, 300);
+  const p2 = (leadPhone || "No provisto").replace(/\s+/g, " ").trim().slice(0, 60);
+  fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${phoneNumberId}/messages`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "X-Notify-Secret": process.env.NOTIFY_SECRET ?? "" },
-    body: JSON.stringify({ phone, message }),
-  }).catch(() => {});
+    headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messaging_product: "whatsapp",
+      to: digits,
+      type: "template",
+      template: {
+        name: AGENT_TEMPLATE_NAME,
+        language: { code: "es" },
+        components: [
+          {
+            type: "body",
+            parameters: [
+              { type: "text", text: p1 },
+              { type: "text", text: p2 },
+            ],
+          },
+        ],
+      },
+    }),
+  }).catch((err) => console.error("[meta-leads] notifyAgentTemplate error:", (err as Error).message));
+}
+
+export function notifyAgent(agent: AssignedAgent, leadName: string, leadPhone: string | null): void {
+  if (!agent.phone) return;
+  notifyAgentTemplate(agent.phone, leadName, leadPhone);
 }
 
 export async function notifyLead(leadPhone: string | null, leadFirstName: string): Promise<void> {
