@@ -59,7 +59,7 @@ export default async function DealDetailPage({
 
     supabase
       .from("tasks")
-      .select("id, title, description, due_date, priority, status, completed_at, created_at")
+      .select("id, agent_id, deal_id, contact_id, title, description, due_date, priority, status, completed_at, created_at")
       .eq("deal_id", deal_id)
       .order("created_at", { ascending: false })
       .limit(50),

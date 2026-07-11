@@ -3,11 +3,13 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, parseISO } from "date-fns";
 import { es } from "date-fns/locale";
 import {
-  Phone, MessageSquare, Mail, Users, Home, FileText, CheckSquare, Plus, X,
+  Phone, MessageSquare, Mail, Users, Home, FileText, CheckSquare, Square,
+  Plus, X, CalendarClock,
 } from "lucide-react";
+import type { Task } from "@/lib/types";
 
 export type ActivityType =
   | "call" | "whatsapp_message" | "email"
@@ -40,33 +42,70 @@ const ACTIVITY_CONFIG: Record<ActivityType, { label: string; icon: React.ReactNo
 
 const LOGGABLE: ActivityType[] = ["call", "whatsapp_message", "email", "meeting", "note"];
 
+type TaskPriority = "urgent" | "high" | "medium" | "low";
+const PRIORITY_META: Record<TaskPriority, { label: string; color: string }> = {
+  urgent: { label: "Urgente", color: "#dc2626" },
+  high:   { label: "Alta",    color: "#ef4444" },
+  medium: { label: "Media",   color: "#C9963A" },
+  low:    { label: "Baja",    color: "#64748b" },
+};
+
+// Fire-and-forget email notification to the assigned agent (immediate
+// confirmation). Non-blocking: any failure is ignored in the UI — the server
+// route handles auth/gating and is best-effort.
+function notifyAssignedAgent(kind: "activity" | "task", id: string) {
+  fetch("/api/notify/activity", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind, id }),
+  }).catch(() => {});
+}
+
+// Unified "Actividad" block: register an activity (past event) OR schedule a
+// seguimiento (a future task) in the same card. Pending seguimientos render at
+// the top; the activity timeline below.
 export function DealActivityPanel({
   dealId,
   contactId,
   agentId,
   initialActivities,
+  initialTasks,
 }: {
   dealId: string;
   contactId?: string | null;
   agentId: string;
   initialActivities: DealActivity[];
+  initialTasks: Task[];
 }) {
   const [activities, setActivities] = useState<DealActivity[]>(initialActivities);
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
   const [showForm, setShowForm] = useState(false);
+  const [mode, setMode] = useState<"activity" | "task">("activity");
   const [saving, setSaving] = useState(false);
+
   const [form, setForm] = useState({
     activity_type: "call" as ActivityType,
     title: "",
     description: "",
     duration_minutes: "",
   });
+  const [taskForm, setTaskForm] = useState({
+    title: "",
+    due_date: "",
+    priority: "medium" as TaskPriority,
+  });
 
-  function resetForm() {
+  const pendingTasks = tasks.filter((t) => t.status !== "completed" && t.status !== "cancelled");
+  const doneTasks = tasks.filter((t) => t.status === "completed");
+  const count = activities.length + pendingTasks.length;
+
+  function closeForm() {
     setForm({ activity_type: "call", title: "", description: "", duration_minutes: "" });
+    setTaskForm({ title: "", due_date: "", priority: "medium" });
     setShowForm(false);
   }
 
-  async function handleSave() {
+  async function handleSaveActivity() {
     if (!form.title.trim()) { toast.error("El título es requerido"); return; }
     setSaving(true);
     const supabase = createClient();
@@ -88,10 +127,57 @@ export function DealActivityPanel({
 
     if (error || !data) { toast.error("Error al guardar: " + (error?.message ?? "desconocido")); setSaving(false); return; }
     setActivities((prev) => [data as DealActivity, ...prev]);
+    notifyAssignedAgent("activity", (data as DealActivity).id);
     toast.success("Actividad registrada");
     setSaving(false);
-    resetForm();
+    closeForm();
   }
+
+  async function handleSaveTask() {
+    if (!taskForm.title.trim()) { toast.error("El título es requerido"); return; }
+    setSaving(true);
+    const supabase = createClient();
+    const nowIso = new Date().toISOString();
+    const payload: Record<string, unknown> = {
+      title: taskForm.title.trim(),
+      deal_id: dealId,
+      contact_id: contactId ?? null,
+      agent_id: agentId,
+      priority: taskForm.priority,
+      status: "pending",
+      is_automated: false,
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+    if (taskForm.due_date) payload.due_date = new Date(taskForm.due_date).toISOString();
+
+    const { data, error } = await supabase.from("tasks").insert(payload).select().single();
+    if (error || !data) { toast.error("Error al agendar: " + (error?.message ?? "desconocido")); setSaving(false); return; }
+    setTasks((prev) => [data as Task, ...prev]);
+    notifyAssignedAgent("task", (data as Task).id);
+    toast.success("Seguimiento agendado");
+    setSaving(false);
+    closeForm();
+  }
+
+  async function toggleTask(task: Task) {
+    const newStatus = task.status === "completed" ? "pending" : "completed";
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("tasks")
+      .update({
+        status: newStatus,
+        completed_at: newStatus === "completed" ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", task.id);
+    if (error) { toast.error("Error actualizando seguimiento"); return; }
+    setTasks((prev) =>
+      prev.map((t) => t.id === task.id ? { ...t, status: newStatus as Task["status"] } : t)
+    );
+  }
+
+  const fieldStyle = { background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", outline: "none" } as const;
 
   return (
     <div className="card-base p-5">
@@ -100,7 +186,7 @@ export function DealActivityPanel({
         <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
           Actividad
           <span className="ml-2 px-1.5 py-0.5 rounded-full text-[9px]" style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}>
-            {activities.length}
+            {count}
           </span>
         </p>
         <button
@@ -112,88 +198,212 @@ export function DealActivityPanel({
           }
         >
           {showForm ? <X size={12} /> : <Plus size={12} />}
-          {showForm ? "Cancelar" : "Registrar"}
+          {showForm ? "Cancelar" : "Agregar"}
         </button>
       </div>
 
-      {/* Log form */}
+      {/* Form */}
       {showForm && (
         <div className="mb-5 p-4 rounded-xl space-y-3" style={{ background: "var(--muted)", border: "1px solid var(--border)" }}>
-          {/* Type pills */}
-          <div className="flex gap-1.5 flex-wrap">
-            {LOGGABLE.map((t) => {
-              const cfg = ACTIVITY_CONFIG[t];
-              const active = form.activity_type === t;
+          {/* Mode toggle: Actividad | Seguimiento */}
+          <div className="flex gap-1.5">
+            {(["activity", "task"] as const).map((m) => {
+              const active = mode === m;
+              const label = m === "activity" ? "Registrar actividad" : "Agendar seguimiento";
               return (
                 <button
-                  key={t}
-                  onClick={() => setForm((f) => ({ ...f, activity_type: t }))}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+                  key={m}
+                  onClick={() => setMode(m)}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
                   style={{
-                    background: active ? cfg.bg : "transparent",
-                    color: active ? cfg.color : "var(--muted-foreground)",
-                    border: active ? `1px solid ${cfg.color}40` : "1px solid var(--border)",
+                    background: active ? "rgba(201,150,58,0.12)" : "transparent",
+                    color: active ? "#C9963A" : "var(--muted-foreground)",
+                    border: active ? "1px solid rgba(201,150,58,0.3)" : "1px solid var(--border)",
                   }}
                 >
-                  {cfg.icon} {cfg.label}
+                  {m === "activity" ? <FileText size={12} /> : <CalendarClock size={12} />}
+                  {label}
                 </button>
               );
             })}
           </div>
 
-          <input
-            value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-            onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") resetForm(); }}
-            placeholder="Título (ej. Llamada de seguimiento)"
-            className="w-full text-sm px-3 py-2 rounded-lg"
-            style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", outline: "none" }}
-          />
+          {mode === "activity" ? (
+            <>
+              {/* Type pills */}
+              <div className="flex gap-1.5 flex-wrap">
+                {LOGGABLE.map((t) => {
+                  const cfg = ACTIVITY_CONFIG[t];
+                  const active = form.activity_type === t;
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setForm((f) => ({ ...f, activity_type: t }))}
+                      className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all"
+                      style={{
+                        background: active ? cfg.bg : "transparent",
+                        color: active ? cfg.color : "var(--muted-foreground)",
+                        border: active ? `1px solid ${cfg.color}40` : "1px solid var(--border)",
+                      }}
+                    >
+                      {cfg.icon} {cfg.label}
+                    </button>
+                  );
+                })}
+              </div>
 
-          <textarea
-            value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-            placeholder="Notas adicionales (opcional)"
-            rows={2}
-            className="w-full text-sm px-3 py-2 rounded-lg resize-none"
-            style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", outline: "none" }}
-          />
+              <input
+                value={form.title}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSaveActivity(); if (e.key === "Escape") closeForm(); }}
+                placeholder="Título (ej. Llamada de seguimiento)"
+                className="w-full text-sm px-3 py-2 rounded-lg"
+                style={fieldStyle}
+              />
 
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              min={1}
-              value={form.duration_minutes}
-              onChange={(e) => setForm((f) => ({ ...f, duration_minutes: e.target.value }))}
-              placeholder="Duración (min)"
-              className="w-32 text-xs px-3 py-2 rounded-lg"
-              style={{ background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", outline: "none" }}
-            />
-            <div className="flex-1" />
-            <button
-              onClick={resetForm}
-              className="px-3 py-1.5 text-xs rounded-lg"
-              style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={saving || !form.title.trim()}
-              className="px-4 py-1.5 text-xs font-bold rounded-lg disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
-            >
-              {saving ? "Guardando…" : "Guardar"}
-            </button>
+              <textarea
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="Notas adicionales (opcional)"
+                rows={2}
+                className="w-full text-sm px-3 py-2 rounded-lg resize-none"
+                style={fieldStyle}
+              />
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={form.duration_minutes}
+                  onChange={(e) => setForm((f) => ({ ...f, duration_minutes: e.target.value }))}
+                  placeholder="Duración (min)"
+                  className="w-32 text-xs px-3 py-2 rounded-lg"
+                  style={fieldStyle}
+                />
+                <div className="flex-1" />
+                <button onClick={closeForm} className="px-3 py-1.5 text-xs rounded-lg" style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}>
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveActivity}
+                  disabled={saving || !form.title.trim()}
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg disabled:opacity-50"
+                  style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+                >
+                  {saving ? "Guardando…" : "Guardar"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <input
+                value={taskForm.title}
+                onChange={(e) => setTaskForm((f) => ({ ...f, title: e.target.value }))}
+                onKeyDown={(e) => { if (e.key === "Enter") handleSaveTask(); if (e.key === "Escape") closeForm(); }}
+                placeholder="Título del seguimiento…"
+                className="w-full text-sm px-3 py-2 rounded-lg"
+                style={fieldStyle}
+              />
+              <div className="flex gap-2 flex-wrap items-center">
+                <input
+                  type="date"
+                  value={taskForm.due_date}
+                  onChange={(e) => setTaskForm((f) => ({ ...f, due_date: e.target.value }))}
+                  className="flex-1 min-w-[9rem] text-xs px-3 py-2 rounded-lg"
+                  style={fieldStyle}
+                />
+                <div className="flex gap-1.5">
+                  {(Object.keys(PRIORITY_META) as TaskPriority[]).map((p) => {
+                    const active = taskForm.priority === p;
+                    const meta = PRIORITY_META[p];
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setTaskForm((f) => ({ ...f, priority: p }))}
+                        className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
+                        style={{
+                          background: active ? `${meta.color}1a` : "transparent",
+                          color: active ? meta.color : "var(--muted-foreground)",
+                          border: active ? `1px solid ${meta.color}55` : "1px solid var(--border)",
+                        }}
+                      >
+                        {meta.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 justify-end">
+                <button onClick={closeForm} className="px-3 py-1.5 text-xs rounded-lg" style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}>
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveTask}
+                  disabled={saving || !taskForm.title.trim()}
+                  className="px-4 py-1.5 text-xs font-bold rounded-lg disabled:opacity-50"
+                  style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+                >
+                  {saving ? "Agendando…" : "Agendar"}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Seguimientos (pending + done) */}
+      {(pendingTasks.length > 0 || doneTasks.length > 0) && (
+        <div className="mb-4">
+          <p className="text-[9px] font-bold uppercase tracking-widest mb-2" style={{ color: "var(--muted-foreground)" }}>
+            Seguimientos
+          </p>
+          <div className="space-y-1">
+            {[...pendingTasks, ...doneTasks].map((task) => {
+              const isDone = task.status === "completed";
+              const prio = (task.priority ?? "medium") as TaskPriority;
+              const prioColor = PRIORITY_META[prio]?.color ?? "#64748b";
+              return (
+                <div key={task.id} className="flex items-start gap-2.5 px-2 py-2 rounded-lg transition-colors hover:bg-muted/50">
+                  <button
+                    onClick={() => toggleTask(task)}
+                    className="mt-0.5 shrink-0 transition-colors"
+                    style={{ color: isDone ? "#10b981" : "var(--muted-foreground)" }}
+                    aria-label={isDone ? "Marcar pendiente" : "Marcar completado"}
+                  >
+                    {isDone ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className="text-sm leading-snug"
+                      style={{ color: isDone ? "var(--muted-foreground)" : "var(--foreground)", textDecoration: isDone ? "line-through" : "none" }}
+                    >
+                      {task.title}
+                    </p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[9px] font-bold uppercase" style={{ color: prioColor }}>
+                        {PRIORITY_META[prio]?.label ?? "Media"}
+                      </span>
+                      {task.due_date && (
+                        <span className="text-[10px]" style={{ color: "var(--muted-foreground)" }}>
+                          · Vence {format(parseISO(task.due_date), "d MMM", { locale: es })}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
 
-      {/* Timeline */}
+      {/* Activity timeline */}
       {activities.length === 0 ? (
-        <p className="text-xs text-center py-6" style={{ color: "var(--muted-foreground)" }}>
-          Sin actividades registradas. Haz clic en Registrar para agregar.
-        </p>
+        pendingTasks.length === 0 && doneTasks.length === 0 ? (
+          <p className="text-xs text-center py-6" style={{ color: "var(--muted-foreground)" }}>
+            Sin actividad. Haz clic en Agregar para registrar una actividad o agendar un seguimiento.
+          </p>
+        ) : null
       ) : (
         <div className="space-y-0">
           {activities.map((act, i) => {
@@ -202,10 +412,7 @@ export function DealActivityPanel({
             return (
               <div key={act.id} className="flex gap-3">
                 <div className="flex flex-col items-center">
-                  <div
-                    className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: cfg.bg, color: cfg.color }}
-                  >
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5" style={{ background: cfg.bg, color: cfg.color }}>
                     {cfg.icon}
                   </div>
                   {i < activities.length - 1 && (
@@ -215,10 +422,7 @@ export function DealActivityPanel({
                 <div className="pb-4 min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <span
-                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                        style={{ background: cfg.bg, color: cfg.color }}
-                      >
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: cfg.bg, color: cfg.color }}>
                         {cfg.label}
                       </span>
                       <p className="text-sm font-semibold mt-1" style={{ color: "var(--foreground)" }}>
