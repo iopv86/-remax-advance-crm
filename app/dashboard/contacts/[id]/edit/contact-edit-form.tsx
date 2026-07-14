@@ -64,22 +64,38 @@ interface PropertyOption {
   sector: string | null;
 }
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+// Resolve where to return after edit. Only honor a `deal:<uuid>` origin and
+// rebuild the path ourselves (never trust a raw URL) to avoid open redirects.
+// Falls back to the contact detail (Clientes) for any other/absent origin.
+function resolveBackHref(contact?: Contact | null, from?: string): string {
+  const fallback = contact ? `/dashboard/contacts/${contact.id}` : "/dashboard/contacts";
+  if (from && from.startsWith("deal:")) {
+    const dealId = from.slice("deal:".length);
+    if (UUID_RE.test(dealId)) return `/dashboard/pipeline/${dealId}`;
+  }
+  return fallback;
+}
+
 export function ContactEditForm({
   contact,
   agents,
   properties,
   privileged,
   currentAgentId,
+  from,
 }: {
   contact?: Contact | null;
   agents: { id: string; full_name: string }[];
   properties: PropertyOption[];
   privileged: boolean;
   currentAgentId?: string;
+  from?: string;
 }) {
   const router = useRouter();
   const isCreate = !contact;
-  const backHref = contact ? `/dashboard/contacts/${contact.id}` : "/dashboard/contacts";
+  const backHref = resolveBackHref(contact, from);
   const [saving, setSaving] = useState(false);
   const [locDraft, setLocDraft] = useState("");
 

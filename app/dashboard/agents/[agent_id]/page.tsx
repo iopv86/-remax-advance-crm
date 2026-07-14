@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ArrowLeft, Clock, Target, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
 import { STAGE_LABELS } from "@/lib/types";
 import type { Deal, DealStage, AgentRole } from "@/lib/types";
+import { formatCurrencyCompact } from "@/lib/format";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -13,8 +14,7 @@ function daysAgo(dateStr: string): number {
 
 function formatValue(v?: number): string {
   if (!v) return "—";
-  if (v >= 1_000_000) return `RD$ ${(v / 1_000_000).toFixed(1)}M`;
-  return `RD$ ${(v / 1_000).toFixed(0)}K`;
+  return formatCurrencyCompact(v, "USD");
 }
 
 const STAGE_COLOR: Record<DealStage, string> = {

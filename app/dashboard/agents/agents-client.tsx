@@ -24,6 +24,7 @@ import type { StalledDeal, PipelineStageBreakdown } from "./page";
 import { RoundRobinClient } from "@/app/dashboard/settings/round-robin/round-robin-client";
 import { ObjectivesClient } from "@/app/dashboard/settings/objectives/objectives-client";
 import { AgentFilter } from "@/components/agent-filter";
+import { currencySymbol } from "@/lib/format";
 
 const AgentSparkline = dynamic(
   () => import("./agent-sparkline").then((m) => m.AgentSparkline),
@@ -37,6 +38,8 @@ const AgentSparkline = dynamic(
 
 // ─── Constants ──────────────────────────────────────────────────────────────
 
+// KPI aggregates are cross-agent sums of deals stored in USD -> format with US$.
+const MONEY_SYM = currencySymbol("USD");
 const GOLD = "var(--primary)";
 const TEXT_MUTED = "var(--muted-foreground)";
 const TEXT_DIM = "var(--muted-foreground)";
@@ -125,8 +128,8 @@ function PipelineStageChart({ data }: { data: PipelineStageBreakdown[] }) {
         const label = STAGE_LABELS_SHORT[item.stage] ?? item.stage;
         const valLabel =
           item.stage_value >= 1_000_000
-            ? `RD$ ${(item.stage_value / 1_000_000).toFixed(1)}M`
-            : `RD$ ${item.stage_value.toLocaleString()}`;
+            ? `${MONEY_SYM} ${(item.stage_value / 1_000_000).toFixed(1)}M`
+            : `${MONEY_SYM} ${item.stage_value.toLocaleString()}`;
         return (
           <div key={item.stage} className="space-y-1">
             <div className="flex justify-between text-[11px] text-muted-foreground uppercase tracking-wider">
@@ -218,8 +221,8 @@ function StalledDealsSheet({
             deals.map((deal) => {
               const valueLabel = deal.deal_value
                 ? deal.deal_value >= 1_000_000
-                  ? `RD$ ${(deal.deal_value / 1_000_000).toFixed(1)}M`
-                  : `RD$ ${deal.deal_value.toLocaleString()}`
+                  ? `${MONEY_SYM} ${(deal.deal_value / 1_000_000).toFixed(1)}M`
+                  : `${MONEY_SYM} ${deal.deal_value.toLocaleString()}`
                 : "—";
               const stageLabel =
                 STAGE_LABELS_SHORT[deal.stage] ?? deal.stage;
@@ -424,8 +427,8 @@ export function AgentsClient({
 
   const pipelineLabel =
     totalPipeline >= 1_000_000
-      ? `RD$ ${(totalPipeline / 1_000_000).toFixed(1)}M`
-      : `RD$ ${totalPipeline.toLocaleString()}`;
+      ? `${MONEY_SYM} ${(totalPipeline / 1_000_000).toFixed(1)}M`
+      : `${MONEY_SYM} ${totalPipeline.toLocaleString()}`;
 
   const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
     {
@@ -809,8 +812,8 @@ export function AgentsClient({
                     const leadsCount = agent.activeDeals + agent.closedDeals;
                     const pipelineLabel =
                       agent.pipelineValue >= 1_000_000
-                        ? `RD$ ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
-                        : `RD$ ${agent.pipelineValue.toLocaleString()}`;
+                        ? `${MONEY_SYM} ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
+                        : `${MONEY_SYM} ${agent.pipelineValue.toLocaleString()}`;
 
                     const captPct =
                       agent.captacionesObjetivo && agent.captacionesObjetivo > 0
@@ -966,8 +969,8 @@ export function AgentsClient({
                       : agent.name;
                   const valLabel =
                     agent.pipelineValue >= 1_000_000
-                      ? `RD$ ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
-                      : `RD$ ${agent.pipelineValue.toLocaleString()}`;
+                      ? `${MONEY_SYM} ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
+                      : `${MONEY_SYM} ${agent.pipelineValue.toLocaleString()}`;
                   return (
                     <div key={agent.id} className="space-y-2">
                       <div className="flex justify-between text-xs text-muted-foreground uppercase tracking-wider">

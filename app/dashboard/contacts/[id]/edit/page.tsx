@@ -6,10 +6,13 @@ import { ContactEditForm } from "./contact-edit-form";
 
 export default async function ContactEditPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ from?: string }>;
 }) {
   const { id } = await params;
+  const { from } = await searchParams;
   const supabase = await createClient();
   const session = await getSessionAgent();
 
@@ -43,6 +46,7 @@ export default async function ContactEditPage({
         agents={agents ?? []}
         properties={(properties ?? []) as { id: string; title: string; city: string | null; sector: string | null }[]}
         privileged={privileged}
+        from={from}
       />
     </div>
   );

@@ -560,7 +560,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                     <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
                       Intereses del cliente
                     </p>
-                    <Link href={`/dashboard/contacts/${contact.id}/edit`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
+                    <Link href={`/dashboard/contacts/${contact.id}/edit?from=deal:${deal.id}`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
                       Editar <ChevronRight className="w-3 h-3" />
                     </Link>
                   </div>
