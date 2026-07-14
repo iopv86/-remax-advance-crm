@@ -10,6 +10,7 @@ import { formatCurrency, formatCurrencyCompact } from "@/lib/format";
 import type { Deal, DealStage, LeadClassification } from "@/lib/types";
 import { ClassificationQuickEdit } from "@/app/dashboard/contacts/[id]/classification-quick-edit";
 import Link from "next/link";
+import { Check } from "lucide-react";
 import {
   DndContext,
   DragOverlay,
@@ -127,29 +128,12 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
       ref={setNodeRef}
       style={{
         ...style,
-        background: "var(--glass-bg)",
-        backdropFilter: "blur(10px)",
-        border: "1px solid rgba(201,150,58,0.15)",
-        borderRadius: "0.25rem",
         padding: "20px",
         cursor: dragging || isDragging ? "grabbing" : "grab",
         opacity: dragging || isDragging ? 0.5 : 1,
-        transition: "border-color 0.2s, box-shadow 0.2s",
         position: "relative",
       }}
-      className={`group ${isWon ? "opacity-70 grayscale hover:grayscale-0 hover:opacity-100" : ""}`}
-      onMouseEnter={(e) => {
-        if (!dragging && !isDragging) {
-          const el = e.currentTarget as HTMLDivElement;
-          el.style.borderColor = "rgba(201,150,58,0.4)";
-          el.style.boxShadow = "inset 0 0 10px rgba(245,189,93,0.05)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        const el = e.currentTarget as HTMLDivElement;
-        el.style.borderColor = "rgba(201,150,58,0.15)";
-        el.style.boxShadow = "none";
-      }}
+      className={`card-interactive group ${isWon ? "opacity-70 grayscale hover:grayscale-0 hover:opacity-100" : ""}`}
     >
       {/* Drag handle area */}
       <div {...listeners} {...attributes} className="absolute inset-0 rounded" style={{ cursor: "grab" }} />
@@ -174,11 +158,11 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
               color: "#93c5fd",
               fontSize: "11px",
               padding: "2px 8px",
-              borderRadius: "0.125rem",
+              borderRadius: "8px",
               fontWeight: 600,
               textTransform: "uppercase",
               letterSpacing: "0.06em",
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "var(--font-sans)",
             }}
           >
             {contact?.lead_classification ?? "Lead"}
@@ -195,7 +179,7 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
               gap: 3,
             }}
           >
-            ✓ Ganado
+            <Check size={10} strokeWidth={3} /> Ganado
           </span>
         )}
       </div>
@@ -204,14 +188,8 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
       <div className="relative" style={{ pointerEvents: "none" }}>
         {/* Property / deal name — contact name as headline */}
         <h4
-          style={{
-            color: "var(--foreground)",
-            fontFamily: "Manrope, var(--font-manrope), sans-serif",
-            fontWeight: 700,
-            fontSize: "15px",
-            marginBottom: 2,
-            lineHeight: 1.3,
-          }}
+          className="surface-heading"
+          style={{ marginBottom: 2, lineHeight: 1.3 }}
         >
           {contactName}
         </h4>
@@ -256,8 +234,8 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
           {/* Value */}
           {deal.deal_value != null && (
             <span
+              className="num"
               style={{
-                fontFamily: "Manrope, var(--font-manrope), sans-serif",
                 fontWeight: 700,
                 fontSize: "14px",
                 color: isWon ? "#34d399" : "#f5bd5d",
@@ -269,18 +247,22 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
         </div>
       </div>
 
-      {/* Edit / delete actions — separate row below content, no overlap */}
+      {/* Edit / delete actions — separate row below content, no overlap.
+          Resting state is visible (muted affordance), not a hover-ghost;
+          hover lift is declarative CSS (.pipe-action / .pipe-action-danger
+          defined in the scoped <style> block below), not JS DOM mutation. */}
       <div
-        className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="flex gap-1"
         style={{ pointerEvents: "auto", marginTop: 10, justifyContent: "flex-end", position: "relative", zIndex: 2 }}
       >
         <Link
           href={`/dashboard/pipeline/${deal.id}`}
           onClick={(e) => e.stopPropagation()}
           title="Ver detalle"
+          className="pipe-action"
           style={{
             padding: "3px 6px",
-            borderRadius: "0.125rem",
+            borderRadius: "8px",
             background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
             color: "var(--muted-foreground)",
@@ -297,9 +279,10 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
           href={`/dashboard/pipeline/${deal.id}/edit`}
           onClick={(e) => e.stopPropagation()}
           title="Editar"
+          className="pipe-action"
           style={{
             padding: "3px 6px",
-            borderRadius: "0.125rem",
+            borderRadius: "8px",
             background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
             color: "var(--muted-foreground)",
@@ -308,15 +291,6 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
             textDecoration: "none",
             display: "inline-flex",
             alignItems: "center",
-            transition: "color 0.15s, border-color 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.color = "#f5bd5d";
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(245,189,93,0.5)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLAnchorElement).style.color = "var(--muted-foreground)";
-            (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(201,150,58,0.2)";
           }}
         >
           Editar
@@ -325,26 +299,16 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
           onClick={(e) => onDelete(deal, e)}
           title="Eliminar"
           disabled={deletingId === deal.id}
+          className="pipe-action-danger"
           style={{
             padding: "3px 6px",
-            borderRadius: "0.125rem",
+            borderRadius: "8px",
             background: "var(--glass-bg-md)",
             border: "1px solid rgba(201,150,58,0.2)",
             color: "var(--muted-foreground)",
             fontSize: 11,
             cursor: "pointer",
             opacity: deletingId === deal.id ? 0.4 : 1,
-            transition: "color 0.15s, border-color 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            if (deletingId !== deal.id) {
-              (e.currentTarget as HTMLButtonElement).style.color = "#f87171";
-              (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(248,113,113,0.4)";
-            }
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--muted-foreground)";
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(201,150,58,0.2)";
           }}
         >
           {deletingId === deal.id ? "..." : "Borrar"}
@@ -495,6 +459,10 @@ export function PipelineClient({
         .kanban-scroll::-webkit-scrollbar { height: 4px; }
         .kanban-scroll::-webkit-scrollbar-track { background: #0d0e14; }
         .kanban-scroll::-webkit-scrollbar-thumb { background: #34343b; border-radius: 10px; }
+        .pipe-action { transition: color 0.15s ease, border-color 0.15s ease; }
+        .pipe-action:hover { color: #C9963A; border-color: rgba(201,150,58,0.5); }
+        .pipe-action-danger { transition: color 0.15s ease, border-color 0.15s ease; }
+        .pipe-action-danger:hover:not(:disabled) { color: #f87171; border-color: rgba(248,113,113,0.4); }
       `}</style>
 
       {canFilterByAgent && agents.length > 0 && (
@@ -519,7 +487,7 @@ export function PipelineClient({
               style={{
                 fontSize: 12,
                 color: "var(--muted-foreground)",
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "var(--font-sans)",
               }}
             >
               Mostrando {visibleDeals.length} de {deals.length} oportunidades
@@ -529,6 +497,7 @@ export function PipelineClient({
       )}
 
       <DndContext
+        id="pipeline-kanban"
         sensors={sensors}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
@@ -577,16 +546,7 @@ export function PipelineClient({
                           flexShrink: 0,
                         }}
                       />
-                      <h3
-                        style={{
-                          fontFamily: "Manrope, var(--font-manrope), sans-serif",
-                          fontWeight: 700,
-                          fontSize: 11,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.12em",
-                          color: "var(--foreground)",
-                        }}
-                      >
+                      <h3 className="eyebrow">
                         {STAGE_SHORT[stage]}
                       </h3>
                     </div>
@@ -594,11 +554,11 @@ export function PipelineClient({
                     <div className="flex items-center gap-2">
                       {stageValue > 0 && (
                         <span
+                          className="num"
                           style={{
                             fontSize: 11,
                             fontWeight: 700,
                             color: "var(--muted-foreground)",
-                            fontFamily: "Manrope, var(--font-manrope), sans-serif",
                           }}
                         >
                           {formatCurrencyCompact(stageValue)}
@@ -632,7 +592,7 @@ export function PipelineClient({
                           borderRadius: "0.25rem",
                           color: "var(--muted-foreground)",
                           fontSize: 12,
-                          fontFamily: "Inter, sans-serif",
+                          fontFamily: "var(--font-sans)",
                         }}
                       >
                         {overStage === stage ? "Soltar aquí" : "Vacío"}
@@ -676,7 +636,7 @@ export function PipelineClient({
                     background: "rgba(18,19,25,0.95)",
                     border: "1px solid rgba(201,150,58,0.5)",
                     boxShadow: "0 20px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(245,189,93,0.08)",
-                    borderRadius: "0.25rem",
+                    borderRadius: "14px",
                     padding: 20,
                     width: 320,
                     cursor: "grabbing",
@@ -715,8 +675,8 @@ export function PipelineClient({
                       </p>
                       {activeDeal.deal_value != null && (
                         <p
+                          className="num"
                           style={{
-                            fontFamily: "Manrope, sans-serif",
                             fontWeight: 700,
                             fontSize: 13,
                             color: "#f5bd5d",
