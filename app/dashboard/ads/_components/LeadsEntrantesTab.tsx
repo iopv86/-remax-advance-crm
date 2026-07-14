@@ -60,6 +60,9 @@ export function LeadsEntrantesTab({
   // toque humano (activities) invalida la vista. En vez de replicar la derivacion
   // server-side (firstTouch/aging/summaries), disparamos router.refresh() con debounce,
   // que revalida el server component y re-deriva con el scoping correcto.
+  // El socket realtime debe autenticarse con el JWT del usuario (setAuth) para que las
+  // tablas con RLS (deals/activities) entreguen postgres_changes; con solo la anon key
+  // la RLS bloquea todos los eventos. Un poll de respaldo cubre eventos perdidos.
   useEffect(() => {
     const supabase = createClient();
     let timer: ReturnType<typeof setTimeout> | null = null;
@@ -68,16 +71,27 @@ export function LeadsEntrantesTab({
       timer = setTimeout(() => router.refresh(), 800);
     };
 
-    const channel = supabase
-      .channel("leads-entrantes-rt")
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "deals" }, scheduleRefresh)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "deals" }, scheduleRefresh)
-      .on("postgres_changes", { event: "INSERT", schema: "public", table: "activities" }, scheduleRefresh)
-      .subscribe();
+    type Channel = ReturnType<typeof supabase.channel>;
+    let channel: Channel | null = null;
+
+    (async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) supabase.realtime.setAuth(session.access_token);
+      channel = supabase
+        .channel("leads-entrantes-rt")
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "deals" }, scheduleRefresh)
+        .on("postgres_changes", { event: "UPDATE", schema: "public", table: "deals" }, scheduleRefresh)
+        .on("postgres_changes", { event: "INSERT", schema: "public", table: "activities" }, scheduleRefresh)
+        .subscribe();
+    })();
+
+    // Respaldo: si un evento realtime no llega, revalidar cada 20s.
+    const poll = setInterval(() => router.refresh(), 20_000);
 
     return () => {
       if (timer) clearTimeout(timer);
-      supabase.removeChannel(channel);
+      clearInterval(poll);
+      if (channel) supabase.removeChannel(channel);
     };
   }, [router]);
 
