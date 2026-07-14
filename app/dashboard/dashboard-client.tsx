@@ -170,14 +170,11 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
         {/* ── Hero welcome strip ── */}
         <div
-          className="animate-fade-up"
+          className="card-primary animate-fade-up"
           style={{
-            borderRadius: 16,
             overflow: "hidden",
             position: "relative",
             background: "linear-gradient(110deg, rgba(28,29,39,0.95) 0%, rgba(22,20,14,0.98) 60%, rgba(28,24,12,0.95) 100%)",
-            border: `1px solid rgba(201,150,58,0.2)`,
-            boxShadow: "0 4px 32px rgba(0,0,0,0.4)",
           }}
         >
           {/* Subtle gold glow in top-right */}
@@ -195,14 +192,9 @@ export function DashboardClient({ data }: { data: DashboardData }) {
 
             {/* Left: Greeting */}
             <div style={{ minWidth: 0 }}>
-              <p style={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 800,
-                fontSize: 26,
-                letterSpacing: "-0.03em",
+              <p className="surface-title" style={{
                 color: "#e5e2e1",
                 margin: "0 0 4px",
-                lineHeight: 1.15,
               }} suppressHydrationWarning>
                 {greeting(session.fullName)}
               </p>
@@ -211,7 +203,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 color: "rgba(229,226,225,0.55)",
                 margin: 0,
                 textTransform: "capitalize",
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "var(--font-sans)",
                 letterSpacing: "0.01em",
               }} suppressHydrationWarning>
                 {TODAY_LABEL}
@@ -247,15 +239,13 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: 5, color: stat.color }}>
                     {stat.icon}
-                    <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "Inter, sans-serif", color: T.surfaceDim }}>
+                    <span className="eyebrow">
                       {stat.label}
                     </span>
                   </div>
-                  <span style={{
-                    fontFamily: "Manrope, sans-serif",
+                  <span className="num" style={{
                     fontWeight: 800,
                     fontSize: 22,
-                    letterSpacing: "-0.03em",
                     color: stat.color,
                     lineHeight: 1,
                   }}>
@@ -280,7 +270,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                   color: T.gold,
                   fontSize: 12,
                   fontWeight: 600,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   textDecoration: "none",
                   transition: "all 0.15s",
                   whiteSpace: "nowrap",
@@ -310,7 +300,7 @@ export function DashboardClient({ data }: { data: DashboardData }) {
                   color: T.surfaceMuted,
                   fontSize: 12,
                   fontWeight: 600,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   textDecoration: "none",
                   transition: "all 0.15s",
                   whiteSpace: "nowrap",

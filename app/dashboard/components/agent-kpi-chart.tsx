@@ -12,6 +12,7 @@ import {
   Cell,
 } from "recharts";
 import { T } from "../dashboard-client";
+import { CHART_AXIS, CHART_GRID, CHART_TOOLTIP, CHART_CURSOR, CHART_GOLD, CHART_GOLD_LIGHT } from "@/lib/chart-theme";
 
 export interface AgentKpi {
   agent_id: string;
@@ -65,36 +66,11 @@ function CustomTooltip({
   if (!active || !payload?.length) return null;
   const p = payload[0];
   return (
-    <div
-      style={{
-        background: "var(--card)",
-        border: `1px solid ${T.border}`,
-        borderRadius: 8,
-        padding: "8px 14px",
-        boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-      }}
-    >
-      <p
-        style={{
-          fontSize: 10,
-          color: T.surfaceDim,
-          fontFamily: "Inter, sans-serif",
-          margin: "0 0 2px",
-          textTransform: "uppercase",
-          letterSpacing: "0.07em",
-        }}
-      >
+    <div style={CHART_TOOLTIP}>
+      <p className="eyebrow" style={{ margin: "0 0 2px" }}>
         {p.payload.fullName ?? label}
       </p>
-      <p
-        style={{
-          fontSize: 16,
-          fontFamily: "Manrope, sans-serif",
-          fontWeight: 700,
-          color: T.gold,
-          margin: 0,
-        }}
-      >
+      <p className="num" style={{ fontSize: 16, fontWeight: 700, color: T.gold, margin: 0 }}>
         {formatValue(p.value)}
       </p>
     </div>
@@ -121,15 +97,8 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
 
   return (
     <div
-      style={{
-        background: T.card,
-        border: `1px solid ${T.border}`,
-        borderRadius: 16,
-        padding: "22px 24px",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-      }}
+      className="card-secondary"
+      style={{ padding: "22px 24px" }}
     >
       {/* Header */}
       <div
@@ -141,23 +110,14 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
         }}
       >
         <div>
-          <h2
-            style={{
-              fontFamily: "Manrope, sans-serif",
-              fontWeight: 700,
-              fontSize: 15,
-              letterSpacing: "-0.01em",
-              color: T.surface,
-              margin: "0 0 2px",
-            }}
-          >
+          <h2 className="surface-heading" style={{ margin: "0 0 2px" }}>
             Desempeño por agente
           </h2>
           <p
             style={{
               fontSize: 11,
               color: T.surfaceDim,
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "var(--font-sans)",
               margin: 0,
             }}
           >
@@ -190,7 +150,7 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
                   color: isActive ? "var(--primary-foreground)" : T.surfaceMuted,
                   fontSize: 11,
                   fontWeight: 600,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   cursor: "pointer",
                   transition: "all 0.15s",
                   letterSpacing: "0.01em",
@@ -227,7 +187,7 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
             style={{
               fontSize: 13,
               color: T.surfaceDim,
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "var(--font-sans)",
             }}
           >
             Sin datos de agentes aún.
@@ -240,10 +200,10 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
             margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
             barCategoryGap="22%"
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-bg)" vertical={false} />
+            <CartesianGrid strokeDasharray={CHART_GRID.strokeDasharray} stroke={CHART_GRID.stroke} vertical={false} />
             <XAxis
               dataKey="agent"
-              tick={{ fill: T.surfaceDim, fontSize: 10, fontFamily: "Inter, sans-serif" }}
+              tick={CHART_AXIS.tick}
               axisLine={false}
               tickLine={false}
               interval={0}
@@ -253,20 +213,20 @@ export function AgentKpiChart({ agents }: { agents: AgentKpi[] }) {
             />
             <YAxis
               tickFormatter={metric.format}
-              tick={{ fill: T.surfaceDim, fontSize: 10, fontFamily: "Inter, sans-serif" }}
+              tick={CHART_AXIS.tick}
               axisLine={false}
               tickLine={false}
               width={52}
             />
             <Tooltip
               content={<CustomTooltip formatValue={metric.format} />}
-              cursor={{ fill: "rgba(201,150,58,0.06)" }}
+              cursor={CHART_CURSOR}
             />
             <Bar dataKey="value" radius={[4, 4, 0, 0]}>
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={entry.value === topValue ? "#E8B84B" : "#C9963A"}
+                  fill={entry.value === topValue ? CHART_GOLD_LIGHT : CHART_GOLD}
                   fillOpacity={entry.value === topValue ? 1 : 0.7}
                 />
               ))}

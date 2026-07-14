@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Syne, Cinzel, Manrope, JetBrains_Mono } from "next/font/google";
+import { Geist, Syne, Cinzel, Manrope, JetBrains_Mono, Inter } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
@@ -40,6 +40,15 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
+// Loaded as the safety net for legacy "Inter, sans-serif" literals scattered
+// across surfaces. New/polished code should use var(--font-sans) (Geist).
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "Advance Estate — CRM Inmobiliario",
   description: "CRM inmobiliario con IA para RE/MAX Advance",
@@ -72,7 +81,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
         />
       </head>
-      <body className={`${cinzel.variable} ${geist.variable} ${syne.variable} ${manrope.variable} ${mono.variable} h-full`}>
+      <body className={`${cinzel.variable} ${geist.variable} ${syne.variable} ${manrope.variable} ${mono.variable} ${inter.variable} h-full`}>
         <PHProvider>
           <ThemeProvider nonce={nonce}>
             {children}

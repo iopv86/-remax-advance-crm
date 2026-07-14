@@ -88,8 +88,8 @@ export function CampaignAttribution({
 
   if (variant === "deal") {
     return (
-      <div className="card-base p-5">
-        <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--muted-foreground)" }}>
+      <div className="card-secondary p-5">
+        <p className="eyebrow mb-3">
           Campañas
         </p>
         {body}

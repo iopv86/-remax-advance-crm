@@ -31,42 +31,25 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
   const totalValue = pipeline.reduce((s, p) => s + p.value, 0);
 
   return (
-    <div style={{
-      background: T.card,
-      border: `1px solid ${T.border}`,
-      borderRadius: 16,
+    <div className="card-secondary" style={{
       padding: "22px 28px",
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
     }}>
       {/* Header */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: 12 }}>
-          <h2 style={{
-            fontFamily: "Manrope, sans-serif",
-            fontWeight: 700,
-            fontSize: 15,
-            letterSpacing: "-0.01em",
-            color: T.surface,
-            margin: 0,
-          }}>
+          <h2 className="surface-heading">
             Pipeline de ventas
           </h2>
-          <span style={{ fontSize: 11, color: T.surfaceDim, fontFamily: "Inter, sans-serif" }}>
+          <span className="num" style={{ fontSize: 11, color: T.surfaceDim }}>
             {totalCount} deals · {formatMoney(totalValue)}
           </span>
         </div>
         <Link
           href="/dashboard/pipeline"
+          className="eyebrow"
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
             color: T.gold,
             textDecoration: "none",
-            fontFamily: "Inter, sans-serif",
           }}
         >
           Ver todo →
@@ -75,7 +58,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
 
       {/* Empty state */}
       {pipeline.length === 0 && (
-        <p style={{ fontSize: 13, color: T.surfaceDim, textAlign: "center", padding: "16px 0", fontFamily: "Inter, sans-serif" }}>
+        <p style={{ fontSize: 13, color: T.surfaceDim, textAlign: "center", padding: "16px 0", fontFamily: "var(--font-sans)" }}>
           No hay deals activos.
         </p>
       )}
@@ -115,8 +98,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
                   alignItems: "center",
                   justifyContent: "center",
                 }}>
-                  <span style={{
-                    fontFamily: "Manrope, sans-serif",
+                  <span className="num" style={{
                     fontWeight: 700,
                     fontSize: 15,
                     color: isWon ? "#22c55e" : T.surface,
@@ -135,7 +117,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
                     letterSpacing: "0.07em",
                     color: color.dot,
                     margin: "0 0 2px",
-                    fontFamily: "Inter, sans-serif",
+                    fontFamily: "var(--font-sans)",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                     whiteSpace: "nowrap",
@@ -143,7 +125,7 @@ export function PipelineSummary({ pipeline }: { pipeline: PipelineStageData[] })
                     {stage.label}
                   </p>
                   {stage.value > 0 && (
-                    <p style={{ fontSize: 10, color: T.surfaceDim, margin: 0, fontFamily: "Inter, sans-serif" }}>
+                    <p className="num" style={{ fontSize: 10, color: T.surfaceDim, margin: 0 }}>
                       {formatMoney(stage.value)}
                     </p>
                   )}

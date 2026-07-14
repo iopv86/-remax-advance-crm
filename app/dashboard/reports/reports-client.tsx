@@ -11,16 +11,16 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import { Download, TrendingUp, Users, DollarSign, Award } from "lucide-react";
+import { Download, TrendingUp, Users, DollarSign, Award, Trophy } from "lucide-react";
 import { AgentFilter } from "@/components/agent-filter";
 import type { DealRow, AgentRow } from "./page";
 import { computeCommission } from "@/lib/commission";
+import { CHART_AXIS, CHART_GRID, CHART_TOOLTIP, CHART_CURSOR, CHART_GOLD } from "@/lib/chart-theme";
 
 // ─── Tokens ────────────────────────────────────────────────────────────────────
 
 const GOLD = "var(--primary)";
 const BG_BODY = "var(--background)";
-const BG_CARD = "var(--card)";
 const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
@@ -150,7 +150,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
   ];
 
   return (
-    <div style={{ minHeight: "100vh", background: BG_BODY, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: BG_BODY, color: TEXT_PRIMARY, fontFamily: "var(--font-sans)" }}>
 
       {/* ── Header ─────────────────────────────────────────────────────────── */}
       <header className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 md:px-10" style={{
@@ -158,7 +158,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
         background: "rgba(13,14,18,0.9)", backdropFilter: "blur(16px)",
         borderBottom: `1px solid rgba(201,150,58,0.1)`,
       }}>
-        <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 28, letterSpacing: "-0.02em", margin: 0 }}>
+        <h1 className="surface-title" style={{ margin: 0 }}>
           Reportes
         </h1>
 
@@ -238,7 +238,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
               style={{
                 fontSize: 12,
                 color: TEXT_MUTED,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "var(--font-sans)",
                 paddingBottom: 6,
               }}
             >
@@ -254,16 +254,17 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
             { icon: <Award style={{ width: 18, height: 18, color: "#22c55e" }} />, label: "Deals ganados", value: closedWon.length, sub: `Perdidos: ${closedLost.length}` },
             { icon: <DollarSign style={{ width: 18, height: 18, color: "#60a5fa" }} />, label: "Pipeline activo", value: active.length, sub: `Deals en curso` },
             { icon: <Users style={{ width: 18, height: 18, color: "#a78bfa" }} />, label: "Conversión", value: `${conversionRate}%`, sub: `${totalLeads} leads totales` },
-          ].map(({ icon, label, value, sub }) => (
-            <div key={label} style={{
-              background: BG_CARD, backdropFilter: "blur(12px)",
-              border: `1px solid ${BORDER_GOLD}`, borderRadius: 16, padding: "20px 24px",
-            }}>
+          ].map(({ icon, label, value, sub }, idx) => (
+            <div
+              key={label}
+              className={idx === 0 ? "card-primary" : "card-secondary"}
+              style={{ backdropFilter: "blur(12px)", padding: "20px 24px" }}
+            >
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                 {icon}
-                <span style={{ fontSize: 11, fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
+                <span className="eyebrow">{label}</span>
               </div>
-              <p style={{ fontSize: 28, fontWeight: 800, fontFamily: "Manrope, sans-serif", color: TEXT_PRIMARY, margin: "0 0 4px" }}>{value}</p>
+              <p className="num" style={{ fontSize: 28, fontWeight: 800, color: TEXT_PRIMARY, margin: "0 0 4px" }}>{value}</p>
               <p style={{ fontSize: 11, color: TEXT_DIM, margin: 0 }}>{sub}</p>
             </div>
           ))}
@@ -273,24 +274,24 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 40 }}>
 
           {/* Funnel */}
-          <div style={{ background: BG_CARD, border: `1px solid ${BORDER_GOLD}`, borderRadius: 16, padding: "24px" }}>
-            <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 15, color: TEXT_PRIMARY, margin: "0 0 20px" }}>
+          <div className="card-secondary" style={{ padding: "24px" }}>
+            <h2 className="surface-heading" style={{ margin: "0 0 20px" }}>
               Embudo de Conversión
             </h2>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={funnelData} layout="vertical" margin={{ left: 0, right: 24 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-bg)" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 10, fill: TEXT_DIM }} axisLine={false} tickLine={false} />
-                <YAxis dataKey="label" type="category" tick={{ fontSize: 10, fill: TEXT_MUTED }} axisLine={false} tickLine={false} width={80} />
+                <CartesianGrid {...CHART_GRID} horizontal={false} />
+                <XAxis type="number" tick={CHART_AXIS.tick} axisLine={false} tickLine={false} />
+                <YAxis dataKey="label" type="category" tick={CHART_AXIS.tick} axisLine={false} tickLine={false} width={80} />
                 <Tooltip
-                  contentStyle={{ background: BG_ELEVATED, border: `1px solid ${BORDER_GOLD}`, borderRadius: 8, fontSize: 12 }}
-                  itemStyle={{ color: TEXT_PRIMARY }}
+                  contentStyle={CHART_TOOLTIP}
+                  cursor={CHART_CURSOR}
                   labelStyle={{ color: TEXT_MUTED }}
                   formatter={(v) => [Number(v), "Deals"]}
                 />
                 <Bar dataKey="count" radius={[0, 4, 4, 0]}>
                   {funnelData.map((entry, idx) => (
-                    <Cell key={idx} fill={entry.label === "Ganado" ? "#22c55e" : entry.label === "Perdido" ? "#ef4444" : GOLD} fillOpacity={entry.label === "Ganado" || entry.label === "Perdido" ? 1 : 0.7} />
+                    <Cell key={idx} fill={entry.label === "Ganado" ? "#22c55e" : entry.label === "Perdido" ? "#ef4444" : CHART_GOLD} fillOpacity={entry.label === "Ganado" || entry.label === "Perdido" ? 1 : 0.7} />
                   ))}
                 </Bar>
               </BarChart>
@@ -298,8 +299,8 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
           </div>
 
           {/* Revenue by month */}
-          <div style={{ background: BG_CARD, border: `1px solid ${BORDER_GOLD}`, borderRadius: 16, padding: "24px" }}>
-            <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 15, color: TEXT_PRIMARY, margin: "0 0 20px" }}>
+          <div className="card-secondary" style={{ padding: "24px" }}>
+            <h2 className="surface-heading" style={{ margin: "0 0 20px" }}>
               Ingresos por Mes
             </h2>
             {monthlyData.length === 0 ? (
@@ -309,16 +310,16 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
             ) : (
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={monthlyData} margin={{ left: 8, right: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--glass-bg)" vertical={false} />
-                  <XAxis dataKey="month" tick={{ fontSize: 10, fill: TEXT_DIM }} axisLine={false} tickLine={false} />
-                  <YAxis tickFormatter={(v) => formatMoney(v)} tick={{ fontSize: 10, fill: TEXT_DIM }} axisLine={false} tickLine={false} width={60} />
+                  <CartesianGrid {...CHART_GRID} vertical={false} />
+                  <XAxis dataKey="month" tick={CHART_AXIS.tick} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={(v) => formatMoney(v)} tick={CHART_AXIS.tick} axisLine={false} tickLine={false} width={60} />
                   <Tooltip
-                    contentStyle={{ background: BG_ELEVATED, border: `1px solid ${BORDER_GOLD}`, borderRadius: 8, fontSize: 12 }}
-                    itemStyle={{ color: TEXT_PRIMARY }}
+                    contentStyle={CHART_TOOLTIP}
+                    cursor={CHART_CURSOR}
                     labelStyle={{ color: TEXT_MUTED }}
                     formatter={(v) => [`$${Number(v).toLocaleString("es-DO")}`, "Ingresos"]}
                   />
-                  <Bar dataKey="value" fill={GOLD} radius={[4, 4, 0, 0]} fillOpacity={0.85} />
+                  <Bar dataKey="value" fill={CHART_GOLD} radius={[4, 4, 0, 0]} fillOpacity={0.85} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -326,9 +327,9 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
         </div>
 
         {/* ── Agent performance table ───────────────────────────────────────── */}
-        <div style={{ background: BG_CARD, border: `1px solid ${BORDER_GOLD}`, borderRadius: 16, overflow: "hidden" }}>
+        <div className="card-secondary" style={{ overflow: "hidden" }}>
           <div style={{ padding: "20px 24px", borderBottom: `1px solid ${BORDER_GOLD}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 15, color: TEXT_PRIMARY, margin: 0 }}>
+            <h2 className="surface-heading" style={{ margin: 0 }}>
               Rendimiento por Agente
             </h2>
             <span style={{ fontSize: 11, color: TEXT_DIM }}>{agentStats.length} agentes activos</span>
@@ -343,7 +344,7 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
               <thead>
                 <tr style={{ borderBottom: `1px solid var(--glass-bg)` }}>
                   {["Agente", "Deals", "Ganados", "Conv. %", "Ingresos", "Comisiones"].map((h) => (
-                    <th key={h} style={{ padding: "12px 16px", textAlign: h === "Agente" ? "left" : "right", fontSize: 10, fontWeight: 600, color: TEXT_DIM, textTransform: "uppercase", letterSpacing: "0.08em", fontFamily: "Manrope, sans-serif" }}>
+                    <th key={h} className="eyebrow" style={{ padding: "12px 16px", textAlign: h === "Agente" ? "left" : "right" }}>
                       {h}
                     </th>
                   ))}
@@ -360,30 +361,34 @@ export function ReportsClient({ deals, agents, totalLeads }: Props) {
                   >
                     <td style={{ padding: "14px 16px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        {idx === 0 && <span title="Top performer">🏆</span>}
+                        {idx === 0 && (
+                          <span title="Top performer" style={{ display: "inline-flex" }}>
+                            <Trophy style={{ width: 14, height: 14, color: CHART_GOLD }} />
+                          </span>
+                        )}
                         <div>
                           <p style={{ fontSize: 13, fontWeight: 600, color: TEXT_PRIMARY, margin: 0 }}>{a.name}</p>
                           <p style={{ fontSize: 10, color: TEXT_DIM, margin: 0 }}>{a.lost > 0 ? `${a.lost} perdido${a.lost !== 1 ? "s" : ""}` : "Sin pérdidas"}</p>
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: "14px 16px", textAlign: "right", fontSize: 13, color: TEXT_MUTED }}>{a.total}</td>
+                    <td className="num" style={{ padding: "14px 16px", textAlign: "right", fontSize: 13, color: TEXT_MUTED }}>{a.total}</td>
                     <td style={{ padding: "14px 16px", textAlign: "right" }}>
-                      <span style={{ fontSize: 13, fontWeight: 600, color: "#22c55e" }}>{a.won}</span>
+                      <span className="num" style={{ fontSize: 13, fontWeight: 600, color: "#22c55e" }}>{a.won}</span>
                     </td>
                     <td style={{ padding: "14px 16px", textAlign: "right" }}>
-                      <span style={{
-                        fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 9999,
+                      <span className="num" style={{
+                        fontSize: 11, fontWeight: 700, padding: "2px 8px", borderRadius: 8,
                         background: Number(a.conv) >= 50 ? "rgba(34,197,94,0.1)" : "rgba(201,150,58,0.1)",
                         color: Number(a.conv) >= 50 ? "#22c55e" : GOLD,
                       }}>
                         {a.conv}%
                       </span>
                     </td>
-                    <td style={{ padding: "14px 16px", textAlign: "right", fontSize: 13, fontWeight: 600, color: TEXT_PRIMARY }}>
+                    <td className="num" style={{ padding: "14px 16px", textAlign: "right", fontSize: 13, fontWeight: 600, color: TEXT_PRIMARY }}>
                       {formatMoney(a.revenue)}
                     </td>
-                    <td style={{ padding: "14px 16px", textAlign: "right", fontSize: 13, color: GOLD }}>
+                    <td className="num" style={{ padding: "14px 16px", textAlign: "right", fontSize: 13, color: GOLD }}>
                       {formatMoney(a.commission)}
                     </td>
                   </tr>

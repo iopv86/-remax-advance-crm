@@ -66,13 +66,7 @@ function ItemIcon({ type, stage }: { type: "contact" | "deal"; stage?: string })
 
 export function ActivityFeed({ items }: { items: ActivityItem[] }) {
   return (
-    <div style={{
-      background: T.card,
-      border: `1px solid ${T.border}`,
-      borderRadius: 16,
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+    <div className="card-secondary" style={{
       overflow: "hidden",
     }}>
       {/* Header */}
@@ -83,17 +77,10 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
         alignItems: "center",
         justifyContent: "space-between",
       }}>
-        <h2 style={{
-          fontFamily: "Manrope, sans-serif",
-          fontWeight: 700,
-          fontSize: 15,
-          letterSpacing: "-0.01em",
-          color: T.surface,
-          margin: 0,
-        }}>
+        <h2 className="surface-heading">
           Actividad reciente
         </h2>
-        <span style={{ fontSize: 10, color: T.surfaceDim, fontFamily: "Inter, sans-serif" }}>
+        <span style={{ fontSize: 10, color: T.surfaceDim, fontFamily: "var(--font-sans)" }}>
           Últimos 10 eventos
         </span>
       </div>
@@ -102,7 +89,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
       <div>
         {items.length === 0 && (
           <div style={{ padding: "32px 24px", textAlign: "center" }}>
-            <p style={{ fontSize: 13, color: T.surfaceDim, fontFamily: "Inter, sans-serif" }}>
+            <p style={{ fontSize: 13, color: T.surfaceDim, fontFamily: "var(--font-sans)" }}>
               Sin actividad reciente.
             </p>
           </div>
@@ -141,7 +128,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
                   fontWeight: 600,
                   color: T.surface,
                   margin: "0 0 2px",
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -152,7 +139,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
                   fontSize: 11,
                   color: T.surfaceDim,
                   margin: 0,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -166,7 +153,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
               <span style={{
                 fontSize: 10,
                 color: T.surfaceDim,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "var(--font-sans)",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
               }} suppressHydrationWarning>

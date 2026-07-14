@@ -10,14 +10,9 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
 
   return (
     <div
+      className="card-secondary"
       style={{
-        background: T.card,
-        border: `1px solid ${T.border}`,
-        borderRadius: 16,
         padding: "20px 22px",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
         display: "flex",
         flexDirection: "column",
         gap: 14,
@@ -57,29 +52,10 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
             <MessageCircle size={15} />
           </div>
           <div>
-            <h2
-              style={{
-                fontFamily: "Manrope, sans-serif",
-                fontWeight: 700,
-                fontSize: 15,
-                letterSpacing: "-0.01em",
-                color: T.surface,
-                margin: 0,
-                lineHeight: 1.1,
-              }}
-            >
+            <h2 className="surface-heading" style={{ margin: 0 }}>
               Ava
             </h2>
-            <p
-              style={{
-                fontSize: 10,
-                color: T.surfaceDim,
-                fontFamily: "Inter, sans-serif",
-                margin: "2px 0 0",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-              }}
-            >
+            <p className="eyebrow" style={{ margin: "2px 0 0" }}>
               Asistente WhatsApp
             </p>
           </div>
@@ -109,7 +85,7 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
           <span
             style={{
               fontSize: 10,
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "var(--font-sans)",
               fontWeight: 600,
               color: statusColor,
               textTransform: "uppercase",
@@ -124,11 +100,10 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
       {/* Message count block */}
       <div style={{ display: "flex", alignItems: "baseline", gap: 8, position: "relative" }}>
         <span
+          className="num"
           style={{
-            fontFamily: "Manrope, sans-serif",
             fontWeight: 800,
             fontSize: 34,
-            letterSpacing: "-0.035em",
             color: T.gold,
             lineHeight: 1,
           }}
@@ -139,7 +114,7 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
           style={{
             fontSize: 11,
             color: T.surfaceMuted,
-            fontFamily: "Inter, sans-serif",
+            fontFamily: "var(--font-sans)",
           }}
         >
           mensajes hoy
@@ -160,7 +135,7 @@ export function AvaStatusCard({ isActive, msgsToday }: { isActive: boolean; msgs
           color: T.surfaceMuted,
           fontSize: 12,
           fontWeight: 600,
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "var(--font-sans)",
           textDecoration: "none",
           transition: "all 0.15s",
           position: "relative",

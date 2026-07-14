@@ -80,8 +80,8 @@ export default async function PipelinePage() {
             <h1
               className="text-[26px] md:text-[36px]"
               style={{
-                fontFamily: "Manrope, var(--font-manrope), sans-serif",
-                fontWeight: 800,
+                fontFamily: "var(--font-syne), system-ui, sans-serif",
+                fontWeight: 700,
                 color: "var(--foreground)",
                 letterSpacing: "-0.02em",
                 lineHeight: 1,

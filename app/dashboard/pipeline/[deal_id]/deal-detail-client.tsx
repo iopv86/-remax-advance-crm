@@ -250,15 +250,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
-            <h1
-              style={{
-                fontFamily: "var(--font-display),var(--font-manrope),system-ui,sans-serif",
-                fontWeight: 700,
-                fontSize: 20,
-                letterSpacing: "-0.02em",
-                color: "var(--foreground)",
-              }}
-            >
+            <h1 className="surface-title">
               {contactName}
             </h1>
             <p className="text-xs mt-0.5 flex items-center gap-1.5" style={{ color: "var(--muted-foreground)" }}>
@@ -271,13 +263,13 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
 
         <div className="flex items-center gap-3">
           <span
-            className="px-3 py-1 rounded-full text-xs font-bold"
+            className="px-3 py-1 rounded-lg text-xs font-bold"
             style={{ background: `${stageColor}18`, color: stageColor, border: `1px solid ${stageColor}30` }}
           >
             {STAGE_LABELS[deal.stage]}
           </span>
           <span
-            className="text-lg font-bold"
+            className="text-lg font-bold num"
             style={{
               fontFamily: "var(--font-display),var(--font-manrope),system-ui",
               color: "var(--primary)",
@@ -291,8 +283,8 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
       <div className="flex-1 p-6 animate-fade-up-1 space-y-5 max-w-5xl">
         {/* ── Stage progress bar ────────────────────────────────────────── */}
         {!isLost && (
-          <div className="card-base p-4">
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "var(--muted-foreground)" }}>
+          <div className="card-secondary p-4">
+            <p className="eyebrow mb-3">
               Progreso del Pipeline
             </p>
             <div className="flex items-center gap-0.5 flex-wrap">
@@ -326,8 +318,8 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
           {/* ── Left: Deal info + Notes + Tasks ─────────────────────────── */}
           <div className="lg:col-span-2 space-y-5">
             {/* Info card */}
-            <div className="card-base p-5">
-              <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: "var(--muted-foreground)" }}>
+            <div className="card-primary p-5">
+              <p className="eyebrow mb-4">
                 Información del deal
               </p>
               <div className="grid grid-cols-2 gap-4">
@@ -339,7 +331,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                       <select
                         value={stageValue}
                         onChange={(e) => setStageValue(e.target.value as DealStage)}
-                        className="flex-1 text-sm px-2 py-1.5 rounded-lg"
+                        className="flex-1 text-sm px-2 py-1.5 rounded-lg focus-ring"
                         style={{
                           background: "var(--muted)", color: "var(--foreground)",
                           border: "1px solid var(--border)", outline: "none",
@@ -375,7 +367,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                         type="number"
                         value={dealValue}
                         onChange={(e) => setDealValue(e.target.value)}
-                        className="flex-1 text-sm px-2 py-1.5 rounded-lg"
+                        className="flex-1 text-sm px-2 py-1.5 rounded-lg focus-ring"
                         style={{
                           background: "var(--muted)", color: "var(--foreground)",
                           border: "1px solid var(--border)", outline: "none",
@@ -391,7 +383,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                     </div>
                   ) : (
                     <button onClick={() => setEditingValue(true)} className="flex items-center gap-2 group">
-                      <span className="text-sm font-bold" style={{ color: "var(--primary)" }}>
+                      <span className="text-sm font-bold num" style={{ color: "var(--primary)" }}>
                         {formatCurrency(deal.deal_value, deal.currency)}
                       </span>
                       <Pencil className="w-3 h-3 opacity-0 group-hover:opacity-60 transition-opacity" style={{ color: "var(--muted-foreground)" }} />
@@ -466,7 +458,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                         type="date"
                         value={closeDateValue}
                         onChange={(e) => setCloseDateValue(e.target.value)}
-                        className="flex-1 text-sm px-2 py-1.5 rounded-lg"
+                        className="flex-1 text-sm px-2 py-1.5 rounded-lg focus-ring"
                         style={{
                           background: "var(--muted)", color: "var(--foreground)",
                           border: "1px solid var(--border)", outline: "none",
@@ -496,7 +488,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                   <p className="text-xs font-medium mb-1.5 flex items-center gap-1" style={{ color: "var(--muted-foreground)" }}>
                     <TrendingUp className="w-3 h-3" /> Comisión estimada
                   </p>
-                  <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+                  <span className="text-sm font-semibold num" style={{ color: "var(--foreground)" }}>
                     {(() => {
                       const amt = computeCommission(deal);
                       if (amt <= 0 && deal.commission_value == null && deal.commission_percentage == null) return "—";
@@ -504,7 +496,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                         <>
                           {formatCurrency(amt, deal.currency)}
                           {deal.commission_percentage != null && (
-                            <span className="text-xs font-normal ml-1" style={{ color: "var(--muted-foreground)" }}>
+                            <span className="text-xs font-normal ml-1 num" style={{ color: "var(--muted-foreground)" }}>
                               ({deal.commission_percentage}%)
                             </span>
                           )}
@@ -555,9 +547,9 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                 </span>
               );
               return (
-                <div className="card-base p-5">
+                <div className="card-secondary p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                    <p className="eyebrow">
                       Intereses del cliente
                     </p>
                     <Link href={`/dashboard/contacts/${contact.id}/edit?from=deal:${deal.id}`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
@@ -615,9 +607,9 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
 
             {/* Co-comprador / Referidor — PII gated by RLS + page-level owner check */}
             {parties.length > 0 && (
-              <div className="card-base p-5">
+              <div className="card-secondary p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                  <p className="eyebrow">
                     Co-comprador / Referidor
                   </p>
                   <Link href={`/dashboard/pipeline/${deal.id}/edit`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
@@ -629,7 +621,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                     <div key={p.id} style={{ paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>{p.full_name}</span>
-                        <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 999, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
+                        <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 8, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
                           {PARTY_TYPE_LABELS[p.party_type] ?? p.party_type}
                         </span>
                       </div>
@@ -657,9 +649,9 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                 .reduce((s, i) => s + (i.amount ?? 0), 0);
               const pending = total - paid;
               return (
-                <div className="card-base p-5">
+                <div className="card-secondary p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                    <p className="eyebrow">
                       Plan de pagos
                     </p>
                     <Link href={`/dashboard/pipeline/${deal.id}/edit`} className="text-xs flex items-center gap-1 transition-colors hover:opacity-80" style={{ color: "var(--primary)" }}>
@@ -673,15 +665,15 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                       return (
                         <div key={i.id} style={{ paddingBottom: 10, borderBottom: "1px solid var(--border)" }}>
                           <div className="flex items-center justify-between mb-1">
-                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 999, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 8, background: "var(--accent)", color: "var(--accent-foreground)", border: "1px solid var(--border)" }}>
                               {INSTALLMENT_KIND_LABELS[i.kind] ?? i.kind}
                             </span>
-                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 999, background: st.bg, color: st.fg }}>
+                            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", padding: "2px 8px", borderRadius: 8, background: st.bg, color: st.fg }}>
                               {st.label}
                             </span>
                           </div>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm font-semibold" style={{ color: "var(--foreground)" }}>
+                            <span className="text-sm font-semibold num" style={{ color: "var(--foreground)" }}>
                               {fmtMoney(i.amount, i.currency)}
                             </span>
                             <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
@@ -703,20 +695,20 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                   <div className="mt-3 pt-2 text-xs space-y-1" style={{ color: "var(--muted-foreground)" }}>
                     <div className="flex justify-between">
                       <span>Total del plan</span>
-                      <span style={{ color: "var(--foreground)", fontWeight: 600 }}>{fmtMoney(total, planCurrency)}</span>
+                      <span className="num" style={{ color: "var(--foreground)", fontWeight: 600 }}>{fmtMoney(total, planCurrency)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Pagado</span>
-                      <span style={{ color: "#22c55e" }}>{fmtMoney(paid, planCurrency)}</span>
+                      <span className="num" style={{ color: "#22c55e" }}>{fmtMoney(paid, planCurrency)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Pendiente</span>
-                      <span style={{ color: "var(--foreground)" }}>{fmtMoney(pending, planCurrency)}</span>
+                      <span className="num" style={{ color: "var(--foreground)" }}>{fmtMoney(pending, planCurrency)}</span>
                     </div>
                     {deal.deal_value != null && deal.currency === planCurrency && Math.abs(total - deal.deal_value) >= 0.01 && (
                       <div className="flex justify-between" style={{ fontStyle: "italic" }}>
                         <span>Valor de la oportunidad</span>
-                        <span>{fmtMoney(deal.deal_value, planCurrency)}</span>
+                        <span className="num">{fmtMoney(deal.deal_value, planCurrency)}</span>
                       </div>
                     )}
                   </div>
@@ -725,9 +717,9 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
             })()}
 
             {/* Notes */}
-            <div className="card-base p-5">
+            <div className="card-secondary p-5">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+                <p className="eyebrow">
                   Notas internas
                 </p>
                 {!editingNotes && (
@@ -747,7 +739,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
                     onChange={(e) => setNotesValue(e.target.value)}
                     rows={5}
                     placeholder="Agrega notas internas sobre este deal…"
-                    className="w-full text-sm px-3 py-2.5 rounded-lg resize-none"
+                    className="w-full text-sm px-3 py-2.5 rounded-lg resize-none focus-ring"
                     style={{
                       background: "var(--muted)", color: "var(--foreground)",
                       border: "1px solid var(--border)", outline: "none",
@@ -793,8 +785,8 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
           </div>
 
           {/* ── Right: Stage history timeline ─────────────────────────── */}
-          <div className="card-base p-5">
-            <p className="text-[10px] font-bold uppercase tracking-widest mb-4" style={{ color: "var(--muted-foreground)" }}>
+          <div className="card-secondary p-5">
+            <p className="eyebrow mb-4">
               Historial de stages
             </p>
 

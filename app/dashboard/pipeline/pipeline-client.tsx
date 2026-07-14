@@ -338,9 +338,9 @@ function DroppableColumn({
       style={
         isOver
           ? {
-              outline: "2px dashed rgba(245,189,93,0.4)",
-              borderRadius: "0.25rem",
-              background: "rgba(245,189,93,0.03)",
+              outline: "2px dashed rgba(201,150,58,0.4)",
+              borderRadius: "16px",
+              background: "rgba(201,150,58,0.03)",
             }
           : {}
       }
@@ -589,7 +589,7 @@ export function PipelineClient({
                           justifyContent: "center",
                           minHeight: 80,
                           border: "2px dashed rgba(201,150,58,0.12)",
-                          borderRadius: "0.25rem",
+                          borderRadius: "14px",
                           color: "var(--muted-foreground)",
                           fontSize: 12,
                           fontFamily: "var(--font-sans)",

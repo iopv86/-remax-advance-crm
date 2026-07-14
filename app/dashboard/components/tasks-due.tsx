@@ -18,13 +18,7 @@ export function TasksDue({
   overdue: number;
 }) {
   return (
-    <div style={{
-      background: T.card,
-      border: `1px solid ${T.border}`,
-      borderRadius: 16,
-      backdropFilter: "blur(12px)",
-      WebkitBackdropFilter: "blur(12px)",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
+    <div className="card-secondary" style={{
       overflow: "hidden",
     }}>
       {/* Header */}
@@ -36,14 +30,7 @@ export function TasksDue({
         justifyContent: "space-between",
         gap: 12,
       }}>
-        <h2 style={{
-          fontFamily: "Manrope, sans-serif",
-          fontWeight: 700,
-          fontSize: 15,
-          letterSpacing: "-0.01em",
-          color: T.surface,
-          margin: 0,
-        }}>
+        <h2 className="surface-heading">
           Seguimientos pendientes
         </h2>
 
@@ -52,7 +39,7 @@ export function TasksDue({
             <span style={{
               fontSize: 10,
               fontWeight: 700,
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "var(--font-sans)",
               padding: "3px 8px",
               borderRadius: 99,
               background: "rgba(244,63,94,0.15)",
@@ -66,7 +53,7 @@ export function TasksDue({
             <span style={{
               fontSize: 10,
               fontWeight: 700,
-              fontFamily: "Inter, sans-serif",
+              fontFamily: "var(--font-sans)",
               padding: "3px 8px",
               borderRadius: 99,
               background: "rgba(201,150,58,0.15)",
@@ -83,7 +70,7 @@ export function TasksDue({
       <div style={{ padding: "8px 0" }}>
         {tasks.length === 0 && (
           <div style={{ padding: "20px 24px", textAlign: "center" }}>
-            <p style={{ fontSize: 13, color: T.surfaceDim, fontFamily: "Inter, sans-serif" }}>
+            <p style={{ fontSize: 13, color: T.surfaceDim, fontFamily: "var(--font-sans)" }}>
               Sin seguimientos pendientes.
             </p>
           </div>
@@ -146,7 +133,7 @@ export function TasksDue({
                   fontWeight: 600,
                   color: T.surface,
                   margin: "0 0 1px",
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
@@ -157,7 +144,7 @@ export function TasksDue({
                   fontSize: 10,
                   color: t.overdue ? "#f43f5e" : T.surfaceDim,
                   margin: 0,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",

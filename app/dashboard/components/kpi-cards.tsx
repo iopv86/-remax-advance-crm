@@ -34,32 +34,19 @@ interface CardDef {
   heroColor: string;
   accentGradient: string;
   href: string;
+  tier: "primary" | "interactive";
 }
 
 function KpiCard({ card }: { card: CardDef }) {
   return (
     <Link
       href={card.href}
+      className={card.tier === "primary" ? "card-primary" : "card-interactive"}
       style={{
-        background: T.card,
-        border: `1px solid ${T.border}`,
-        borderRadius: 16,
         overflow: "hidden",
-        backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.3)",
-        transition: "transform 0.2s, box-shadow 0.2s",
         cursor: "pointer",
         textDecoration: "none",
         display: "block",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(-2px)";
-        (e.currentTarget as HTMLAnchorElement).style.boxShadow = `0 8px 32px rgba(0,0,0,0.4), 0 0 20px ${card.heroColor}12`;
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLAnchorElement).style.transform = "translateY(0)";
-        (e.currentTarget as HTMLAnchorElement).style.boxShadow = "0 4px 24px rgba(0,0,0,0.3)";
       }}
     >
       {/* Accent keyline bar */}
@@ -72,14 +59,7 @@ function KpiCard({ card }: { card: CardDef }) {
       <div className="p-4 md:p-5">
         {/* Label + icon */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <span style={{
-            fontSize: 10,
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.1em",
-            color: T.surfaceMuted,
-            fontFamily: "Inter, sans-serif",
-          }}>
+          <span className="eyebrow">
             {card.label}
           </span>
           <span style={{
@@ -95,10 +75,8 @@ function KpiCard({ card }: { card: CardDef }) {
         </div>
 
         {/* Value */}
-        <div className="text-[26px] md:text-[38px]" style={{
-          fontFamily: "Manrope, sans-serif",
+        <div className="num text-[26px] md:text-[38px]" style={{
           fontWeight: 800,
-          letterSpacing: "-0.04em",
           lineHeight: 1,
           color: card.heroColor,
           marginBottom: card.sub ? 6 : 12,
@@ -108,7 +86,7 @@ function KpiCard({ card }: { card: CardDef }) {
 
         {/* Sub-line */}
         {card.sub && (
-          <div style={{ fontSize: 11, color: T.surfaceDim, fontFamily: "Inter, sans-serif", marginBottom: 10 }}>
+          <div style={{ fontSize: 11, color: T.surfaceDim, fontFamily: "var(--font-sans)", marginBottom: 10 }}>
             {card.sub}
           </div>
         )}
@@ -122,7 +100,7 @@ function KpiCard({ card }: { card: CardDef }) {
           alignItems: "center",
           gap: 4,
           fontSize: 11,
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "var(--font-sans)",
           color: card.deltaFlat ? T.surfaceDim : card.deltaUp ? "#10b981" : "#f43f5e",
         }}>
           {card.deltaFlat
@@ -153,6 +131,7 @@ export function KpiCards({ kpi }: { kpi: KPIData }) {
       heroColor: T.gold,
       accentGradient: `linear-gradient(90deg, #C9963A 0%, #E8B84B 50%, rgba(201,150,58,0.3) 100%)`,
       href: "/dashboard/reports",
+      tier: "primary",
       icon: (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
@@ -169,6 +148,7 @@ export function KpiCards({ kpi }: { kpi: KPIData }) {
       heroColor: "#d4a443",
       accentGradient: `linear-gradient(90deg, #d4a443 0%, #e0b04d 50%, rgba(212,164,67,0.3) 100%)`,
       href: "/dashboard/pipeline",
+      tier: "interactive",
       icon: (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
@@ -184,6 +164,7 @@ export function KpiCards({ kpi }: { kpi: KPIData }) {
       heroColor: "#7c9fe8",
       accentGradient: `linear-gradient(90deg, #7c9fe8 0%, #a0baf5 50%, rgba(124,159,232,0.3) 100%)`,
       href: "/dashboard/contacts",
+      tier: "interactive",
       icon: (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -199,6 +180,7 @@ export function KpiCards({ kpi }: { kpi: KPIData }) {
       heroColor: "#a78bfa",
       accentGradient: `linear-gradient(90deg, #a78bfa 0%, #c4b5fd 50%, rgba(167,139,250,0.3) 100%)`,
       href: "/dashboard/pipeline",
+      tier: "interactive",
       icon: (
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>

@@ -180,10 +180,10 @@ export function DealActivityPanel({
   const fieldStyle = { background: "var(--background)", border: "1px solid var(--border)", color: "var(--foreground)", outline: "none" } as const;
 
   return (
-    <div className="card-base p-5">
+    <div className="card-secondary p-5">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: "var(--muted-foreground)" }}>
+        <p className="eyebrow">
           Actividad
           <span className="ml-2 px-1.5 py-0.5 rounded-full text-[9px]" style={{ background: "var(--muted)", color: "var(--muted-foreground)" }}>
             {count}

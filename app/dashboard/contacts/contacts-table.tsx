@@ -58,33 +58,13 @@ function avatarPalette(initials: string) {
 function getStatusBadge(classification?: string) {
   switch (classification) {
     case "hot":
-      return {
-        label: "Lead Caliente",
-        bg: "rgba(245,189,93,0.10)",
-        color: T.primary,
-        border: `rgba(245,189,93,0.20)`,
-      };
+      return { label: "Lead Caliente", className: "badge-hot" };
     case "warm":
-      return {
-        label: "En Seguimiento",
-        bg: T.surfaceContainerHighest,
-        color: T.onSurfaceVariant,
-        border: `rgba(79,69,55,0.20)`,
-      };
+      return { label: "En Seguimiento", className: "badge-warm" };
     case "cold":
-      return {
-        label: "Frío",
-        bg: T.surfaceContainerHighest,
-        color: T.onSurfaceVariant,
-        border: `rgba(79,69,55,0.20)`,
-      };
+      return { label: "Frío", className: "badge-cold" };
     default:
-      return {
-        label: "Sin clasificar",
-        bg: "rgba(52,211,153,0.10)",
-        color: "#34d399",
-        border: "rgba(52,211,153,0.20)",
-      };
+      return { label: "Sin clasificar", className: "badge-new" };
   }
 }
 
@@ -387,13 +367,12 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                       <p style={{ fontSize: 14, fontWeight: 600, color: T.onSurface, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {name}
                       </p>
-                      <span style={{
+                      <span className={`${badge.className} border`} style={{
                         flexShrink: 0, display: "inline-block",
-                        padding: "2px 6px", borderRadius: 4,
+                        padding: "2px 6px", borderRadius: 8,
                         fontSize: 9, fontWeight: 700,
                         textTransform: "uppercase", letterSpacing: "0.06em",
                         whiteSpace: "nowrap",
-                        background: badge.bg, color: badge.color, border: `1px solid ${badge.border}`,
                       }}>
                         {badge.label}
                       </span>
@@ -451,14 +430,9 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                 ].map(({ label, align }) => (
                   <th
                     key={label}
+                    className="eyebrow"
                     style={{
                       padding: "16px 24px",
-                      fontFamily: "Manrope, var(--font-manrope), sans-serif",
-                      fontSize: 11,
-                      fontWeight: 700,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.12em",
-                      color: T.onSurfaceVariant,
                       textAlign: align as "left" | "center" | "right",
                       whiteSpace: "nowrap",
                     }}
@@ -519,11 +493,12 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                 return (
                   <tr
                     key={c.id}
+                    className="table-row-hover"
                     onMouseEnter={() => setHoveredId(c.id)}
                     onMouseLeave={() => setHoveredId(null)}
                     style={{
                       borderTop: `1px solid rgba(79,69,55,0.08)`,
-                      background: isChecked ? T.surfaceContainerHigh : isHovered ? T.surfaceContainerHigh : "transparent",
+                      background: isChecked ? T.surfaceContainerHigh : "transparent",
                       borderLeft: isChecked
                         ? `3px solid ${T.primaryContainer}`
                         : isHovered
@@ -575,7 +550,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                           <p
                             style={{
                               fontSize: 14,
-                              fontWeight: 500,
+                              fontWeight: 600,
                               color: T.onSurface,
                               margin: 0,
                             }}
@@ -585,7 +560,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                           {c.email && (
                             <p
                               style={{
-                                fontSize: 11,
+                                fontSize: 12,
                                 color: T.onSurfaceVariant,
                                 margin: 0,
                                 marginTop: 1,
@@ -600,11 +575,11 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
 
                     {/* Teléfono */}
                     <td
+                      className="num"
                       style={{
                         padding: "16px 24px",
-                        fontSize: 14,
-                        fontFamily: "Manrope, var(--font-manrope), sans-serif",
-                        color: T.onSurface,
+                        fontSize: 12,
+                        color: T.onSurfaceVariant,
                       }}
                     >
                       {c.phone ?? "—"}
@@ -613,17 +588,15 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                     {/* Estado */}
                     <td style={{ padding: "16px 24px" }}>
                       <span
+                        className={`${badge.className} border`}
                         style={{
                           display: "inline-block",
                           padding: "2px 10px",
-                          borderRadius: 4,
+                          borderRadius: 8,
                           fontSize: 10,
                           fontWeight: 700,
                           textTransform: "uppercase",
                           letterSpacing: "0.08em",
-                          background: badge.bg,
-                          color: badge.color,
-                          border: `1px solid ${badge.border}`,
                         }}
                       >
                         {badge.label}
@@ -667,9 +640,9 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                     {/* Último Contacto */}
                     <td style={{ padding: "16px 24px", textAlign: "center" }}>
                       <p
+                        className="num"
                         style={{
                           fontSize: 14,
-                          fontFamily: "Manrope, var(--font-manrope), sans-serif",
                           color: T.onSurface,
                           margin: 0,
                         }}
