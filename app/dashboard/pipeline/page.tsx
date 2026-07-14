@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
+import { formatCurrency } from "@/lib/format";
 import type { Deal } from "@/lib/types";
 import { NewDealButton } from "@/components/quick-action-sheets";
 import { PipelineClient } from "./pipeline-client";
@@ -109,7 +110,7 @@ export default async function PipelinePage() {
                 color: "var(--primary)",
               }}
             >
-              RD$ {totalPipeline.toLocaleString()}
+              {formatCurrency(totalPipeline)}
             </div>
           </div>
         </div>
