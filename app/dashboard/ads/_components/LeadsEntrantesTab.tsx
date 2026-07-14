@@ -1,30 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-export interface IncomingLead {
-  dealId: string;
-  contactId: string;
-  agentId: string;
-  agentName: string;
-  name: string;
-  phone: string | null;
-  source: string | null;
-  classification: string | null;
-  assignedAt: string;
-  agingHours: number;
-  touched: boolean;
-  firstTouchHours: number | null;
-}
-
-export interface AgentSummary {
-  agentId: string;
-  agentName: string;
-  assigned: number;
-  untouched: number;
-  touched: number;
-}
+import { createClient } from "@/lib/supabase/client";
+import type { IncomingLead, AgentSummary } from "../_lib/incoming-leads";
 
 const SOURCE_LABELS: Record<string, string> = {
   ctwa_ad: "WhatsApp Ad",
@@ -43,7 +23,7 @@ const CLASS_LABELS: Record<string, string> = {
   unqualified: "S/CALIF",
 };
 
-// Aging → color (24h ámbar, 72h rojo). Sin SLA automático (fase 2).
+// Aging -> color (24h ambar, 72h rojo). Sin SLA automatico (fase 2).
 function agingColor(hours: number): string {
   if (hours >= 72) return "#ef4444";
   if (hours >= 24) return "#f59e0b";
@@ -57,7 +37,7 @@ function fmtHours(hours: number | null): string {
   return `${Math.round(hours / 24)}d`;
 }
 
-export function LeadsEntrantesClient({
+export function LeadsEntrantesTab({
   leads,
   summaries,
   privileged,
@@ -66,6 +46,7 @@ export function LeadsEntrantesClient({
   summaries: AgentSummary[];
   privileged: boolean;
 }) {
+  const router = useRouter();
   const [agentFilter, setAgentFilter] = useState<string>("all");
 
   const filtered = useMemo(
@@ -75,79 +56,85 @@ export function LeadsEntrantesClient({
 
   const totalUntouched = leads.filter((l) => !l.touched).length;
 
+  // Realtime: una fila que entra/sale de nuevo_sin_contactar (deals) o un primer
+  // toque humano (activities) invalida la vista. En vez de replicar la derivacion
+  // server-side (firstTouch/aging/summaries), disparamos router.refresh() con debounce,
+  // que revalida el server component y re-deriva con el scoping correcto.
+  useEffect(() => {
+    const supabase = createClient();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleRefresh = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => router.refresh(), 800);
+    };
+
+    const channel = supabase
+      .channel("leads-entrantes-rt")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "deals" }, scheduleRefresh)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "deals" }, scheduleRefresh)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "activities" }, scheduleRefresh)
+      .subscribe();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+      supabase.removeChannel(channel);
+    };
+  }, [router]);
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh", background: "var(--background)" }}>
-      <div className="px-4 pt-6 pb-0 md:px-12 md:pt-8" style={{ background: "var(--background)" }}>
-        <nav
-          style={{
-            display: "flex", alignItems: "center", gap: 6, color: "var(--muted-foreground)",
-            fontSize: 11, marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.2em",
-          }}
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      {/* Metrica dual: N en cola . M sin tocar (coherente con las AgentCard). */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 20 }}>
+        <span
+          className="text-[20px] md:text-[28px]"
+          style={{ fontFamily: "Manrope, var(--font-manrope), sans-serif", fontWeight: 700, color: "var(--foreground)" }}
         >
-          <span>Dashboard</span>
-          <span style={{ fontSize: 10 }}>›</span>
-          <span style={{ color: "var(--primary)" }}>Leads Entrantes</span>
-        </nav>
-        <div className="flex flex-col gap-3 mb-6 md:flex-row md:justify-between md:items-end md:mb-8">
-          <h1
-            className="text-[26px] md:text-[36px]"
-            style={{
-              fontFamily: "Manrope, var(--font-manrope), sans-serif", fontWeight: 800,
-              color: "var(--foreground)", letterSpacing: "-0.02em", lineHeight: 1,
-            }}
-          >
-            Leads Entrantes
-          </h1>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 2 }} className="md:items-end">
-            <span style={{ color: "var(--muted-foreground)", fontSize: 11, textTransform: "uppercase", letterSpacing: "0.2em" }}>
-              Sin contactar
-            </span>
-            <div
-              className="text-[20px] md:text-[28px]"
-              style={{ fontFamily: "Manrope, var(--font-manrope), sans-serif", fontWeight: 700, color: totalUntouched > 0 ? "#f59e0b" : "var(--primary)" }}
-            >
-              {totalUntouched}
-            </div>
-          </div>
-        </div>
+          {leads.length}
+        </span>
+        <span style={{ color: "var(--muted-foreground)", fontSize: 13 }}>en cola</span>
+        <span style={{ color: "var(--muted-foreground)", fontSize: 13 }}>·</span>
+        <span
+          style={{ fontSize: 15, fontWeight: 700, color: totalUntouched > 0 ? "#f59e0b" : "var(--muted-foreground)" }}
+        >
+          {totalUntouched}
+        </span>
+        <span style={{ color: "var(--muted-foreground)", fontSize: 13 }}>sin tocar</span>
+      </div>
 
-        {/* Resumen por agente */}
-        {privileged && summaries.length > 0 && (
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
+      {/* Resumen por agente */}
+      {privileged && summaries.length > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 24 }}>
+          <AgentCard
+            label="Todos"
+            active={agentFilter === "all"}
+            onClick={() => setAgentFilter("all")}
+            assigned={leads.length}
+            untouched={totalUntouched}
+          />
+          {summaries.map((s) => (
             <AgentCard
-              label="Todos"
-              active={agentFilter === "all"}
-              onClick={() => setAgentFilter("all")}
-              assigned={leads.length}
-              untouched={totalUntouched}
+              key={s.agentId}
+              label={s.agentName}
+              active={agentFilter === s.agentId}
+              onClick={() => setAgentFilter(s.agentId)}
+              assigned={s.assigned}
+              untouched={s.untouched}
             />
-            {summaries.map((s) => (
-              <AgentCard
-                key={s.agentId}
-                label={s.agentName}
-                active={agentFilter === s.agentId}
-                onClick={() => setAgentFilter(s.agentId)}
-                assigned={s.assigned}
-                untouched={s.untouched}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
-      <div className="px-4 pb-10 md:px-12 md:pb-12" style={{ flex: 1 }}>
-        {filtered.length === 0 ? (
-          <div style={{ padding: 48, textAlign: "center", color: "var(--muted-foreground)" }}>
-            No hay leads sin contactar.
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {filtered.map((l) => (
-              <LeadRow key={l.dealId} lead={l} showAgent={privileged} />
-            ))}
-          </div>
-        )}
-      </div>
+      {filtered.length === 0 ? (
+        <div style={{ padding: 48, textAlign: "center", color: "var(--muted-foreground)" }}>
+          No hay leads sin contactar.
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          {filtered.map((l) => (
+            <LeadRow key={l.dealId} lead={l} showAgent={privileged} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

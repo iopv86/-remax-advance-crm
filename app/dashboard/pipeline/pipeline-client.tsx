@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { AgentFilter, type AgentFilterOption } from "@/components/agent-filter";
 import { STAGE_LABELS } from "@/lib/types";
+import { formatCurrency, formatCurrencyCompact } from "@/lib/format";
 import type { Deal, DealStage, LeadClassification } from "@/lib/types";
 import { ClassificationQuickEdit } from "@/app/dashboard/contacts/[id]/classification-quick-edit";
 import Link from "next/link";
@@ -262,7 +263,7 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
                 color: isWon ? "#34d399" : "#f5bd5d",
               }}
             >
-              {deal.currency ?? "RD$"} {deal.deal_value.toLocaleString()}
+              {formatCurrency(deal.deal_value, deal.currency ?? "USD")}
             </span>
           )}
         </div>
@@ -600,7 +601,7 @@ export function PipelineClient({
                             fontFamily: "Manrope, var(--font-manrope), sans-serif",
                           }}
                         >
-                          RD$ {(stageValue / 1_000_000).toFixed(1)}M
+                          {formatCurrencyCompact(stageValue)}
                         </span>
                       )}
                       <span
@@ -722,8 +723,7 @@ export function PipelineClient({
                             marginTop: 2,
                           }}
                         >
-                          {activeDeal.currency ?? "RD$"}{" "}
-                          {activeDeal.deal_value.toLocaleString()}
+                          {formatCurrency(activeDeal.deal_value, activeDeal.currency ?? "USD")}
                         </p>
                       )}
                     </div>
