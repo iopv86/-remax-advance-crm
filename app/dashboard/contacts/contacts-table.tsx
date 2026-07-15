@@ -64,7 +64,7 @@ function getStatusBadge(classification?: string) {
     case "cold":
       return { label: "Frío", className: "badge-cold" };
     default:
-      return { label: "Sin clasificar", className: "badge-new" };
+      return { label: "Sin clasificar", className: "badge-unqualified" };
   }
 }
 
