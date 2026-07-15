@@ -496,8 +496,16 @@ export function PipelineClient({
     const el = scrollRef.current;
     if (!el) return;
 
+    // Capture first: it throws NotFoundError if the pointer is no longer active,
+    // and anything we mutated before it would then never be cleaned up — leaving
+    // the board stuck in the dragging state with smooth scrolling disabled.
+    try {
+      el.setPointerCapture(e.pointerId);
+    } catch {
+      return;
+    }
+
     el.dataset.dragging = "true";
-    el.setPointerCapture(e.pointerId);
     dragRef.current = {
       startX: e.clientX,
       startScrollLeft: el.scrollLeft,
@@ -704,7 +712,8 @@ export function PipelineClient({
         <div>
         {/* Kanban scroll container. tabIndex + role: WCAG 2.1.1 — a scrollable
             region needs to be reachable by keyboard, which also gives native
-            Left/Right/Home/End scrolling for free. */}
+            Left/Right arrow scrolling for free. (Home/End are vertical-axis
+            keys and are a no-op here; the rail's buttons cover jump-to-edge.) */}
         <div
           ref={scrollRef}
           id="kanban-board"
