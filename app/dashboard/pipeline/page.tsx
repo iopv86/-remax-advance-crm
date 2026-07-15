@@ -136,7 +136,10 @@ export default async function PipelinePage() {
       </div>
 
       {/* Kanban Board */}
-      <div className="px-4 pb-10 md:px-12 md:pb-12" style={{ flex: 1, overflowX: "auto" }}>
+      {/* No overflow here: it would become the nearest scroll container and the
+          board's sticky scroll rail would anchor to this inert box instead of
+          <main>. PipelineClient owns its own horizontal scrolling. */}
+      <div className="px-4 pb-10 md:px-12 md:pb-12" style={{ flex: 1 }}>
         <PipelineClient
           deals={typedDeals}
           agents={agents}
