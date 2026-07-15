@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -10,7 +10,9 @@ import { formatCurrency, formatCurrencyCompact } from "@/lib/format";
 import type { Deal, DealStage, LeadClassification } from "@/lib/types";
 import { ClassificationQuickEdit } from "@/app/dashboard/contacts/[id]/classification-quick-edit";
 import Link from "next/link";
-import { Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Check } from "lucide-react";
+import { useHorizontalScrollRail } from "@/lib/hooks/use-horizontal-scroll-rail";
+import { ScrollRail } from "./scroll-rail";
 import {
   DndContext,
   DragOverlay,
@@ -55,8 +57,6 @@ const COLUMN_WIDTH = 320;
 const COLUMN_GAP = 24;
 const SCROLL_STEP = COLUMN_WIDTH + COLUMN_GAP;
 const MIN_THUMB_PX = 40;
-/** scrollLeft never lands exactly on the max under fractional device pixel ratios. */
-const SCROLL_EDGE_TOLERANCE = 1;
 
 const STAGE_SHORT: Record<DealStage, string> = {
   nuevo_sin_contactar: "SIN CONTACTAR",
@@ -399,139 +399,10 @@ export function PipelineClient({
   // Thumb geometry is written imperatively: every DealCard calls useDraggable,
   // so a setState per scroll frame would re-render the whole board. Only the
   // booleans below live in state, and only flip at the extremes.
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const trackRef = useRef<HTMLDivElement | null>(null);
-  const thumbRef = useRef<HTMLDivElement | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const dragRef = useRef<{ startX: number; startScrollLeft: number; pointerId: number } | null>(
-    null
-  );
-
-  const [atStart, setAtStart] = useState(true);
-  const [atEnd, setAtEnd] = useState(false);
-  // Starts false so the server and the hydration pass both render no rail —
-  // identical markup, no mismatch. The first measurement flips it on, already
-  // sized, so the thumb never paints at the wrong width.
-  const [canScroll, setCanScroll] = useState(false);
-
-  const sync = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const max = el.scrollWidth - el.clientWidth;
-
-    // The board booleans are computed first and unconditionally: the rail is
-    // only mounted once canScroll flips true, so gating this on the track/thumb
-    // refs would deadlock — they can't exist until canScroll is already true.
-    const nextAtStart = el.scrollLeft <= SCROLL_EDGE_TOLERANCE;
-    const nextAtEnd = el.scrollLeft >= max - SCROLL_EDGE_TOLERANCE;
-    const nextCanScroll = max > SCROLL_EDGE_TOLERANCE;
-    setAtStart((prev) => (prev === nextAtStart ? prev : nextAtStart));
-    setAtEnd((prev) => (prev === nextAtEnd ? prev : nextAtEnd));
-    setCanScroll((prev) => (prev === nextCanScroll ? prev : nextCanScroll));
-
-    // Thumb geometry, written imperatively — a setState per scroll frame would
-    // re-render all 14 columns and every useDraggable card.
-    const track = trackRef.current;
-    const thumb = thumbRef.current;
-    if (!track || !thumb || max <= 0 || el.scrollWidth <= 0) return;
-
-    const trackWidth = track.clientWidth;
-    const thumbWidth = Math.max(
-      MIN_THUMB_PX,
-      (el.clientWidth / el.scrollWidth) * trackWidth
-    );
-    const offset = (el.scrollLeft / max) * (trackWidth - thumbWidth);
-
-    thumb.style.width = `${thumbWidth}px`;
-    thumb.style.transform = `translateX(${offset}px)`;
-  }, []);
-
-  const scheduleSync = useCallback(() => {
-    if (rafRef.current !== null) return;
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null;
-      sync();
-    });
-  }, [sync]);
-
-  // useEffect, not useLayoutEffect: this component is server-rendered, and
-  // useLayoutEffect warns ("does nothing on the server") there. Nothing here
-  // runs during render, so server and client markup stay identical.
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    sync();
-    el.addEventListener("scroll", scheduleSync, { passive: true });
-    const observer = new ResizeObserver(scheduleSync);
-    observer.observe(el);
-
-    return () => {
-      el.removeEventListener("scroll", scheduleSync);
-      observer.disconnect();
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
-    };
-  }, [sync, scheduleSync]);
-
-  // The first sync runs before the rail is mounted, so it sizes the booleans but
-  // not the thumb. Size the thumb once the rail actually exists.
-  useEffect(() => {
-    if (canScroll) sync();
-  }, [canScroll, sync]);
-
-  const step = useCallback((direction: -1 | 1) => {
-    scrollRef.current?.scrollBy({ left: direction * SCROLL_STEP, behavior: "smooth" });
-  }, []);
-
-  // Drag-to-scroll. dnd-kit's PointerSensor binds its activator to the card's
-  // own drag handle, so a pointerdown on the board background never reaches it.
-  // The inverse is the real risk — card pointerdowns bubble up to here — hence
-  // the data-no-drag-scroll opt-out.
-  function handleBoardPointerDown(e: React.PointerEvent<HTMLDivElement>) {
-    if (e.pointerType !== "mouse" || e.button !== 0) return;
-    if ((e.target as HTMLElement).closest("[data-no-drag-scroll]")) return;
-
-    const el = scrollRef.current;
-    if (!el) return;
-
-    // Capture first: it throws NotFoundError if the pointer is no longer active,
-    // and anything we mutated before it would then never be cleaned up — leaving
-    // the board stuck in the dragging state with smooth scrolling disabled.
-    try {
-      el.setPointerCapture(e.pointerId);
-    } catch {
-      return;
-    }
-
-    el.dataset.dragging = "true";
-    dragRef.current = {
-      startX: e.clientX,
-      startScrollLeft: el.scrollLeft,
-      pointerId: e.pointerId,
-    };
-    el.style.cursor = "grabbing";
-    el.style.userSelect = "none";
-  }
-
-  function handleBoardPointerMove(e: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    const el = scrollRef.current;
-    if (!drag || !el || e.pointerId !== drag.pointerId) return;
-    el.scrollLeft = drag.startScrollLeft - (e.clientX - drag.startX);
-  }
-
-  function endBoardDrag(e: React.PointerEvent<HTMLDivElement>) {
-    const drag = dragRef.current;
-    const el = scrollRef.current;
-    if (!drag || !el || e.pointerId !== drag.pointerId) return;
-    if (el.hasPointerCapture(drag.pointerId)) el.releasePointerCapture(drag.pointerId);
-    dragRef.current = null;
-    delete el.dataset.dragging;
-    el.style.cursor = "";
-    el.style.userSelect = "";
-  }
+  const { scrollRef, canScroll, boardProps, railProps } = useHorizontalScrollRail({
+    step: SCROLL_STEP,
+    minThumbPx: MIN_THUMB_PX,
+  });
 
   async function handleDelete(deal: Deal, e: React.MouseEvent) {
     e.stopPropagation();
@@ -613,56 +484,16 @@ export function PipelineClient({
            container's own box, ~2,700px below the fold here). The rail replaces it. */
         .kanban-scroll { scrollbar-width: none; -ms-overflow-style: none; scroll-behavior: smooth; }
         .kanban-scroll::-webkit-scrollbar { display: none; }
-        /* During a drag-to-scroll every scrollLeft write would animate, making the
-           drag feel rubbery. Declared here rather than mutated via el.style: React
-           owns the inline style and would never restore a value we cleared. */
-        .kanban-scroll[data-dragging="true"] { scroll-behavior: auto; }
-        .kanban-rail {
-          position: sticky;
-          bottom: 0;
-          z-index: 5;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          width: fit-content;
-          margin: 0 auto;
-          padding: 8px 12px;
-          background: var(--card);
-          border: 1px solid var(--border);
-          border-radius: 999px;
+        /* Everything a live drag needs, declared rather than mutated via
+           el.style: React diffs against its own props, not the DOM, so clearing
+           an inline value it owns would delete the declaration for good instead
+           of restoring it. scroll-behavior matters most — without it every
+           scrollLeft write during a drag animates and the drag feels rubbery. */
+        .kanban-scroll[data-dragging="true"] {
+          scroll-behavior: auto;
+          cursor: grabbing;
+          user-select: none;
         }
-        .kanban-track {
-          position: relative;
-          width: min(420px, 40vw);
-          height: 10px;
-          border-radius: 999px;
-          background: var(--muted);
-          overflow: hidden;
-        }
-        .kanban-thumb {
-          position: absolute;
-          top: 0;
-          left: 0;
-          height: 100%;
-          border-radius: 999px;
-          background: var(--primary);
-          opacity: 0.7;
-          transition: opacity 0.15s ease;
-        }
-        .kanban-track:hover .kanban-thumb { opacity: 1; }
-        .kanban-arrow {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 28px;
-          height: 28px;
-          border-radius: 999px;
-          border: 1px solid var(--border);
-          color: var(--muted-foreground);
-          transition: color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
-        }
-        .kanban-arrow:hover:not(:disabled) { color: var(--primary); border-color: var(--primary); }
-        .kanban-arrow:disabled { opacity: 0.3; cursor: default; }
         .pipe-action { transition: color 0.15s ease, border-color 0.15s ease; }
         .pipe-action:hover { color: #C9963A; border-color: rgba(201,150,58,0.5); }
         .pipe-action-danger { transition: color 0.15s ease, border-color 0.15s ease; }
@@ -721,10 +552,7 @@ export function PipelineClient({
           role="region"
           aria-label="Tablero de oportunidades"
           tabIndex={0}
-          onPointerDown={handleBoardPointerDown}
-          onPointerMove={handleBoardPointerMove}
-          onPointerUp={endBoardDrag}
-          onPointerCancel={endBoardDrag}
+          {...boardProps}
           style={{
             overflowX: "auto",
             paddingBottom: 24,
@@ -831,38 +659,10 @@ export function PipelineClient({
           </div>
         </div>
 
-        {/* Scroll rail. The track/thumb are decorative: keyboard and screen
-            reader users get the board via the focusable region above, so the
-            two buttons carry the whole accessible affordance. */}
-        {canScroll && (
-          <div className="kanban-rail">
-            <button
-              type="button"
-              className="kanban-arrow focus-ring"
-              aria-label="Desplazar columnas a la izquierda"
-              aria-controls="kanban-board"
-              disabled={atStart}
-              onClick={() => step(-1)}
-            >
-              <ChevronLeft size={16} />
-            </button>
-
-            <div className="kanban-track" ref={trackRef} aria-hidden="true">
-              <div className="kanban-thumb" ref={thumbRef} />
-            </div>
-
-            <button
-              type="button"
-              className="kanban-arrow focus-ring"
-              aria-label="Desplazar columnas a la derecha"
-              aria-controls="kanban-board"
-              disabled={atEnd}
-              onClick={() => step(1)}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
-        )}
+        {/* Mounted only once there is something to scroll. Gating here rather
+            than inside ScrollRail keeps this next to the canScroll contract:
+            false on the server and through hydration, so the markup matches. */}
+        {canScroll && <ScrollRail controls="kanban-board" {...railProps} />}
         </div>
 
         {/* Drag overlay */}
