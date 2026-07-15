@@ -9,6 +9,7 @@ import { es } from "date-fns/locale";
 import { createClient } from "@/lib/supabase/client";
 import { Pagination } from "@/components/pagination";
 import { PROPERTY_TYPE_LABELS } from "@/lib/intereses-labels";
+import { initialsOf } from "@/lib/format";
 import type { Contact } from "@/lib/types";
 
 // ── Design tokens (adaptive — CSS vars) ───────────────────────────────────────
@@ -313,7 +314,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
         ) : (
           initial.map((c) => {
             const name = [c.first_name, c.last_name].filter(Boolean).join(" ") || "Sin nombre";
-            const initials = [c.first_name?.[0], c.last_name?.[0]].filter(Boolean).join("").toUpperCase() || "?";
+            const initials = initialsOf(c.first_name, c.last_name) || "?";
             const { bg: avBg, color: avColor } = avatarPalette(initials);
             const badge = getStatusBadge(c.lead_classification);
             const mobileDateStr = c.last_activity_at ?? c.created_at;
@@ -464,11 +465,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
               {initial.map((c) => {
                 const name =
                   [c.first_name, c.last_name].filter(Boolean).join(" ") || "Sin nombre";
-                const initials =
-                  [c.first_name?.[0], c.last_name?.[0]]
-                    .filter(Boolean)
-                    .join("")
-                    .toUpperCase() || "?";
+                const initials = initialsOf(c.first_name, c.last_name) || "?";
                 const { bg: avBg, color: avColor } = avatarPalette(initials);
                 const badge = getStatusBadge(c.lead_classification);
 

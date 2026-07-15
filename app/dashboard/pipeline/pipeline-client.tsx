@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { AgentFilter, type AgentFilterOption } from "@/components/agent-filter";
 import { STAGE_LABELS } from "@/lib/types";
-import { formatCurrency, formatCurrencyCompact } from "@/lib/format";
+import { formatCurrency, formatCurrencyCompact, initialsOf } from "@/lib/format";
 import type { Deal, DealStage, LeadClassification } from "@/lib/types";
 import { ClassificationQuickEdit } from "@/app/dashboard/contacts/[id]/classification-quick-edit";
 import Link from "next/link";
@@ -122,11 +122,7 @@ function DealCard({ deal, onDelete, deletingId, isDragging = false }: DealCardPr
   const contactId = typeof deal.contact_id === "string" ? deal.contact_id : null;
   const contactName =
     [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") || "Sin nombre";
-  const contactInitials =
-    [contact?.first_name?.[0], contact?.last_name?.[0]]
-      .filter(Boolean)
-      .join("")
-      .toUpperCase() || "?";
+  const contactInitials = initialsOf(contact?.first_name, contact?.last_name) || "?";
 
   const isWon = deal.stage === "closed_won";
 
@@ -676,11 +672,7 @@ export function PipelineClient({
               const name =
                 [contact?.first_name, contact?.last_name].filter(Boolean).join(" ") ||
                 "Sin nombre";
-              const initials =
-                [contact?.first_name?.[0], contact?.last_name?.[0]]
-                  .filter(Boolean)
-                  .join("")
-                  .toUpperCase() || "?";
+              const initials = initialsOf(contact?.first_name, contact?.last_name) || "?";
 
               return (
                 <div

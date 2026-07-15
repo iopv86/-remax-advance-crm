@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { MessageSquare, Save } from "lucide-react";
+import { initialsOf } from "@/lib/format";
 
 interface AvaConfig {
   id: string;
@@ -834,7 +835,7 @@ export function AvaClient({
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {recentMessages.map((msg) => {
-                  const initials = contactName(msg.contact)[0]?.toUpperCase() ?? "?";
+                  const initials = initialsOf(contactName(msg.contact)) || "?";
                   return (
                     <div key={msg.id} className="flex items-start" style={{ gap: 12 }}>
                       <div

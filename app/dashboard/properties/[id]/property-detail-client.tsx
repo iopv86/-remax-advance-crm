@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import type { PropertyType, CurrencyType, PropertyOwner } from "@/lib/types";
 import { STAGE_LABELS } from "@/lib/types";
+import { initialsOf } from "@/lib/format";
 import { PropertyUnitsTab } from "./property-units-tab";
 import { LoanCalculator } from "@/components/loan-calculator";
 
@@ -729,7 +730,7 @@ export function PropertyDetailClient({
                         fontSize: 16, fontWeight: 700, color: GOLD,
                       }}
                     >
-                      {property.agent.full_name.charAt(0).toUpperCase()}
+                      {initialsOf(property.agent.full_name)}
                     </div>
                   )}
                   <div>

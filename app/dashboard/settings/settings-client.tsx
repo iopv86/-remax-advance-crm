@@ -7,6 +7,7 @@ import { InviteAgentDialog } from "@/components/invite-agent-dialog";
 import { resendInvitation, deleteAgent, updateAgent, sendAgentPasswordReset } from "./actions";
 import { MetaAdsConfig } from "./meta-ads-config";
 import { createClient } from "@/lib/supabase/client";
+import { initialsOf } from "@/lib/format";
 import type { Agent } from "@/lib/types";
 import type { MetaFullConfig } from "./actions";
 import {
@@ -187,7 +188,7 @@ function InitialAvatar({ name, size = 36 }: { name: string; size?: number }) {
         border: "1px solid rgba(201,150,58,0.2)",
       }}
     >
-      {name?.[0]?.toUpperCase() ?? "?"}
+      {initialsOf(name) || "?"}
     </div>
   );
 }

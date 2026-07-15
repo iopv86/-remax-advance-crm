@@ -6,6 +6,7 @@ import { es } from "date-fns/locale";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { STAGE_LABELS } from "@/lib/types";
+import { initialsOf } from "@/lib/format";
 import type { Deal, Task, Message, DealStage, LeadClassification } from "@/lib/types";
 import { ContactActions } from "./contact-actions";
 import { ClassificationQuickEdit } from "./classification-quick-edit";
@@ -134,11 +135,7 @@ export default async function ContactDetailPage({
 
   const fullName =
     [contact.first_name, contact.last_name].filter(Boolean).join(" ") || "Sin nombre";
-  const initials =
-    [contact.first_name?.[0], contact.last_name?.[0]]
-      .filter(Boolean)
-      .join("")
-      .toUpperCase() || "?";
+  const initials = initialsOf(contact.first_name, contact.last_name) || "?";
 
   const classification = contact.lead_classification as LeadClassification | undefined;
 

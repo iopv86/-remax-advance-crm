@@ -8,6 +8,7 @@ import { es } from "date-fns/locale";
 import { Search, Lock, MessageSquare, ExternalLink, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { CLASSIFICATION_LABELS } from "@/lib/types";
+import { initialsOf } from "@/lib/format";
 import { WhatsAppComposer } from "@/components/whatsapp-composer";
 
 interface ConversationMessage {
@@ -690,7 +691,7 @@ export function ConversationsClient({ initialConversations }: Props) {
                   className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ background: "rgba(201,150,58,0.15)", color: "#C9963A" }}
                 >
-                  {assignedAgent?.full_name?.[0]?.toUpperCase() ?? "—"}
+                  {initialsOf(assignedAgent?.full_name) || "—"}
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-[#e5e2e1]">

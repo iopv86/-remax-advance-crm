@@ -6,6 +6,7 @@ import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { MessageSquare, Save } from "lucide-react";
 import { AvaConfigForm } from "@/app/dashboard/settings/ava-config-form";
+import { initialsOf } from "@/lib/format";
 
 interface AvaConfig {
   id: string;
@@ -442,7 +443,7 @@ export function AvaIAClient({
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {recentMessages.map((msg) => {
-                  const initials = contactName(msg.contact)[0]?.toUpperCase() ?? "?";
+                  const initials = initialsOf(contactName(msg.contact)) || "?";
                   return (
                     <div key={msg.id} className="flex items-start" style={{ gap: 12 }}>
                       <div className="flex items-center justify-center flex-shrink-0" style={{ width: 28, height: 28, borderRadius: "50%", background: msg.is_automated ? "rgba(245,189,93,0.15)" : "var(--secondary)", color: msg.is_automated ? "#f5bd5d" : "var(--muted-foreground)", fontSize: 10, fontWeight: 700, marginTop: 2 }}>
