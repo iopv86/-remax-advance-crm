@@ -55,7 +55,7 @@ const FIELD_LABEL: React.CSSProperties = {
   textTransform: "uppercase",
   color: "var(--muted-foreground)",
   marginBottom: 6,
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
 };
 
@@ -68,7 +68,7 @@ const FIELD_INPUT: React.CSSProperties = {
   color: "var(--foreground)",
   fontSize: 14,
   outline: "none",
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--font-sans)",
   boxSizing: "border-box",
 };
 
@@ -81,7 +81,7 @@ const BTN_PRIMARY: React.CSSProperties = {
   cursor: "pointer",
   fontSize: 14,
   fontWeight: 600,
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 const BTN_SECONDARY: React.CSSProperties = {
@@ -92,7 +92,7 @@ const BTN_SECONDARY: React.CSSProperties = {
   border: "1px solid var(--glass-bg-md)",
   cursor: "pointer",
   fontSize: 14,
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--font-sans)",
 };
 
 // ── Nav config ──────────────────────────────────────

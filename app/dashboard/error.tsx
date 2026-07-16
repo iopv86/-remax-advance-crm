@@ -21,7 +21,7 @@ export default function DashboardError({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "var(--font-sans)",
         padding: "24px",
       }}
     >

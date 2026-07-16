@@ -70,7 +70,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
             <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 15, color: SURFACE, margin: "0 0 3px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
               {proposal.title ?? (proposal.contact_name ? `Para ${proposal.contact_name}` : "Propuesta sin título")}
             </p>
-            <p style={{ fontSize: 11, color: DIM, margin: 0, fontFamily: "Inter, sans-serif" }}>
+            <p style={{ fontSize: 11, color: DIM, margin: 0, fontFamily: "var(--font-sans)" }}>
               {formatDate(proposal.created_at)} · {proposal.property_ids.length} {proposal.property_ids.length === 1 ? "propiedad" : "propiedades"}
               {proposal.contact_name && ` · ${proposal.contact_name}`}
             </p>
@@ -90,7 +90,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={opens > 0 ? "#10b981" : DIM} strokeWidth="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
             </svg>
-            <span style={{ fontSize: 11, fontWeight: 700, color: opens > 0 ? "#10b981" : DIM, fontFamily: "Inter, sans-serif" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: opens > 0 ? "#10b981" : DIM, fontFamily: "var(--font-sans)" }}>
               {opens} {opens === 1 ? "vista" : "vistas"}
             </span>
           </div>
@@ -116,7 +116,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
             marginBottom: 12,
             fontSize: 11,
             color: "#c4bfb8",
-            fontFamily: "Inter, sans-serif",
+            fontFamily: "var(--font-sans)",
           }}>
             ⭐ La propiedad más vista recibió <strong style={{ color: GOLD }}>{topPropViews} vistas</strong> — probablemente la que más le interesa.
           </div>
@@ -126,7 +126,7 @@ function ProposalCard({ proposal, origin }: ProposalCardProps) {
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <div style={{
             flex: 1, background: "var(--background)", border: `1px solid ${BORDER_SUB}`, borderRadius: 6,
-            padding: "6px 10px", fontSize: 11, color: DIM, fontFamily: "Inter, sans-serif",
+            padding: "6px 10px", fontSize: 11, color: DIM, fontFamily: "var(--font-sans)",
             overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
           }}>
             {url}
@@ -174,7 +174,7 @@ function StatChip({ icon, label, color }: { icon: string; label: string; color: 
     <span style={{
       display: "inline-flex", alignItems: "center", gap: 4, padding: "3px 8px",
       borderRadius: 20, background: `${color}10`, border: `1px solid ${color}25`,
-      fontSize: 10, fontWeight: 600, color, fontFamily: "Inter, sans-serif",
+      fontSize: 10, fontWeight: 600, color, fontFamily: "var(--font-sans)",
     }}>
       {icon} {label}
     </span>
@@ -193,7 +193,7 @@ export function ProposalsClient({ proposals }: { proposals: ProposalRow[] }) {
           <h1 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 26, letterSpacing: "-0.03em", color: SURFACE, margin: "0 0 6px" }}>
             Propuestas
           </h1>
-          <p style={{ fontSize: 13, color: DIM, fontFamily: "Inter, sans-serif", margin: 0 }}>
+          <p style={{ fontSize: 13, color: DIM, fontFamily: "var(--font-sans)", margin: 0 }}>
             Links compartidos con clientes y métricas de apertura
           </p>
         </div>
@@ -203,10 +203,10 @@ export function ProposalsClient({ proposals }: { proposals: ProposalRow[] }) {
             background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16,
             padding: "48px 32px", textAlign: "center",
           }}>
-            <p style={{ fontSize: 15, color: DIM, fontFamily: "Inter, sans-serif", margin: "0 0 8px" }}>
+            <p style={{ fontSize: 15, color: DIM, fontFamily: "var(--font-sans)", margin: "0 0 8px" }}>
               No has creado propuestas todavía
             </p>
-            <p style={{ fontSize: 12, color: "rgba(154,144,136,0.5)", fontFamily: "Inter, sans-serif", margin: 0 }}>
+            <p style={{ fontSize: 12, color: "rgba(154,144,136,0.5)", fontFamily: "var(--font-sans)", margin: 0 }}>
               Ve a Propiedades, selecciona propiedades y pulsa "Crear propuesta"
             </p>
           </div>
@@ -226,7 +226,7 @@ export function ProposalsClient({ proposals }: { proposals: ProposalRow[] }) {
                   background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12,
                   padding: "12px 18px", flex: 1, minWidth: 120,
                 }}>
-                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: DIM, fontFamily: "Inter, sans-serif", margin: "0 0 4px" }}>
+                  <p style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: DIM, fontFamily: "var(--font-sans)", margin: "0 0 4px" }}>
                     {stat.label}
                   </p>
                   <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 800, fontSize: 28, color: GOLD, margin: 0, lineHeight: 1 }}>

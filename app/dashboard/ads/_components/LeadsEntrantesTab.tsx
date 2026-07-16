@@ -73,9 +73,14 @@ export function LeadsEntrantesTab({
 
     type Channel = ReturnType<typeof supabase.channel>;
     let channel: Channel | null = null;
+    let cancelled = false;
 
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      // Unmounted before getSession resolved: don't subscribe, or the channel
+      // is created after cleanup already ran and leaks (a second .on() then
+      // lands on an already-subscribed channel by name).
+      if (cancelled) return;
       if (session?.access_token) supabase.realtime.setAuth(session.access_token);
       channel = supabase
         .channel("leads-entrantes-rt")
@@ -89,6 +94,7 @@ export function LeadsEntrantesTab({
     const poll = setInterval(() => router.refresh(), 20_000);
 
     return () => {
+      cancelled = true;
       if (timer) clearTimeout(timer);
       clearInterval(poll);
       if (channel) supabase.removeChannel(channel);

@@ -622,9 +622,9 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
                           }}
                         >
                           {c.budget_currency ?? "USD"}{" "}
-                          {c.budget_min ? c.budget_min.toLocaleString() : ""}
+                          {c.budget_min ? c.budget_min.toLocaleString("en-US") : ""}
                           {c.budget_min && c.budget_max ? " – " : ""}
-                          {c.budget_max ? c.budget_max.toLocaleString() : ""}
+                          {c.budget_max ? c.budget_max.toLocaleString("en-US") : ""}
                         </p>
                       )}
                     </td>

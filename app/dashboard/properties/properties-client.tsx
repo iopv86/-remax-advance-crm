@@ -285,7 +285,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
         minHeight: "100vh",
         background: BG_BODY,
         color: TEXT_PRIMARY,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "var(--font-sans)",
       }}
     >
       {/* ── Filter Sidebar — desktop only ───────────────────────────────── */}
@@ -1417,13 +1417,13 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
             <h2 style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 18, color: "var(--foreground)", margin: "0 0 6px" }}>
               Crear propuesta
             </h2>
-            <p style={{ fontSize: 12, color: "var(--muted-foreground)", fontFamily: "Inter, sans-serif", margin: "0 0 20px" }}>
+            <p style={{ fontSize: 12, color: "var(--muted-foreground)", fontFamily: "var(--font-sans)", margin: "0 0 20px" }}>
               {selectedIds.size} {selectedIds.size === 1 ? "propiedad seleccionada" : "propiedades seleccionadas"}
             </p>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Nombre del cliente (opcional)
                 </label>
                 <input
@@ -1434,12 +1434,12 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   style={{
                     width: "100%", background: "var(--background)", border: "1px solid var(--glass-border-md)",
                     borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
-                    fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
+                    fontFamily: "var(--font-sans)", outline: "none", boxSizing: "border-box",
                   }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Título (opcional)
                 </label>
                 <input
@@ -1450,12 +1450,12 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   style={{
                     width: "100%", background: "var(--background)", border: "1px solid var(--glass-border-md)",
                     borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
-                    fontFamily: "Inter, sans-serif", outline: "none", boxSizing: "border-box",
+                    fontFamily: "var(--font-sans)", outline: "none", boxSizing: "border-box",
                   }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "Inter, sans-serif", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+                <label style={{ display: "block", fontSize: 11, fontWeight: 600, color: "var(--muted-foreground)", marginBottom: 6, fontFamily: "var(--font-sans)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
                   Mensaje de presentación (opcional)
                 </label>
                 <textarea
@@ -1466,7 +1466,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   style={{
                     width: "100%", background: "var(--background)", border: "1px solid var(--glass-border-md)",
                     borderRadius: 8, padding: "9px 12px", color: "var(--foreground)", fontSize: 14,
-                    fontFamily: "Inter, sans-serif", outline: "none", resize: "none", boxSizing: "border-box",
+                    fontFamily: "var(--font-sans)", outline: "none", resize: "none", boxSizing: "border-box",
                   }}
                 />
               </div>
@@ -1478,7 +1478,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 style={{
                   flex: 1, padding: "10px 0", borderRadius: 8, background: "var(--background)",
                   border: "1px solid var(--glass-border-md)", color: "var(--muted-foreground)",
-                  fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                  fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)",
                 }}
               >
                 Cancelar
@@ -1490,7 +1490,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   flex: 2, padding: "10px 0", borderRadius: 8, background: GOLD,
                   border: "none", color: "var(--primary-foreground)",
                   fontSize: 13, fontWeight: 700, cursor: proposalCreatingSlug ? "not-allowed" : "pointer",
-                  fontFamily: "Inter, sans-serif", opacity: proposalCreatingSlug ? 0.7 : 1,
+                  fontFamily: "var(--font-sans)", opacity: proposalCreatingSlug ? 0.7 : 1,
                 }}
               >
                 {proposalCreatingSlug ? "Creando…" : "Generar link compartible"}
@@ -1533,7 +1533,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 <p style={{ fontFamily: "Manrope, sans-serif", fontWeight: 700, fontSize: 16, color: "var(--foreground)", margin: 0 }}>
                   ¡Propuesta lista!
                 </p>
-                <p style={{ fontSize: 12, color: "var(--muted-foreground)", margin: 0, fontFamily: "Inter, sans-serif" }}>
+                <p style={{ fontSize: 12, color: "var(--muted-foreground)", margin: 0, fontFamily: "var(--font-sans)" }}>
                   Compártela con tu cliente
                 </p>
               </div>
@@ -1545,7 +1545,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
               borderRadius: 8, padding: "10px 14px", marginBottom: 16,
               display: "flex", alignItems: "center", gap: 8,
             }}>
-              <span style={{ flex: 1, fontSize: 12, color: "var(--muted-foreground)", fontFamily: "Inter, sans-serif", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              <span style={{ flex: 1, fontSize: 12, color: "var(--muted-foreground)", fontFamily: "var(--font-sans)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {typeof window !== "undefined" ? `${window.location.origin}/p/${proposalShareSlug}` : `/p/${proposalShareSlug}`}
               </span>
               <button
@@ -1556,7 +1556,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 style={{
                   background: "rgba(201,150,58,0.1)", border: "1px solid rgba(201,150,58,0.2)",
                   borderRadius: 6, padding: "4px 10px", color: GOLD, fontSize: 11,
-                  fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif", whiteSpace: "nowrap",
+                  fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)", whiteSpace: "nowrap",
                 }}
               >
                 Copiar
@@ -1575,7 +1575,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                   padding: "9px 0", borderRadius: 8, background: "rgba(37,211,102,0.1)",
                   border: "1px solid rgba(37,211,102,0.2)", color: "#25D366",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)",
                 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -1594,7 +1594,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                   flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                   padding: "9px 0", borderRadius: 8, background: "rgba(124,159,232,0.1)",
                   border: "1px solid rgba(124,159,232,0.2)", color: "#7c9fe8",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)",
                 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -1612,7 +1612,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 style={{
                   flex: 1, padding: "9px 0", borderRadius: 8, background: "var(--background)",
                   border: "1px solid var(--glass-border-md)", color: "var(--muted-foreground)",
-                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                  fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "var(--font-sans)",
                 }}
               >
                 Ver propuesta
@@ -1622,7 +1622,7 @@ export function PropertiesClient({ initialProperties, projects, currentAgentId, 
                 style={{
                   flex: 1, padding: "9px 0", borderRadius: 8, background: GOLD,
                   border: "none", color: "var(--primary-foreground)",
-                  fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "Inter, sans-serif",
+                  fontSize: 12, fontWeight: 700, cursor: "pointer", fontFamily: "var(--font-sans)",
                 }}
               >
                 Listo

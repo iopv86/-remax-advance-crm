@@ -102,19 +102,29 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(initialNotifications.length === PAGE_SIZE);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
+
+  // Gate clock-dependent date grouping until after hydration: SSR uses Vercel
+  // UTC, the client uses RD (UTC-4); around midnight the Hoy/Ayer section
+  // structure would diverge → hydration mismatch (React #418 family).
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional hydration gate: flips once, post-paint
+  useEffect(() => setMounted(true), []);
 
   // ── Real-time subscription ──────────────────────────────────────────────────
   useEffect(() => {
     const supabase = createClient();
-    let userId: string | null = null;
+    let cancelled = false;
+    type Channel = ReturnType<typeof supabase.channel>;
+    let channel: Channel | null = null;
 
     supabase.auth.getUser().then(({ data }) => {
-      userId = data.user?.id ?? null;
-      setCurrentUserId(userId);
-      if (!userId) return;
+      if (cancelled) return;
+      const uid = data.user?.id ?? null;
+      setCurrentUserId(uid);
+      if (!uid) return;
 
-      const channel = supabase
+      channel = supabase
         .channel("notifications-page")
         .on(
           "postgres_changes",
@@ -122,7 +132,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
             event: "INSERT",
             schema: "public",
             table: "notifications",
-            filter: `user_id=eq.${userId}`,
+            filter: `user_id=eq.${uid}`,
           },
           (payload) => {
             const newNotif = payload.new as NotificationRow;
@@ -131,11 +141,12 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
           }
         )
         .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
     });
+
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   // ── Infinite scroll ─────────────────────────────────────────────────────────
@@ -191,7 +202,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
       ? notifications.filter((n) => !n.read)
       : notifications.filter((n) => n.type === filter);
 
-  const groups = groupByDate(filtered);
+  const groups = mounted ? groupByDate(filtered) : [{ label: "", items: filtered }];
 
   // ── Actions ─────────────────────────────────────────────────────────────────
   async function markRead(n: NotificationRow) {
@@ -241,7 +252,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
         minHeight: "100vh",
         background: BG_BODY,
         color: TEXT_PRIMARY,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "var(--font-sans)",
       }}
     >
       {/* ── Header ───────────────────────────────────────────────────────── */}
@@ -395,22 +406,28 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-            {groups.map(({ label, items }) => (
-              <section key={label}>
-                {/* Group header */}
-                <p
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: TEXT_DIM,
-                    textTransform: "uppercase",
-                    letterSpacing: "0.1em",
-                    marginBottom: 12,
-                    fontFamily: "Manrope, sans-serif",
-                  }}
-                >
-                  {label}
-                </p>
+            {groups.map(({ label, items }, idx) => (
+              // Keyed by position, not label: the section is a presentational
+              // wrapper and its cards carry stable n.id keys, so index keys let
+              // the first group's DOM persist across the post-hydration
+              // flat→grouped transition instead of remounting every card.
+              <section key={idx}>
+                {/* Group header — hidden during the pre-hydration flat render */}
+                {label && (
+                  <p
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: TEXT_DIM,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.1em",
+                      marginBottom: 12,
+                      fontFamily: "Manrope, sans-serif",
+                    }}
+                  >
+                    {label}
+                  </p>
+                )}
 
                 {/* Notification cards */}
                 <div
@@ -520,7 +537,7 @@ export function NotificationsClient({ initialNotifications, initialUnread }: Pro
                               marginTop: 2,
                             }}
                           >
-                            <span style={{ fontSize: 11, color: TEXT_DIM, whiteSpace: "nowrap" }}>
+                            <span suppressHydrationWarning style={{ fontSize: 11, color: TEXT_DIM, whiteSpace: "nowrap" }}>
                               {timeAgo(n.created_at)}
                             </span>
                             {!n.read && (

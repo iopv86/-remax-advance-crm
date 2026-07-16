@@ -8,7 +8,7 @@ import { T } from "../dashboard-client";
 function formatMoney(v: number): string {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000)     return `$${(v / 1_000).toFixed(0)}K`;
-  return `$${v.toLocaleString()}`;
+  return `$${v.toLocaleString("en-US")}`;
 }
 
 function pctDelta(current: number, previous: number): { label: string; up: boolean; flat: boolean } {

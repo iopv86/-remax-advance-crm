@@ -50,7 +50,7 @@ function initials(name: string): string {
 function formatMoney(v: number): string {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(1)}M`;
   if (v >= 1_000)     return `$${(v / 1_000).toFixed(0)}K`;
-  return `$${v.toLocaleString()}`;
+  return `$${v.toLocaleString("en-US")}`;
 }
 
 const TODAY_LABEL = new Date().toLocaleDateString("es-DO", {

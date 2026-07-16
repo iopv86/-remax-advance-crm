@@ -153,6 +153,10 @@ export function useHorizontalScrollRail({
     el.addEventListener("scroll", scheduleSync, { passive: true });
     const observer = new ResizeObserver(scheduleSync);
     observer.observe(el);
+    // Also observe the content row: collapsing/expanding columns changes the
+    // inner scrollWidth but NOT the scroll container's own border-box, so
+    // observing only `el` would miss it and the thumb / atEnd would go stale.
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
 
     return () => {
       el.removeEventListener("scroll", scheduleSync);

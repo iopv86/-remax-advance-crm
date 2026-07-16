@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -21,6 +21,7 @@ import {
   useSensors,
   useDroppable,
   useDraggable,
+  MeasuringStrategy,
   type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
@@ -356,6 +357,70 @@ function DroppableColumn({
   );
 }
 
+// ── Collapsed (empty) column ────────────────────────────────────────────────
+// An empty stage still costs 320px; with 14 stages that is a lot of dead width.
+// When the board is idle we shrink empty stages to a 52px strip. During a drag
+// every stage is rendered full-width again (see the `collapsed` condition in the
+// map), so drop targets stay full-size and the layout only reshapes once, at
+// pickup — never while the user is aiming.
+function CollapsedColumn({
+  stage,
+  colRef,
+}: {
+  stage: DealStage;
+  colRef: (el: HTMLDivElement | null) => void;
+}) {
+  return (
+    <div
+      ref={colRef}
+      aria-label={`Etapa ${STAGE_SHORT[stage]}: vacía`}
+      title={STAGE_LABELS[stage]}
+      style={{
+        minWidth: 52,
+        width: 52,
+        alignSelf: "stretch",
+        minHeight: 160,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 12,
+        paddingTop: 14,
+        paddingBottom: 14,
+        background: "var(--card)",
+        border: "1px solid var(--border)",
+        borderRadius: 16,
+      }}
+    >
+      <span
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: "50%",
+          background: STAGE_DOT[stage],
+          flexShrink: 0,
+        }}
+      />
+      <span
+        className="eyebrow"
+        style={{
+          writingMode: "vertical-rl",
+          transform: "rotate(180deg)",
+          whiteSpace: "nowrap",
+          color: "var(--muted-foreground)",
+        }}
+      >
+        {STAGE_SHORT[stage]}
+      </span>
+      <span
+        className="num"
+        style={{ marginTop: "auto", fontSize: 11, fontWeight: 700, color: "var(--muted-foreground)" }}
+      >
+        0
+      </span>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function PipelineClient({
@@ -399,6 +464,33 @@ export function PipelineClient({
     step: SCROLL_STEP,
     minThumbPx: MIN_THUMB_PX,
   });
+
+  // Stage chips: jump-to-stage nav for the 14-column board. A click writes
+  // scrollLeft on the same element the rail owns, so the rail's scroll listener
+  // re-syncs the thumb automatically — no competing scroll owner. Rect-delta
+  // (not index * STEP) keeps it correct when empty columns are collapsed to a
+  // narrow strip, which makes column widths non-uniform.
+  const [activeChip, setActiveChip] = useState<DealStage | null>(null);
+  const colRefs = useRef<Partial<Record<DealStage, HTMLDivElement | null>>>({});
+
+  // Stable per-stage ref callbacks. Inline `(el) => colRefs.current[s] = el`
+  // would be a new identity each render, so React would detach+reattach every
+  // column ref on every mid-drag re-render (overStage updates fire per frame).
+  const setColRef = useMemo(() => {
+    const map = {} as Record<DealStage, (el: HTMLDivElement | null) => void>;
+    for (const s of STAGE_ORDER) map[s] = (el) => { colRefs.current[s] = el; };
+    return map;
+  }, []);
+
+  function scrollToStage(stage: DealStage) {
+    const board = scrollRef.current;
+    const col = colRefs.current[stage];
+    if (!board || !col) return;
+    const left =
+      board.scrollLeft + col.getBoundingClientRect().left - board.getBoundingClientRect().left;
+    board.scrollTo({ left, behavior: "smooth" });
+    setActiveChip(stage);
+  }
 
   async function handleDelete(deal: Deal, e: React.MouseEvent) {
     e.stopPropagation();
@@ -494,6 +586,8 @@ export function PipelineClient({
         .pipe-action:hover { color: #C9963A; border-color: rgba(201,150,58,0.5); }
         .pipe-action-danger { transition: color 0.15s ease, border-color 0.15s ease; }
         .pipe-action-danger:hover:not(:disabled) { color: #f87171; border-color: rgba(248,113,113,0.4); }
+        .stage-chips { scrollbar-width: none; -ms-overflow-style: none; }
+        .stage-chips::-webkit-scrollbar { display: none; }
       `}</style>
 
       {canFilterByAgent && agents.length > 0 && (
@@ -533,10 +627,67 @@ export function PipelineClient({
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
+        // Empty columns expand from a 52px strip to 320px the instant a drag
+        // starts. Always-measure keeps droppable rects fresh through that
+        // one-time reshape, so drops land on the correct stage.
+        measuring={{ droppable: { strategy: MeasuringStrategy.Always } }}
       >
         {/* Kanban viewport — must NOT declare overflow, or it becomes the rail's
             scroll container and sticky silently stops working. */}
         <div>
+        {/* Stage chips — jump-to-stage nav for the 14 columns. Sibling of the
+            scroll container and the rail (never their ancestor), so its own
+            overflow-x scroll is safe: sticky anchors to the nearest scrollable
+            ancestor, which this row is not. */}
+        <div
+          className="stage-chips"
+          role="tablist"
+          aria-label="Ir a etapa"
+          style={{ display: "flex", gap: 8, overflowX: "auto", marginBottom: 20, paddingBottom: 4 }}
+        >
+          {STAGE_ORDER.map((stage) => {
+            const isActive = activeChip === stage;
+            const count = grouped[stage].length;
+            return (
+              <button
+                key={stage}
+                type="button"
+                role="tab"
+                aria-selected={isActive}
+                onClick={() => scrollToStage(stage)}
+                className="focus-ring"
+                aria-label={`Ir a ${STAGE_LABELS[stage]} (${count})`}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 7,
+                  flexShrink: 0,
+                  padding: "6px 12px",
+                  borderRadius: 999,
+                  background: "var(--card)",
+                  border: `1px solid ${isActive ? "var(--primary)" : "var(--border)"}`,
+                  color: isActive ? "var(--primary)" : "var(--muted-foreground)",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                  transition: "color 0.15s ease, border-color 0.15s ease",
+                }}
+              >
+                <span
+                  style={{ width: 7, height: 7, borderRadius: "50%", background: STAGE_DOT[stage], flexShrink: 0 }}
+                />
+                <span className="eyebrow" style={{ color: "inherit" }}>
+                  {STAGE_SHORT[stage]}
+                </span>
+                <span
+                  className="num"
+                  style={{ fontSize: 11, fontWeight: 700, color: "inherit", opacity: 0.85 }}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
         {/* Kanban scroll container. tabIndex + role: WCAG 2.1.1 — a scrollable
             region needs to be reachable by keyboard, which also gives native
             Left/Right arrow scrolling for free. (Home/End are vertical-axis
@@ -567,9 +718,24 @@ export function PipelineClient({
               const stageValue = stageDeals.reduce((sum, d) => sum + (d.deal_value ?? 0), 0);
               const dotColor = STAGE_DOT[stage];
 
+              // Collapse an empty stage to a strip while idle; a live drag
+              // (activeDeal) forces every stage full-width so drop targets stay
+              // full-size and the reshape happens only once, at pickup.
+              const collapsed = stageDeals.length === 0 && !activeDeal;
+              if (collapsed) {
+                return (
+                  <CollapsedColumn
+                    key={stage}
+                    stage={stage}
+                    colRef={setColRef[stage]}
+                  />
+                );
+              }
+
               return (
                 <div
                   key={stage}
+                  ref={setColRef[stage]}
                   style={{ minWidth: 320, width: 320, display: "flex", flexDirection: "column", gap: 0 }}
                 >
                   {/* Column header */}

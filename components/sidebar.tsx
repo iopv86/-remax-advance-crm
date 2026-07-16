@@ -76,28 +76,39 @@ export function Sidebar({
   const [activitiesOpen, setActivitiesOpen] = useState(true);
   const [mounted, setMounted] = useState(false);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional mount gate: defers theme toggle to post-hydration
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
+    type Channel = ReturnType<typeof supabase.channel>;
+    let channel: Channel | null = null;
 
     supabase
       .from("notifications")
       .select("id", { count: "exact", head: true })
       .eq("read", false)
-      .then(({ count }) => setUnreadCount(count ?? 0));
+      .then(({ count }) => {
+        if (!cancelled) setUnreadCount(count ?? 0);
+      });
 
     supabase.auth.getUser().then(({ data }) => {
+      if (cancelled) return;
       const userId = data.user?.id;
       if (!userId) return;
-      const channel = supabase
+      channel = supabase
         .channel("sidebar-notif-count")
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${userId}` }, () => {
           setUnreadCount((n) => n + 1);
         })
         .subscribe();
-      return () => supabase.removeChannel(channel);
     });
+
+    return () => {
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
+    };
   }, []);
 
   const primaryNavItems = ALL_PRIMARY_NAV_ITEMS.filter((item) => item.roles.includes(role));
