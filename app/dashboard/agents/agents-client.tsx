@@ -129,7 +129,7 @@ function PipelineStageChart({ data }: { data: PipelineStageBreakdown[] }) {
         const valLabel =
           item.stage_value >= 1_000_000
             ? `${MONEY_SYM} ${(item.stage_value / 1_000_000).toFixed(1)}M`
-            : `${MONEY_SYM} ${item.stage_value.toLocaleString()}`;
+            : `${MONEY_SYM} ${item.stage_value.toLocaleString("en-US")}`;
         return (
           <div key={item.stage} className="space-y-1">
             <div className="flex justify-between text-[11px] text-muted-foreground uppercase tracking-wider">
@@ -222,7 +222,7 @@ function StalledDealsSheet({
               const valueLabel = deal.deal_value
                 ? deal.deal_value >= 1_000_000
                   ? `${MONEY_SYM} ${(deal.deal_value / 1_000_000).toFixed(1)}M`
-                  : `${MONEY_SYM} ${deal.deal_value.toLocaleString()}`
+                  : `${MONEY_SYM} ${deal.deal_value.toLocaleString("en-US")}`
                 : "—";
               const stageLabel =
                 STAGE_LABELS_SHORT[deal.stage] ?? deal.stage;
@@ -428,7 +428,7 @@ export function AgentsClient({
   const pipelineLabel =
     totalPipeline >= 1_000_000
       ? `${MONEY_SYM} ${(totalPipeline / 1_000_000).toFixed(1)}M`
-      : `${MONEY_SYM} ${totalPipeline.toLocaleString()}`;
+      : `${MONEY_SYM} ${totalPipeline.toLocaleString("en-US")}`;
 
   const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
     {
@@ -552,7 +552,7 @@ export function AgentsClient({
                 style={{
                   fontSize: 12,
                   color: TEXT_MUTED,
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   paddingBottom: 6,
                 }}
               >
@@ -813,7 +813,7 @@ export function AgentsClient({
                     const pipelineLabel =
                       agent.pipelineValue >= 1_000_000
                         ? `${MONEY_SYM} ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
-                        : `${MONEY_SYM} ${agent.pipelineValue.toLocaleString()}`;
+                        : `${MONEY_SYM} ${agent.pipelineValue.toLocaleString("en-US")}`;
 
                     const captPct =
                       agent.captacionesObjetivo && agent.captacionesObjetivo > 0
@@ -970,7 +970,7 @@ export function AgentsClient({
                   const valLabel =
                     agent.pipelineValue >= 1_000_000
                       ? `${MONEY_SYM} ${(agent.pipelineValue / 1_000_000).toFixed(1)}M`
-                      : `${MONEY_SYM} ${agent.pipelineValue.toLocaleString()}`;
+                      : `${MONEY_SYM} ${agent.pipelineValue.toLocaleString("en-US")}`;
                   return (
                     <div key={agent.id} className="space-y-2">
                       <div className="flex justify-between text-xs text-muted-foreground uppercase tracking-wider">

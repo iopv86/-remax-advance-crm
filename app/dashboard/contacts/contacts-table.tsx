@@ -168,6 +168,7 @@ export function ContactsTable({ contacts: initial, pagination, currentAgentId, c
         // ignore invalid dates
       }
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional client-only gate: date-fns relative times depend on Date.now(); computing in an effect defers to post-hydration and avoids an SSR/client mismatch (React #418)
     setRelativeTimes(times);
   }, [initial]);
 

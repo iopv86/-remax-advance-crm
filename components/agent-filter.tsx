@@ -86,7 +86,7 @@ export function AgentFilter({
           border: `1px solid ${open ? BORDER_STRONG : BORDER}`,
           borderRadius: 8,
           color: TEXT_PRIMARY,
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "var(--font-sans)",
           fontSize: 13,
           fontWeight: 500,
           cursor: "pointer",
@@ -179,7 +179,7 @@ export function AgentFilter({
                 padding: "12px 14px",
                 fontSize: 12,
                 color: TEXT_MUTED,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "var(--font-sans)",
               }}
             >
               No hay agentes activos
@@ -221,7 +221,7 @@ function OptionRow({
         border: "none",
         borderRadius: 6,
         color: active ? GOLD : TEXT_PRIMARY,
-        fontFamily: "Inter, sans-serif",
+        fontFamily: "var(--font-sans)",
         fontSize: 13,
         fontWeight: active ? 600 : 500,
         cursor: "pointer",

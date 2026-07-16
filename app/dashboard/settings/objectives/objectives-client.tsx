@@ -187,7 +187,7 @@ export function ObjectivesClient({ agents: initial, embedded = false }: { agents
   if (embedded) return content;
 
   return (
-    <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "var(--font-sans)" }}>
       <header style={{
         position: "sticky", top: 0, zIndex: 40,
         background: "var(--bg-header)", backdropFilter: "blur(16px)",

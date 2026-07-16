@@ -36,13 +36,13 @@ export function Pagination({ currentPage, totalCount, pageSize, basePath, filter
   const btnBase: React.CSSProperties = {
     display: "inline-flex", alignItems: "center", justifyContent: "center",
     width: 32, height: 32, borderRadius: 8, fontSize: 13, fontWeight: 600,
-    fontFamily: "Inter, sans-serif", textDecoration: "none", transition: "all 0.15s",
+    fontFamily: "var(--font-sans)", textDecoration: "none", transition: "all 0.15s",
     border: "1px solid transparent",
   };
 
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 0", flexWrap: "wrap", gap: 8 }}>
-      <span style={{ fontSize: 12, color: "#9A9088", fontFamily: "Inter, sans-serif" }}>
+      <span style={{ fontSize: 12, color: "#9A9088", fontFamily: "var(--font-sans)" }}>
         {from}–{to} de {totalCount}
       </span>
 

@@ -14,7 +14,7 @@ function formatMoney(v: number | undefined, currency = "USD"): string {
   if (!v) return "—";
   if (v >= 1_000_000) return `${currency === "DOP" ? "RD$" : "$"}${(v / 1_000_000).toFixed(2)}M`;
   if (v >= 1_000) return `${currency === "DOP" ? "RD$" : "$"}${(v / 1_000).toFixed(0)}K`;
-  return `${currency === "DOP" ? "RD$" : "$"}${v.toLocaleString()}`;
+  return `${currency === "DOP" ? "RD$" : "$"}${v.toLocaleString("en-US")}`;
 }
 
 const TYPE_LABELS: Record<string, string> = {

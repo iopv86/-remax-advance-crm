@@ -114,7 +114,7 @@ const PRIORITY_MAP: Record<string, { color: string }> = {
 function formatPrice(price: number, currency?: string): string {
   const cur = currency ?? "USD";
   if (price >= 1_000_000) return `${cur} ${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
-  return `${cur} ${price.toLocaleString()}`;
+  return `${cur} ${price.toLocaleString("en-US")}`;
 }
 
 function sanitizePhone(phone: string): string {

@@ -37,7 +37,7 @@ function fmt(price: number, currency?: string | null): string {
   const cur = currency ?? "USD";
   if (price >= 1_000_000)
     return `${cur} ${(price / 1_000_000).toFixed(price % 1_000_000 === 0 ? 0 : 2)}M`;
-  return `${cur} ${price.toLocaleString()}`;
+  return `${cur} ${price.toLocaleString("en-US")}`;
 }
 
 // ─── Price range recompute ─────────────────────────────────────────────────────

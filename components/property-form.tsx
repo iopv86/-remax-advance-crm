@@ -597,7 +597,7 @@ export function PropertyForm({ mode, initialData, initialOwners }: PropertyFormP
   return (
     <form
       onSubmit={handleSubmit}
-      style={{ minHeight: "100vh", background: BG_BODY, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}
+      style={{ minHeight: "100vh", background: BG_BODY, color: TEXT_PRIMARY, fontFamily: "var(--font-sans)" }}
     >
       {/* ── Header bar ──────────────────────────────────────────────────────── */}
       <div style={{
@@ -828,13 +828,13 @@ export function PropertyForm({ mode, initialData, initialOwners }: PropertyFormP
                     <div style={{ flex: 1, padding: "12px 14px", background: BG_SURFACE, borderRadius: 8, border: `1px solid ${BORDER}` }}>
                       <p style={{ margin: "0 0 4px", fontSize: 11, color: TEXT_MUTED }}>Precio mínimo</p>
                       <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_PRIMARY }}>
-                        {initialData?.price ? `${form.currency} ${Number(initialData.price).toLocaleString()}` : "—"}
+                        {initialData?.price ? `${form.currency} ${Number(initialData.price).toLocaleString("en-US")}` : "—"}
                       </p>
                     </div>
                     <div style={{ flex: 1, padding: "12px 14px", background: BG_SURFACE, borderRadius: 8, border: `1px solid ${BORDER}` }}>
                       <p style={{ margin: "0 0 4px", fontSize: 11, color: TEXT_MUTED }}>Precio máximo</p>
                       <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: TEXT_PRIMARY }}>
-                        {initialData?.price_max ? `${form.currency} ${Number(initialData.price_max).toLocaleString()}` : "—"}
+                        {initialData?.price_max ? `${form.currency} ${Number(initialData.price_max).toLocaleString("en-US")}` : "—"}
                       </p>
                     </div>
                   </div>

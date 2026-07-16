@@ -224,7 +224,7 @@ export function RoundRobinClient({
 
   if (embedded) {
     return (
-      <div style={{ color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
+      <div style={{ color: TEXT_PRIMARY, fontFamily: "var(--font-sans)" }}>
         {/* Embedded header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -263,7 +263,7 @@ export function RoundRobinClient({
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "Inter, sans-serif" }}>
+    <div style={{ minHeight: "100vh", background: BG, color: TEXT_PRIMARY, fontFamily: "var(--font-sans)" }}>
       {/* Header */}
       <header style={{
         position: "sticky", top: 0, zIndex: 40,

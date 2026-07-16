@@ -39,6 +39,12 @@ export function NotificationBell() {
   const [loaded, setLoaded] = useState(false);
   const [marking, setMarking] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const openRef = useRef(open);
+
+  // Mirror `open` into a ref so the realtime channel callback can read the
+  // live value without `open` being a dependency (avoids resubscribing the
+  // channel on every dropdown toggle).
+  useEffect(() => { openRef.current = open; }, [open]);
 
   // Get userId + initial unread count
   useEffect(() => {
@@ -81,14 +87,14 @@ export function NotificationBell() {
         },
         () => {
           setUnread((n) => n + 1);
-          if (open) loadNotifications();
+          if (openRef.current) loadNotifications();
         }
       )
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, open]);
+  }, [userId]);
 
   const loadNotifications = useCallback(async () => {
     const supabase = createClient();

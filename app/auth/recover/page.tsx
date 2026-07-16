@@ -67,7 +67,7 @@ function RecoverInner() {
       <p
         style={{
           color: "#9899A8",
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "var(--font-sans)",
           fontSize: 14,
         }}
       >

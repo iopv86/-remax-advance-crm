@@ -33,7 +33,7 @@ const FIELD_LABEL: React.CSSProperties = {
   textTransform: "uppercase",
   color: "var(--muted-foreground)",
   marginBottom: 6,
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--font-sans)",
   fontWeight: 700,
 };
 
@@ -46,7 +46,7 @@ const FIELD_INPUT: React.CSSProperties = {
   color: "var(--foreground)",
   fontSize: 14,
   outline: "none",
-  fontFamily: "Inter, sans-serif",
+  fontFamily: "var(--font-sans)",
   boxSizing: "border-box",
 };
 
@@ -380,7 +380,7 @@ export function MetaAdsConfig({ initialConfig }: Props) {
                 border: "none",
                 cursor: isPending ? "not-allowed" : "pointer",
                 opacity: isPending ? 0.7 : 1,
-                fontFamily: "Inter, sans-serif",
+                fontFamily: "var(--font-sans)",
               }}
             >
               {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
