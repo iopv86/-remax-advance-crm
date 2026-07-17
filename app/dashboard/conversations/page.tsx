@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, type ComponentProps } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ConversationsClient } from "./conversations-client";
@@ -27,10 +27,15 @@ export default async function ConversationsPage() {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (
     <Suspense fallback={<div className="p-8 text-sm" style={{ color: "var(--muted-foreground)" }}>Cargando conversaciones…</div>}>
-      <ConversationsClient initialConversations={conversations as any} />
+      <ConversationsClient
+        initialConversations={
+          conversations as unknown as ComponentProps<
+            typeof ConversationsClient
+          >["initialConversations"]
+        }
+      />
     </Suspense>
   );
 }

@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { VisitasClient } from "./visitas-client";
@@ -43,9 +44,9 @@ export default async function VisitasPage() {
 
   return (
     <VisitasClient
-      initialShowings={(showings as any[]) ?? []}
-      contacts={(contacts as any[]) ?? []}
-      properties={(properties as any[]) ?? []}
+      initialShowings={(showings as unknown as ComponentProps<typeof VisitasClient>["initialShowings"]) ?? []}
+      contacts={(contacts as unknown as ComponentProps<typeof VisitasClient>["contacts"]) ?? []}
+      properties={(properties as unknown as ComponentProps<typeof VisitasClient>["properties"]) ?? []}
       currentAgentId={session.agentId}
       isPrivileged={isPrivileged(session.role)}
     />

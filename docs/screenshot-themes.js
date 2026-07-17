@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports -- standalone Node CommonJS utility script run with `node`, not part of the app bundle; require() is correct (no "type":"module") */
 const puppeteer = require('puppeteer');
 const path = require('path');
 

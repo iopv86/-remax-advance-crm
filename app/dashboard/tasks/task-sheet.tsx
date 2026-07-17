@@ -66,6 +66,7 @@ export function TaskSheet({ open, onOpenChange, task, onSaved }: Props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- deliberate controlled-form reset: syncs form to task/open so the sheet shows fresh values on each open or task change
     setForm(task ? taskToForm(task) : EMPTY);
   }, [task, open]);
 

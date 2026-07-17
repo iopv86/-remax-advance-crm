@@ -103,6 +103,7 @@ export default async function AgentsPage({
     params.period === "7" ? 7 : params.period === "90" ? 90 : 30;
   const currentPeriod: "7" | "30" | "90" =
     params.period === "7" ? "7" : params.period === "90" ? "90" : "30";
+  // eslint-disable-next-line react-hooks/purity -- async Server Component renders once per request; Date.now() is the intended per-request timestamp, not render impurity
   const periodStart = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
@@ -121,6 +122,7 @@ export default async function AgentsPage({
       redirect("/dashboard");
   }
 
+  // eslint-disable-next-line react-hooks/purity -- async Server Component renders once per request; Date.now() is the intended per-request timestamp, not render impurity
   const stalledCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
   const [
@@ -259,6 +261,7 @@ export default async function AgentsPage({
       deal_value: raw.deal_value as number | null,
       notes: raw.notes as string | null,
       days_stalled: Math.floor(
+        // eslint-disable-next-line react-hooks/purity -- async Server Component renders once per request; Date.now() is the intended per-request timestamp, not render impurity
         (Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24)
       ),
       contact_name: contact

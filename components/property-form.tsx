@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ChevronLeft, Upload, X, Download, FileText, AlertTriangle } from "lucide-react";
@@ -498,7 +498,7 @@ export function PropertyForm({ mode, initialData, initialOwners }: PropertyFormP
   }
 
   // ── Submit ──────────────────────────────────────────────────────────────────
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) { toast.error("El título es obligatorio"); return; }
     setSaving(true);
@@ -584,7 +584,7 @@ export function PropertyForm({ mode, initialData, initialOwners }: PropertyFormP
     setIsDirty(false);
     toast.success(isEdit ? "Propiedad actualizada" : "Propiedad creada");
     router.push(`/dashboard/properties/${savedId}`);
-  }, [form, images, csvRows, isEdit, initialData, priceOverride, router, primaryOwner, coOwner, showCoOwner]);
+  };
 
   // ─────────────────────────────────────────────────────────────────────────────
   // RENDER

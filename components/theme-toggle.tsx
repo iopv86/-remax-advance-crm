@@ -9,6 +9,7 @@ export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- next-themes hydration gate: setState in a mount-only effect is the documented guard against SSR/client theme mismatch
   useEffect(() => setMounted(true), []);
   if (!mounted) return null;
 

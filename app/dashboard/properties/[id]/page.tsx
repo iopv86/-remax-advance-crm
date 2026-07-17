@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
+import type { ComponentProps } from "react";
 import { PropertyDetailClient, type PropertyDetail } from "./property-detail-client";
 import type { PropertyOwner } from "@/lib/types";
 
@@ -56,7 +57,7 @@ export default async function PropertyDetailPage({
   return (
     <PropertyDetailClient
       property={property}
-      deals={(deals as any[]) ?? []}
+      deals={(deals as unknown as ComponentProps<typeof PropertyDetailClient>["deals"]) ?? []}
       owners={owners}
       canEdit={canEdit}
       initialTab={tab === "unidades" ? "unidades" : "info"}

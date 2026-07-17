@@ -207,7 +207,7 @@ export function ProposalsClient({ proposals }: { proposals: ProposalRow[] }) {
               No has creado propuestas todavía
             </p>
             <p style={{ fontSize: 12, color: "rgba(154,144,136,0.5)", fontFamily: "var(--font-sans)", margin: 0 }}>
-              Ve a Propiedades, selecciona propiedades y pulsa "Crear propuesta"
+              Ve a Propiedades, selecciona propiedades y pulsa &quot;Crear propuesta&quot;
             </p>
           </div>
         ) : (

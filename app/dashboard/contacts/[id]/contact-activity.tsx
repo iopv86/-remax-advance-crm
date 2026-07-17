@@ -221,7 +221,7 @@ export function ContactActivity({
         <div style={{ textAlign: "center", padding: "48px 0", color: TEXT_MUTED }}>
           <FileText style={{ width: 36, height: 36, margin: "0 auto 10px", opacity: 0.2 }} />
           <p style={{ fontSize: 13, margin: 0 }}>Sin actividad registrada.</p>
-          <p style={{ fontSize: 11, margin: "4px 0 0", opacity: 0.6 }}>Usa "Registrar" para añadir llamadas, emails, reuniones…</p>
+          <p style={{ fontSize: 11, margin: "4px 0 0", opacity: 0.6 }}>Usa &quot;Registrar&quot; para añadir llamadas, emails, reuniones…</p>
         </div>
       ) : (
         <div style={{ position: "relative", paddingLeft: 20 }}>
