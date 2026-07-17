@@ -11,7 +11,17 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
+  // Targets are projects, not env vars: `FOO=bar playwright test` is POSIX syntax
+  // that npm hands to cmd.exe on Windows, where it fails outright rather than
+  // setting anything. PLAYWRIGHT_BASE_URL still overrides both when it is set.
   projects: [
-    { name: "chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "local", use: { ...devices["Desktop Chrome"] } },
+    {
+      name: "prod",
+      use: {
+        ...devices["Desktop Chrome"],
+        baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "https://remax-advance-crm.vercel.app",
+      },
+    },
   ],
 });
