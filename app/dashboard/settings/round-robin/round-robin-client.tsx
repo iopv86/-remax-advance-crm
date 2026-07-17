@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { RefreshCw, Save, ChevronUp, ChevronDown, Users } from "lucide-react";
@@ -113,6 +113,50 @@ const BORDER = "rgba(201,150,58,0.15)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED   = "var(--muted-foreground)";
 
+// Pure merge of agents + config. Deterministic (no clock/random), so it is safe
+// as a useState initializer: server and first client render agree.
+function buildEntries(agents: Agent[], initialConfig: ConfigRow[]): RREntry[] {
+  if (initialConfig.length === 0) {
+    // No config yet — bootstrap from all agents, all inactive (admin must explicitly enable)
+    return agents.map((a, i) => ({
+      agent_id: a.id,
+      full_name: a.full_name,
+      email: a.email,
+      is_active: false,
+      position: i + 1,
+    }));
+  }
+
+  // Config exists — use it, join with agent names
+  const merged = initialConfig
+    .map((c) => {
+      const agent = agents.find((a) => a.id === c.agent_id);
+      if (!agent) return null;
+      return {
+        agent_id: c.agent_id,
+        full_name: agent.full_name,
+        email: agent.email,
+        is_active: c.is_active,
+        position: c.position,
+      };
+    })
+    .filter(Boolean) as RREntry[];
+
+  // Append any active agents not yet in config (new hires)
+  const configured = new Set(merged.map((e) => e.agent_id));
+  const newAgents: RREntry[] = agents
+    .filter((a) => !configured.has(a.id))
+    .map((a, i) => ({
+      agent_id: a.id,
+      full_name: a.full_name,
+      email: a.email,
+      is_active: false,
+      position: merged.length + i + 1,
+    }));
+
+  return [...merged, ...newAgents];
+}
+
 export function RoundRobinClient({
   agents,
   config: initialConfig,
@@ -122,53 +166,10 @@ export function RoundRobinClient({
   config: ConfigRow[];
   embedded?: boolean;
 }) {
-  const [entries, setEntries] = useState<RREntry[]>([]);
+  // Derived from props on first render only — matches the previous mount-effect
+  // semantics (which never re-synced either) without the empty-state flash.
+  const [entries, setEntries] = useState<RREntry[]>(() => buildEntries(agents, initialConfig));
   const [saving, setSaving] = useState(false);
-
-  // Merge agents + config on mount
-  useEffect(() => {
-    if (initialConfig.length > 0) {
-      // Config exists — use it, join with agent names
-      const merged = initialConfig
-        .map((c) => {
-          const agent = agents.find((a) => a.id === c.agent_id);
-          if (!agent) return null;
-          return {
-            agent_id: c.agent_id,
-            full_name: agent.full_name,
-            email: agent.email,
-            is_active: c.is_active,
-            position: c.position,
-          };
-        })
-        .filter(Boolean) as RREntry[];
-
-      // Append any active agents not yet in config (new hires)
-      const configured = new Set(merged.map((e) => e.agent_id));
-      const newAgents: RREntry[] = agents
-        .filter((a) => !configured.has(a.id))
-        .map((a, i) => ({
-          agent_id: a.id,
-          full_name: a.full_name,
-          email: a.email,
-          is_active: false,
-          position: merged.length + i + 1,
-        }));
-
-      setEntries([...merged, ...newAgents]);
-    } else {
-      // No config yet — bootstrap from all agents, all inactive (admin must explicitly enable)
-      setEntries(
-        agents.map((a, i) => ({
-          agent_id: a.id,
-          full_name: a.full_name,
-          email: a.email,
-          is_active: false,
-          position: i + 1,
-        }))
-      );
-    }
-  }, []);
 
   function move(index: number, dir: -1 | 1) {
     const next = index + dir;

@@ -279,19 +279,29 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
   const [csvError, setCsvError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const loadUnits = useCallback(async () => {
+  // isCancelled lets the mount effect discard a response that landed after the
+  // component unmounted or after propertyId changed (a stale response would
+  // otherwise overwrite the newer one). Manual refetch call sites pass nothing
+  // and always apply.
+  const loadUnits = useCallback(async (isCancelled?: () => boolean) => {
     const supabase = createClient();
     const { data, error } = await supabase
       .from("project_units")
       .select("*")
       .eq("property_id", propertyId)
       .order("nombre_unidad");
+    if (isCancelled?.()) return;
     if (error) setFetchError("No se pudieron cargar las unidades.");
     else setUnits((data ?? []) as ProjectUnit[]);
     setLoading(false);
   }, [propertyId]);
 
-  useEffect(() => { loadUnits(); }, [loadUnits]);
+  useEffect(() => {
+    let cancelled = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- async fetch-on-mount guarded against stale responses; the setState happens after await, not synchronously in the effect body
+    void loadUnits(() => cancelled);
+    return () => { cancelled = true; };
+  }, [loadUnits]);
 
   // ── CSV export ──────────────────────────────────────────────────────────────
 
@@ -592,7 +602,7 @@ export function PropertyUnitsTab({ propertyId, canEdit }: Props) {
       ) : units.length === 0 && !csvRows ? (
         <div style={{ padding: "48px 24px", textAlign: "center", background: BG_ELEVATED, borderRadius: 12, border: `1px dashed ${BORDER_DIM}` }}>
           <div style={{ fontSize: 13, color: TEXT_MUTED, marginBottom: 6 }}>No hay unidades registradas para este proyecto.</div>
-          {canEdit && <div style={{ fontSize: 12, color: TEXT_MUTED, opacity: 0.6 }}>Usa "Agregar unidad" o sube un CSV para comenzar.</div>}
+          {canEdit && <div style={{ fontSize: 12, color: TEXT_MUTED, opacity: 0.6 }}>{'Usa "Agregar unidad" o sube un CSV para comenzar.'}</div>}
         </div>
       ) : units.length > 0 ? (
         <div style={{ background: BG_ELEVATED, border: `1px solid ${BORDER_DIM}`, borderRadius: 12, overflow: "hidden" }}>
