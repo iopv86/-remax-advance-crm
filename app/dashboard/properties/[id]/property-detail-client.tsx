@@ -314,6 +314,7 @@ export function PropertyDetailClient({
   const [activeTab, setActiveTab] = useState<DetailTab>(initialTab ?? "info");
   const [localStatus, setLocalStatus] = useState(property.status);
   const [saving, setSaving] = useState(false);
+  const [creatingProposal, setCreatingProposal] = useState(false);
   const status = STATUS_MAP[localStatus] ?? STATUS_MAP.inactive;
 
   async function handleSetInactive() {
@@ -336,6 +337,29 @@ export function PropertyDetailClient({
     if (error) { toast.error("Error al eliminar: " + error.message); return; }
     toast.success("Propiedad eliminada");
     router.push("/dashboard/properties");
+  }
+
+  async function handleCreateProposal() {
+    if (creatingProposal) return;
+    setCreatingProposal(true);
+    try {
+      const res = await fetch("/api/proposals", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyIds: [property.id] }),
+      });
+      if (!res.ok) {
+        const err = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(err.error ?? "Error creando propuesta");
+        return;
+      }
+      const { slug } = (await res.json()) as { slug: string };
+      router.push(`/p/${slug}`);
+    } catch {
+      toast.error("Error creando propuesta");
+    } finally {
+      setCreatingProposal(false);
+    }
   }
 
   return (
@@ -789,18 +813,20 @@ export function PropertyDetailClient({
                 Acciones rápidas
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <Link
-                  href={`/dashboard/proposals/new?propertyId=${property.id}`}
+                <button
+                  type="button"
+                  onClick={handleCreateProposal}
+                  disabled={creatingProposal}
                   style={{
-                    display: "flex", alignItems: "center", gap: 8,
+                    display: "flex", alignItems: "center", gap: 8, width: "100%", boxSizing: "border-box",
                     padding: "10px 14px", background: "rgba(201,150,58,0.1)", color: GOLD,
                     fontSize: 13, fontWeight: 600, borderRadius: 8, border: `1px solid rgba(201,150,58,0.2)`,
-                    textDecoration: "none",
+                    cursor: creatingProposal ? "not-allowed" : "pointer", opacity: creatingProposal ? 0.7 : 1,
                   }}
                 >
                   <FileText style={{ width: 14, height: 14 }} />
-                  Crear propuesta
-                </Link>
+                  {creatingProposal ? "Creando…" : "Crear propuesta"}
+                </button>
                 <Link
                   href={`/dashboard/pipeline/new?propertyId=${property.id}`}
                   style={{
