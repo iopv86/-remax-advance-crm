@@ -11,9 +11,6 @@ import { initialsOf } from "@/lib/format";
 import type { Agent } from "@/lib/types";
 import type { MetaFullConfig } from "./actions";
 import {
-  Users,
-  User,
-  Bell,
   Bot,
   CheckCircle2,
   XCircle,

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
+import { getSessionAgent } from "@/lib/supabase/get-session-agent";
 import type { Property } from "@/lib/types";
 import { PropertiesClient } from "./properties-client";
 

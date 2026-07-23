@@ -393,6 +393,7 @@ export function ProfileClient({ agent, stats }: { agent: Agent | null; stats: St
             title="Cambiar foto de perfil"
           >
             {avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- user-uploaded avatar preview (may be a blob: URL); next/image unsuitable
               <img
                 src={avatarUrl}
                 alt={agent?.full_name}

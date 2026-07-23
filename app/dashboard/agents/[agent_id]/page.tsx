@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ArrowLeft, Clock, Target, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
 import { STAGE_LABELS } from "@/lib/types";
-import type { Deal, DealStage, AgentRole } from "@/lib/types";
+import type { DealStage, AgentRole } from "@/lib/types";
 import { formatCurrencyCompact } from "@/lib/format";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -79,7 +79,6 @@ export default async function AgentDetailPage({
     { data: rawDeals },
     { data: kpiRow },
     { data: rtRow },
-    { data: histRows },
   ] = await Promise.all([
     supabase
       .from("agents")

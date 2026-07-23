@@ -10,7 +10,6 @@ import {
   Text,
   Image,
   StyleSheet,
-  Font,
 } from "@react-pdf/renderer";
 import type { Property } from "@/lib/types";
 
@@ -277,6 +276,7 @@ export function ProposalDocument({ properties, agent, config }: ProposalDocProps
         </View>
 
         {config.agency_logo_url ? (
+          // eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image (PDF primitive), not HTML img; no alt prop exists
           <Image src={config.agency_logo_url} style={{ width: 120, marginBottom: 16 }} />
         ) : (
           <Text style={S.coverTitle}>{config.agency_name}</Text>
@@ -321,6 +321,7 @@ export function ProposalDocument({ properties, agent, config }: ProposalDocProps
             <View key={p.id} style={S.card} wrap={false}>
               {/* Imagen */}
               {p.images && p.images.length > 0 ? (
+                // eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image (PDF primitive), not HTML img; no alt prop exists
                 <Image src={p.images[0]} style={S.cardImage} />
               ) : (
                 <View style={S.cardNoImage}>

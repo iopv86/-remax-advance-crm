@@ -4,9 +4,9 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { format, isToday, isTomorrow, isPast, startOfDay, addDays, isSameDay } from "date-fns";
+import { format, isToday, isTomorrow, isPast, startOfDay } from "date-fns";
 import { es } from "date-fns/locale";
-import { Plus, CalendarDays, Clock, MapPin, Phone, Star, ChevronLeft, ChevronRight, MessageSquare, X, Check, Ban } from "lucide-react";
+import { Plus, CalendarDays, Clock, MapPin, Star, MessageSquare, X, Check, Ban } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -103,17 +103,6 @@ const STATUS_MAP: Record<ShowingStatus, { label: string; color: string; bg: stri
   no_show: { label: "No se presentó", color: "var(--muted-foreground)", bg: "rgba(107,114,128,0.12)" },
 };
 
-const TYPE_LABELS: Record<string, string> = {
-  apartment: "Apto",
-  penthouse: "Penthouse",
-  villa: "Villa",
-  house: "Casa",
-  land: "Solar",
-  commercial: "Comercial",
-  apart_hotel: "Apart-Hotel",
-  farm: "Finca",
-};
-
 function sanitizePhone(phone: string): string {
   return phone.replace(/[\s\-\+\(\)]/g, "");
 }
@@ -134,7 +123,6 @@ function dayLabel(date: Date): string {
 function ShowingCard({
   showing,
   onConfirm,
-  onComplete,
   onCancel,
   onFeedback,
   isPast: past,
@@ -618,7 +606,6 @@ export function VisitasClient({
   contacts,
   properties,
   currentAgentId,
-  isPrivileged,
 }: {
   initialShowings: Showing[];
   contacts: ContactOption[];
@@ -632,6 +619,11 @@ export function VisitasClient({
   const [feedbackShowing, setFeedbackShowing] = useState<Showing | null>(null);
   const [filter, setFilter] = useState<"upcoming" | "past" | "all">("upcoming");
 
+  // now/today are intentionally recreated on every render so the past/upcoming boundary
+  // reflects the current time whenever this view re-renders. Memoizing them would freeze
+  // the classification at mount time (a visit past its scheduled time would stay under
+  // "Proximas" until a full remount).
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- now/today deliberately fresh each render; memoizing would freeze the time boundary
   const now = new Date();
   const today = startOfDay(now);
 

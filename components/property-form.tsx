@@ -1035,6 +1035,7 @@ export function PropertyForm({ mode, initialData, initialOwners }: PropertyFormP
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: images.length ? 12 : 0 }}>
             {images.map((url) => (
               <div key={url} style={{ position: "relative", width: 100, height: 80, borderRadius: 8, overflow: "hidden", border: `1px solid ${BORDER}` }}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- in-form uploaded/preview photo thumbnails with dynamic/blob URLs; next/image unsuitable */}
                 <img src={url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 <button
                   type="button"

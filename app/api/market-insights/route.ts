@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-export async function GET(req: Request) {
+export async function GET() {
   const supabase = await createClient();
 
   const { data: { user } } = await supabase.auth.getUser();

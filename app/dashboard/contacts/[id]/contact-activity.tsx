@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { format, formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import {
   Phone, MessageSquare, Mail, Users, Home, FileText, CheckSquare, Plus, X

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { toast } from "sonner";
 import type { ProposalRow } from "./page";
 
@@ -40,7 +39,6 @@ interface ProposalCardProps {
 }
 
 function ProposalCard({ proposal, origin }: ProposalCardProps) {
-  const [expanded, setExpanded] = useState(false);
   const url = `${origin}/p/${proposal.slug}`;
   const opens = eventCount(proposal.property_views, "open");
   const whatsapp = eventCount(proposal.property_views, "whatsapp_click");

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import {
-  ArrowLeft, Building2, User, CalendarDays, DollarSign,
+  ArrowLeft, Building2, User, CalendarDays,
   ChevronRight, Pencil, Check, X, Clock, TrendingUp,
   MessageSquare,
 } from "lucide-react";
@@ -288,7 +288,7 @@ export function DealDetailClient({ deal: initialDeal, history, initialTasks, ini
               Progreso del Pipeline
             </p>
             <div className="flex items-center gap-0.5 flex-wrap">
-              {ALL_STAGES.filter((s) => s !== "closed_lost").map((s, i) => {
+              {ALL_STAGES.filter((s) => s !== "closed_lost").map((s) => {
                 const idx = ALL_STAGES.filter((x) => x !== "closed_lost").indexOf(s);
                 const isDone = idx <= (isWon ? ALL_STAGES.length : stageIdx);
                 const isCurrent = s === deal.stage;

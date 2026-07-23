@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Bot, Save, Loader2 } from "lucide-react";
+import { Save, Loader2 } from "lucide-react";
 import { saveAvaConfig } from "./actions";
 import { toast } from "sonner";
 

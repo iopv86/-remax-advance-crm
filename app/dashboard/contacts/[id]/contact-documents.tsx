@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { Upload, FileText, FileImage, File, Trash2, Download, X } from "lucide-react";
+import { Upload, FileText, FileImage, File, Trash2, Download } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -51,7 +51,6 @@ function FileIcon({ mime }: { mime?: string }) {
 }
 
 const GOLD = "var(--primary)";
-const BG_SURFACE = "var(--card)";
 const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";

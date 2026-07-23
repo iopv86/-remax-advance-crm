@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ slug: proposal.slug });
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const client = await createClient();
   const { data: { user } } = await client.auth.getUser();
   if (!user) return NextResponse.json({ error: "No autorizado" }, { status: 401 });

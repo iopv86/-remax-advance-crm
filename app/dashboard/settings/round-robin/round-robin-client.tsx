@@ -108,7 +108,6 @@ function RoundRobinList({
 
 const GOLD = "var(--primary)";
 const BG   = "var(--background)";
-const CARD = "var(--card)";
 const BORDER = "rgba(201,150,58,0.15)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED   = "var(--muted-foreground)";

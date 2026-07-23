@@ -7,7 +7,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { STAGE_LABELS } from "@/lib/types";
 import { initialsOf } from "@/lib/format";
-import type { Deal, Task, Message, DealStage, LeadClassification } from "@/lib/types";
+import type { Deal, Message, DealStage, LeadClassification } from "@/lib/types";
 import { ContactActions } from "./contact-actions";
 import { ClassificationQuickEdit } from "./classification-quick-edit";
 import { ContactWhatsApp } from "./contact-whatsapp";

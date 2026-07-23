@@ -27,8 +27,7 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function buildProposalHtml(
   properties: Property[],
-  agent: AgentInfo,
-  baseUrl: string
+  agent: AgentInfo
 ): string {
   const propCards = properties
     .map((p) => {

@@ -263,7 +263,6 @@ function Pill({ icon, label }: { icon: string; label: string }) {
 
 export function ProposalPublicClient({ data }: { data: ProposalData }) {
   const { id: proposalId, agent, properties, title, message, contact_name } = data;
-  const proposalUrl = typeof window !== "undefined" ? window.location.href : "";
   const [copied, setCopied] = useState(false);
 
   // Track page open on mount

@@ -33,7 +33,6 @@ const PILLS: { label: string; value: string }[] = [
 export function ContactsFilterBar({
   currentClassification,
   currentSearch,
-  totalCount,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();

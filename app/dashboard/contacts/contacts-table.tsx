@@ -25,19 +25,6 @@ const T = {
   primaryContainer: "var(--primary)",
 } as const;
 
-// ── Label maps ────────────────────────────────────────────────────────────────
-const SOURCE_LABELS: Record<string, string> = {
-  ctwa_ad: "CTWA Ad",
-  lead_form: "Formulario",
-  referral: "Referido",
-  walk_in: "Walk-in",
-  website: "Web",
-  social_media: "Redes",
-  other: "Otro",
-  whatsapp: "WhatsApp",
-  instagram: "Instagram",
-};
-
 // Single source of truth — shared with the read surfaces and the editor.
 const PROPERTY_LABELS = PROPERTY_TYPE_LABELS;
 

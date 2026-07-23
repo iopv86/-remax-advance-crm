@@ -20,7 +20,6 @@ interface WaTemplate {
 const GOLD = "var(--primary)";
 const BG_PAGE = "var(--background)";
 const BG_CARD = "var(--card)";
-const BG_ELEVATED = "var(--secondary)";
 const TEXT_PRIMARY = "var(--foreground)";
 const TEXT_MUTED = "var(--muted-foreground)";
 const BORDER = "var(--glass-bg-md)";

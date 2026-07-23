@@ -42,7 +42,6 @@ const AgentSparkline = dynamic(
 const MONEY_SYM = currencySymbol("USD");
 const GOLD = "var(--primary)";
 const TEXT_MUTED = "var(--muted-foreground)";
-const TEXT_DIM = "var(--muted-foreground)";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -368,12 +367,6 @@ export function AgentsClient({
     [agents]
   );
 
-  // Period label mapping
-  const PERIOD_LABELS: Record<"7" | "30" | "90", string> = {
-    "7": "Semanal",
-    "30": "Mensual",
-    "90": "Trimestral",
-  };
 
   function setPeriod(label: string) {
     const map: Record<string, string> = {
