@@ -23,6 +23,13 @@ export function formatCurrency(value: number, currency: string = "USD"): string 
 
 const SURROGATE_START = 0xd800;
 const SURROGATE_END = 0xdfff;
+// Format/invisible BMP code points that survive .trim() but paint nothing:
+// zero-width chars, bidi controls, and the BOM. Chosen as an "initial" they
+// render an empty avatar circle, so drop them like a lone surrogate.
+const INVISIBLE_FIRST = new Set<number>([
+  0x200b, 0x200c, 0x200d, 0x200e, 0x200f,
+  0x202a, 0x202b, 0x202c, 0x202d, 0x202e, 0xfeff,
+]);
 // Only the first code point is ever read, and one takes at most 2 UTF-16 units.
 // Names arrive from WhatsApp leads, so bound the scan rather than materialize a
 // whole attacker-sized string into a code-point array.
@@ -48,7 +55,9 @@ export function initialsOf(...parts: (string | null | undefined)[]): string {
       const first = Array.from(part.trim().slice(0, INITIAL_SCAN_LIMIT))[0];
       if (!first) return undefined;
       const code = first.codePointAt(0) ?? 0;
-      return code >= SURROGATE_START && code <= SURROGATE_END ? undefined : first;
+      if (code >= SURROGATE_START && code <= SURROGATE_END) return undefined;
+      if (INVISIBLE_FIRST.has(code)) return undefined;
+      return first;
     })
     .filter(Boolean)
     .join("")

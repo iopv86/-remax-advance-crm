@@ -754,7 +754,7 @@ export function PropertyDetailClient({
                         fontSize: 16, fontWeight: 700, color: GOLD,
                       }}
                     >
-                      {initialsOf(property.agent.full_name)}
+                      {initialsOf(property.agent.full_name) || "?"}
                     </div>
                   )}
                   <div>
