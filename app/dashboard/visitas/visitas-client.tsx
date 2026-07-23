@@ -129,7 +129,6 @@ function ShowingCard({
 }: {
   showing: Showing;
   onConfirm: (id: string) => void;
-  onComplete: (id: string) => void;
   onCancel: (id: string) => void;
   onFeedback: (showing: Showing) => void;
   isPast: boolean;
@@ -806,7 +805,6 @@ export function VisitasClient({
                         key={s.id}
                         showing={s}
                         onConfirm={handleConfirm}
-                        onComplete={() => setFeedbackShowing(s)}
                         onCancel={handleCancel}
                         onFeedback={setFeedbackShowing}
                         isPast={isPast(new Date(s.scheduled_at))}
