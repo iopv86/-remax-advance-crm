@@ -1,14 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { redirect } from "next/navigation";
 import { ObjectivesClient } from "./objectives-client";
 
 export default async function ObjectivesPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  // Role guard — admin and manager only. Fails closed: getSessionAgent redirects
+  // to /login when the authenticated user has no agents row.
+  const session = await getSessionAgent();
+  if (!isPrivileged(session.role)) redirect("/dashboard");
 
-  const { data: role } = await supabase.from("agents").select("role").eq("email", user.email!).maybeSingle();
-  if (role && !["admin", "manager"].includes(role.role)) redirect("/dashboard");
+  const supabase = await createClient();
 
   const { data: agents } = await supabase
     .from("agents")

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { redirect } from "next/navigation";
 import type {
   AgentKPIView,
@@ -95,6 +96,11 @@ export default async function AgentsPage({
 }: {
   searchParams: Promise<{ period?: string }>;
 }) {
+  // Role guard — admin and manager only. Fails closed: getSessionAgent redirects
+  // to /login when the authenticated user has no agents row.
+  const session = await getSessionAgent();
+  if (!isPrivileged(session.role)) redirect("/dashboard");
+
   const supabase = await createClient();
   const params = await searchParams;
 
@@ -107,20 +113,6 @@ export default async function AgentsPage({
   const periodStart = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
-
-  // Role guard — admin and manager only
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (user?.email) {
-    const { data: agent } = await supabase
-      .from("agents")
-      .select("role")
-      .eq("email", user.email)
-      .maybeSingle();
-    if (agent && !["admin", "manager"].includes(agent.role))
-      redirect("/dashboard");
-  }
 
   // eslint-disable-next-line react-hooks/purity -- async Server Component renders once per request; Date.now() is the intended per-request timestamp, not render impurity
   const stalledCutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();

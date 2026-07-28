@@ -1,18 +1,15 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSessionAgent, isPrivileged } from "@/lib/supabase/get-session-agent";
 import { redirect } from "next/navigation";
 import { RoundRobinClient } from "./round-robin-client";
 
 export default async function RoundRobinPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  // Role guard — admin and manager only. Fails closed: getSessionAgent redirects
+  // to /login when the authenticated user has no agents row.
+  const session = await getSessionAgent();
+  if (!isPrivileged(session.role)) redirect("/dashboard");
 
-  const { data: roleRow } = await supabase
-    .from("agents")
-    .select("role")
-    .eq("email", user.email!)
-    .maybeSingle();
-  if (roleRow && !["admin", "manager"].includes(roleRow.role)) redirect("/dashboard");
+  const supabase = await createClient();
 
   // Load active agents
   const { data: agents } = await supabase
