@@ -1,3 +1,8 @@
+-- *** NO RE-EJECUTAR TAL CUAL. Ver migrations/0027_kpi_views_security_invoker.sql.
+-- *** CREATE OR REPLACE VIEW sin clausula WITH (...) BORRA las reloptions, incluida
+-- *** security_invoker, y reabre una fuga de datos sin autenticar. Si hay que
+-- *** redefinir estas vistas, anadir WITH (security_invoker = true) a cada una.
+--
 -- 0022_unify_commission_views.sql
 -- Unify commission calculation across the app. Commission is MANUAL per deal
 -- (deals.commission_percentage, editable). Remove the hardcoded 3% fallback that

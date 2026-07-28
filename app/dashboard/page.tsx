@@ -340,9 +340,13 @@ export default async function DashboardPage() {
   }
 
   // ─── Agent KPI rollup (current month) ─────────────────────────────────────
-  const { data: agentKpisData } = await supabase
-    .from("agent_monthly_kpis")
-    .select("agent_id, full_name, deals_closed, total_revenue, conversion_rate, fast_response_rate");
+  // Scoped like every other query on this page: a non-privileged agent sees only
+  // their own row, not the whole agency's revenue.
+  const { data: agentKpisData } = await agentScope(
+    supabase
+      .from("agent_monthly_kpis")
+      .select("agent_id, full_name, deals_closed, total_revenue, conversion_rate, fast_response_rate")
+  );
 
   const agentKpis: AgentKpi[] = agentKpisData ?? [];
 

@@ -1,3 +1,8 @@
+-- *** NO RE-EJECUTAR TAL CUAL. Ver migrations/0027_kpi_views_security_invoker.sql.
+-- *** CREATE OR REPLACE VIEW sin clausula WITH (...) BORRA las reloptions, incluida
+-- *** security_invoker, y reabre una fuga de datos sin autenticar. Si hay que
+-- *** redefinir estas vistas, anadir WITH (security_invoker = true) a cada una.
+--
 -- B14 P01 T03: recrear vistas KPI para EXCLUIR 'nuevo_sin_contactar' del pipeline contable.
 -- Pipeline contable = stage != 'nuevo_sin_contactar' (set explícito, nunca comparación ordinal del enum).
 
