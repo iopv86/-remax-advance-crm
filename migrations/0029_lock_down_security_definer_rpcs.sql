@@ -1,0 +1,322 @@
+-- 0029_lock_down_security_definer_rpcs
+-- Cierra la TERCERA via de la misma clase de fallo que 0027 y 0028.
+--   0027: vistas sin security_invoker -> RLS ni se evaluaba.
+--   0028: tablas sin RLS (y una con policy TO PUBLIC) -> lectura y escritura anon.
+--   0029: funciones SECURITY DEFINER ejecutables por anon.
+--
+-- SECURITY DEFINER SALTA RLS POR DISENO. Una funcion mutadora invocable sin
+-- login es un bypass completo, y no lo tapa ninguna policy: la funcion corre
+-- como su owner (postgres), no como quien la llama.
+-- Via de ataque: POST /rest/v1/rpc/<nombre> con la sola anon key del bundle.
+--
+-- ORIGEN (causa raiz, la misma que pario las 9 tablas de 0028):
+--   ALTER DEFAULT PRIVILEGES ... IN SCHEMA public GRANT EXECUTE ON FUNCTIONS
+--   TO anon, authenticated, service_role   (grantors postgres Y supabase_admin)
+-- Por eso las 16 funciones SECURITY DEFINER de `public` nacieron con anon
+-- pudiendo ejecutarlas, y por eso CUALQUIER funcion nueva nacera igual.
+-- Arreglar ese default es la defensa estructural -> migracion aparte (ver
+-- PENDIENTE al final). Esta migracion es puramente retroactiva y SUSTRACTIVA.
+--
+-- ============================ LAS DOS TRAMPAS DE ACL ========================
+-- El ACL de las 16 es identico:
+--   =X/postgres ; postgres=X/postgres ; anon=X/postgres ;
+--   authenticated=X/postgres ; service_role=X/postgres
+-- Es decir: PUBLIC tiene EXECUTE *Y ADEMAS* anon/authenticated/service_role
+-- tienen un grant EXPLICITO propio.
+--
+--   *** TRAMPA 1: `REVOKE ... FROM PUBLIC` a secas es un NO-OP para anon aqui,
+--   *** porque le queda su grant explicito. (En 0028, con match_project_content,
+--   *** SI bastaba revocar a PUBLIC porque anon NO tenia grant explicito. El
+--   *** mismo gesto tiene efecto distinto segun el ACL: hay que MIRAR el ACL,
+--   *** no repetir el gesto.) Por eso aqui todo revoke nombra `PUBLIC, anon`.
+--
+--   *** TRAMPA 2, la peligrosa: EL PRIVILEGIO EXECUTE *SI* SE COMPRUEBA AL
+--   *** EVALUAR UNA POLICY DE RLS. Los 4 predicados (is_admin,
+--   *** is_admin_or_manager, is_ava_bot, is_privileged_user) los invocan ~70
+--   *** policies sobre ~25 tablas, casi todas TO PUBLIC. MEDIDO en transaccion
+--   *** con rollback: tras revocar EXECUTE a PUBLIC+authenticated,
+--   *** `select count(*) from contacts` con un JWT de admin real devolvio
+--   *** 42501 permission denied for function is_admin_or_manager (antes: 256).
+--   *** => `authenticated` JAMAS puede perder EXECUTE sobre los 4 predicados
+--   *** o el CRM entero se cae. El statement correcto esta entre dos statements
+--   *** equivocados que se diferencian en UNA palabra.
+-- ===========================================================================
+--
+-- MEDIDO CONTRA PROD antes de tocar nada (curl real con la anon key publica,
+-- y transaccion con rollback usando `set local role anon`):
+--   reassign_stale_leads(0)   -> como ANON reasigno 230 de 256 contactos,
+--                                escribio 230 filas en reassignment_log y 230
+--                                tareas de prioridad alta, Y DEVUELVE nombres
+--                                de contactos y de agentes al que la llama
+--                                (mutacion masiva + exfiltracion en una).
+--   insert_ava_message(...)   -> como ANON INSERTO un mensaje en la
+--                                conversacion de un contacto real.
+--   assign_next_rr_agent()    -> como ANON devolvio un agente real y movio el
+--                                puntero del round-robin.
+--   increment_follow_up_count -> HTTP 204 como anon.
+--   mark_project_dispatched   -> HTTP 204 como anon.
+--   los 4 predicados          -> HTTP 200 (false/null; sin oraculo util).
+--   log_deal_stage_change     -> HTTP 404 PGRST202.
+--
+--   *** Las 7 funciones de TRIGGER (prorettype=trigger) NO son invocables como
+--   *** RPC: PostgREST responde 404 PGRST202. Se revocan igual por higiene
+--   *** (superficie futura + dejan de ensuciar cada auditoria), y es seguro
+--   *** porque disparar un trigger NO comprueba EXECUTE sobre su funcion: eso
+--   *** se comprueba al hacer CREATE TRIGGER, que lo hizo el owner.
+--
+-- INVENTARIO DE CONSUMIDORES LEGITIMOS (grep en los DOS repos, no supuesto):
+--   assign_next_rr_agent      CRM lib/meta-leads.ts:205 via adminClient()
+--                             = SERVICE_ROLE (rutas api/cron/lead-poll y
+--                             api/meta/lead-webhook)
+--                             + Ava agent/tools.py:150 = AUTHENTICATED
+--   insert_ava_message        Ava agent/tools.py:586    = AUTHENTICATED
+--   increment_follow_up_count Ava agent/follow_up.py:60 = AUTHENTICATED
+--   mark_project_dispatched   n8n/orchestrator/orchestrator.py:80  (ver FASE D)
+--   reassign_stale_leads      NINGUNO. Cero call sites en ambos repos.
+--   los 4 predicados          ~70 policies de RLS (ver TRAMPA 2)
+--   las 7 de trigger          solo por trigger
+--
+-- IDENTIDAD DE AVA: firma con password como info@remaxadvance.com y manda ESE
+-- JWT -> rol `authenticated`, nunca service_role. NO tiene fila en `agents`.
+-- Su auth es fail-closed (agent/supabase_auth.py:54-63 lanza RuntimeError en
+-- vez de caer a la anon key), asi que revocar anon NO puede degradarla en
+-- silencio a una via anonima: esa via no existe.
+--
+-- ESTA MIGRACION NO CONTIENE NI UN SOLO `GRANT`. Todo consumidor legitimo ya
+-- tiene su entrada explicita en el ACL. Es puramente sustractiva, y por eso el
+-- rollback de cualquier fase es un unico GRANT (documentado en cada fase).
+--   *** PRECISION SOBRE EL ROLLBACK: los GRANT documentados restauran los ROLES
+--   *** NOMBRADOS, no el grant de PUBLIC que habia antes. Es DELIBERADO, no un
+--   *** olvido: devolver EXECUTE a PUBLIC volveria a abrir anon por herencia
+--   *** (TRAMPA 1) y desharia justo lo que cierra esta migracion. O sea, el
+--   *** rollback da paridad FUNCIONAL para los consumidores conocidos (todos
+--   *** llegan como anon, authenticated o service_role; PostgREST nunca ejecuta
+--   *** como PUBLIC pelado), NO paridad literal de ACL. Si algun dia hace falta
+--   *** paridad literal, hay que anadir `, PUBLIC` a mano y asumir lo que
+--   *** implica.
+-- `service_role` conserva EXECUTE salvo en FASE B: quitarselo no aporta nada
+-- (tiene bypassrls y puede hacer el mismo efecto con DML directo).
+-- El owner `postgres` no se toca nunca.
+--
+-- Aplicar por FASES, midiendo cada una (patron 0027/0028). Tras cada fase:
+--   COMMIT;  luego  NOTIFY pgrst, 'reload schema';  luego la sonda de la fase.
+
+-- ============================== FASE A =====================================
+begin;
+-- 7 funciones de TRIGGER. Riesgo ~cero: no son RPC-invocables (404 PGRST202
+-- medido) y disparar un trigger no comprueba EXECUTE.
+-- Aqui SI se revoca tambien a `authenticated`: nadie las llama por nombre.
+-- Verificado que ningun cuerpo de funcion invoca a otra de las 16
+-- (pg_proc.prosrc ~* '<los 16 nombres>' -> 0 filas), asi que EXECUTE no
+-- importa en tiempo de llamada para ninguna.
+-- ROLLBACK: GRANT EXECUTE ON FUNCTION <fn> TO anon, authenticated;
+revoke execute on function
+    public.cascade_contact_agent_to_deals(),
+    public.log_deal_stage_change(),
+    public.mark_contact_responded(),
+    public.mark_contact_responded_message(),
+    public.notify_deal_assigned(),
+    public.notify_new_whatsapp(),
+    public.update_contact_last_activity()
+  from public, anon, authenticated;
+commit;
+notify pgrst, 'reload schema';
+-- >>> SONDA FASE A <<<  como `authenticated`, en transaccion con rollback,
+-- disparar un trigger y comprobar que SIGUE saltando pese al revoke:
+--   update deals set stage = <otra> where id = <uno>;  -> deal_stage_history +1
+-- MEDIDO: 2 -> 3. Confirma que disparar un trigger no comprueba EXECUTE.
+
+-- ============================== FASE B =====================================
+begin;
+-- reassign_stale_leads: huerfana (0 call sites), destructiva (230/256 contactos
+-- medido) y ademas exfiltra nombres. Se cierra a SOLO OWNER: se revoca incluso
+-- a service_role, porque no la llama nadie y asi una service key filtrada
+-- tampoco puede disparar el estropicio de una sola peticion.
+-- Ivan sigue pudiendo ejecutarla a mano en el SQL Editor (esa sesion es postgres).
+--   *** NO se hace DROP aqui a proposito. Su definicion NO existe en ningun
+--   *** repo (se creo desde el dashboard), asi que un DROP es irreversible
+--   *** salvo que se capture antes pg_get_functiondef. El DROP va en una
+--   *** migracion posterior, tras capturar la definicion y una ventana de
+--   *** observacion: con el revoke puesto, cualquier caller invisible
+--   *** (pg_cron, Edge Function, webhook, workflow n8n que viva solo en la
+--   *** nube) se delata con un 42501 ruidoso en vez de cambiar de
+--   *** comportamiento en silencio.
+--   *** Y OJO al restaurarla algun dia: DROP+CREATE resetea el ACL al default
+--   *** de ALTER DEFAULT PRIVILEGES, o sea ANON RECUPERA EXECUTE. (CREATE OR
+--   *** REPLACE si lo conserva.) Analogo a nivel funcion de la leccion de 0027
+--   *** sobre CREATE OR REPLACE VIEW y las reloptions.
+-- ROLLBACK: GRANT EXECUTE ON FUNCTION public.reassign_stale_leads(integer)
+--           TO anon, authenticated, service_role;
+revoke execute on function public.reassign_stale_leads(integer)
+  from public, anon, authenticated, service_role;
+commit;
+notify pgrst, 'reload schema';
+-- >>> SONDA FASE B <<<  MEDIDO: anon y authenticated(admin) -> ambos
+-- 42501 permission denied for function reassign_stale_leads. Y por HTTP con la
+-- anon key: 401 42501. El exploit de 230 contactos queda muerto.
+
+-- ============================== FASE C =====================================
+begin;
+-- Las 3 RPC que Ava SI usa. Se revoca SOLO a PUBLIC+anon; `authenticated`
+-- conserva su grant explicito (Ava) y `service_role` el suyo (el CRM llama
+-- assign_next_rr_agent desde el webhook de Meta y el cron de leads).
+--   *** LIMITE CONOCIDO QUE LOS GRANTS NO PUEDEN EXPRESAR: `authenticated` es
+--   *** UN SOLO ROL para los 10 usuarios de auth. Tras esta fase, un agente
+--   *** logueado cualquiera todavia puede llamar insert_ava_message (y, al ser
+--   *** SECURITY DEFINER, saltarse la RLS de `messages` para forjar un mensaje
+--   *** en la conversacion de otro) o mover el puntero del round-robin.
+--   *** Acotarlo a Ava exige un guard `is_ava_bot()` DENTRO del cuerpo de la
+--   *** funcion - exactamente la forma a la que llego 0028 para
+--   *** ava_call_requests. Queda como PENDIENTE explicito: no se hace aqui
+--   *** porque los cuerpos solo existen en la base (no en ningun repo) y
+--   *** reescribirlos exige capturarlos y revisarlos primero.
+-- ROLLBACK: GRANT EXECUTE ON FUNCTION <fn> TO anon;
+revoke execute on function
+    public.insert_ava_message(uuid, message_direction, message_channel, text, boolean, text, text),
+    public.assign_next_rr_agent(),
+    public.increment_follow_up_count(text)
+  from public, anon;
+commit;
+notify pgrst, 'reload schema';
+-- >>> SONDA FASE C <<<
+--   *** OJO AL FALSO VERDE: sondar por HTTP con `{}` a una funcion que EXIGE
+--   *** argumentos devuelve 404 PGRST202 por DESAJUSTE DE FIRMA, tenga o no
+--   *** permiso el rol. Eso NO prueba nada. Hay que mandar la firma CORRECTA.
+--   *** Me paso en esta misma sesion: los dos primeros "cerrados" eran 404 de
+--   *** firma. Con la firma correcta salen 401 42501, que es la prueba real.
+--   *** (Misma clase de error que el selector de V15 que pasaba por la razon
+--   *** equivocada: un verde puede ser un falso negativo.)
+-- MEDIDO con firma correcta:
+--   anon -> 401 42501 en insert_ava_message, increment_follow_up_count,
+--           assign_next_rr_agent y reassign_stale_leads.
+--   Ava (JWT real de info@remaxadvance.com, rol authenticated verificado
+--        decodificando el payload) -> insert_ava_message 409 23503 (violacion
+--        de FK = EXECUTE OK, el cuerpo corrio) e increment_follow_up_count 204.
+--   Control de validez de la sonda: mark_project_dispatched 204 e is_admin 200
+--   siguen abiertos (fases D/E no aplicadas) -> la sonda SI detecta lo abierto.
+
+-- ===========================================================================
+-- FASES NO APLICADAS AQUI (decision de alcance de Ivan: medir por separado)
+--
+-- FASE D - mark_project_dispatched(uuid, timestamptz).
+--   Su unico consumidor es n8n/orchestrator/orchestrator.py:80, un cron horario
+--   en Railway (servicio n8n-orchestrator, distinto de los 4 workflows n8n) que
+--   hasta hoy hablaba con PostgREST usando la ANON KEY a proposito.
+--   *** HALLAZGO DE ESTA VENTANA: 0028 ya habia ROTO ese orquestador, y no por
+--   *** la RPC sino por su PRIMERA llamada: fetch_due_projects() hace
+--   *** GET /rest/v1/projects con la anon key y 0028 revoco anon sobre
+--   *** `projects` -> HTTP 401 42501 -> raise_for_status() -> el cron muere
+--   *** antes de despachar nada. Evidencia: `bcr` (sync_interval_hours=1)
+--   *** perdio 2-3 corridas horarias seguidas.
+--   Arreglado FUERA de la base y sin tocar el repo de Ava (invariante): se
+--   cambio la variable SUPABASE_ANON_KEY del servicio n8n-orchestrator en
+--   Railway a la service key vigente. La que habia en Railway
+--   (sb_secret_i7rx...) estaba ROTADA y PostgREST la rechaza con
+--   "Unregistered API key"; la vigente vive en Vercel (sb_secret_hu1C...) y
+--   SI funciona -> o sea, el comentario del codigo ("avoids sb_secret_* key
+--   issue with PostgREST") ya NO es cierto: el problema era la key caduca, no
+--   el formato.
+--   *** EFECTO COLATERAL QUE HAY QUE SABER: el orquestador tiene UNA sola
+--   *** credencial y la reusa para TODAS sus llamadas, asi que cambiarle el
+--   *** valor no arregla solo la RPC: sube el SERVICIO ENTERO de anon a
+--   *** service_role (bypass total de RLS). Y como el codigo es read-only por
+--   *** invariante, la variable SIGUE LLAMANDOSE `SUPABASE_ANON_KEY` mientras
+--   *** contiene un secreto de service_role (orchestrator.py:25,36,37), y el
+--   *** comentario obsoleto de :77 sigue ahi. Quien audite ese servicio de
+--   *** Railway o rote esa key mas adelante NO tiene ninguna senal de que es
+--   *** una credencial de maximo privilegio. Renombrarla exige tocar el repo
+--   *** de Ava -> queda como pendiente para cuando se levante ese invariante.
+--   Con el orquestador ya en service_role, esta fase pasa a ser
+--   trivial y sin bloqueo:
+--     revoke execute on function public.mark_project_dispatched(uuid, timestamptz)
+--       from public, anon;
+--
+-- FASE E - los 4 predicados, revocando SOLO a `PUBLIC, anon` (nunca a
+--   authenticated: ver TRAMPA 2). Deja la superficie SECURITY DEFINER
+--   alcanzable por anon en CERO. Riesgo real a medir antes: como ~70 policies
+--   son TO PUBLIC, tambien se evaluan para anon, asi que un GET anonimo que
+--   hoy devuelve 200 [] pasaria a 401 42501. Es fail-closed y mas ruidoso,
+--   pero hay que comprobar antes que ninguna ruta del CRM hable con PostgREST
+--   antes de autenticarse y que Realtime (0026) no suscriba sin JWT.
+--     revoke execute on function public.is_admin(), public.is_admin_or_manager(),
+--       public.is_ava_bot(), public.is_privileged_user() from public, anon;
+--
+-- PENDIENTE ESTRUCTURAL - ALTER DEFAULT PRIVILEGES (la causa raiz).
+--   Mientras siga concediendo a anon, cada objeto nuevo de `public` nace
+--   filtrando. Va en su propia migracion porque su radio de impacto es EL
+--   FUTURO (una tabla creada dentro de tres semanas), no 16 filas conocidas,
+--   y obliga a que toda migracion futura traiga su GRANT explicito.
+--   Precondicion medida: hay defaults de DOS grantors (postgres y
+--   supabase_admin) y solo se pueden alterar los de supabase_admin si la
+--   sesion es miembro de ese rol; si no, seria un arreglo a medias que parece
+--   completo.
+--
+-- CALLERS INVISIBLES: DESCARTADOS POR MEDICION (no solo por grep de repos).
+--   El grep de repos no ve pg_cron, Database Webhooks ni Edge Functions. Medido:
+--     pg_cron instalado                     0
+--     pg_net instalado                      0
+--     supabase_functions.hooks existe       0
+--     triggers de webhook (http_request)    0
+--     Edge Functions en el proyecto         0  (list_edge_functions -> [])
+--     cuerpos de funcion en CUALQUIER schema que citen las 5 RPC   0 filas
+--   O sea: los unicos llamadores posibles son clientes HTTP externos, que son
+--   exactamente los que si estan inventariados arriba.
+--
+-- LINT RECURRENTE (correr despues de CADA migracion).
+--   *** La primera version de este lint listaba "toda funcion anon-ejecutable y
+--   *** toda tabla con grant a anon" y devolvia ~170 filas: los operadores de
+--   *** pgvector y decenas de tablas que SI estan protegidas por RLS (el grant
+--   *** solo, con RLS, no filtra nada). Un lint que nadie puede leer es un lint
+--   *** que nadie corre. Esta version acota a lo que de verdad es explotable.
+--   (a) SECURITY DEFINER anon-ejecutable, sin contar triggers ni extensiones:
+--     select p.oid::regprocedure from pg_proc p
+--       join pg_namespace n on n.oid=p.pronamespace
+--      where n.nspname='public' and p.prosecdef
+--        and p.prorettype <> 'trigger'::regtype
+--        and has_function_privilege('anon',p.oid,'EXECUTE')
+--        and not exists (select 1 from pg_depend d
+--                         where d.objid=p.oid and d.deptype='e');
+--     Tras esta migracion devuelve 5: los 4 predicados + mark_project_dispatched
+--     (= fases E y D, pendientes a proposito). Objetivo final: 0.
+--   (b) tablas base SIN RLS con grant a anon (el modo de fallo de 0028):
+--     select c.oid::regclass from pg_class c
+--       join pg_namespace n on n.oid=c.relnamespace
+--      where n.nspname='public' and c.relkind in ('r','p')
+--        and not c.relrowsecurity
+--        and has_table_privilege('anon',c.oid,'SELECT,INSERT,UPDATE,DELETE');
+--     Devuelve 0 (0028 las cerro).
+--   (c) policies permisivas abiertas a PUBLIC/anon con USING/WITH CHECK
+--       literal `true` (el modo de fallo de `projects` en 0028):
+--     select pol.polrelid::regclass, pol.polname,
+--            pg_get_expr(pol.polqual,pol.polrelid),
+--            pg_get_expr(pol.polwithcheck,pol.polrelid)
+--       from pg_policy pol join pg_class c on c.oid=pol.polrelid
+--       join pg_namespace n on n.oid=c.relnamespace
+--      where n.nspname='public' and pol.polpermissive
+--        and (pol.polroles='{0}'::oid[] or 'anon'::regrole = any(pol.polroles))
+--        and (pg_get_expr(pol.polqual,pol.polrelid) = 'true'
+--          or pg_get_expr(pol.polwithcheck,pol.polrelid) = 'true');
+--   Usar has_*_privilege y NO leer proacl a ojo: la funcion resuelve la
+--   herencia de PUBLIC, que es justo lo que hace parecer suficiente un
+--   REVOKE FROM PUBLIC (TRAMPA 1).
+--
+-- HALLAZGO NUEVO DE ESTE LINT, NO TOCADO (hace falta decision de Ivan).
+--   El lint (c) destapa una CUARTA via de la misma familia, preexistente:
+--     properties  :: properties_select   FOR SELECT TO PUBLIC USING (true)
+--     ava_config  :: ava_config_read_all FOR SELECT TO PUBLIC USING (true)
+--     agent_zones :: zones_select        FOR SELECT TO PUBLIC USING (true)
+--   MEDIDO con la sola anon key, SIN sesion:
+--     properties  HTTP 200, 2.951 B, **59 columnas**, entre ellas price,
+--                 commission_pct, is_exclusive y agent_id. Hoy solo hay 1
+--                 propiedad y commission_pct viene null, asi que lo que se fuga
+--                 AHORA es poco; la policy expone la comision y la exclusividad
+--                 de TODA propiedad futura.
+--     ava_config  HTTP 200, 123 B (solo id/is_active/timestamps, banal).
+--     agent_zones HTTP 200, [] (vacia, pero abierta).
+--   NO se cierra aqui a proposito: un CRM inmobiliario PODRIA querer el
+--   catalogo de propiedades publico (aunque la pagina publica /p/[slug] usa
+--   service_role y no lo necesita). Leccion de 0028 aplicada: preguntar antes
+--   de tapar algo que puede ser publico por diseno.
+--   `property_proposals :: public_read_proposals` y
+--   `proposal_views :: public_insert_views` tambien son USING/CHECK true, pero
+--   esas SI son el tracking de propuestas publicas = intencionales.
