@@ -26,12 +26,17 @@ test.describe("Deals / Pipeline", () => {
 
   test("deal detail opens without crashing", async ({ page }) => {
     await page.goto("/dashboard/pipeline");
-    // La tarjeta es un <Link> a /dashboard/pipeline/<id> (pipeline-client:265).
-    // Se excluye el enlace hermano .../edit, que apunta al formulario.
+    // La tarjeta es un <Link> a /dashboard/pipeline/<uuid> (pipeline-client:265).
+    // Se excluyen los hermanos .../edit (formulario) y .../new (el boton "Nueva
+    // oportunidad", que aparece 2 veces y es el PRIMER enlace del DOM que casa
+    // el prefijo: sin excluirlo, .first() abria el formulario de alta y el test
+    // pasaba sin llegar a abrir ninguna ficha).
     // El selector anterior ([data-testid='deal-card'], table tbody tr) no existe
     // en el tablero: el test se auto-saltaba en silencio y no probaba nada.
     const firstDeal = page
-      .locator("a[href^='/dashboard/pipeline/']:not([href$='/edit'])")
+      .locator(
+        "a[href^='/dashboard/pipeline/']:not([href$='/edit']):not([href$='/new'])"
+      )
       .first();
     const count = await firstDeal.count();
     if (count === 0) {
@@ -39,7 +44,12 @@ test.describe("Deals / Pipeline", () => {
       return;
     }
     await firstDeal.click();
-    // Either modal or navigation — just check no crash
+    // Se afirma la URL destino antes que la ausencia de crash: sin esto el test
+    // pasaba igual navegando a cualquier sitio, que es justo como el selector
+    // roto anterior lograba pasar sin abrir ninguna ficha.
+    await expect(page).toHaveURL(/\/dashboard\/pipeline\/[0-9a-f-]{36}/, {
+      timeout: 10_000,
+    });
     await expect(page.locator("body")).not.toContainText("Something went wrong");
     await expect(page.locator("body")).not.toContainText("500");
   });
