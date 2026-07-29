@@ -8,8 +8,8 @@ test.describe("Authentication", () => {
     await page.goto("/login");
     await expect(page).toHaveURL(/\/login/);
 
-    await page.getByLabel(/email/i).fill(EMAIL);
-    await page.getByLabel(/contraseña|password/i).fill(PASSWORD);
+    await page.getByLabel(/correo|email/i).fill(EMAIL);
+    await page.getByLabel(/^contraseña$/i).fill(PASSWORD);
     await page.getByRole("button", { name: /iniciar|entrar|login/i }).click();
 
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
@@ -22,11 +22,14 @@ test.describe("Authentication", () => {
 
   test("invalid credentials shows error", async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel(/email/i).fill("wrong@example.com");
-    await page.getByLabel(/contraseña|password/i).fill("wrongpassword");
+    await page.getByLabel(/correo|email/i).fill("wrong@example.com");
+    await page.getByLabel(/^contraseña$/i).fill("wrongpassword");
     await page.getByRole("button", { name: /iniciar|entrar|login/i }).click();
 
-    await expect(page.getByText(/inválid|incorrect|error/i)).toBeVisible({ timeout: 8_000 });
+    // Anclado al mensaje real que devuelve la API. Un /error/i suelto casa
+    // tambien con el label "Console Error" del overlay de Next en dev y rompe
+    // el strict mode al resolver 2 elementos.
+    await expect(page.getByText(/credenciales inválidas/i)).toBeVisible({ timeout: 8_000 });
     await expect(page).toHaveURL(/\/login/);
   });
 });

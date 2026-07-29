@@ -176,6 +176,7 @@ export default function LoginPage() {
                 <form onSubmit={handleForgotPassword}>
                   <div style={{ marginBottom: 28 }}>
                     <label
+                      htmlFor="forgot-email"
                       style={{
                         display: "block",
                         fontSize: 10,
@@ -189,6 +190,7 @@ export default function LoginPage() {
                       Correo Electrónico
                     </label>
                     <input
+                      id="forgot-email"
                       type="email"
                       placeholder="usuario@advanceestate.com"
                       value={forgotEmail}
@@ -292,6 +294,7 @@ export default function LoginPage() {
               {/* Email */}
               <div>
                 <label
+                  htmlFor="email"
                   style={{
                     display: "block",
                     fontSize: 10,
@@ -305,6 +308,7 @@ export default function LoginPage() {
                   Correo Electrónico
                 </label>
                 <input
+                  id="email"
                   type="email"
                   placeholder="usuario@advanceestate.com"
                   value={email}
@@ -339,6 +343,7 @@ export default function LoginPage() {
                   }}
                 >
                   <label
+                    htmlFor="password"
                     style={{
                       fontSize: 10,
                       letterSpacing: "0.2em",
@@ -375,6 +380,7 @@ export default function LoginPage() {
                 </div>
                 <div style={{ position: "relative" }}>
                   <input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     value={password}

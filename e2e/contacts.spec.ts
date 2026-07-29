@@ -6,8 +6,8 @@ const PASSWORD = process.env.E2E_PASSWORD ?? "";
 test.describe("Contacts", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/login");
-    await page.getByLabel(/email/i).fill(EMAIL);
-    await page.getByLabel(/contraseña|password/i).fill(PASSWORD);
+    await page.getByLabel(/correo|email/i).fill(EMAIL);
+    await page.getByLabel(/^contraseña$/i).fill(PASSWORD);
     await page.getByRole("button", { name: /iniciar|entrar|login/i }).click();
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15_000 });
   });
@@ -33,7 +33,12 @@ test.describe("Contacts", () => {
 
   test("contact detail page loads", async ({ page }) => {
     await page.goto("/dashboard/contacts");
-    const firstContact = page.locator("table tbody tr, [data-testid='contact-row']").first();
+    // La navegacion cuelga del <Link> del nombre, no de la fila: el <tr> lleva
+    // cursor:default y no tiene onClick, asi que clicar la fila es un no-op por
+    // diseno (la fila se reserva para seleccion multiple y acciones inline).
+    const firstContact = page
+      .locator("table tbody tr a[href*='/dashboard/contacts/']")
+      .first();
     const count = await firstContact.count();
     if (count === 0) {
       test.skip(); // No contacts to test
@@ -41,6 +46,10 @@ test.describe("Contacts", () => {
     }
     await firstContact.click();
     await expect(page).toHaveURL(/\/dashboard\/contacts\/.+/);
-    await expect(page.getByRole("heading")).toBeVisible();
+    // La ficha tiene 4 headings; un getByRole("heading") pelado rompe el strict
+    // mode. Se ancla al titulo de la vista, que es el que prueba que cargo.
+    await expect(
+      page.getByRole("heading", { name: /detalle de contacto/i })
+    ).toBeVisible();
   });
 });

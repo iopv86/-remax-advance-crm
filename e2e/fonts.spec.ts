@@ -92,7 +92,7 @@ test.describe("Font tokens", () => {
     test.skip(!EMAIL || !PASSWORD, "needs E2E_EMAIL / E2E_PASSWORD");
 
     await page.goto("/login");
-    // The login inputs have no associated <label>, so target them by type.
+    // Targeted by type on purpose: keeps this font check independent of label copy.
     await page.locator('input[type="email"]').fill(EMAIL);
     await page.locator('input[type="password"]').fill(PASSWORD);
     await page.getByRole("button", { name: /iniciar|entrar|login/i }).click();
