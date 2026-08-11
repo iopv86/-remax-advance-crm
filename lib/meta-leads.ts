@@ -1,8 +1,13 @@
 import { adminClient } from "@/lib/supabase/admin";
 import { enqueueCapiEvent } from "@/lib/meta-capi";
+import { recordLeadIngest, HEALTHY_OUTCOMES } from "@/lib/meta-lead-ledger";
+import { GRAPH_VERSION } from "@/lib/meta-graph";
 import type { LeadFormAnswers } from "@/lib/types";
 
-export const GRAPH_VERSION = "v19.0";
+// Single source of truth lives in lib/meta-graph.ts. Re-exported so existing
+// importers keep working; two independent copies would silently diverge the day
+// one of them is bumped for a Graph deprecation.
+export { GRAPH_VERSION };
 
 export interface FieldData {
   name: string;
@@ -16,6 +21,8 @@ export interface LeadFormData {
   campaign_id?: string;
   form_id?: string;
   platform?: string;
+  /** Meta's time_created. Recorded in the ledger so reconciliation can window by it. */
+  created_time?: string;
 }
 
 type Db = ReturnType<typeof adminClient>;
@@ -215,6 +222,36 @@ export async function assignRrAgent(db: Db): Promise<AssignedAgent | null> {
   return (agent as AssignedAgent) ?? { id: agentId as string, phone: null, full_name: null };
 }
 
+/**
+ * Who should own the intake DEAL for a lead landing on an existing contact.
+ *
+ * Policy C, chosen deliberately over "always keep the contact's owner" (leaves
+ * paid leads unworked) and "always reassign" (yanks a contact away from the
+ * agent nurturing them): the contact keeps its owner, and only the new deal is
+ * routed to the rotation, and only when the current owner is not actually
+ * working leads. `deals.agent_id` is already independent of `contacts.agent_id`,
+ * so this needs no schema change.
+ *
+ * Consequence worth knowing: contact owner and deal owner can differ, and that
+ * is visible in the UI.
+ */
+export async function resolveDealAgent(
+  db: Db,
+  existingAgentId: string | null,
+): Promise<AssignedAgent | null> {
+  if (!existingAgentId) return assignRrAgent(db);
+
+  const { data: active } = await db
+    .from("round_robin_config").select("id")
+    .eq("agent_id", existingAgentId).eq("is_active", true).maybeSingle();
+
+  if (!active) return assignRrAgent(db);
+
+  const { data: agent } = await db
+    .from("agents").select("id, phone, full_name").eq("id", existingAgentId).maybeSingle();
+  return (agent as AssignedAgent) ?? { id: existingAgentId, phone: null, full_name: null };
+}
+
 // ── agent + lead notifications (fire-and-forget) ───────────────────────────────
 
 // Approved Meta template that alerts the assigned agent about a new lead.
@@ -351,10 +388,22 @@ export async function notifyLead(leadPhone: string | null, leadFirstName: string
 
 // ── core: process one leadgen lead into the CRM ────────────────────────────────
 
+export type ProcessReason =
+  | "new_contact"
+  | "existing_contact_new_deal"
+  | "already_in_pipeline"
+  | "race_winner"
+  | "no_agent"
+  | "insert_error"
+  | "no_insert";
+
 export interface ProcessResult {
   created: boolean;
   contactId: string | null;
-  reason: string;
+  reason: ProcessReason;
+  /** Present so the caller can count no_agent and the ledger can record ownership. */
+  agentId: string | null;
+  dealId: string | null;
 }
 
 /**
@@ -363,7 +412,63 @@ export interface ProcessResult {
  * same lead (deduped by phone, then meta_lead_id; intake deal deduped per contact).
  * Used by BOTH the push webhook and the pull poller.
  */
-export async function processLead(db: Db, lead: LeadFormData, formName?: string | null): Promise<ProcessResult> {
+export async function processLead(
+  db: Db,
+  lead: LeadFormData,
+  formName?: string | null,
+  source: "poll" | "webhook" = "poll",
+): Promise<ProcessResult> {
+  // Single exit point: every outcome, including the ones that create nothing,
+  // lands one row in meta_lead_ingest. Before this existed, a lead dropped for
+  // lack of an agent left no trace anywhere -- no row, no error, no log line.
+  const finish = async (
+    created: boolean,
+    contactId: string | null,
+    reason: ProcessReason,
+    agentId: string | null = null,
+    dealId: string | null = null,
+  ): Promise<ProcessResult> => {
+    await recordLeadIngest(db, {
+      leadId: lead.id,
+      formId: lead.form_id ?? null,
+      createdTime: lead.created_time ?? null,
+      contactId,
+      dealId,
+      agentId,
+      outcome: reason,
+      source,
+    });
+    return { created, contactId, reason, agentId, dealId };
+  };
+
+  // Idempotency gate, by lead id.
+  //
+  // The poller now re-presents every lead for 15 minutes (the overlap that stops
+  // leads being lost to Meta's indexing lag), so processLead runs ~15 times per
+  // lead. The old dedup was "is there an open deal in nuevo_sin_contactar" --
+  // which stops holding the moment an agent moves the deal on. A fast agent
+  // inside that 15-minute window would otherwise earn the lead a SECOND intake
+  // deal, a duplicate CAPI event and a duplicate WhatsApp notification.
+  //
+  // Anchoring on the lead id instead makes re-processing inert regardless of
+  // deal stage. One indexed primary-key lookup, so the overlap stays cheap.
+  const { data: ledgerRow } = await db
+    .from("meta_lead_ingest").select("outcome, contact_id").eq("lead_id", lead.id).maybeSingle();
+  if (
+    ledgerRow?.contact_id &&
+    (HEALTHY_OUTCOMES as readonly string[]).includes(ledgerRow.outcome as string)
+  ) {
+    // Already accounted for. Do not rewrite the ledger row: that would be 15
+    // pointless writes per lead per 15 minutes.
+    return {
+      created: false,
+      contactId: ledgerRow.contact_id as string,
+      reason: "already_in_pipeline",
+      agentId: null,
+      dealId: null,
+    };
+  }
+
   const fields = lead.field_data ?? [];
   const rawName = pickField(fields, ["full_name", "full name", "name", "nombre", "nombre_completo"]) ?? "";
   const email = pickField(fields, ["email", "correo", "correo_electronico"]);
@@ -389,13 +494,14 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
   let existingId: string | null = null;
   let existingAgentId: string | null = null;
   let existingCtwa: string | null = null;
+  let existingMetaLeadId: string | null = null;
   if (phone) {
-    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid").eq("phone", phone).maybeSingle();
-    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; }
+    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid, meta_lead_id").eq("phone", phone).maybeSingle();
+    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; existingMetaLeadId = data.meta_lead_id; }
   }
   if (!existingId) {
-    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid").eq("meta_lead_id", lead.id).maybeSingle();
-    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; }
+    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid, meta_lead_id").eq("meta_lead_id", lead.id).maybeSingle();
+    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; existingMetaLeadId = data.meta_lead_id; }
   }
 
   // Returns the new deal's id, or null if one already exists in the holding stages.
@@ -404,9 +510,18 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
       .from("deals").select("id").eq("contact_id", contactId)
       .in("stage", ["nuevo_sin_contactar", "lead_captured"]).limit(1).maybeSingle();
     if (openDeal) return null;
-    const { data: newDeal } = await db.from("deals").insert({
+    const { data: newDeal, error: dealErr } = await db.from("deals").insert({
       contact_id: contactId, agent_id: agentId, stage: "nuevo_sin_contactar", currency: "USD",
     }).select("id").maybeSingle();
+    if (dealErr) {
+      // 23505 means a concurrent run won the same check-then-insert race. Treat
+      // it as "already exists" rather than as a new deal, so no duplicate CAPI
+      // event and no duplicate agent notification follow.
+      if (dealErr.code !== "23505") {
+        console.error("[meta-leads] intake deal insert failed:", dealErr.message);
+      }
+      return null;
+    }
     return newDeal?.id ?? null;
   };
 
@@ -415,9 +530,20 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
     let agentId = existingAgentId;
     if (!agentId) {
       agent = await assignRrAgent(db);
-      if (!agent) return { created: false, contactId: existingId, reason: "no_agent" };
+      if (!agent) return finish(false, existingId, "no_agent");
       agentId = agent.id;
       await db.from("contacts").update({ agent_id: agentId, assigned_at: new Date().toISOString() }).eq("id", existingId);
+    }
+    // Claim the lead id for a contact that arrived by some other route (manual
+    // entry, import, an earlier campaign). Without this the contact stays
+    // invisible to any reconciliation keyed on meta_lead_id -- which is how two
+    // correctly-ingested leads were mistaken for lost ones. Guarded on IS NULL,
+    // so it is race-safe, idempotent, and cannot overwrite a first-touch value.
+    if (existingMetaLeadId == null) {
+      const { error: claimErr } = await db
+        .from("contacts").update({ meta_lead_id: lead.id })
+        .eq("id", existingId).is("meta_lead_id", null);
+      if (claimErr) console.error("[meta-leads] meta_lead_id claim failed:", claimErr.message);
     }
     // Capture form answers if we have custom ones and the contact has none yet
     // (never clobber a richer manual edit).
@@ -437,19 +563,36 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
         await db.from("contacts").update(attributionColumns(attr)).eq("id", existingId);
       }
     }
-    const newDealId = await createIntakeDeal(existingId, agentId);
+    // Policy C: the CONTACT keeps its owner, but the new intake DEAL goes to the
+    // rotation when that owner is not an active round-robin participant.
+    // Measured reason: two paid campaign leads landed on the admin because their
+    // phone matched a contact imported in April, and sat unworked in a tray
+    // nobody reads -- which is why both rotation agents said "not mine".
+    const dealAgent = agent ?? (await resolveDealAgent(db, agentId));
+    if (!dealAgent) return finish(false, existingId, "no_agent");
+
+    const newDealId = await createIntakeDeal(existingId, dealAgent.id);
     if (newDealId) {
       await enqueueCapiEvent(db, {
         stage: "lead_captured", dealId: newDealId, contactId: existingId, email, phone, ctwaClid: existingCtwa,
       });
-      if (agent) notifyAgent(agent, rawName, phone, budgetDisplay, interes, horario);
+      // Notify whoever owns the DEAL. This used to fire only when the agent had
+      // just been assigned, so a returning lead on an already-assigned contact
+      // created a real new deal that nobody was ever told about.
+      notifyAgent(dealAgent, rawName, phone, budgetDisplay, interes, horario);
     }
-    return { created: !!newDealId, contactId: existingId, reason: newDealId ? "existing_contact_new_deal" : "already_in_pipeline" };
+    return finish(
+      !!newDealId,
+      existingId,
+      newDealId ? "existing_contact_new_deal" : "already_in_pipeline",
+      dealAgent.id,
+      newDealId,
+    );
   }
 
   // New contact
   const agent = await assignRrAgent(db);
-  if (!agent) return { created: false, contactId: null, reason: "no_agent" };
+  if (!agent) return finish(false, null, "no_agent");
   const agentId = agent.id;
 
   // De-conflated, enriched Meta attribution (IDs always; names best-effort).
@@ -478,12 +621,15 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
     if (insertErr.code === "23505") {
       // race: another path won — find winner and ensure a deal exists
       const { data: winner } = await db.from("contacts").select("id").eq("meta_lead_id", lead.id).maybeSingle();
-      if (winner) { await createIntakeDeal(winner.id, agentId); return { created: false, contactId: winner.id, reason: "race_winner" }; }
+      if (winner) {
+        const raceDealId = await createIntakeDeal(winner.id, agentId);
+        return finish(false, winner.id, "race_winner", agentId, raceDealId);
+      }
     }
-    console.error("[meta-leads] insert error:", insertErr.message);
-    return { created: false, contactId: null, reason: "insert_error" };
+    console.error("[meta-leads] insert error for lead", lead.id, ":", insertErr.message);
+    return finish(false, null, "insert_error", agentId);
   }
-  if (!inserted) return { created: false, contactId: null, reason: "no_insert" };
+  if (!inserted) return finish(false, null, "no_insert", agentId);
 
   const newDealId = await createIntakeDeal(inserted.id, agentId);
   if (newDealId) {
@@ -495,5 +641,5 @@ export async function processLead(db: Db, lead: LeadFormData, formName?: string 
   }
   notifyAgent(agent, rawName, phone, budgetDisplay, interes, horario);
   notifyLead(phone, firstName).catch(() => {});
-  return { created: true, contactId: inserted.id, reason: "new_contact" };
+  return finish(true, inserted.id, "new_contact", agentId, newDealId);
 }

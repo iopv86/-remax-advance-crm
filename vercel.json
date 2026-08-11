@@ -10,6 +10,12 @@
     },
     "app/api/cron/task-reminders/route.ts": {
       "maxDuration": 60
+    },
+    "app/api/cron/lead-poll/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/cron/lead-audit/route.ts": {
+      "maxDuration": 60
     }
   },
   "crons": [
@@ -20,6 +26,10 @@
     {
       "path": "/api/cron/lead-poll",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/lead-audit",
+      "schedule": "7 * * * *"
     },
     {
       "path": "/api/cron/tasas-sync",

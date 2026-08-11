@@ -2,6 +2,7 @@ import { timingSafeEqual } from "crypto";
 import { adminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
 import { resolveMetaConfig } from "@/lib/meta-config";
+import { sendAgentEmail } from "@/lib/email";
 
 function safeCompare(a: string, b: string): boolean {
   try {
@@ -116,6 +117,35 @@ export async function GET(request: Request) {
     .from("agency_config")
     .upsert({ key: "meta_last_synced", value: syncedAt }, { onConflict: "key" });
 
-  console.log(`[cron/meta-sync] Upserted ${rows.length} rows at ${syncedAt}`);
-  return NextResponse.json({ message: "Sync complete.", upserted: rows.length, synced_at: syncedAt });
+  // Dead-man for the lead reconciler. Two independent Vercel crons watching each
+  // other, so a silently dead auditor cannot pass for "no leads lost". Does not
+  // cover Vercel cron dying wholesale -- only an external observer can.
+  const auditFresh = await checkLeadAuditAlive(supabase);
+
+  console.log(`[cron/meta-sync] Upserted ${rows.length} rows at ${syncedAt} auditFresh=${auditFresh}`);
+  return NextResponse.json({
+    message: "Sync complete.", upserted: rows.length, synced_at: syncedAt, auditFresh,
+  });
+}
+
+const AUDIT_STALE_MS = 6 * 60 * 60 * 1000;
+
+async function checkLeadAuditAlive(supabase: ReturnType<typeof adminClient>): Promise<boolean> {
+  const to = process.env.LEAD_ALERT_EMAIL;
+  const { data } = await supabase
+    .from("agency_config").select("value").eq("key", "lead_audit_last_ok").maybeSingle();
+  const lastMs = data?.value ? new Date(data.value as string).getTime() : NaN;
+  const fresh = Number.isFinite(lastMs) && Date.now() - lastMs < AUDIT_STALE_MS;
+  if (fresh || !to) return fresh;
+
+  const sent = await sendAgentEmail({
+    to,
+    subject: "[CRM] El reconciliador de leads lleva horas sin completar",
+    text:
+      `/api/cron/lead-audit no ha registrado una ejecucion correcta desde ` +
+      `${data?.value ?? "nunca"}.\n\n` +
+      `Mientras siga asi, nadie esta comprobando que los leads de Meta lleguen al CRM.`,
+  });
+  if (!sent) console.error("[cron/meta-sync] dead-man alert send failed");
+  return false;
 }

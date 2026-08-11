@@ -1,7 +1,9 @@
 import { timingSafeEqual } from "crypto";
 import { NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
-import { processLead, GRAPH_VERSION, type LeadFormData } from "@/lib/meta-leads";
+import { processLead, type LeadFormData } from "@/lib/meta-leads";
+import { getPageToken, listActiveForms, fetchFormLeads } from "@/lib/meta-graph";
+import { computeScanWindow, shouldAdvanceWatermark } from "@/lib/lead-poll-watermark";
 
 function safeCompare(a: string, b: string): boolean {
   try {
@@ -13,25 +15,17 @@ function safeCompare(a: string, b: string): boolean {
 }
 
 const PAGE_ID = process.env.META_PAGE_ID ?? "513362528519585"; // RE/MAX Advance - R.D.
-const LOOKBACK_MS = 60 * 60 * 1000; // first run / fallback window: 1h
-
-interface FormRow { id: string; status?: string; name?: string }
-interface LeadRow { id: string; created_time?: string; field_data?: { name: string; values: string[] }[]; campaign_id?: string; ad_id?: string; form_id?: string; platform?: string }
-interface LeadsResp { data: LeadRow[]; paging?: { next?: string } }
-
-async function graphGet<T>(url: string): Promise<T | null> {
-  const res = await fetch(url, { next: { revalidate: 0 } });
-  if (!res.ok) {
-    console.error(`[lead-poll] Graph ${res.status}: ${url.split("?")[0]}`);
-    return null;
-  }
-  return res.json() as Promise<T>;
-}
 
 // GET /api/cron/lead-poll
-// Vercel cron — PULLS new Meta Lead-Form leads via the Graph API and ingests them.
-// This bypasses the push-webhook lead-access requirement: retrieval uses our own
-// page-admin token (which has leads_retrieval), so leads flow without Lead Access Manager.
+// Vercel cron (every minute) -- PULLS new Meta Lead-Form leads via the Graph API
+// and ingests them. Retrieval uses a page token derived from /me/accounts, which
+// carries leads_retrieval, so leads flow without Lead Access Manager.
+//
+// The watermark is FAIL-CLOSED: it only advances when the run actually saw the
+// whole window. Any failure leaves it where it was so the next run re-reads the
+// same window, which is safe because processLead is idempotent. See
+// lib/lead-poll-watermark.ts for the defect this replaced.
+//
 // Auth: Authorization: Bearer {CRON_SECRET}
 export async function GET(request: Request) {
   const authHeader = request.headers.get("authorization");
@@ -43,38 +37,34 @@ export async function GET(request: Request) {
   const userToken = process.env.META_ACCESS_TOKEN;
   if (!userToken) return NextResponse.json({ error: "META_ACCESS_TOKEN not set" }, { status: 503 });
 
-  // Listing a page's leadgen_forms requires a PAGE access token (the user token returns []).
-  // Derive it from the user token; fall back to the user token for lead reads.
-  const accts = await graphGet<{ data: { access_token: string }[] }>(
-    `https://graph.facebook.com/${GRAPH_VERSION}/me/accounts?fields=access_token&access_token=${userToken}`
-  );
-  const token = accts?.data?.[0]?.access_token ?? userToken;
-
   const db = adminClient();
-
-  // Watermark (unix seconds). Default: now - 1h on first run.
-  const { data: wmRow } = await db.from("agency_config").select("value").eq("key", "lead_poll_last_ts").maybeSingle();
-  const watermarkMs = wmRow?.value ? new Date(wmRow.value as string).getTime() : Date.now() - LOOKBACK_MS;
-  const sinceUnix = Math.floor(watermarkMs / 1000);
   const startedAt = new Date().toISOString();
 
-  // Active lead forms for the page
-  const formsResp = await graphGet<{ data: FormRow[] }>(
-    `https://graph.facebook.com/${GRAPH_VERSION}/${PAGE_ID}/leadgen_forms?fields=id,status,name&limit=100&access_token=${token}`
-  );
-  const forms = (formsResp?.data ?? []).filter((f) => f.status === "ACTIVE" || !f.status);
+  const { data: wmRow } = await db
+    .from("agency_config").select("value").eq("key", "lead_poll_last_ts").maybeSingle();
+  const win = computeScanWindow(wmRow?.value as string | undefined, Date.now());
+  const sinceUnix = Math.floor(win.sinceMs / 1000);
 
-  const filtering = encodeURIComponent(JSON.stringify([{ field: "time_created", operator: "GREATER_THAN", value: sinceUnix }]));
-  let seen = 0, created = 0, errors = 0;
+  // No fallback to the user token: it returns [] for leadgen_forms, which would
+  // masquerade as "no forms" and skip the window.
+  const pageToken = await getPageToken(userToken, PAGE_ID);
+  const tokenOk = pageToken !== null;
 
-  for (const form of forms) {
-    let url: string | null =
-      `https://graph.facebook.com/${GRAPH_VERSION}/${form.id}/leads` +
-      `?fields=id,created_time,field_data,campaign_id,ad_id,form_id,platform&filtering=${filtering}&limit=100&access_token=${token}`;
-    while (url) {
-      const page: LeadsResp | null = await graphGet<LeadsResp>(url);
-      if (!page) { errors++; break; }
-      for (const l of page.data ?? []) {
+  let formsOk = false;
+  let seen = 0, created = 0, noAgent = 0, graphErrors = 0;
+  let formCount = 0;
+
+  if (pageToken) {
+    const forms = await listActiveForms(pageToken, PAGE_ID);
+    formsOk = forms !== null;
+    formCount = forms?.length ?? 0;
+
+    for (const form of forms ?? []) {
+      const { ok, leads } = await fetchFormLeads(pageToken, form.id, sinceUnix);
+      if (!ok) graphErrors++;
+      // Ingest whatever was read even on a partial failure -- the watermark stays
+      // pinned regardless, so the rest is picked up next run.
+      for (const l of leads) {
         seen++;
         const lead: LeadFormData = {
           id: l.id,
@@ -83,24 +73,55 @@ export async function GET(request: Request) {
           ad_id: l.ad_id,
           form_id: l.form_id ?? form.id,
           platform: l.platform,
+          created_time: l.created_time,
         };
         try {
-          const r = await processLead(db, lead, form.name ?? null);
+          const r = await processLead(db, lead, form.name ?? null, "poll");
           if (r.created) created++;
+          if (r.reason === "no_agent") noAgent++;
         } catch (e) {
-          errors++;
-          console.error("[lead-poll] processLead error:", (e as Error).message);
+          graphErrors++;
+          console.error("[lead-poll] processLead threw for lead", l.id, ":", (e as Error).message);
         }
       }
-      // Only follow Graph-hosted pagination cursors (defensive against a tampered next URL).
-      const nextUrl: string | null = page.paging?.next ?? null;
-      url = nextUrl && nextUrl.startsWith("https://graph.facebook.com/") ? nextUrl : null;
     }
   }
 
-  // Advance the watermark to the start of this run (safe overlap handled by dedup)
-  await db.from("agency_config").upsert({ key: "lead_poll_last_ts", value: startedAt }, { onConflict: "key" });
+  const advanced = shouldAdvanceWatermark({ tokenOk, formsOk, graphErrors, noAgent });
+  if (advanced) {
+    await db.from("agency_config").upsert(
+      { key: "lead_poll_last_ts", value: startedAt }, { onConflict: "key" },
+    );
+  } else {
+    console.error(
+      `[lead-poll] watermark PINNED: tokenOk=${tokenOk} formsOk=${formsOk} ` +
+      `graphErrors=${graphErrors} noAgent=${noAgent}`,
+    );
+  }
+  if (noAgent > 0) console.error(`[lead-poll] ${noAgent} lead(s) had no agent to assign`);
+  // Pinned past the 24h floor: the window is being truncated and leads can be
+  // dropped again. This is the one state that needs a human.
+  if (win.clamped) console.error("[lead-poll] scan window CLAMPED at 24h -- watermark pinned too long");
 
-  console.log(`[lead-poll] forms=${forms.length} seen=${seen} created=${created} errors=${errors} since=${sinceUnix}`);
-  return NextResponse.json({ ok: true, forms: forms.length, seen, created, errors, since: startedAt });
+  console.log(
+    `[lead-poll] forms=${formCount} seen=${seen} created=${created} ` +
+    `noAgent=${noAgent} graphErrors=${graphErrors} advanced=${advanced} since=${sinceUnix}`,
+  );
+
+  // Every counter that gates the upsert is in the body, so a curl is a real
+  // observation rather than a bare ok:true.
+  return NextResponse.json({
+    ok: advanced,
+    advanced,
+    tokenOk,
+    formsOk,
+    forms: formCount,
+    seen,
+    created,
+    noAgent,
+    graphErrors,
+    firstRun: win.firstRun,
+    clamped: win.clamped,
+    since: new Date(win.sinceMs).toISOString(),
+  });
 }

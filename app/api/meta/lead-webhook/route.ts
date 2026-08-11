@@ -23,7 +23,7 @@ async function fetchLeadData(leadgenId: string): Promise<LeadFormData | null> {
   if (!token) return null;
   const url =
     `https://graph.facebook.com/${GRAPH_VERSION}/${leadgenId}` +
-    `?fields=field_data,ad_id,campaign_id,form_id,platform`;
+    `?fields=field_data,ad_id,campaign_id,form_id,platform,created_time`;
   const res = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
     next: { revalidate: 0 },
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
         lead.ad_id = lead.ad_id ?? change.value.ad_id;
 
         // The webhook does not list forms, so it has no form name to supply.
-        await processLead(db, lead, null);
+        await processLead(db, lead, null, "webhook");
       } catch (err) {
         console.error("[lead-webhook] intake error for leadgen_id", leadgen_id, ":", (err as Error).message);
       }
