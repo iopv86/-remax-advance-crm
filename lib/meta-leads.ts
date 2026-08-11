@@ -2,7 +2,14 @@ import { adminClient } from "@/lib/supabase/admin";
 import { enqueueCapiEvent } from "@/lib/meta-capi";
 import { recordLeadIngest, HEALTHY_OUTCOMES } from "@/lib/meta-lead-ledger";
 import { GRAPH_VERSION } from "@/lib/meta-graph";
+import { after } from "next/server";
+import { sendAgentEmail } from "@/lib/email";
+import { buildLeadEmail, crmLeadLink } from "@/lib/lead-email";
 import type { LeadFormAnswers } from "@/lib/types";
+
+// Same fallback as app/api/notify/activity/route.ts, so both email paths build
+// links identically.
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://remax-advance-crm.vercel.app";
 
 // Single source of truth lives in lib/meta-graph.ts. Re-exported so existing
 // importers keep working; two independent copies would silently diverge the day
@@ -206,6 +213,8 @@ export interface AssignedAgent {
   id: string;
   phone: string | null;
   full_name: string | null;
+  /** Corporate address from agents.email. Recipient of the backup notification. */
+  email: string | null;
 }
 
 export async function assignRrAgent(db: Db): Promise<AssignedAgent | null> {
@@ -216,10 +225,10 @@ export async function assignRrAgent(db: Db): Promise<AssignedAgent | null> {
   }
   const { data: agent } = await db
     .from("agents")
-    .select("id, phone, full_name")
+    .select("id, phone, full_name, email")
     .eq("id", agentId as string)
     .maybeSingle();
-  return (agent as AssignedAgent) ?? { id: agentId as string, phone: null, full_name: null };
+  return (agent as AssignedAgent) ?? { id: agentId as string, phone: null, full_name: null, email: null };
 }
 
 /**
@@ -248,8 +257,8 @@ export async function resolveDealAgent(
   if (!active) return assignRrAgent(db);
 
   const { data: agent } = await db
-    .from("agents").select("id, phone, full_name").eq("id", existingAgentId).maybeSingle();
-  return (agent as AssignedAgent) ?? { id: existingAgentId, phone: null, full_name: null };
+    .from("agents").select("id, phone, full_name, email").eq("id", existingAgentId).maybeSingle();
+  return (agent as AssignedAgent) ?? { id: existingAgentId, phone: null, full_name: null, email: null };
 }
 
 // ── agent + lead notifications (fire-and-forget) ───────────────────────────────
@@ -351,6 +360,23 @@ export function notifyAgentTemplate(
   }).catch((err) => console.error("[meta-leads] notifyAgentTemplate error:", (err as Error).message));
 }
 
+/**
+ * Alerts the assigned agent on BOTH channels.
+ *
+ * WhatsApp is dispatched first and unawaited, so a slow mail send can never
+ * delay it; the subsequent await also keeps the serverless function alive long
+ * enough for that fetch to actually complete, which nothing did before.
+ *
+ * The email is redundancy: today, if the Meta template fails (expired token,
+ * template rejected, 24h window) the agent learns nothing and the lead goes
+ * cold silently. Neither channel can block intake -- `notifyAgentTemplate`
+ * catches its own rejection and `sendAgentEmail` never throws and returns false
+ * on any failure.
+ *
+ * The recipient comes ONLY from `agent.email`. The lead-supplied email parsed in
+ * processLead must never reach this function; taking an AssignedAgent makes that
+ * structural rather than a rule someone has to remember.
+ */
 export function notifyAgent(
   agent: AssignedAgent,
   leadName: string,
@@ -358,9 +384,46 @@ export function notifyAgent(
   budgetDisplay: string,
   interes: string,
   horario: string,
+  link: string,
 ): void {
-  if (!agent.phone) return;
-  notifyAgentTemplate(agent.phone, leadName, leadPhone, budgetDisplay, interes, horario);
+  // Guarded per channel: an agent with no phone must still get the email, and
+  // an agent with no email must still get the WhatsApp.
+  if (agent.phone) {
+    notifyAgentTemplate(agent.phone, leadName, leadPhone, budgetDisplay, interes, horario);
+  }
+  const to = agent.email;
+  if (!to) return;
+
+  const { subject, text } = buildLeadEmail({
+    agentName: agent.full_name,
+    leadName,
+    leadPhone,
+    budgetDisplay,
+    interes,
+    horario,
+    link,
+  });
+
+  const send = () =>
+    sendAgentEmail({ to, subject, text }).then((ok) => {
+      // Agent id only -- no PII in logs, matching lib/email.ts.
+      if (!ok) console.error("[meta-leads] lead email failed for agent", agent.id);
+    });
+
+  // after() runs the send AFTER the response is sent, without blocking it, and
+  // the platform keeps the function alive until it finishes. Awaiting instead
+  // would put Resend's 8s timeout inside the webhook's 5s budget and inside the
+  // poller's 60s one -- and a poll run that overruns its budget is precisely the
+  // overlapping-invocation condition the advisory lock exists to survive.
+  // A bare unawaited promise is not an option either: the function can be frozen
+  // the moment the handler returns.
+  try {
+    after(send);
+  } catch {
+    // Outside a request scope (a script, a test): nothing will keep us alive, so
+    // fall back to firing it directly.
+    void send();
+  }
 }
 
 export async function notifyLead(leadPhone: string | null, leadFirstName: string): Promise<void> {
@@ -505,24 +568,26 @@ export async function processLead(
   }
 
   // Returns the new deal's id, or null if one already exists in the holding stages.
+  /**
+   * Returns the new deal's id, or null if one already exists in the holding stages.
+   *
+   * Delegates to the SQL function (migration 0033) because the check and the
+   * insert MUST be atomic: as plain client-side check-then-insert, two concurrent
+   * runs for the same contact both passed the check and both created a deal --
+   * and therefore both notified the agent. There is a real instance of that in
+   * production. The function takes a per-contact advisory lock, so callers for
+   * different contacts still run in parallel.
+   */
   const createIntakeDeal = async (contactId: string, agentId: string): Promise<string | null> => {
-    const { data: openDeal } = await db
-      .from("deals").select("id").eq("contact_id", contactId)
-      .in("stage", ["nuevo_sin_contactar", "lead_captured"]).limit(1).maybeSingle();
-    if (openDeal) return null;
-    const { data: newDeal, error: dealErr } = await db.from("deals").insert({
-      contact_id: contactId, agent_id: agentId, stage: "nuevo_sin_contactar", currency: "USD",
-    }).select("id").maybeSingle();
-    if (dealErr) {
-      // 23505 means a concurrent run won the same check-then-insert race. Treat
-      // it as "already exists" rather than as a new deal, so no duplicate CAPI
-      // event and no duplicate agent notification follow.
-      if (dealErr.code !== "23505") {
-        console.error("[meta-leads] intake deal insert failed:", dealErr.message);
-      }
+    const { data, error } = await db.rpc("create_intake_deal", {
+      p_contact_id: contactId,
+      p_agent_id: agentId,
+    });
+    if (error) {
+      console.error("[meta-leads] create_intake_deal failed:", error.message);
       return null;
     }
-    return newDeal?.id ?? null;
+    return (data as string | null) ?? null;
   };
 
   if (existingId) {
@@ -579,7 +644,10 @@ export async function processLead(
       // Notify whoever owns the DEAL. This used to fire only when the agent had
       // just been assigned, so a returning lead on an already-assigned contact
       // created a real new deal that nobody was ever told about.
-      notifyAgent(dealAgent, rawName, phone, budgetDisplay, interes, horario);
+      notifyAgent(
+        dealAgent, rawName, phone, budgetDisplay, interes, horario,
+        crmLeadLink(APP_URL, newDealId, existingId),
+      );
     }
     return finish(
       !!newDealId,
@@ -639,7 +707,10 @@ export async function processLead(
       email: inserted.email, phone: inserted.phone, ctwaClid: null,
     });
   }
-  notifyAgent(agent, rawName, phone, budgetDisplay, interes, horario);
+  notifyAgent(
+    agent, rawName, phone, budgetDisplay, interes, horario,
+    crmLeadLink(APP_URL, newDealId, inserted.id),
+  );
   notifyLead(phone, firstName).catch(() => {});
   return finish(true, inserted.id, "new_contact", agentId, newDealId);
 }
