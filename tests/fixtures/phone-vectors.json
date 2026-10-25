@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "nota": "Vectores compartidos de D01: SQL (phone_key, phone_match_set), busqueda por variantes y E.164 de TypeScript (P02). El sha256 del contenido con CRLF->LF esta fijado en tests/db/phone-key.int.test.ts.",
+  "sql_keys": [
+    { "input": "+18095550101", "key": "18095550101", "match": ["18095550101"] },
+    { "input": "18095550101", "key": "18095550101", "match": ["18095550101"] },
+    { "input": "8095550101", "key": "18095550101", "match": ["18095550101", "8095550101"] },
+    { "input": "809-555-0101", "key": "18095550101", "match": ["18095550101", "8095550101"] },
+    { "input": "(809) 555 0101", "key": "18095550101", "match": ["18095550101", "8095550101"] },
+    { "input": "+34612345678", "key": "34612345678", "match": ["34612345678"] },
+    { "input": "34612345678", "key": "34612345678", "match": ["34612345678"] },
+    { "input": "612345678", "key": null, "match": ["612345678"] },
+    { "input": "[numero de contacto del cliente]", "key": null, "match": [] },
+    { "input": "[número de contacto del cliente]", "key": null, "match": [], "nota": "el marcador real de prod lleva acento" },
+    { "input": "1234567890", "key": null, "match": [] },
+    { "input": "+6455550123", "key": "6455550123", "match": ["6455550123"] },
+    { "input": "5555555555", "key": null, "match": [] },
+    { "input": "", "key": null, "match": [] },
+    { "input": null, "key": null, "match": [] },
+    { "input": "809abc0101", "key": null, "match": [] },
+    { "input": "+4791234567", "key": "4791234567", "match": ["4791234567"] },
+    { "input": "+4520123456", "key": "4520123456", "match": ["4520123456"] },
+    { "input": "+6591234567", "key": "6591234567", "match": ["6591234567"] },
+    { "input": "4791234567", "key": null, "match": ["4791234567"], "nota": "wa_id sin +: resolve_contact da 22023" },
+    { "input": "4792234567", "key": "14792234567", "match": ["14792234567", "4792234567"], "nota": "sin + un numero europeo con forma NANP recibe clave NANP equivocada: por eso Ava manda '+'" }
+  ],
+  "lookups": [
+    { "stored": "+18095550101", "wa_id": "18095550101", "found": true, "by": "exact", "nota": "misma clave" },
+    { "stored": "655501234", "wa_id": "34655501234", "found": true, "by": "variant", "nota": "ES: movil guardado sin prefijo" },
+    { "stored": "+543624123456", "wa_id": "5493624123456", "found": true, "by": "variant", "nota": "AR: Meta manda 549, el contacto guarda 54" },
+    { "stored": "+525512345678", "wa_id": "5215512345678", "found": true, "by": "variant", "nota": "MX: Meta manda 521, el contacto guarda 52" },
+    { "stored": "+6455550123", "wa_id": "16455550123", "found": true, "by": "variant", "nota": "NANP: el contacto guarda el numero sin el 1" },
+    { "stored": "612345678", "wa_id": "12612345678", "found": false, "by": null, "nota": "NO es sufijo-10: 12612345678 no casa con 612345678" },
+    { "stored": "54362154123456", "wa_id": "5493624123456", "found": false, "by": null, "nota": "AR con 15 interno: formato no soportado, no casa" },
+    { "stored": "+14792234567", "wa_id": "4792234567", "found": true, "by": "variant", "nota": "Riesgo N6 conocido: un movil noruego de 8 digitos (+47 9223 4567, enviado como +4792234567) con forma NANP casa por la variante NANP con un numero de EE.UU. (area 479); queda evento 'variant' para revisarlo; se acepta porque la variante NANP es la que cubre los duplicados medidos en H1 y el evento hace visible el caso." }
+  ],
+  "variants": [
+    { "key": "4792234567", "contains": ["14792234567"] }
+  ],
+  "ts_e164": [
+    { "raw": "809 555 0101", "region": "DO", "e164": "+18095550101" },
+    { "raw": "+34612345678", "region": "DO", "e164": "+34612345678" },
+    { "raw": "612345678", "region": "DO", "e164": null },
+    { "raw": "[numero de contacto del cliente]", "region": "DO", "e164": null },
+    { "raw": "1234567890", "region": "DO", "e164": null }
+  ]
+}

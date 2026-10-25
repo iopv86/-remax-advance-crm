@@ -56,3 +56,12 @@ dev-server*.log
 /playwright-report/
 /test-results/
 .env.e2e
+
+# Banco de integracion aislado (pnpm, no lo instala Vercel)
+tests/db/node_modules
+# Snapshots generados del catalogo de prod (D01-P01): el repo es publico y llevan el esquema completo de
+# RLS y ACL de prod. Se regeneran con tests/db/fixtures/build-prod-schema.py; copia local en
+# whatsapp-agentkit/.planning/phases/D01-campana-agente/fixtures-prod/.
+tests/db/fixtures/prod-catalog.json
+tests/db/fixtures/prod-schema.sql
+tests/db/fixtures/contacts-fingerprint.*.prod.json

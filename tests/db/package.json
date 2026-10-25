@@ -1,0 +1,33 @@
+{
+  "name": "advance-crm-db-bench",
+  "private": true,
+  "type": "module",
+  "description": "Banco aislado de integracion (Postgres embebido 17.6). No es un workspace de la raiz: npm y Vercel no lo instalan.",
+  "devDependencies": {
+    "embedded-postgres": "17.6.0-beta.15",
+    "postgres": "3.4.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "@embedded-postgres/windows-x64": "17.6.0-beta.15",
+      "@embedded-postgres/linux-x64": "17.6.0-beta.15",
+      "@embedded-postgres/linux-arm64": "17.6.0-beta.15",
+      "@embedded-postgres/linux-arm": "17.6.0-beta.15",
+      "@embedded-postgres/linux-ia32": "17.6.0-beta.15",
+      "@embedded-postgres/linux-ppc64": "17.6.0-beta.15",
+      "@embedded-postgres/darwin-x64": "17.6.0-beta.15",
+      "@embedded-postgres/darwin-arm64": "17.6.0-beta.15"
+    },
+    "neverBuiltDependencies": [
+      "embedded-postgres",
+      "@embedded-postgres/windows-x64",
+      "@embedded-postgres/linux-x64",
+      "@embedded-postgres/linux-arm64",
+      "@embedded-postgres/linux-arm",
+      "@embedded-postgres/linux-ia32",
+      "@embedded-postgres/linux-ppc64",
+      "@embedded-postgres/darwin-x64",
+      "@embedded-postgres/darwin-arm64"
+    ]
+  }
+}
