@@ -65,3 +65,4 @@ tests/db/node_modules
 tests/db/fixtures/prod-catalog.json
 tests/db/fixtures/prod-schema.sql
 tests/db/fixtures/contacts-fingerprint.*.prod.json
+tests/db/fixtures/agents-fingerprint.*.prod.json

@@ -19,6 +19,7 @@ export const MIGRATIONS = [
   '0035_resolve_contact.sql',
   '0036_agent_lead_notifications.sql',
   '0037_contacts_phone_check.sql',
+  '0038_agents_write_guard.sql',
 ] as const
 
 // Binarios de @embedded-postgres/windows-x64@17.6.0-beta.15 auditados el 2026-10-14 (mismas constantes que

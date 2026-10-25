@@ -297,19 +297,22 @@ def build() -> None:
 
 
 def fingerprint() -> None:
-    """Ejecuta contacts-fingerprint.sql en prod (solo SELECT) y escribe {"fp": ...} en el fichero indicado."""
-    if len(sys.argv) != 3 or sys.argv[2] not in ("pre", "post"):
-        raise SystemExit("uso: fingerprint pre | post")
-    rows = _run(_read_pat(), (HERE / "contacts-fingerprint.sql").read_text(encoding="utf-8"), "fingerprint")
+    """Ejecuta <stem>-fingerprint.sql en prod (solo SELECT) y escribe {"fp": ...} en <stem>-fingerprint.<fase>.prod.json.
+    stem = contacts (por defecto, D01-P01) o agents (0038)."""
+    stems = ("contacts", "agents")
+    if len(sys.argv) not in (3, 4) or sys.argv[2] not in ("pre", "post") or (len(sys.argv) == 4 and sys.argv[3] not in stems):
+        raise SystemExit("uso: fingerprint pre | post [contacts | agents]")
+    stem = sys.argv[3] if len(sys.argv) == 4 else "contacts"
+    rows = _run(_read_pat(), (HERE / f"{stem}-fingerprint.sql").read_text(encoding="utf-8"), "fingerprint")
     if len(rows) != 1 or "fp" not in rows[0]:
         raise SystemExit(f"respuesta inesperada: {len(rows)} filas")
-    target = HERE / f"contacts-fingerprint.{sys.argv[2]}.prod.json"
+    target = HERE / f"{stem}-fingerprint.{sys.argv[2]}.prod.json"
     target.write_text(json.dumps({"fp": rows[0]["fp"]}, indent=1, ensure_ascii=False, sort_keys=True) + "\n",
                       encoding="utf-8", newline="\n")
     fp = rows[0]["fp"]
-    print(f"{target.name}: tablas={sorted(fp['columns'] or {})} funciones={len(fp['functions'] or [])}")
+    print(f"{target.name}: claves={sorted(fp)} funciones={len(fp['functions'] or [])}")
 
 
 if __name__ == "__main__":
     {"extract": extract, "build": build, "fingerprint": fingerprint}.get(
-        sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit("uso: extract | build | fingerprint pre|post"))()
+        sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit("uso: extract | build | fingerprint pre|post [contacts|agents]"))()
