@@ -44,6 +44,8 @@ function clean(v: string | null | undefined, max: number): string {
     .slice(0, max);
 }
 
+export { clean as cleanEmailValue };
+
 /** Deep link to the record. Both routes are real; falls back to the dashboard. */
 export function crmLeadLink(
   appUrl: string,

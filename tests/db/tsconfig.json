@@ -4,6 +4,7 @@
     "noEmit": true,
     "incremental": false,
     "plugins": [],
+    "types": ["node", "next"],
     "paths": { "@/*": ["../../*"] }
   },
   "include": ["**/*.ts"],

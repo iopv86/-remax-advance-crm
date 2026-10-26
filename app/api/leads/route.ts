@@ -1,6 +1,7 @@
 import { timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
+import { toE164, keyFromE164 } from "@/lib/phone";
 
 function verifyApiKey(req: NextRequest): boolean {
   const apiKey = process.env.ADVANCE_CRM_API_KEY;
@@ -57,35 +58,64 @@ export async function POST(req: NextRequest) {
   const lastName = parts.slice(1).join(" ") || null;
 
   const db = adminClient();
+  const sourceDetail = safeSource ?? "external_api";
 
-  // If a phone was supplied, check for an existing contact first.
-  // Never change agent_id on an existing contact — that would steal the lead.
-  if (safePhone) {
-    const { data: existing, error: lookupError } = await db
-      .from("contacts")
-      .select("id")
-      .eq("phone", safePhone)
-      .maybeSingle();
-
-    if (lookupError) {
-      console.error("[POST /api/leads] lookup error:", lookupError.message);
+  // A valid phone goes through resolve_contact (D01, migration 0035): the same
+  // locked find-or-create the poller and Ava use, matching every stored format
+  // and country variant instead of the exact `.eq("phone", ...)` it replaces.
+  // No round-robin here, as before; an existing contact keeps its agent.
+  const e164 = safePhone ? toE164(safePhone) : null;
+  if (e164) {
+    const { data: rows, error } = await db.rpc("resolve_contact", {
+      p_phone: e164,
+      p_key: keyFromE164(e164),
+      p_meta_lead_id: null,
+      p_first_name: firstName || null,
+      p_last_name: lastName,
+      p_source: "social_media",
+      p_assign_rr: false,
+      p_create_without_agent: true,
+    });
+    const r = (rows as { outcome: string; contact_id: string | null }[] | null)?.[0];
+    // 22023 = the RPC rejected the arguments: a client error, so the caller must not retry it as a 500.
+    if (error?.code === "22023") {
+      return NextResponse.json({ error: "invalid phone" }, { status: 422 });
+    }
+    if (error || !r) {
+      console.error("[POST /api/leads] resolve_contact error:", error?.code ?? "no row");
       return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
     }
-
-    if (existing) {
-      // Contact already exists — return its id without mutating agent_id or status.
-      return NextResponse.json({ ok: true, id: existing.id }, { status: 200 });
+    // Two or more candidates by country variant: nothing is created or chosen; the
+    // grouped alert asks a human (contact_match_events).
+    if (r.outcome === "ambiguous") {
+      return NextResponse.json({ ok: false, error: "ambiguous" }, { status: 409 });
     }
+    if (r.outcome === "found" && r.contact_id) {
+      return NextResponse.json({ ok: true, id: r.contact_id }, { status: 200 });
+    }
+    if (r.outcome === "created" && r.contact_id) {
+      // The RPC writes the minimal row; the rest goes by id.
+      const { error: updErr } = await db
+        .from("contacts")
+        .update({ source_detail: sourceDetail, agent_notes: safeNotes ?? null })
+        .eq("id", r.contact_id);
+      if (updErr) console.error("[POST /api/leads] detail update error:", updErr.message);
+      return NextResponse.json({ ok: true, id: r.contact_id }, { status: 201 });
+    }
+    console.error("[POST /api/leads] unexpected resolve_contact outcome:", r.outcome);
+    return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
 
+  // No valid phone: create the contact without one (R8), as before minus the
+  // unvalidated phone text.
   const { data, error } = await db
     .from("contacts")
     .insert({
       first_name: firstName,
       last_name: lastName,
-      phone: safePhone ?? null,
+      phone: null,
       source: "social_media",
-      source_detail: safeSource ?? "external_api",
+      source_detail: sourceDetail,
       agent_notes: safeNotes ?? null,
       lead_status: "new",
     })
@@ -93,21 +123,13 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error) {
-    // 23505 = unique_violation — another request raced us to INSERT.
-    // Retry the lookup and return the winner's id.
-    if (error.code === "23505" && safePhone) {
-      const { data: raceWinner } = await db
-        .from("contacts")
-        .select("id")
-        .eq("phone", safePhone)
-        .maybeSingle();
-      if (raceWinner) {
-        return NextResponse.json({ ok: true, id: raceWinner.id }, { status: 200 });
-      }
-    }
     console.error("[POST /api/leads] Supabase insert error:", error.message);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, id: data.id }, { status: 201 });
+  // A phone was sent but did not validate: the caller learns it was not stored.
+  return NextResponse.json(
+    { ok: true, id: data.id, ...(safePhone ? { phone_invalid: true } : {}) },
+    { status: 201 },
+  );
 }

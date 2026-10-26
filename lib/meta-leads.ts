@@ -5,6 +5,9 @@ import { GRAPH_VERSION } from "@/lib/meta-graph";
 import { after } from "next/server";
 import { sendAgentEmail } from "@/lib/email";
 import { buildLeadEmail, crmLeadLink } from "@/lib/lead-email";
+import { formatBudgetShort, findAnswer } from "@/lib/lead-format";
+import { AGENT_TEMPLATE_NAME, drainAgentNotifications } from "@/lib/agent-notifications";
+import { toE164, keyFromE164 } from "@/lib/phone";
 import type { LeadFormAnswers } from "@/lib/types";
 
 // Same fallback as app/api/notify/activity/route.ts, so both email paths build
@@ -200,6 +203,11 @@ export function parseBudgetRange(raw: string | null): { min: number | null; max:
 const UUID_RE = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
 const E164_RE = /^\+?[1-9]\d{7,14}$/;
 
+/**
+ * @deprecated processLead validates with toE164 (lib/phone.ts) since D01-P02.
+ * Kept only for the negative control in lib/phone.test.ts, which documents that
+ * this check left "809 555 0101" without a phone.
+ */
 export function isValidPhone(phone: string | null): boolean {
   if (!phone) return false;
   if (UUID_RE.test(phone)) return false;
@@ -268,40 +276,11 @@ export async function resolveDealAgent(
 // {{3}} budget, {{4}} preferred contact time, {{5}} lead phone (tappable in
 // WhatsApp). Static "Abrir CRM" URL button (dynamic wa.me buttons are rejected
 // by Meta). Hardcoded stable name; v1 kept as a comment for instant rollback
-// (revert the constant): "ava_nuevo_lead_agente".
-const AGENT_TEMPLATE_NAME = "ava_nuevo_lead_agente_v2";
+// (revert the constant): "ava_nuevo_lead_agente". Single copy, shared with the
+// queue drain: lib/agent-notifications.ts.
 
-/** Compact budget display, e.g. "US$72.5k-80k" / "RD$3.5M" / "No especificado". */
-export function formatBudgetShort(
-  min: number | null | undefined,
-  max: number | null | undefined,
-  currency: string | null | undefined,
-): string {
-  const sym = currency === "DOP" ? "RD$" : "US$";
-  const short = (n: number): string => {
-    if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
-    if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "k";
-    return String(Math.round(n));
-  };
-  const lo = typeof min === "number" && min > 0 ? min : null;
-  const hi = typeof max === "number" && max > 0 ? max : null;
-  if (lo && hi) return `${sym}${short(lo)}-${short(hi)}`;
-  if (lo) return `${sym}${short(lo)}`;
-  if (hi) return `${sym}${short(hi)}`;
-  return "No especificado";
-}
-
-/** First field value whose name contains any keyword (case-insensitive). */
-export function findAnswer(fields: FieldData[], keywords: string[]): string | null {
-  for (const f of fields ?? []) {
-    const name = (f.name ?? "").toLowerCase();
-    if (keywords.some((k) => name.includes(k))) {
-      const v = f.values?.[0]?.trim();
-      if (v) return v;
-    }
-  }
-  return null;
-}
+// Moved to lib/lead-format.ts (no import cycle with lib/agent-notifications.ts).
+export { formatBudgetShort, findAnswer };
 
 /**
  * Notifies the assigned agent about a new lead via an approved Meta template,
@@ -455,10 +434,33 @@ export type ProcessReason =
   | "new_contact"
   | "existing_contact_new_deal"
   | "already_in_pipeline"
-  | "race_winner"
   | "no_agent"
+  // resolve_contact found 2+ candidates by country variant: nothing created, a
+  // human decides (D01 REQ 3). Deliberately NOT in HEALTHY_OUTCOMES.
+  | "ambiguous"
+  // RPC failures. resolve_error and deal_error throw (fail-closed, retried by the
+  // poller); resolve_rejected (22023, bad arguments) does not, since retrying
+  // cannot help. None is healthy, so lead-audit reports them.
+  | "resolve_error"
+  | "resolve_rejected"
+  | "deal_error"
+  // The new contact's details (email, answers, budget, attribution) failed to
+  // save twice: thrown before the deal, so the next pass fills them.
+  | "details_error"
+  // Produced by the pre-D01 insert path; still present in historic ledger rows.
+  | "race_winner"
   | "insert_error"
   | "no_insert";
+
+const RESOLVE_OUTCOMES: ReadonlySet<string> = new Set(["found", "created", "ambiguous", "no_agent"]);
+
+/** One row of public.resolve_contact (migration 0035). */
+interface ResolveRow {
+  outcome: "found" | "created" | "ambiguous" | "no_agent";
+  contact_id: string | null;
+  agent_id: string | null;
+  agent_assigned_now: boolean;
+}
 
 export interface ProcessResult {
   created: boolean;
@@ -470,10 +472,14 @@ export interface ProcessResult {
 }
 
 /**
- * Idempotent: creates a contact (source=lead_form) + intake deal (nuevo_sin_contactar)
- * with a round-robin agent, fires CAPI Lead, notifies. Safe to call repeatedly for the
- * same lead (deduped by phone, then meta_lead_id; intake deal deduped per contact).
- * Used by BOTH the push webhook and the pull poller.
+ * Idempotent: finds or creates the contact with resolve_contact (the same
+ * database function Ava uses), opens the intake deal (nuevo_sin_contactar) with
+ * a round-robin agent, fires CAPI Lead, notifies. Safe to call repeatedly for the
+ * same lead (ledger gate by lead id; resolve_contact by phone key, country
+ * variants and meta_lead_id under an advisory lock; intake deal deduped per
+ * contact). Fail-closed: an RPC error throws after recording the ledger row, so
+ * nothing is created and the poller retries. Used by BOTH the push webhook and
+ * the pull poller.
  */
 export async function processLead(
   db: Db,
@@ -536,7 +542,8 @@ export async function processLead(
   const rawName = pickField(fields, ["full_name", "full name", "name", "nombre", "nombre_completo"]) ?? "";
   const email = pickField(fields, ["email", "correo", "correo_electronico"]);
   const rawPhone = pickField(fields, ["phone_number", "phone", "telefono", "teléfono", "numero", "número"]);
-  const phone = isValidPhone(rawPhone) ? rawPhone : null;
+  // E.164 or nothing (R8): "809 555 0101" is now +18095550101 instead of null.
+  const phone = toE164(rawPhone, "DO");
   const [firstName, ...rest] = rawName.split(" ");
   const lastName = rest.join(" ") || null;
 
@@ -553,164 +560,254 @@ export async function processLead(
   const interes = (formName?.trim() || findAnswer(fields, ["proyecto", "interes", "interés"]) || "No especificado");
   const horario = (findAnswer(fields, ["momento", "horario"]) || "No especificado");
 
-  // Dedup by phone, then meta_lead_id
-  let existingId: string | null = null;
-  let existingAgentId: string | null = null;
-  let existingCtwa: string | null = null;
-  let existingMetaLeadId: string | null = null;
-  if (phone) {
-    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid, meta_lead_id").eq("phone", phone).maybeSingle();
-    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; existingMetaLeadId = data.meta_lead_id; }
+  // One call finds or creates the contact under an advisory lock on the phone
+  // key (migration 0035), the same function Ava uses. It replaces the exact
+  // `.eq("phone", phone)` lookup -- which missed every contact Ava had created
+  // first in another format (7 of the 10 measured form + WhatsApp duplicates) --
+  // the separate round-robin PATCH and the unlocked insert.
+  const { data: resolved, error: resolveErr } = await db.rpc("resolve_contact", {
+    p_phone: phone,
+    p_key: keyFromE164(phone),
+    p_meta_lead_id: lead.id,
+    p_first_name: firstName || null,
+    p_last_name: lastName,
+    p_source: "lead_form",
+    p_assign_rr: true,
+    p_create_without_agent: false,
+  });
+  if (resolveErr) {
+    // 22023 = the RPC rejected the arguments: deterministic, so retrying every
+    // minute would only pin the poller's watermark until its 24h floor drops
+    // leads. The ledger row is not healthy, so lead-audit reports it.
+    if (resolveErr.code === "22023") {
+      console.error("[meta-leads] resolve_contact rejected the arguments of lead", lead.id);
+      return finish(false, null, "resolve_rejected");
+    }
+    // Fail-closed: nothing is created, the ledger keeps the gap, and the throw
+    // pins the poller's watermark so its 15-minute overlap retries the lead.
+    await finish(false, null, "resolve_error");
+    throw new Error(`resolve_contact failed: ${resolveErr.code ?? "unknown"}`);
   }
-  if (!existingId) {
-    const { data } = await db.from("contacts").select("id, agent_id, ctwa_clid, meta_lead_id").eq("meta_lead_id", lead.id).maybeSingle();
-    if (data) { existingId = data.id; existingAgentId = data.agent_id; existingCtwa = data.ctwa_clid; existingMetaLeadId = data.meta_lead_id; }
+  const r = (resolved as ResolveRow[] | null)?.[0];
+  // A closed set: an outcome this code does not know must never fall through as "found".
+  if (!r || !RESOLVE_OUTCOMES.has(r.outcome)) {
+    await finish(false, null, "resolve_error");
+    throw new Error(r ? "resolve_contact returned an unknown outcome" : "resolve_contact returned no row");
   }
+  // The RPC already wrote the contact_match_events row; the grouped alert reports it.
+  if (r.outcome === "ambiguous") return finish(false, null, "ambiguous");
+  // Not healthy on purpose (W6): the poller keeps its watermark and the next pass retries.
+  if (r.outcome === "no_agent" || !r.contact_id || !r.agent_id) return finish(false, r.contact_id, "no_agent");
 
-  // Returns the new deal's id, or null if one already exists in the holding stages.
+  const contactId = r.contact_id;
+  const isNew = r.outcome === "created";
+
   /**
-   * Returns the new deal's id, or null if one already exists in the holding stages.
-   *
-   * Delegates to the SQL function (migration 0033) because the check and the
-   * insert MUST be atomic: as plain client-side check-then-insert, two concurrent
-   * runs for the same contact both passed the check and both created a deal --
-   * and therefore both notified the agent. There is a real instance of that in
-   * production. The function takes a per-contact advisory lock, so callers for
-   * different contacts still run in parallel.
+   * create_intake_deal (migration 0036) checks and inserts atomically under a
+   * per-contact lock and enqueues the agent notification in the same
+   * transaction. null = an intake deal is already open. An RPC error throws: a
+   * deal that failed to open must be retried, not recorded as "already in
+   * pipeline" (which is healthy and would never be looked at again).
    */
-  const createIntakeDeal = async (contactId: string, agentId: string): Promise<string | null> => {
-    const { data, error } = await db.rpc("create_intake_deal", {
-      p_contact_id: contactId,
-      p_agent_id: agentId,
-    });
+  const createIntakeDeal = async (agentId: string): Promise<string | null> => {
+    const { data, error } = await db.rpc("create_intake_deal", { p_contact_id: contactId, p_agent_id: agentId });
     if (error) {
-      console.error("[meta-leads] create_intake_deal failed:", error.message);
-      return null;
+      await finish(false, contactId, "deal_error", agentId);
+      throw new Error(`create_intake_deal failed: ${error.code ?? "unknown"}`);
     }
     return (data as string | null) ?? null;
   };
 
-  if (existingId) {
-    let agent: AssignedAgent | null = null;
-    let agentId = existingAgentId;
-    if (!agentId) {
-      agent = await assignRrAgent(db);
-      if (!agent) return finish(false, existingId, "no_agent");
-      agentId = agent.id;
-      await db.from("contacts").update({ agent_id: agentId, assigned_at: new Date().toISOString() }).eq("id", existingId);
-    }
-    // Claim the lead id for a contact that arrived by some other route (manual
-    // entry, import, an earlier campaign). Without this the contact stays
-    // invisible to any reconciliation keyed on meta_lead_id -- which is how two
-    // correctly-ingested leads were mistaken for lost ones. Guarded on IS NULL,
-    // so it is race-safe, idempotent, and cannot overwrite a first-touch value.
-    if (existingMetaLeadId == null) {
-      const { error: claimErr } = await db
-        .from("contacts").update({ meta_lead_id: lead.id })
-        .eq("id", existingId).is("meta_lead_id", null);
-      if (claimErr) console.error("[meta-leads] meta_lead_id claim failed:", claimErr.message);
-    }
-    // Capture form answers if we have custom ones and the contact has none yet
-    // (never clobber a richer manual edit).
-    if (hasCustomAnswers(fields)) {
-      const { data: cur } = await db.from("contacts").select("lead_form_answers").eq("id", existingId).maybeSingle();
-      if (cur && cur.lead_form_answers == null) {
-        await db.from("contacts").update({ lead_form_answers: leadFormAnswers }).eq("id", existingId);
-      }
-    }
-    // Backfill campaign attribution only if the contact was never attributed
-    // (both id columns null). Preserves first-touch; skips the Graph call otherwise.
-    if (lead.campaign_id || lead.ad_id) {
-      const { data: cur } = await db
-        .from("contacts").select("meta_campaign_id, meta_ad_id").eq("id", existingId).maybeSingle();
-      if (cur && cur.meta_campaign_id == null && cur.meta_ad_id == null) {
-        const attr = await fetchCampaignAttribution(lead, process.env.META_ACCESS_TOKEN ?? "", formName);
-        await db.from("contacts").update(attributionColumns(attr)).eq("id", existingId);
-      }
-    }
-    // Policy C: the CONTACT keeps its owner, but the new intake DEAL goes to the
-    // rotation when that owner is not an active round-robin participant.
-    // Measured reason: two paid campaign leads landed on the admin because their
-    // phone matched a contact imported in April, and sat unworked in a tray
-    // nobody reads -- which is why both rotation agents said "not mine".
-    const dealAgent = agent ?? (await resolveDealAgent(db, agentId));
-    if (!dealAgent) return finish(false, existingId, "no_agent");
-
-    const newDealId = await createIntakeDeal(existingId, dealAgent.id);
-    if (newDealId) {
-      await enqueueCapiEvent(db, {
-        stage: "lead_captured", dealId: newDealId, contactId: existingId, email, phone, ctwaClid: existingCtwa,
-      });
-      // Notify whoever owns the DEAL. This used to fire only when the agent had
-      // just been assigned, so a returning lead on an already-assigned contact
-      // created a real new deal that nobody was ever told about.
-      notifyAgent(
-        dealAgent, rawName, phone, budgetDisplay, interes, horario,
-        crmLeadLink(APP_URL, newDealId, existingId),
-      );
-    }
-    return finish(
-      !!newDealId,
-      existingId,
-      newDealId ? "existing_contact_new_deal" : "already_in_pipeline",
-      dealAgent.id,
-      newDealId,
-    );
-  }
-
-  // New contact
-  const agent = await assignRrAgent(db);
-  if (!agent) return finish(false, null, "no_agent");
-  const agentId = agent.id;
-
-  // De-conflated, enriched Meta attribution (IDs always; names best-effort).
-  const attr = await fetchCampaignAttribution(lead, process.env.META_ACCESS_TOKEN ?? "", formName);
-
-  const { data: inserted, error: insertErr } = await db
-    .from("contacts")
-    .insert({
-      first_name: firstName || "Lead",
-      last_name: lastName,
+  let ctwaClid: string | null = null;
+  if (isNew) {
+    // resolve_contact wrote the minimal row (phones, name, source, meta_lead_id,
+    // agent); the rest of what the old insert carried is written here, by id.
+    const attr = await fetchCampaignAttribution(lead, process.env.META_ACCESS_TOKEN ?? "", formName);
+    const details = {
       email: email || null,
-      phone: phone || null,
-      whatsapp_number: phone || null,
-      source: "lead_form",
-      meta_lead_id: lead.id,
-      ...attributionColumns(attr),
-      agent_id: agentId,
-      assigned_at: new Date().toISOString(),
       lead_form_answers: leadFormAnswers,
+      ...attributionColumns(attr),
       ...(budget ? { budget_min: budget.min, budget_max: budget.max, budget_currency: budget.currency } : {}),
-    })
-    .select("id, email, phone")
-    .maybeSingle();
-
-  if (insertErr) {
-    if (insertErr.code === "23505") {
-      // race: another path won — find winner and ensure a deal exists
-      const { data: winner } = await db.from("contacts").select("id").eq("meta_lead_id", lead.id).maybeSingle();
-      if (winner) {
-        const raceDealId = await createIntakeDeal(winner.id, agentId);
-        return finish(false, winner.id, "race_winner", agentId, raceDealId);
-      }
+    };
+    let { error: updErr } = await db.from("contacts").update(details).eq("id", contactId);
+    if (updErr) ({ error: updErr } = await db.from("contacts").update(details).eq("id", contactId));
+    if (updErr) {
+      // Not healthy and thrown BEFORE the deal: the next pass finds the contact
+      // and fills what is missing (below), and the agent's notice carries it.
+      await finish(false, contactId, "details_error", r.agent_id);
+      throw new Error(`contact details update failed: ${updErr.code ?? "unknown"}`);
     }
-    console.error("[meta-leads] insert error for lead", lead.id, ":", insertErr.message);
-    return finish(false, null, "insert_error", agentId);
-  }
-  if (!inserted) return finish(false, null, "no_insert", agentId);
-
-  const newDealId = await createIntakeDeal(inserted.id, agentId);
-  if (newDealId) {
-    // New lead-form contact: never CTWA-sourced, so no ctwa_clid enrichment.
-    await enqueueCapiEvent(db, {
-      stage: "lead_captured", dealId: newDealId, contactId: inserted.id,
-      email: inserted.email, phone: inserted.phone, ctwaClid: null,
+  } else {
+    ctwaClid = await enrichExistingContact(db, contactId, lead, {
+      email, budget, formName: formName?.trim() || null, leadFormAnswers,
     });
   }
-  notifyAgent(
-    agent, rawName, phone, budgetDisplay, interes, horario,
-    crmLeadLink(APP_URL, newDealId, inserted.id),
-  );
-  notifyLead(phone, firstName).catch(() => {});
-  return finish(true, inserted.id, "new_contact", agentId, newDealId);
+
+  // D13: a client with an intake deal already open gets a note on that deal,
+  // never a second deal or template. Checked BEFORE Policy C so a returning
+  // client does not spend a round-robin turn for nothing; create_intake_deal
+  // still decides atomically if this read races with another path.
+  let openDeal = false;
+  if (!isNew) {
+    const { data: open, error: openErr } = await db
+      .from("deals").select("id")
+      .eq("contact_id", contactId).in("stage", ["nuevo_sin_contactar", "lead_captured"])
+      .limit(1).maybeSingle();
+    // On a failed read create_intake_deal still decides; the cost is one round-robin turn.
+    if (openErr) console.error("[meta-leads] open deal read failed for lead", lead.id, ":", openErr.message);
+    openDeal = !!open;
+  }
+
+  let dealAgent: AssignedAgent | null = null;
+  let newDealId: string | null = null;
+  if (!openDeal) {
+    // An agent resolve_contact just assigned owns the deal. An existing owner
+    // goes through Policy C: the CONTACT keeps its owner, but the new intake
+    // DEAL goes to the rotation when that owner is not an active round-robin
+    // participant (two paid leads once sat unworked on the admin's import).
+    dealAgent = isNew || r.agent_assigned_now ? await readAgent(db, r.agent_id) : await resolveDealAgent(db, r.agent_id);
+    if (!dealAgent) return finish(false, contactId, "no_agent");
+    newDealId = await createIntakeDeal(dealAgent.id);
+  }
+
+  if (newDealId && dealAgent) {
+    await enqueueCapiEvent(db, {
+      stage: "lead_captured", dealId: newDealId, contactId, email, phone, ctwaClid,
+    });
+    // Notify whoever owns the DEAL, including a returning lead on an
+    // already-assigned contact (that used to create a deal nobody was told about).
+    await notifyDealAgent(db, newDealId, dealAgent, {
+      leadName: rawName, leadPhone: phone, budgetDisplay, interes, horario,
+      link: crmLeadLink(APP_URL, newDealId, contactId),
+    });
+  } else if (!isNew) {
+    const { error: noteErr } = await db.rpc("record_campaign_return", {
+      p_contact_id: contactId,
+      p_note: `Lleno el formulario: ${formName?.trim() || "sin nombre de formulario"}`,
+    });
+    if (noteErr) console.error("[meta-leads] record_campaign_return failed for lead", lead.id, ":", noteErr.message);
+    // The contact had no agent and resolve_contact just gave it one: the
+    // cascade trigger moved its open deal to that agent, who has not been told.
+    // A CRM bell only (D19), never a template.
+    if (r.agent_assigned_now) {
+      const { error: bellErr } = await db.rpc("notify_agent_client_returned", { p_contact_id: contactId });
+      if (bellErr) console.error("[meta-leads] notify_agent_client_returned failed for lead", lead.id, ":", bellErr.message);
+    }
+  }
+
+  // Only a brand-new contact gets the lead template: a found contact may already
+  // be talking to Ava, and a template on top of that conversation is noise.
+  if (isNew) notifyLead(phone, firstName).catch(() => {});
+
+  const reason: ProcessReason = isNew ? "new_contact" : newDealId ? "existing_contact_new_deal" : "already_in_pipeline";
+  return finish(isNew || !!newDealId, contactId, reason, dealAgent?.id ?? r.agent_id, newDealId);
+}
+
+async function readAgent(db: Db, id: string): Promise<AssignedAgent> {
+  const { data, error } = await db.from("agents").select("id, phone, full_name, email").eq("id", id).maybeSingle();
+  // The queue drain re-reads the agent; only the previous path ('skipped') depends on this row.
+  if (error) console.error("[meta-leads] agent read failed for agent", id, ":", error.message);
+  return (data as AssignedAgent) ?? { id, phone: null, full_name: null, email: null };
+}
+
+/**
+ * A lead that lands on an existing contact (Ava's, an import, an earlier form).
+ * Fills only what the contact does NOT have yet, never overwriting: the lead id,
+ * the form answers, the email, the budget, the form name and, if the contact was
+ * never attributed, the campaign attribution. The queued agent notice is built
+ * from the contact row, so this is also what puts the current form's interest
+ * and budget in it (the previous path passed them straight from the lead).
+ * Returns the contact's ctwa_clid for the CAPI event.
+ */
+async function enrichExistingContact(
+  db: Db,
+  contactId: string,
+  lead: LeadFormData,
+  f: {
+    email: string | null;
+    budget: ReturnType<typeof parseBudgetRange>;
+    formName: string | null;
+    leadFormAnswers: LeadFormAnswers;
+  },
+): Promise<string | null> {
+  const { data: cur, error: curErr } = await db
+    .from("contacts")
+    .select("ctwa_clid, meta_lead_id, lead_form_answers, meta_campaign_id, meta_ad_id, email, budget_min, budget_max, meta_form_name")
+    .eq("id", contactId)
+    .maybeSingle();
+  if (curErr || !cur) {
+    console.error("[meta-leads] existing contact read failed for lead", lead.id, ":", curErr?.message ?? "no row");
+    return null;
+  }
+  // Claim the lead id for a contact that arrived by some other route. Without
+  // this the contact stays invisible to any reconciliation keyed on meta_lead_id
+  // -- which is how two correctly-ingested leads were mistaken for lost ones.
+  // Guarded on IS NULL, so it is race-safe and cannot overwrite a first-touch value.
+  if (cur.meta_lead_id == null) {
+    const { error } = await db
+      .from("contacts").update({ meta_lead_id: lead.id })
+      .eq("id", contactId).is("meta_lead_id", null);
+    if (error) console.error("[meta-leads] meta_lead_id claim failed:", error.message);
+  }
+  const fill: Record<string, unknown> = {};
+  if (cur.lead_form_answers == null) fill.lead_form_answers = f.leadFormAnswers;
+  if (cur.email == null && f.email) fill.email = f.email;
+  if (cur.budget_min == null && cur.budget_max == null && f.budget) {
+    Object.assign(fill, { budget_min: f.budget.min, budget_max: f.budget.max, budget_currency: f.budget.currency });
+  }
+  // Backfill campaign attribution only if the contact was never attributed
+  // (both id columns null). Preserves first-touch; skips the Graph call otherwise.
+  if ((lead.campaign_id || lead.ad_id) && cur.meta_campaign_id == null && cur.meta_ad_id == null) {
+    Object.assign(fill, attributionColumns(await fetchCampaignAttribution(lead, process.env.META_ACCESS_TOKEN ?? "", f.formName)));
+  }
+  if (cur.meta_form_name == null && f.formName) fill.meta_form_name = f.formName;
+  if (Object.keys(fill).length > 0) {
+    const { error } = await db.from("contacts").update(fill).eq("id", contactId);
+    if (error) console.error("[meta-leads] existing contact fill failed for lead", lead.id, ":", error.message);
+  }
+  return (cur.ctwa_clid as string | null) ?? null;
+}
+
+interface AgentNoticeFields {
+  leadName: string;
+  leadPhone: string | null;
+  budgetDisplay: string;
+  interes: string;
+  horario: string;
+  link: string;
+}
+
+/**
+ * Exactly one sender per deal (D12) across the switch-over: the status of the
+ * deal's agent_lead_notifications row decides. 'skipped' (the queue flag was
+ * off when the deal was created) -> the previous path, notifyAgent. Anything
+ * else -> ONLY the queue drain: 'pending', but also 'sending'/'sent' if the
+ * cron claimed the row in the meantime, a missing row or a failed read. Coding
+ * it as "pending drains, everything else uses notifyAgent" would double-send
+ * whenever the cron won that race.
+ */
+async function notifyDealAgent(db: Db, dealId: string, agent: AssignedAgent, f: AgentNoticeFields): Promise<void> {
+  const read = () => db.from("agent_lead_notifications").select("status").eq("deal_id", dealId).maybeSingle();
+  // Retried once: with the flag off every row is 'skipped', and a failed read would
+  // send it to the drain, which never claims 'skipped' (the notice would be lost).
+  let { data: row, error } = await read();
+  if (error) ({ data: row, error } = await read());
+  if (error) console.error("[meta-leads] notification status read failed twice for deal", dealId, ":", error.message);
+  if (!error && row?.status === "skipped") {
+    notifyAgent(agent, f.leadName, f.leadPhone, f.budgetDisplay, f.interes, f.horario, f.link);
+    return;
+  }
+  // after() keeps the function alive past the response without putting Meta's
+  // and Resend's timeouts inside the webhook's or the poller's budget. A row it
+  // does not reach is sent by the every-minute cron.
+  const drain = () =>
+    drainAgentNotifications(db, { limit: 5 })
+      .then((res) => { if (res.error) console.error("[meta-leads] notification drain:", res.error); })
+      .catch((e) => console.error("[meta-leads] notification drain threw:", (e as Error).message));
+  try {
+    after(drain);
+  } catch {
+    // Outside a request scope (a script, a test): nothing keeps us alive, so run it now.
+    await drain();
+  }
 }

@@ -66,3 +66,5 @@ tests/db/fixtures/prod-catalog.json
 tests/db/fixtures/prod-schema.sql
 tests/db/fixtures/contacts-fingerprint.*.prod.json
 tests/db/fixtures/agents-fingerprint.*.prod.json
+# Auditoria local de 2026-05 con valores de secretos (D01-P02): nunca al repo publico.
+SECURITY-AUDIT-2026-05-08.md

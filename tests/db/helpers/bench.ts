@@ -82,6 +82,8 @@ export interface Bench {
 export interface StartOptions {
   /** Migraciones que NO se cargan (p.ej. 0037 para probar el CHECK sobre filas previas). */
   without?: readonly string[]
+  /** D01-P02: carga meta_lead_ingest y capi_outbox (fixtures/p02-ingest-tables.sql) antes de las migraciones. */
+  ingestTables?: boolean
 }
 
 export async function applyMigration(sql: Sql, file: string): Promise<void> {
@@ -130,6 +132,7 @@ export async function startBench(opts: StartOptions = {}): Promise<Bench> {
   }
   try {
     await sql.unsafe(readSql(fixturePath('prod-schema.sql')))
+    if (opts.ingestTables) await sql.unsafe(readSql(fixturePath('p02-ingest-tables.sql')))
     for (const f of MIGRATIONS) {
       if (opts.without?.includes(f)) {
         skipped.push(f)
