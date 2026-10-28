@@ -1,0 +1,67 @@
+{
+ "fp": {
+  "acl_full": [
+   "function mark_project_dispatched(uuid,timestamp with time zone):authenticated:postgres:EXECUTE:false",
+   "function mark_project_dispatched(uuid,timestamp with time zone):postgres:postgres:EXECUTE:false",
+   "function mark_project_dispatched(uuid,timestamp with time zone):service_role:postgres:EXECUTE:false",
+   "table projects:authenticated:postgres:SELECT:false",
+   "table projects:postgres:postgres:DELETE:false",
+   "table projects:postgres:postgres:INSERT:false",
+   "table projects:postgres:postgres:MAINTAIN:false",
+   "table projects:postgres:postgres:REFERENCES:false",
+   "table projects:postgres:postgres:SELECT:false",
+   "table projects:postgres:postgres:TRIGGER:false",
+   "table projects:postgres:postgres:TRUNCATE:false",
+   "table projects:postgres:postgres:UPDATE:false",
+   "table projects:service_role:postgres:DELETE:false",
+   "table projects:service_role:postgres:INSERT:false",
+   "table projects:service_role:postgres:MAINTAIN:false",
+   "table projects:service_role:postgres:REFERENCES:false",
+   "table projects:service_role:postgres:SELECT:false",
+   "table projects:service_role:postgres:TRIGGER:false",
+   "table projects:service_role:postgres:TRUNCATE:false",
+   "table projects:service_role:postgres:UPDATE:false"
+  ],
+  "functions": [
+   [
+    "mark_project_dispatched(uuid,timestamp with time zone)",
+    "p_id uuid, p_dispatched_at timestamp with time zone DEFAULT now()",
+    "void",
+    "0a23fcb82e5290a22624194a44e032d1",
+    "{search_path=public}",
+    true,
+    "v",
+    "postgres",
+    [
+     "authenticated:EXECUTE",
+     "service_role:EXECUTE"
+    ]
+   ]
+  ],
+  "policies": [
+   [
+    "projects_select_all",
+    "PERMISSIVE",
+    "{authenticated}",
+    "SELECT",
+    "true",
+    null
+   ]
+  ],
+  "relacl": [
+   "authenticated:SELECT",
+   "service_role:DELETE",
+   "service_role:INSERT",
+   "service_role:MAINTAIN",
+   "service_role:REFERENCES",
+   "service_role:SELECT",
+   "service_role:TRIGGER",
+   "service_role:TRUNCATE",
+   "service_role:UPDATE"
+  ],
+  "rls": [
+   true,
+   false
+  ]
+ }
+}

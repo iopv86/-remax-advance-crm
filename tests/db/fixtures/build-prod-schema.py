@@ -298,10 +298,10 @@ def build() -> None:
 
 def fingerprint() -> None:
     """Ejecuta <stem>-fingerprint.sql en prod (solo SELECT) y escribe {"fp": ...} en <stem>-fingerprint.<fase>.prod.json.
-    stem = contacts (por defecto, D01-P01) o agents (0038)."""
-    stems = ("contacts", "agents")
+    stem = contacts (por defecto, D01-P01), agents (0038) o projects-dispatch (0039)."""
+    stems = ("contacts", "agents", "projects-dispatch")
     if len(sys.argv) not in (3, 4) or sys.argv[2] not in ("pre", "post") or (len(sys.argv) == 4 and sys.argv[3] not in stems):
-        raise SystemExit("uso: fingerprint pre | post [contacts | agents]")
+        raise SystemExit("uso: fingerprint pre | post [contacts | agents | projects-dispatch]")
     stem = sys.argv[3] if len(sys.argv) == 4 else "contacts"
     rows = _run(_read_pat(), (HERE / f"{stem}-fingerprint.sql").read_text(encoding="utf-8"), "fingerprint")
     if len(rows) != 1 or "fp" not in rows[0]:
@@ -315,4 +315,4 @@ def fingerprint() -> None:
 
 if __name__ == "__main__":
     {"extract": extract, "build": build, "fingerprint": fingerprint}.get(
-        sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit("uso: extract | build | fingerprint pre|post [contacts|agents]"))()
+        sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit("uso: extract | build | fingerprint pre|post [contacts|agents|projects-dispatch]"))()

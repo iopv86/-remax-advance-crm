@@ -1,5 +1,5 @@
 // Banco aislado de D01-P01: Postgres embebido 17.6 (= prod) con el esquema REAL de prod
-// (tests/db/fixtures/prod-schema.sql, generado) y despues las migraciones 0034-0037 que existan.
+// (tests/db/fixtures/prod-schema.sql, generado) y despues las migraciones de MIGRATIONS.
 // Opt-in: PG_INTEGRATION=1 npm run test:int. Las dependencias (embedded-postgres, postgres) viven en
 // tests/db/node_modules y NO en la raiz: por eso todo import de ellas es dinamico o `import type`.
 import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs'
@@ -20,6 +20,7 @@ export const MIGRATIONS = [
   '0036_agent_lead_notifications.sql',
   '0037_contacts_phone_check.sql',
   '0038_agents_write_guard.sql',
+  '0039_mark_project_dispatched_service_only.sql',
 ] as const
 
 // Binarios de @embedded-postgres/windows-x64@17.6.0-beta.15 auditados el 2026-10-14 (mismas constantes que
@@ -84,6 +85,8 @@ export interface StartOptions {
   without?: readonly string[]
   /** D01-P02: carga meta_lead_ingest y capi_outbox (fixtures/p02-ingest-tables.sql) antes de las migraciones. */
   ingestTables?: boolean
+  /** E01: carga public.projects y mark_project_dispatched con el ACL de prod previo a 0039 (fixtures/projects-dispatch.pre.sql), antes de aplicar las migraciones. */
+  projectsDispatch?: boolean
 }
 
 export async function applyMigration(sql: Sql, file: string): Promise<void> {
@@ -133,6 +136,7 @@ export async function startBench(opts: StartOptions = {}): Promise<Bench> {
   try {
     await sql.unsafe(readSql(fixturePath('prod-schema.sql')))
     if (opts.ingestTables) await sql.unsafe(readSql(fixturePath('p02-ingest-tables.sql')))
+    if (opts.projectsDispatch) await sql.unsafe(readSql(fixturePath('projects-dispatch.pre.sql')))
     for (const f of MIGRATIONS) {
       if (opts.without?.includes(f)) {
         skipped.push(f)
