@@ -87,6 +87,8 @@ export interface StartOptions {
   ingestTables?: boolean
   /** E01: carga public.projects y mark_project_dispatched con el ACL de prod previo a 0039 (fixtures/projects-dispatch.pre.sql), antes de aplicar las migraciones. */
   projectsDispatch?: boolean
+  /** D01-P04: increment_follow_up_count de prod y las 8 tablas hijas que faltan (fixtures/p04-pre.sql), antes de las migraciones. */
+  p04?: boolean
 }
 
 export async function applyMigration(sql: Sql, file: string): Promise<void> {
@@ -137,6 +139,7 @@ export async function startBench(opts: StartOptions = {}): Promise<Bench> {
     await sql.unsafe(readSql(fixturePath('prod-schema.sql')))
     if (opts.ingestTables) await sql.unsafe(readSql(fixturePath('p02-ingest-tables.sql')))
     if (opts.projectsDispatch) await sql.unsafe(readSql(fixturePath('projects-dispatch.pre.sql')))
+    if (opts.p04) await sql.unsafe(readSql(fixturePath('p04-pre.sql')))
     for (const f of MIGRATIONS) {
       if (opts.without?.includes(f)) {
         skipped.push(f)

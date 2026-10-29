@@ -700,7 +700,14 @@ function TabPerfil({
 
 // ── TabIntegraciones ─────────────────────────────────
 
-type ImportResult = { imported: number; skipped: number; failed: number; total: number } | null;
+type ImportResult = {
+  imported: number;
+  skipped: number;
+  failed: number;
+  total: number;
+  invalidPhone?: number;
+  invalidPhoneRows?: number[];
+} | null;
 
 // ── TabImportar ──────────────────────────────────────
 
@@ -709,6 +716,7 @@ function TabImportar() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState<ImportResult>(null);
   const [importError, setImportError] = useState<string | null>(null);
+  const invalidRows = importResult?.invalidPhoneRows ?? [];
 
   async function handleImport() {
     if (!csvFile) return;
@@ -799,6 +807,9 @@ function TabImportar() {
                 { label: "Importados", value: importResult.imported, color: "#34d399" },
                 { label: "Duplicados", value: importResult.skipped, color: "var(--muted-foreground)" },
                 ...(importResult.failed > 0 ? [{ label: "Fallidos", value: importResult.failed, color: "#f87171" }] : []),
+                ...((importResult.invalidPhone ?? 0) > 0
+                  ? [{ label: "Teléfono inválido", value: importResult.invalidPhone ?? 0, color: "#f87171" }]
+                  : []),
                 { label: "Total", value: importResult.total, color: "var(--foreground)" },
               ].map(({ label, value, color }) => (
                 <div key={label} className="text-center">
@@ -807,6 +818,14 @@ function TabImportar() {
                 </div>
               ))}
             </div>
+          )}
+
+          {invalidRows.length > 0 && (
+            <p className="text-sm" style={{ color: "#f87171" }}>
+              No se importaron por teléfono inválido las filas {invalidRows.join(", ")}
+              {(importResult?.invalidPhone ?? 0) > invalidRows.length ? " y otras" : ""}. Corrige el teléfono en el
+              CSV y vuelve a importarlas.
+            </p>
           )}
 
           {importError && (

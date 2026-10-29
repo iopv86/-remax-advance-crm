@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { friendlyContactError } from "@/lib/contact-errors";
 import type { Contact } from "@/lib/types";
 import {
   Field,
@@ -198,7 +199,9 @@ export function ContactEditForm({
         .select("id")
         .single();
       if (error || !inserted) {
-        toast.error("Error al crear: " + (error?.message ?? "desconocido"));
+        // Only the SQLSTATE goes to the console: the message can carry the phone or the lead id.
+        console.error("contact create failed", { code: error?.code ?? null });
+        toast.error(friendlyContactError(error));
         setSaving(false);
         return;
       }
@@ -214,7 +217,8 @@ export function ContactEditForm({
     if (privileged && form.agent_id) payload.agent_id = form.agent_id;
     const { error } = await supabase.from("contacts").update(payload).eq("id", contact!.id);
     if (error) {
-      toast.error("Error al guardar: " + error.message);
+      console.error("contact update failed", { code: error.code ?? null });
+      toast.error(friendlyContactError(error));
       setSaving(false);
       return;
     }
