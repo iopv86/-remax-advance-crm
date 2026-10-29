@@ -248,7 +248,7 @@ describe.skipIf(!RUN)('mark_project_dispatched (0039): banco G con la migracion,
       })
     })
 
-    it.skipIf(!existsSync(POST))('G tiene la huella de prod tras aplicar 0039 (projects-dispatch-fingerprint.post.prod.json)', async () => {
+    it('G tiene la huella de prod tras aplicar 0039 (projects-dispatch-fingerprint.post.prod.json)', async () => {
       expect(await fingerprint(G)).toEqual(fromFile(POST))
     })
   })
